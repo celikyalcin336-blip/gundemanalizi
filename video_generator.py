@@ -350,8 +350,16 @@ def download_social_video(url: str, output_path: str) -> str:
             if r_fx.status_code == 200:
                 data = r_fx.json()
                 videos = ((data.get("tweet") or {}).get("media") or {}).get("videos") or []
-                if videos and videos[0].get("url"):
-                    return _stream_download(videos[0]["url"], output_path)
+                if videos:
+                    v0 = videos[0]
+                    best_mp4 = v0.get("url")
+                    # Render 0.1 CPU'da çok hızlı işlenmesi için varsa orta (480p-720p) mp4 formatını seç
+                    for fmt in (v0.get("formats") or []):
+                        if fmt.get("container") == "mp4" and 400000 <= (fmt.get("bitrate") or 0) <= 1500000:
+                            best_mp4 = fmt.get("url")
+                            break
+                    if best_mp4:
+                        return _stream_download(best_mp4, output_path)
         except Exception:
             pass
 
@@ -394,86 +402,86 @@ def brand_raw_video(
     import imageio_ffmpeg
     print(f"\n🔥 Ultra-Hızlı FFmpeg ile Tam Ekran Logolanıyor: {title[:55]}...")
 
-    VW_OUT, VH_OUT = 720, 1280
+    VW_OUT, VH_OUT = 540, 960
 
-    font_brand = get_font(FONT_BOLD, 22)
-    font_sub = get_font(FONT_REGULAR, 14)
-    font_badge = get_font(FONT_BOLD, 16)
-    font_title = get_font(FONT_BOLD, 26)
-    font_footer = get_font(FONT_BOLD, 17)
+    font_brand = get_font(FONT_BOLD, 17)
+    font_sub = get_font(FONT_REGULAR, 11)
+    font_badge = get_font(FONT_BOLD, 12)
+    font_title = get_font(FONT_BOLD, 20)
+    font_footer = get_font(FONT_BOLD, 13)
 
-    # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (Sadece 1 kare = ~1 MB RAM!)
+    # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (Sadece 1 kare = ~0.5 MB RAM!)
     overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
 
-    lines = wrap_text(title, font_title, VW_OUT - 56, odraw)[:3]
-    top_grad_h = 115 + len(lines) * 34 + 25
+    lines = wrap_text(title, font_title, VW_OUT - 42, odraw)[:3]
+    top_grad_h = 86 + len(lines) * 26 + 20
 
     for y in range(top_grad_h):
         ratio = 1.0 - (y / top_grad_h)
         alpha = int(210 * (ratio ** 1.3))
         odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
-    for y in range(VH_OUT - 80, VH_OUT):
-        ratio = (y - (VH_OUT - 80)) / 80.0
+    for y in range(VH_OUT - 60, VH_OUT):
+        ratio = (y - (VH_OUT - 60)) / 60.0
         alpha = int(190 * (ratio ** 1.2))
         odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
     logo_path = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(logo_path):
         l_raw = Image.open(logo_path).convert("RGBA")
-        ls = l_raw.resize((48, 48), Image.Resampling.LANCZOS)
-        m1 = Image.new("L", (48, 48), 0)
-        ImageDraw.Draw(m1).ellipse((0, 0, 48, 48), fill=255)
-        overlay.paste(ls, (24, 26), mask=m1)
-        odraw.ellipse((22, 24, 74, 76), outline=(220, 38, 38, 255), width=2)
+        ls = l_raw.resize((36, 36), Image.Resampling.LANCZOS)
+        m1 = Image.new("L", (36, 36), 0)
+        ImageDraw.Draw(m1).ellipse((0, 0, 36, 36), fill=255)
+        overlay.paste(ls, (18, 20), mask=m1)
+        odraw.ellipse((16, 18, 56, 58), outline=(220, 38, 38, 255), width=2)
 
-    odraw.text((84, 28), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
-    odraw.text((84, 54), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
+    odraw.text((64, 21), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
+    odraw.text((64, 41), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
 
     cat_label = f"● {category.upper()}"
     cb = odraw.textbbox((0, 0), cat_label, font=font_badge)
-    bw = (cb[2] - cb[0]) + 24
-    odraw.rounded_rectangle([VW_OUT - bw - 24, 30, VW_OUT - 24, 66], radius=8, fill=(220, 38, 38, 240))
-    odraw.text((VW_OUT - bw - 12, 38), cat_label, fill=(255, 255, 255, 255), font=font_badge)
+    bw = (cb[2] - cb[0]) + 18
+    odraw.rounded_rectangle([VW_OUT - bw - 18, 22, VW_OUT - 18, 50], radius=6, fill=(220, 38, 38, 240))
+    odraw.text((VW_OUT - bw - 9, 28), cat_label, fill=(255, 255, 255, 255), font=font_badge)
 
-    ty = 88
+    ty = 66
     for idx, line in enumerate(lines):
         col = (255, 255, 255, 255) if idx == 0 else (254, 240, 138, 255)
-        odraw.text((28, ty + 2), line, fill=(0, 0, 0, 220), font=font_title)
-        odraw.text((26, ty), line, fill=col, font=font_title)
-        ty += 34
+        odraw.text((21, ty + 2), line, fill=(0, 0, 0, 220), font=font_title)
+        odraw.text((20, ty), line, fill=col, font=font_title)
+        ty += 26
 
     # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
-    # 1. Videonun tam orta-alt kısmına (kesilip çalınamayacak bölgeye: y=940) yarı saydam logo + @gundemanalizi rozeti
-    wm_y = 935
-    wm_box_w = 236
+    # 1. Videonun tam orta-alt kısmına (kesilip çalınamayacak bölgeye: y=700) yarı saydam logo + @gundemanalizi rozeti
+    wm_y = 700
+    wm_box_w = 185
     wm_x = (VW_OUT - wm_box_w) // 2
     odraw.rounded_rectangle(
-        [wm_x, wm_y, wm_x + wm_box_w, wm_y + 54],
-        radius=27,
+        [wm_x, wm_y, wm_x + wm_box_w, wm_y + 42],
+        radius=21,
         fill=(10, 14, 22, 145),
         outline=(220, 38, 38, 175),
         width=2
     )
     if os.path.exists(logo_path):
-        l_wm = Image.open(logo_path).convert("RGBA").resize((40, 40), Image.Resampling.LANCZOS)
-        m_wm = Image.new("L", (40, 40), 0)
-        ImageDraw.Draw(m_wm).ellipse((0, 0, 40, 40), fill=215)
-        overlay.paste(l_wm, (wm_x + 10, wm_y + 7), mask=m_wm)
+        l_wm = Image.open(logo_path).convert("RGBA").resize((30, 30), Image.Resampling.LANCZOS)
+        m_wm = Image.new("L", (30, 30), 0)
+        ImageDraw.Draw(m_wm).ellipse((0, 0, 30, 30), fill=215)
+        overlay.paste(l_wm, (wm_x + 8, wm_y + 6), mask=m_wm)
 
-    font_wm_bold = get_font(FONT_BOLD, 17)
-    font_wm_sub = get_font(FONT_REGULAR, 13)
-    odraw.text((wm_x + 58, wm_y + 8), "@gundemanalizi", fill=(255, 255, 255, 225), font=font_wm_bold)
-    odraw.text((wm_x + 58, wm_y + 29), "gündemanalizi.com.tr", fill=(254, 240, 138, 210), font=font_wm_sub)
+    font_wm_bold = get_font(FONT_BOLD, 13)
+    font_wm_sub = get_font(FONT_REGULAR, 10)
+    odraw.text((wm_x + 44, wm_y + 6), "@gundemanalizi", fill=(255, 255, 255, 225), font=font_wm_bold)
+    odraw.text((wm_x + 44, wm_y + 22), "gündemanalizi.com.tr", fill=(254, 240, 138, 210), font=font_wm_sub)
 
     # 2. Videonun orta-sağ iç kısmına hafif hayalet (ghost) filigran (kırpılsa bile videonun içinde kalır)
-    font_ghost = get_font(FONT_BOLD, 24)
-    odraw.text((VW_OUT - 255, 610), "@gundemanalizi", fill=(255, 255, 255, 68), font=font_ghost)
+    font_ghost = get_font(FONT_BOLD, 18)
+    odraw.text((VW_OUT - 190, 460), "@gundemanalizi", fill=(255, 255, 255, 68), font=font_ghost)
 
     # 3. En alt bar imzası
-    odraw.text((26, VH_OUT - 42), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
-    odraw.text((VW_OUT - 175, VH_OUT - 42), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
+    odraw.text((20, VH_OUT - 32), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
+    odraw.text((VW_OUT - 135, VH_OUT - 32), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
 
     overlay_path = os.path.join(OUTPUT_DIR, f"ov_{output_filename}.png")
     overlay.save(overlay_path, "PNG")
@@ -486,31 +494,29 @@ def brand_raw_video(
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # 2. Doğrudan FFmpeg ile tam genişlik (720x1280) ölçekle ve şeffaf logoyu üstüne bas (~25MB RAM)
+    # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür (60fps videolarda 8 kat hız kazandırır!), sonra ölçekle ve logoyu bas
     filter_complex = (
-        f"[0:v]scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease,"
+        f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
         f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
         f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
     )
     ff_cmd = [
         ffmpeg_exe, "-y",
+        "-t", "45",
         "-i", raw_video_path,
         "-i", overlay_path,
         "-filter_complex", filter_complex,
         "-map", "[v]",
         "-map", "0:a?",
-        "-t", "45",
-        "-r", "24",
         "-c:v", "libx264",
         "-preset", "ultrafast",
-        "-crf", "26",
-        "-threads", "1",
-        "-c:a", "aac",
-        "-b:a", "96k",
+        "-tune", "zerolatency",
+        "-crf", "27",
+        "-c:a", "copy",
         "-movflags", "+faststart",
         output_path
     ]
-    res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=60)
+    res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=110)
     if os.path.exists(overlay_path):
         os.remove(overlay_path)
 
