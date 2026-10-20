@@ -166,6 +166,7 @@ def _process_viral_video_job(
     max_dur_sec: float,
     wm_pos: str,
     audio_mode: str,
+    ticker_text: str,
     pub_site: bool,
     pub_tg: bool
 ):
@@ -190,8 +191,9 @@ def _process_viral_video_job(
             "step": 2,
             "percent": 42,
             "eta_sec": 15,
-            "step_text": "🎨 2/5: Tam ekran Gündem Analizi logosu, başlık ve çalınmaz filigran işleniyor..."
+            "step_text": "🎨 2/5: Tam ekran Gündem Analizi logosu, kayan bant ve filigran işleniyor..."
         })
+        auto_ticker = ticker_text.strip() or (f"{title} • {summary}" if summary else title)
         res = video_generator.brand_raw_video(
             raw_video_path=raw_path,
             title=title,
@@ -200,7 +202,8 @@ def _process_viral_video_job(
             start_sec=start_sec,
             max_dur_sec=max_dur_sec,
             wm_pos=wm_pos,
-            audio_mode=audio_mode
+            audio_mode=audio_mode,
+            ticker_text=auto_ticker
         )
 
         # ADIM 3: Yapay Zeka Haber & Sosyal Medya Metni
@@ -297,6 +300,7 @@ async def panel_viral_video(
     max_dur_sec: float = Form(45.0),
     wm_pos: str = Form("center"),
     audio_mode: str = Form("original"),
+    ticker_text: str = Form(""),
     pub_site: str = Form("true"),
     pub_tg: str = Form("true"),
     video_file: UploadFile = File(None)
@@ -344,6 +348,7 @@ async def panel_viral_video(
             float(max_dur_sec or 45),
             wm_pos.strip(),
             audio_mode.strip(),
+            ticker_text.strip(),
             pub_site.lower() == "true",
             pub_tg.lower() == "true"
         ),

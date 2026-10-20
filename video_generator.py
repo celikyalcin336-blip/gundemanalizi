@@ -392,13 +392,15 @@ def brand_raw_video(
     start_sec: float = 0.0,
     max_dur_sec: float = 45.0,
     wm_pos: str = "center",
-    audio_mode: str = "original"
+    audio_mode: str = "original",
+    ticker_text: str = ""
 ) -> dict:
     """
     Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama & Kurgu Motoru:
     - start_sec / max_dur_sec ile başlangıç ve bitiş süresini kırpar (trim).
     - wm_pos ('center', 'right', 'left') ile çalınmaz filigran konumunu ayarlar.
     - audio_mode ('original', 'ambient', 'mute') ile ses modunu kontrol eder.
+    - ticker_text ile ekranın altında TV tarzı canlı kayan SON DAKİKA bandı oluşturur.
     """
     import gc
     import subprocess
@@ -412,6 +414,11 @@ def brand_raw_video(
     font_badge = get_font(FONT_BOLD, 12)
     font_title = get_font(FONT_BOLD, 20)
     font_footer = get_font(FONT_BOLD, 13)
+    font_ticker = get_font(FONT_BOLD, 14)
+
+    use_ticker = (ticker_text or "").strip().lower() != "off"
+    raw_ticker = (ticker_text or "").strip() or title.strip()
+    ticker_unit = f"   •   {raw_ticker.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
 
     # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (Sadece 1 kare = ~0.5 MB RAM!)
     overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
@@ -425,9 +432,9 @@ def brand_raw_video(
         alpha = int(210 * (ratio ** 1.3))
         odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
-    for y in range(VH_OUT - 60, VH_OUT):
-        ratio = (y - (VH_OUT - 60)) / 60.0
-        alpha = int(190 * (ratio ** 1.2))
+    for y in range(VH_OUT - 92, VH_OUT):
+        ratio = (y - (VH_OUT - 92)) / 92.0
+        alpha = int(220 * (ratio ** 1.1))
         odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
     logo_path = os.path.join(ASSETS_DIR, "logo.png")
@@ -456,7 +463,7 @@ def brand_raw_video(
         ty += 26
 
     # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
-    wm_y = 700
+    wm_y = 690
     wm_box_w = 185
     if wm_pos == "right":
         wm_x = VW_OUT - wm_box_w - 22
@@ -487,9 +494,35 @@ def brand_raw_video(
     font_ghost = get_font(FONT_BOLD, 18)
     odraw.text((VW_OUT - 190, 460), "@gundemanalizi", fill=(255, 255, 255, 68), font=font_ghost)
 
-    # 3. En alt bar imzası
-    odraw.text((20, VH_OUT - 32), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
-    odraw.text((VW_OUT - 135, VH_OUT - 32), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
+    # 3. ALTTAN KAYAN SON DAKİKA BANDI SOL SABİT ROZETİ (TV Stili)
+    ticker_y = 874
+    ticker_h = 34
+    ticker_path = None
+    loop_w = 600
+    if use_ticker:
+        # Sol taraftaki sabit kırmızı "● SON DAKİKA" kutusu (kayan yazı bunun altından geçer)
+        odraw.rectangle([0, ticker_y, 134, ticker_y + ticker_h], fill=(220, 38, 38, 255))
+        odraw.line([(0, ticker_y), (VW_OUT, ticker_y)], fill=(220, 38, 38, 255), width=2)
+        odraw.line([(0, ticker_y + ticker_h), (VW_OUT, ticker_y + ticker_h)], fill=(30, 41, 59, 255), width=1)
+        odraw.text((12, ticker_y + 8), "● SON DAKİKA", fill=(255, 255, 255, 255), font=font_badge)
+
+        # Kayan şerit PNG'sini hazırla
+        tb = odraw.textbbox((0, 0), ticker_unit, font=font_ticker)
+        loop_w = max(450, (tb[2] - tb[0]))
+        strip_w = loop_w * 2 + VW_OUT
+        strip_img = Image.new("RGBA", (strip_w, ticker_h), (14, 20, 34, 235))
+        sdraw = ImageDraw.Draw(strip_img)
+        cx = 0
+        while cx < strip_w:
+            sdraw.text((cx, 8), ticker_unit, fill=(254, 240, 138, 255), font=font_ticker)
+            cx += loop_w
+        ticker_path = os.path.join(OUTPUT_DIR, f"tk_{output_filename}.png")
+        strip_img.save(ticker_path, "PNG")
+        del strip_img
+
+    # 4. En alt bar imzası
+    odraw.text((20, VH_OUT - 34), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
+    odraw.text((VW_OUT - 135, VH_OUT - 34), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
 
     overlay_path = os.path.join(OUTPUT_DIR, f"ov_{output_filename}.png")
     overlay.save(overlay_path, "PNG")
@@ -502,12 +535,20 @@ def brand_raw_video(
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür, sonra ölçekle ve logoyu bas
-    filter_complex = (
-        f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
-        f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
-        f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
-    )
+    # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür, sonra ölçekle, kayan bandı ve logoyu bas
+    if use_ticker and ticker_path:
+        filter_complex = (
+            f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
+            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
+            f"[bg][2:v]overlay=x='134-mod(t*115\\,{loop_w})':y={ticker_y}[bg_tk];"
+            f"[bg_tk][1:v]overlay=0:0,format=yuv420p[v]"
+        )
+    else:
+        filter_complex = (
+            f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
+            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
+            f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
+        )
 
     safe_start = max(0.0, float(start_sec or 0.0))
     safe_dur = max(3.0, min(60.0, float(max_dur_sec or 45.0)))
@@ -521,6 +562,10 @@ def brand_raw_video(
         "-i", raw_video_path,
         "-i", overlay_path,
     ]
+    if use_ticker and ticker_path:
+        ff_cmd += ["-i", ticker_path]
+
+    amb_input_idx = 3 if (use_ticker and ticker_path) else 2
     if audio_mode == "ambient":
         amb_wav = os.path.join(OUTPUT_DIR, f"amb_{output_filename}.wav")
         generate_ambient_news_music(min(safe_dur, 30.0), amb_wav)
@@ -533,7 +578,7 @@ def brand_raw_video(
     if audio_mode == "mute":
         ff_cmd += ["-an"]
     elif audio_mode == "ambient" and amb_wav:
-        ff_cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "96k", "-shortest"]
+        ff_cmd += ["-map", f"{amb_input_idx}:a", "-c:a", "aac", "-b:a", "96k", "-shortest"]
     else:
         ff_cmd += ["-map", "0:a?", "-c:a", "copy"]
 
@@ -548,6 +593,8 @@ def brand_raw_video(
     res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=110)
     if os.path.exists(overlay_path):
         os.remove(overlay_path)
+    if ticker_path and os.path.exists(ticker_path):
+        os.remove(ticker_path)
     if amb_wav and os.path.exists(amb_wav):
         os.remove(amb_wav)
 
