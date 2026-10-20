@@ -168,11 +168,13 @@ def _process_viral_video_job(
     audio_mode: str,
     ticker_text: str,
     pub_site: bool,
-    pub_tg: bool
+    pub_tg: bool,
+    pub_fb: bool
 ):
     import video_generator
     import ai_writer
     import telegram_notifier
+    import meta_poster
 
     job = VIDEO_JOBS[job_id]
     try:
@@ -250,15 +252,18 @@ def _process_viral_video_job(
             if art_obj:
                 article_id = art_obj.get("id")
 
-        # ADIM 5: Telegram Kanalına Gönderim
-        if pub_tg:
+        # ADIM 5: Seçilen Sosyal Medya Kanallarına Gönderim (Telegram / Facebook)
+        if pub_tg or pub_fb:
             job.update({
                 "step": 5,
                 "percent": 94,
-                "eta_sec": 2,
-                "step_text": "📲 5/5: Logolu video @gundemanalizi Telegram kanalına gönderiliyor..."
+                "eta_sec": 3,
+                "step_text": "📲 5/5: Logolu video seçtiğin sosyal medya hesaplarında paylaşılıyor..."
             })
-            telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+            if pub_tg:
+                telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+            if pub_fb:
+                meta_poster.post_video_to_facebook(res["video_path"], ai_cap["caption"], site_url)
 
         if os.path.exists(raw_path):
             os.remove(raw_path)
@@ -269,7 +274,7 @@ def _process_viral_video_job(
             "step": 5,
             "percent": 100,
             "eta_sec": 0,
-            "step_text": "✅ Tamamlandı! Video logolandı ve tüm platformlar için hazır!",
+            "step_text": "✅ Tamamlandı! Video logolandı ve seçtiğin tüm platformlarda paylaşıldı!",
             "download_url": f"/images/{out_filename}",
             "thumb_url": f"/images/{os.path.basename(res['thumb_path'])}",
             "article_url": f"/haber/{slug}" if slug else "",
@@ -303,6 +308,7 @@ async def panel_viral_video(
     ticker_text: str = Form(""),
     pub_site: str = Form("true"),
     pub_tg: str = Form("true"),
+    pub_fb: str = Form("true"),
     video_file: UploadFile = File(None)
 ):
     pin = request.headers.get("X-Admin-Pin", "")
@@ -350,7 +356,8 @@ async def panel_viral_video(
             audio_mode.strip(),
             ticker_text.strip(),
             pub_site.lower() == "true",
-            pub_tg.lower() == "true"
+            pub_tg.lower() == "true",
+            pub_fb.lower() == "true"
         ),
         daemon=True
     )

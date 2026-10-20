@@ -264,18 +264,27 @@
                                     <option value="mute">🔇 Tamamen Sessiz Yap</option>
                                 </select>
                             </div>
+                            <div class="col-span-2 sm:col-span-3">
+                                <label class="block text-slate-400 font-semibold mb-1">🔴 Alttan Kayan Son Dakika Bandı (Boş bırakırsan otomatik başlığı kaydırır)</label>
+                                <input id="v-ticker" type="text" placeholder="Örn: SON DAKİKA • İSTANBUL'DA TRAFİK KAVGASI KAMERADA (Kapatmak için off yaz)"
+                                    class="w-full px-2.5 py-2 rounded-lg bg-slate-900 border border-brand-border text-white">
+                            </div>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-brand-border/60">
-                        <div class="flex items-center gap-4 text-slate-300 font-semibold">
+                        <div class="flex flex-wrap items-center gap-3.5 text-slate-300 font-semibold">
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
                                 <input id="v-pub-site" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>🌐 Sitede Yayınla</span>
+                                <span>🌐 Web Sitesi</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
                                 <input id="v-pub-tg" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>📲 Telegram'a Gönder</span>
+                                <span>📲 Telegram</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input id="v-pub-fb" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
+                                <span>📘 Facebook Sayfası</span>
                             </label>
                         </div>
 
@@ -692,8 +701,10 @@
             fd.append('max_dur_sec', document.getElementById('v-maxdur').value || '45');
             fd.append('wm_pos', document.getElementById('v-wmpos').value || 'center');
             fd.append('audio_mode', document.getElementById('v-audio').value || 'original');
+            fd.append('ticker_text', document.getElementById('v-ticker').value || '');
             fd.append('pub_site', document.getElementById('v-pub-site').checked ? 'true' : 'false');
             fd.append('pub_tg', document.getElementById('v-pub-tg').checked ? 'true' : 'false');
+            fd.append('pub_fb', document.getElementById('v-pub-fb').checked ? 'true' : 'false');
 
             const fileInput = document.getElementById('v-file');
             if (fileInput.files.length > 0) {

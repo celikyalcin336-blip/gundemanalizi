@@ -73,11 +73,9 @@ def process_single_news(item: dict) -> bool:
     print("📲 Telegram kanalına sitemizin linkiyle gönderiliyor...")
     telegram_notifier.send_telegram_news(card_path, caption, site_article_url)
 
-    # 5. Paylaşım (Facebook)
-    print("🚀 Facebook'a paylaşım yapılıyor...")
-    fb_res = meta_poster.post_to_facebook(caption, card_path)
-
-    fb_id = fb_res.get("post_id")
+    # Not: Otonom bot yalnızca Web Sitesi ve Telegram'da paylaşım yapar.
+    # Facebook ve diğer sosyal medya paylaşımları yalnızca /panel üzerinden manuel seçildiğinde yapılır.
+    fb_id = None
     ig_id = None
 
     # 4. Veritabanına kaydet

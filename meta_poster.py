@@ -50,19 +50,66 @@ def upload_image_to_imgur(image_path: str) -> str:
 
     return ""
 
-def post_to_facebook(caption: str, image_path: str) -> dict:
+# Son otomatik Facebook paylaşım zamanını takip eder (Anti-Spam & Algoritma Koruması)
+_LAST_FB_AUTO_POST_TIME = 0.0
+FB_MIN_INTERVAL_SECONDS = int(os.getenv("FB_MIN_INTERVAL_SECONDS", str(3 * 3600)))  # Varsayılan: 3 saatte 1
+
+
+def _can_auto_post_to_facebook() -> bool:
+    """
+    Facebook Algoritma & Anti-Spam Kalkanı:
+    1. Gece 01:00 - 08:00 (TSİ) arasında otomatik paylaşım yapmaz (gerçek insan editör davranışı).
+    2. Otomatik haber kartlarını en sık 3 saatte 1 paylaşır (günde 5-6 kaliteli post),
+       böylece sayfa spama düşmez ve organik erişim (keşfet) maksimumda kalır.
+    """
+    global _LAST_FB_AUTO_POST_TIME
+    from datetime import datetime, timezone, timedelta
+    tr_now = datetime.now(timezone(timedelta(hours=3)))
+    if 1 <= tr_now.hour < 8:
+        print(f"🌙 [Facebook Koruma Kalkanı] Gece uyku modu ({tr_now.strftime('%H:%M')}) - Facebook spama düşmesin diye yalnızca Site ve Telegram'a atıldı.")
+        return False
+
+    now_ts = time.time()
+    if _LAST_FB_AUTO_POST_TIME > 0 and (now_ts - _LAST_FB_AUTO_POST_TIME) < FB_MIN_INTERVAL_SECONDS:
+        rem_min = int((FB_MIN_INTERVAL_SECONDS - (now_ts - _LAST_FB_AUTO_POST_TIME)) / 60)
+        print(f"🛡️ [Facebook Koruma Kalkanı] Son paylaşımdan bu yana 3 saat geçmedi ({rem_min} dk kaldı). Sadece Site ve Telegram'a atıldı.")
+        return False
+
+    return True
+
+
+def _post_first_comment(object_id: str, news_link: str):
+    """
+    Facebook algoritmasının dış link içeren gönderilerin erişimini düşürmemesi için
+    haber linkini ana metne değil, gönderinin altına İLK YORUM olarak bırakır.
+    """
+    if not object_id or not news_link:
+        return
+    try:
+        time.sleep(2)
+        c_url = f"https://graph.facebook.com/v21.0/{object_id}/comments"
+        c_payload = {
+            "message": f"📰 Haberin tüm detayları ve gelişmeler için tıklayın:\n👉 {news_link}",
+            "access_token": config.META_PAGE_ACCESS_TOKEN
+        }
+        requests.post(c_url, data=c_payload, timeout=15)
+    except Exception:
+        pass
+
+
+def post_to_facebook(caption: str, image_path: str, news_link: str = None, is_manual: bool = False) -> dict:
     """
     Facebook Sayfasına görsel ve açıklama metnini yayınlar.
+    - Otomatik paylaşımlarda 3 saat kuralı ve gece uyku modunu uygular.
+    - Erişim düşmemesi için linki ana açıklamaya değil, otomatik İLK YORUMA ekler.
     """
-    if config.DRY_RUN:
-        print("\n[DRY RUN - FACEBOOK SİMÜLASYONU]")
-        print(f"Sayfa ID: {config.FACEBOOK_PAGE_ID or 'Tanımlanmadı (Simülasyon)'}")
-        print(f"Görsel Dosyası: {image_path}")
-        print(f"Açıklama:\n{caption[:120]}...\n")
+    global _LAST_FB_AUTO_POST_TIME
+    if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
+        print("\n[FACEBOOK SİMÜLASYONU - Token/Page ID henüz girilmedi]")
         return {"status": "simulated", "post_id": f"fb_mock_{int(time.time())}"}
 
-    if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
-        raise ValueError("META_PAGE_ACCESS_TOKEN veya FACEBOOK_PAGE_ID ayarlanmamış!")
+    if not is_manual and not _can_auto_post_to_facebook():
+        return {"status": "skipped_by_shield", "post_id": None}
 
     url = f"https://graph.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/photos"
     payload = {
@@ -70,17 +117,58 @@ def post_to_facebook(caption: str, image_path: str) -> dict:
         "access_token": config.META_PAGE_ACCESS_TOKEN
     }
 
-    with open(image_path, "rb") as img_file:
-        files = {"source": img_file}
-        resp = requests.post(url, data=payload, files=files, timeout=30)
-        data = resp.json()
+    try:
+        with open(image_path, "rb") as img_file:
+            files = {"source": img_file}
+            resp = requests.post(url, data=payload, files=files, timeout=35)
+            data = resp.json()
 
-        if resp.status_code == 200 and "id" in data:
-            print(f"✅ Facebook paylaşımı başarılı! Post ID: {data.get('post_id', data['id'])}")
-            return {"status": "success", "post_id": data.get("post_id", data["id"])}
-        else:
-            print(f"❌ Facebook paylaşım hatası: {data}")
-            return {"status": "error", "error": data}
+            if resp.status_code == 200 and "id" in data:
+                post_id = data.get("post_id", data["id"])
+                if not is_manual:
+                    _LAST_FB_AUTO_POST_TIME = time.time()
+                print(f"✅ Facebook fotoğraf paylaşımı başarılı! Post ID: {post_id}")
+                if news_link:
+                    _post_first_comment(post_id, news_link)
+                return {"status": "success", "post_id": post_id}
+            else:
+                print(f"❌ Facebook paylaşım hatası: {data}")
+                return {"status": "error", "error": data}
+    except Exception as e:
+        print(f"❌ Facebook bağlantı hatası: {e}")
+        return {"status": "error", "error": str(e)}
+
+
+def post_video_to_facebook(video_path: str, caption: str, news_link: str = None) -> dict:
+    """
+    Facebook Sayfasına doğrudan MP4/Reels video yayınlar ve linki ilk yoruma bırakır.
+    """
+    if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
+        return {"status": "simulated"}
+
+    url = f"https://graph-video.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/videos"
+    payload = {
+        "description": caption,
+        "access_token": config.META_PAGE_ACCESS_TOKEN
+    }
+
+    try:
+        with open(video_path, "rb") as vf:
+            files = {"source": vf}
+            resp = requests.post(url, data=payload, files=files, timeout=90)
+            data = resp.json()
+            if resp.status_code == 200 and "id" in data:
+                vid_id = data["id"]
+                print(f"✅ Facebook video paylaşımı başarılı! Video ID: {vid_id}")
+                if news_link:
+                    _post_first_comment(vid_id, news_link)
+                return {"status": "success", "video_id": vid_id}
+            else:
+                print(f"❌ Facebook video hatası: {data}")
+                return {"status": "error", "error": data}
+    except Exception as e:
+        print(f"❌ Facebook video bağlantı hatası: {e}")
+        return {"status": "error", "error": str(e)}
 
 def post_to_instagram(caption: str, image_path: str) -> dict:
     """

@@ -5,7 +5,7 @@ load_dotenv()
 
 # Meta (Facebook) Ayarları
 META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "")
-FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "")
+FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "1237983366054395")  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "")
 
 # Telegram Bildirim Ayarları
