@@ -49,4 +49,4 @@ RSS_FEEDS = [
 DRY_RUN = os.getenv("DRY_RUN", "True").lower() in ("true", "1", "yes")
 
 # Kontrol Sıklığı (Dakika)
-CHECK_INTERVAL_MINUTES = int(os.getenv("CHECK_INTERVAL_MINUTES", "20"))
+CHECK_INTERVAL_MINUTES = int(os.getenv("CHECK_INTERVAL_MINUTES", "30"))

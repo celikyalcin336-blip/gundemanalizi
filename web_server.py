@@ -40,6 +40,7 @@ def bot_background_worker():
             time.sleep(config.CHECK_INTERVAL_MINUTES * 60)
             print("🔄 [Otonom Bot] Periyodik haber taraması başlatılıyor...")
             main.run_bot(max_items=1)
+            database.cleanup_old_images(days=180)
         except Exception as e:
             print(f"⚠️ [Otonom Bot] Döngü hatası: {e}")
 
@@ -119,6 +120,10 @@ async def contact_page(request: Request):
 @app.get("/api/articles")
 async def api_articles(limit: int = 10):
     return database.get_articles(limit=limit)
+
+@app.get("/api/stats")
+async def api_stats():
+    return database.get_storage_stats()
 
 @app.get("/robots.txt", response_class=HTMLResponse)
 async def robots():

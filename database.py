@@ -172,17 +172,63 @@ def _basename(path: str) -> str:
     return path.replace("\\", "/").split("/")[-1]
 
 
+def _compress_image(path: str) -> bytes:
+    """
+    Görseli web için küçültüp sıkıştırır (800px, JPEG kalite 72).
+    1080px ~250 KB'lık kart, gözle fark edilmeyecek şekilde ~60-90 KB'a iner.
+    Telegram'a giden orijinal dosya etkilenmez.
+    """
+    from io import BytesIO
+    from PIL import Image
+    with Image.open(path) as img:
+        img = img.convert("RGB")
+        img.thumbnail((800, 800), Image.LANCZOS)
+        buf = BytesIO()
+        img.save(buf, format="JPEG", quality=72, optimize=True, progressive=True)
+        return buf.getvalue()
+
+
 def save_image_file(path: str):
-    """Görsel dosyasını kalıcı veritabanına yazar (yalnızca PostgreSQL modunda)."""
+    """Görsel dosyasını sıkıştırıp kalıcı veritabanına yazar (yalnızca PostgreSQL modunda)."""
     if not USE_PG or not path or not os.path.exists(path):
         return
-    with open(path, "rb") as f:
-        data = f.read()
+    try:
+        data = _compress_image(path)
+    except Exception as e:
+        print(f"⚠️ Görsel sıkıştırılamadı, orijinali kaydediliyor: {e}")
+        with open(path, "rb") as f:
+            data = f.read()
     with get_connection() as conn:
         conn.execute("""
             INSERT INTO images (filename, data) VALUES (?, ?)
             ON CONFLICT (filename) DO UPDATE SET data = EXCLUDED.data
         """, (_basename(path), psycopg2.Binary(data)))
+
+
+def cleanup_old_images(days: int = 180) -> int:
+    """
+    Belirtilen günden eski haber görsellerini siler (haber metinleri kalır).
+    Böylece ücretsiz 1 GB'lık veritabanı hiçbir zaman dolmaz.
+    """
+    if not USE_PG:
+        return 0
+    with get_connection() as conn:
+        cur = conn.execute(
+            "DELETE FROM images WHERE created_at < NOW() - (? * INTERVAL '1 day')", (days,)
+        )
+        return cur.rowcount or 0
+
+
+def get_storage_stats() -> Dict:
+    """Veritabanı doluluk bilgisini döner (izleme için)."""
+    stats = {"articles": 0, "images": 0, "db_size_mb": None}
+    with get_connection() as conn:
+        stats["articles"] = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
+        if USE_PG:
+            stats["images"] = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
+            size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
+            stats["db_size_mb"] = round(size / 1024 / 1024, 1)
+    return stats
 
 
 def get_image(filename: str) -> Optional[bytes]:
