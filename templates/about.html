@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakkımızda & Künye | Gündem Analizi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#dc2626',
+                            dark: '#0a0d14',
+                            card: '#121722',
+                            border: '#1f293d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3.5 group">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <div>
+                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
+                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    </span>
+                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                        Doğru Haber • Tarafsız Analiz
+                    </p>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+                    ← Ana Sayfa
+                </a>
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 flex-1 w-full">
+        <div class="rounded-2xl border border-brand-border bg-brand-card p-8 sm:p-12 shadow-2xl">
+            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-brand-border">
+                <img src="/assets/logo.png" alt="Gündem Analizi Logo" class="w-16 h-16 rounded-full border-2 border-red-600">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white">Hakkımızda & Künye</h1>
+                    <p class="text-red-400 text-sm font-semibold">GÜNDEM ANALİZİ BAĞIMSIZ HABER PLATFORMU</p>
+                </div>
+            </div>
+
+            <div class="space-y-6 text-slate-300 text-base leading-relaxed">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> Biz Kimiz?
+                </h2>
+                <p>
+                    <strong>Gündem Analizi</strong>, Türkiye ve dünyada yaşanan son dakika gelişmelerini, siyaset, ekonomi, teknoloji ve toplumsal olayları tarafsız, doğru ve hızlı bir şekilde kamuoyuna ulaştırmak amacıyla kurulmuş bağımsız bir dijital haber ve analiz platformudur.
+                </p>
+
+                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-4">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> Yayın İlkelerimiz
+                </h2>
+                <ul class="list-disc list-inside space-y-2 pl-2">
+                    <li><strong>Doğruluk ve Güvenilirlik:</strong> Kamuya sunulan tüm haberler doğrulanmış ajans kaynakları ve resmi açıklamalara dayandırılır.</li>
+                    <li><strong>Tarafsızlık:</strong> Olaylar spekülasyondan uzak, objektif ve dengeli bir bakış açısıyla analiz edilir.</li>
+                    <li><strong>Hızlı ve Özgün İçerik:</strong> Gelişmeler anlık olarak taranır, okuyucunun en kısa sürede doğru bilgiye ulaşması sağlanır.</li>
+                    <li><strong>Kaynak Gösterme:</strong> Alıntılanan her haberin kaynak ve ajans bilgisi açıkça belirtilir.</li>
+                </ul>
+
+                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-4">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> Künye & İletişim
+                </h2>
+                <div class="bg-slate-900/80 p-5 rounded-xl border border-brand-border text-sm space-y-2">
+                    <p><strong>İmtiyaz Sahibi & Yayın Yönetmeni:</strong> Yalçın Çelik</p>
+                    <p><strong>Yayın Türü:</strong> Dijital Süreli Yayın (İnternet Haber Sitesi)</p>
+                    <p><strong>Web Sitesi:</strong> <a href="https://gundemanalizi.com.tr" class="text-red-400 hover:underline">gundemanalizi.com.tr</a></p>
+                    <p><strong>Resmi Telegram Kanalı:</strong> <a href="https://t.me/gundemanalizi" target="_blank" class="text-red-400 hover:underline">t.me/gundemanalizi</a></p>
+                    <p><strong>E-posta & Basın Bültenleri:</strong> <a href="mailto:iletisim@gundemanalizi.com.tr" class="text-red-400 hover:underline">iletisim@gundemanalizi.com.tr</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-brand-border bg-brand-dark py-6 text-center text-xs text-slate-500">
+        <p>GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
