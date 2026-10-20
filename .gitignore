@@ -1,0 +1,7 @@
+# Gizli bilgiler ve geçici dosyalar
+.env
+data/
+output/
+__pycache__/
+*.pyc
+*.db
