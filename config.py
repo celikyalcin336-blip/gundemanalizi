@@ -9,13 +9,14 @@ FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "")
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "")
 
 # Telegram Bildirim Ayarları
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8882292811:AAHo8qyRE8NgFl3JU3HOgcBkTNOrf0x82B4")
+# Gizli bilgiler koda YAZILMAZ: yerelde .env dosyasından, Render'da Environment ayarlarından okunur.
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003631115657")  # Gündem Analizi Kanalı
 TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "1934709259")  # Yalçın Çelik Özel Chat
 
 # Marka ve Web Sitesi Bilgisi
 BRAND_NAME = "GÜNDEM ANALİZİ"
-SITE_URL = os.getenv("SITE_URL", "https://gundemanalizi.com.tr")
+SITE_URL = os.getenv("SITE_URL", "https://gündemanalizi.com.tr")
 
 # AI (Google Gemini) Ayarı
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

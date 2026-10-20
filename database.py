@@ -1,3 +1,13 @@
+"""
+Veritabanı katmanı.
+
+İki modda çalışır:
+- DATABASE_URL ortam değişkeni tanımlıysa: PostgreSQL (kalıcı bulut veritabanı, ör. Neon)
+- Tanımlı değilse: yerel SQLite (data/news_bot.db)
+
+Haber kartı görselleri de PostgreSQL modunda veritabanında saklanır; böylece
+Render ücretsiz planında sunucu yeniden başlasa bile haberler ve görseller kaybolmaz.
+"""
 import sqlite3
 import os
 import re
@@ -6,12 +16,60 @@ from typing import List, Dict, Optional
 
 DB_DIR = os.path.join(os.path.dirname(__file__), "data")
 DB_PATH = os.path.join(DB_DIR, "news_bot.db")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+USE_PG = DATABASE_URL.startswith("postgres")
+
+if USE_PG:
+    import psycopg2
+    import psycopg2.extras
+
+
+class _Conn:
+    """sqlite3 / psycopg2 farkını gizleyen küçük sarmalayıcı."""
+
+    def __init__(self):
+        if USE_PG:
+            self.raw = psycopg2.connect(DATABASE_URL)
+        else:
+            os.makedirs(DB_DIR, exist_ok=True)
+            self.raw = sqlite3.connect(DB_PATH)
+            self.raw.row_factory = sqlite3.Row
+
+    def execute(self, sql: str, params: tuple = ()):
+        if USE_PG:
+            sql = sql.replace("?", "%s")
+            cur = self.raw.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        else:
+            cur = self.raw.cursor()
+        cur.execute(sql, params)
+        return cur
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            if exc_type is None:
+                self.raw.commit()
+            else:
+                self.raw.rollback()
+        finally:
+            self.raw.close()
+
 
 def get_connection():
-    os.makedirs(DB_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    return _Conn()
+
+
+def _row_to_dict(row) -> Dict:
+    d = dict(row)
+    # PostgreSQL datetime nesnelerini, SQLite ile aynı metin formatına çevir
+    if d.get("created_at") is not None and not isinstance(d["created_at"], str):
+        d["created_at"] = d["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+    return d
+
 
 def slugify(text: str) -> str:
     """Türkçe başlığı SEO dostu URL slug'ına dönüştürür."""
@@ -26,14 +84,15 @@ def slugify(text: str) -> str:
     slug = re.sub(r'[-\s]+', '-', text)
     return slug[:80]
 
+
 def init_db():
     """Veritabanını ve gerekli tabloları oluşturur."""
+    pk = "SERIAL PRIMARY KEY" if USE_PG else "INTEGER PRIMARY KEY AUTOINCREMENT"
     with get_connection() as conn:
-        cursor = conn.cursor()
         # 1. Paylaşılan haber kimlikleri
-        cursor.execute("""
+        conn.execute(f"""
             CREATE TABLE IF NOT EXISTS posted_news (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {pk},
                 news_hash TEXT UNIQUE NOT NULL,
                 title TEXT NOT NULL,
                 source TEXT,
@@ -44,9 +103,9 @@ def init_db():
             )
         """)
         # 2. Web sitesi makaleleri tablosu
-        cursor.execute("""
+        conn.execute(f"""
             CREATE TABLE IF NOT EXISTS articles (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {pk},
                 slug TEXT UNIQUE NOT NULL,
                 title TEXT NOT NULL,
                 summary TEXT,
@@ -58,67 +117,145 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        conn.commit()
+        # 3. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
+        if USE_PG:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS images (
+                    filename TEXT PRIMARY KEY,
+                    data BYTEA NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+    if USE_PG:
+        _migrate_from_sqlite_if_empty()
+
+
+def _migrate_from_sqlite_if_empty():
+    """Bulut veritabanı boşsa, repodaki SQLite dosyasındaki eski haberleri ve görselleri taşır."""
+    with get_connection() as conn:
+        count = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
+    if count > 0 or not os.path.exists(DB_PATH):
+        return
+
+    print("📦 Eski SQLite haberleri bulut veritabanına taşınıyor...")
+    src = sqlite3.connect(DB_PATH)
+    src.row_factory = sqlite3.Row
+    try:
+        posted = [dict(r) for r in src.execute("SELECT * FROM posted_news ORDER BY id")]
+        articles = [dict(r) for r in src.execute("SELECT * FROM articles ORDER BY id")]
+    finally:
+        src.close()
+
+    with get_connection() as conn:
+        for p in posted:
+            conn.execute("""
+                INSERT INTO posted_news (news_hash, title, source, link, facebook_post_id, instagram_post_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (news_hash) DO NOTHING
+            """, (p["news_hash"], p["title"], p["source"], p["link"],
+                  p["facebook_post_id"], p["instagram_post_id"], p["created_at"]))
+        for a in articles:
+            conn.execute("""
+                INSERT INTO articles (slug, title, summary, content, category, image_path, source, views, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (slug) DO NOTHING
+            """, (a["slug"], a["title"], a["summary"], a["content"], a["category"],
+                  a["image_path"], a["source"], a["views"], a["created_at"]))
+
+    for a in articles:
+        if a.get("image_path"):
+            local = os.path.join(OUTPUT_DIR, _basename(a["image_path"]))
+            if os.path.exists(local):
+                save_image_file(local)
+    print(f"✅ {len(articles)} haber bulut veritabanına taşındı.")
+
+
+def _basename(path: str) -> str:
+    return path.replace("\\", "/").split("/")[-1]
+
+
+def save_image_file(path: str):
+    """Görsel dosyasını kalıcı veritabanına yazar (yalnızca PostgreSQL modunda)."""
+    if not USE_PG or not path or not os.path.exists(path):
+        return
+    with open(path, "rb") as f:
+        data = f.read()
+    with get_connection() as conn:
+        conn.execute("""
+            INSERT INTO images (filename, data) VALUES (?, ?)
+            ON CONFLICT (filename) DO UPDATE SET data = EXCLUDED.data
+        """, (_basename(path), psycopg2.Binary(data)))
+
+
+def get_image(filename: str) -> Optional[bytes]:
+    if not USE_PG:
+        return None
+    with get_connection() as conn:
+        row = conn.execute("SELECT data FROM images WHERE filename = ?", (filename,)).fetchone()
+    return bytes(row["data"]) if row else None
+
 
 def is_already_posted(news_hash: str) -> bool:
     with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1 FROM posted_news WHERE news_hash = ?", (news_hash,))
-        return cursor.fetchone() is not None
+        row = conn.execute("SELECT 1 FROM posted_news WHERE news_hash = ?", (news_hash,)).fetchone()
+        return row is not None
+
 
 def mark_as_posted(news_hash: str, title: str, source: str = "", link: str = "", fb_id: str = None, ig_id: str = None):
     with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT OR REPLACE INTO posted_news 
-            (news_hash, title, source, link, facebook_post_id, instagram_post_id)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (news_hash, title, source, link, fb_id, ig_id))
-        conn.commit()
+        if USE_PG:
+            conn.execute("""
+                INSERT INTO posted_news (news_hash, title, source, link, facebook_post_id, instagram_post_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (news_hash) DO UPDATE SET
+                    title = EXCLUDED.title, source = EXCLUDED.source, link = EXCLUDED.link,
+                    facebook_post_id = EXCLUDED.facebook_post_id, instagram_post_id = EXCLUDED.instagram_post_id
+            """, (news_hash, title, source, link, fb_id, ig_id))
+        else:
+            conn.execute("""
+                INSERT OR REPLACE INTO posted_news 
+                (news_hash, title, source, link, facebook_post_id, instagram_post_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (news_hash, title, source, link, fb_id, ig_id))
+
 
 def save_article(title: str, summary: str, content: str, image_path: str, source: str, category: str = "Gündem") -> str:
     """Makaleyi web sitesi veritabanına kaydeder ve SEO URL slug'ını döner."""
     base_slug = slugify(title)
     if not base_slug:
         base_slug = "haber"
-    
+
+    # Görseli kalıcı depoya da yaz (PostgreSQL modunda)
+    save_image_file(image_path)
+
     slug = base_slug
     with get_connection() as conn:
-        cursor = conn.cursor()
         # Slug benzersizliği sağla
         counter = 1
-        while True:
-            cursor.execute("SELECT 1 FROM articles WHERE slug = ?", (slug,))
-            if not cursor.fetchone():
-                break
+        while conn.execute("SELECT 1 FROM articles WHERE slug = ?", (slug,)).fetchone():
             slug = f"{base_slug}-{counter}"
             counter += 1
 
-        cursor.execute("""
+        conn.execute("""
             INSERT INTO articles (slug, title, summary, content, category, image_path, source)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (slug, title, summary, content, category, image_path, source))
-        conn.commit()
     return slug
+
 
 def get_articles(limit: int = 20, category: str = None) -> List[Dict]:
     """Son yayınlanan makaleleri listeler."""
     with get_connection() as conn:
-        cursor = conn.cursor()
         if category:
-            cursor.execute("SELECT * FROM articles WHERE category = ? ORDER BY id DESC LIMIT ?", (category, limit))
+            cur = conn.execute("SELECT * FROM articles WHERE category = ? ORDER BY id DESC LIMIT ?", (category, limit))
         else:
-            cursor.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ?", (limit,))
-        return [dict(row) for row in cursor.fetchall()]
+            cur = conn.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ?", (limit,))
+        return [_row_to_dict(row) for row in cur.fetchall()]
+
 
 def get_article_by_slug(slug: str) -> Optional[Dict]:
     """Slug'a göre makale detayını çeker ve okunma sayısını 1 artırır."""
     with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM articles WHERE slug = ?", (slug,))
-        row = cursor.fetchone()
+        row = conn.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
         if row:
-            cursor.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (row["id"],))
-            conn.commit()
-            return dict(row)
+            conn.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (row["id"],))
+            return _row_to_dict(row)
         return None

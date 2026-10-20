@@ -5,6 +5,7 @@ feedparser>=6.0.11
 requests>=2.31.0
 pillow>=10.2.0
 python-dotenv>=1.0.1
+psycopg2-binary>=2.9.9
 google-genai>=1.0.0
 gTTS>=2.5.0
 moviepy>=2.2.0

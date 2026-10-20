@@ -8,15 +8,29 @@ import config
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Windows Yazı Tipleri (Türkçe karakter desteği tam olan sistem fontları)
-FONT_BOLD_PATH = "C:\\Windows\\Fonts\\segoeuib.ttf"
-FONT_REGULAR_PATH = "C:\\Windows\\Fonts\\segoeui.ttf"
+# Evrensel Yazı Tipleri (Repo içindeki fontlar her ortamda çalışır: Windows & Render Linux)
+BASE_DIR = os.path.dirname(__file__)
+FONT_BOLD_PATH = os.path.join(BASE_DIR, "assets", "fonts", "segoeuib.ttf")
+FONT_REGULAR_PATH = os.path.join(BASE_DIR, "assets", "fonts", "segoeui.ttf")
+
+if not os.path.exists(FONT_BOLD_PATH):
+    FONT_BOLD_PATH = "C:\\Windows\\Fonts\\segoeuib.ttf"
+if not os.path.exists(FONT_REGULAR_PATH):
+    FONT_REGULAR_PATH = "C:\\Windows\\Fonts\\segoeui.ttf"
 
 def get_font(path: str, size: int):
     try:
-        return ImageFont.truetype(path, size)
+        if os.path.exists(path):
+            return ImageFont.truetype(path, size)
     except Exception:
-        return ImageFont.load_default()
+        pass
+    # Linux sistem fontları alternatifi
+    for fallback in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf", "arial.ttf"]:
+        try:
+            return ImageFont.truetype(fallback, size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
 
 def wrap_text(text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageDraw.ImageDraw) -> list:
     """Metni belirtilen piksel genişliğine sığacak şekilde satırlara böler."""
