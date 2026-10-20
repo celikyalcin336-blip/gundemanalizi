@@ -117,7 +117,14 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        # 3. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
+        # 3. Site ziyaret sayacı tablosu
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS site_metrics (
+                key TEXT PRIMARY KEY,
+                val INTEGER DEFAULT 0
+            )
+        """)
+        # 4. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
         if USE_PG:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS images (
@@ -305,3 +312,81 @@ def get_article_by_slug(slug: str) -> Optional[Dict]:
             conn.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (row["id"],))
             return _row_to_dict(row)
         return None
+
+
+def delete_article(article_id: int) -> bool:
+    """Belirtilen ID'li makaleyi siler."""
+    with get_connection() as conn:
+        cur = conn.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+        return (cur.rowcount or 0) > 0
+
+
+def record_visit(key: str = "home_visits"):
+    """Genel sayfa ziyaret sayacını 1 artırır."""
+    try:
+        with get_connection() as conn:
+            if USE_PG:
+                conn.execute("""
+                    INSERT INTO site_metrics (key, val) VALUES (?, 1)
+                    ON CONFLICT (key) DO UPDATE SET val = site_metrics.val + 1
+                """, (key,))
+            else:
+                row = conn.execute("SELECT val FROM site_metrics WHERE key = ?", (key,)).fetchone()
+                new_val = (row["val"] + 1) if row else 1
+                conn.execute("INSERT OR REPLACE INTO site_metrics (key, val) VALUES (?, ?)", (key, new_val))
+    except Exception:
+        pass
+
+
+def get_dashboard_summary() -> Dict:
+    """Yönetim paneli (/panel) için tüm ayrıntılı istatistikleri döner."""
+    with get_connection() as conn:
+        totals = conn.execute(
+            "SELECT COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS total_views FROM articles"
+        ).fetchone()
+        total_articles = totals["cnt"] if totals else 0
+        total_views = totals["total_views"] if totals else 0
+
+        home_row = conn.execute(
+            "SELECT val FROM site_metrics WHERE key = ?", ("home_visits",)
+        ).fetchone()
+        home_visits = home_row["val"] if home_row else 0
+
+        top_rows = conn.execute(
+            "SELECT * FROM articles ORDER BY views DESC, id DESC LIMIT 10"
+        ).fetchall()
+        recent_rows = conn.execute(
+            "SELECT * FROM articles ORDER BY id DESC LIMIT 30"
+        ).fetchall()
+
+        cat_rows = conn.execute(
+            "SELECT category, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY category ORDER BY cnt DESC"
+        ).fetchall()
+        src_rows = conn.execute(
+            "SELECT source, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY source ORDER BY cnt DESC"
+        ).fetchall()
+
+        images_count = 0
+        db_size_mb = 0.0
+        if USE_PG:
+            images_count = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
+            size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
+            db_size_mb = round(size / 1024 / 1024, 1)
+
+    recent_list = [_row_to_dict(r) for r in recent_rows]
+    top_list = [_row_to_dict(r) for r in top_rows]
+    return {
+        "total_articles": total_articles,
+        "total_views": total_views,
+        "home_visits": home_visits,
+        "total_all_hits": total_views + home_visits,
+        "avg_views": round(total_views / total_articles, 1) if total_articles > 0 else 0,
+        "images_count": images_count,
+        "db_size_mb": db_size_mb,
+        "use_pg": USE_PG,
+        "last_article_time": recent_list[0]["created_at"] if recent_list else "-",
+        "top_articles": top_list,
+        "recent_articles": recent_list,
+        "categories": [dict(r) for r in cat_rows],
+        "sources": [dict(r) for r in src_rows],
+    }

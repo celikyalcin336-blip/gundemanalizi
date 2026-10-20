@@ -79,6 +79,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None):
+    database.record_visit("home_visits")
     articles = database.get_articles(limit=24, category=kategori)
     return templates.TemplateResponse(
         request=request,
@@ -88,6 +89,36 @@ async def home(request: Request, kategori: str = None):
             "active_category": kategori
         }
     )
+
+ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
+
+@app.get("/panel", response_class=HTMLResponse)
+async def admin_panel(request: Request):
+    stats = database.get_dashboard_summary()
+    stats["gemini_active"] = bool(config.GEMINI_API_KEY)
+    stats["telegram_active"] = bool(config.TELEGRAM_BOT_TOKEN and config.TELEGRAM_CHAT_ID)
+    stats["check_interval"] = config.CHECK_INTERVAL_MINUTES
+    return templates.TemplateResponse(
+        request=request,
+        name="panel.html",
+        context={"stats": stats}
+    )
+
+@app.post("/api/panel/fetch-now")
+async def panel_fetch_now(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    threading.Thread(target=main.run_bot, kwargs={"max_items": 1}, daemon=True).start()
+    return {"ok": True, "message": "Yeni haber taraması başlatıldı! 15-20 saniye içinde siteye ve Telegram'a düşecek."}
+
+@app.post("/api/panel/delete/{article_id}")
+async def panel_delete_article(article_id: int, request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    deleted = database.delete_article(article_id)
+    return {"ok": deleted}
 
 @app.get("/haber/{slug}", response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
