@@ -172,6 +172,81 @@
             </div>
         </div>
 
+        <!-- VİRAL VİDEO HABER STÜDYOSU (X/TWITTER VEYA DOSYADAN LOGOLU REELS & PAYLAŞIM) -->
+        <div class="bg-gradient-to-br from-red-950/40 via-brand-card to-brand-card border border-red-600/40 rounded-2xl p-6 shadow-2xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-5 border-b border-brand-border">
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                        <i data-lucide="clapperboard" class="w-5 h-5 text-red-500"></i>
+                        VİRAL VİDEO HABER STÜDYOSU (HAM VİDEO ➔ LOGOLU REELS & PAYLAŞIM)
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        X (Twitter), TikTok veya telefonundaki çıplak olay videosunu yükle; üstüne Gündem Analizi logosu ve başlık basıp kendi orijinal sesiyle sitede ve Telegram'da paylaşsın!
+                    </p>
+                </div>
+                <span class="bg-red-600 text-white text-[11px] font-extrabold px-3 py-1 rounded-full self-start sm:self-center shrink-0">
+                    ORİJİNAL SES + FİLİGRANLI
+                </span>
+            </div>
+
+            <form id="viral-form" onsubmit="submitViralVideo(event)" class="grid grid-cols-1 md:grid-cols-12 gap-4 text-xs">
+                <div class="md:col-span-6 space-y-3">
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">Haber Başlığı (Videonun Üstünde Görünecek) *</label>
+                        <input id="v-title" type="text" required placeholder="Örn: İstanbul Esenler'de trafikte tartışan sürücüler birbirine girdi"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">Kısa Açıklama / Detay (Boş bırakırsan Gemini AI tamamlar)</label>
+                        <textarea id="v-summary" rows="2" placeholder="Olayın kısa detayı (nerede oldu, ne yaşandı)..."
+                            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500"></textarea>
+                    </div>
+                </div>
+
+                <div class="md:col-span-6 space-y-3 flex flex-col justify-between">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-1">
+                            <label class="block text-slate-300 font-bold mb-1">Kategori</label>
+                            <select id="v-category" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500">
+                                <option value="Son Dakika">Son Dakika</option>
+                                <option value="Gündem" selected>Gündem</option>
+                                <option value="Asayiş">Asayiş</option>
+                                <option value="Ekonomi">Ekonomi</option>
+                                <option value="Dünya">Dünya</option>
+                                <option value="Spor">Spor</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-slate-300 font-bold mb-1">1. Yöntem: Cihazdan Ham Video Seç (.mp4)</label>
+                            <input id="v-file" type="file" accept="video/*"
+                                class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">VEYA 2. Yöntem: X (Twitter) / TikTok / Direkt Video Linki Yapıştır</label>
+                        <input id="v-url" type="url" placeholder="https://x.com/... veya video linki"
+                            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500">
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <div id="viral-result" class="hidden flex items-center gap-2">
+                            <a id="viral-dl" href="#" download class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg transition">
+                                📥 Logolu Reels Videoyu İndir
+                            </a>
+                            <a id="viral-art" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold border border-brand-border transition">
+                                Haberi Gör ➔
+                            </a>
+                        </div>
+                        <button id="v-submit" type="submit" class="ml-auto inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-red-900/50 transition">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Logola, Siteye & Telegram'a Paylaş</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- KATEGORİ & KAYNAK DAĞILIMI + EN ÇOK OKUNANLAR -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -368,6 +443,49 @@
                 showToast('#' + id + ' numaralı haber silindi.');
             } else {
                 alert('Silinemedi, yönetici şifresini kontrol edin.');
+            }
+        }
+
+        async function submitViralVideo(e) {
+            e.preventDefault();
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            const btn = document.getElementById('v-submit');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerText = '⏳ Video Logolanıyor & Paylaşılıyor (20-35 sn)...';
+
+            const fd = new FormData();
+            fd.append('title', document.getElementById('v-title').value);
+            fd.append('summary', document.getElementById('v-summary').value);
+            fd.append('category', document.getElementById('v-category').value);
+            fd.append('video_url', document.getElementById('v-url').value);
+            const fileInput = document.getElementById('v-file');
+            if (fileInput.files.length > 0) {
+                fd.append('video_file', fileInput.files[0]);
+            }
+
+            try {
+                const res = await fetch('/api/panel/viral-video', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Pin': pin },
+                    body: fd
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert('Hata: ' + (data.detail || 'Video işlenemedi'));
+                } else {
+                    showToast('🎬 ' + data.message);
+                    const resBox = document.getElementById('viral-result');
+                    document.getElementById('viral-dl').href = data.download_url;
+                    document.getElementById('viral-art').href = data.article_url;
+                    resBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                alert('Bağlantı hatası: ' + err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+                lucide.createIcons();
             }
         }
     </script>

@@ -3,7 +3,7 @@ import time
 import threading
 from contextlib import asynccontextmanager
 import uvicorn
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse
@@ -119,6 +119,93 @@ async def panel_delete_article(article_id: int, request: Request):
         raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
     deleted = database.delete_article(article_id)
     return {"ok": deleted}
+
+@app.post("/api/panel/viral-video")
+async def panel_viral_video(
+    request: Request,
+    title: str = Form(...),
+    summary: str = Form(""),
+    category: str = Form("Gündem"),
+    video_url: str = Form(""),
+    video_file: UploadFile = File(None)
+):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+
+    import hashlib
+    import video_generator
+    import ai_writer
+    import telegram_notifier
+
+    vid_id = hashlib.md5(f"{title}_{time.time()}".encode("utf-8")).hexdigest()[:10]
+    raw_path = os.path.join(OUTPUT_DIR, f"raw_{vid_id}.mp4")
+    out_filename = f"viral_{vid_id}.mp4"
+
+    try:
+        if video_file and video_file.filename:
+            content = await video_file.read()
+            with open(raw_path, "wb") as f:
+                f.write(content)
+        elif video_url.strip():
+            await _run_in_thread(video_generator.download_social_video, video_url.strip(), raw_path)
+        else:
+            raise HTTPException(status_code=400, detail="Lütfen bir video dosyası seçin veya video linki girin.")
+
+        # 1. Videoyu Gündem Analizi logosu ve başlıkla işle
+        res = await _run_in_thread(
+            video_generator.brand_raw_video,
+            raw_path,
+            title.strip(),
+            category.strip(),
+            out_filename
+        )
+
+        # 2. Gemini AI ile sosyal medya metni ve web makalesi üret
+        base_summary = summary.strip() or title.strip()
+        ai_cap = ai_writer.generate_social_caption(title.strip(), base_summary, "Gündem Analizi Özel")
+        article_data = ai_writer.generate_full_article(title.strip(), base_summary, "Gündem Analizi Özel")
+
+        # Makale içerisine video oynatıcıyı da ekle
+        video_html = f"""
+        <div class="my-6 rounded-2xl overflow-hidden border border-red-600/40 bg-black shadow-2xl">
+            <video controls playsinline class="w-full max-h-[640px] mx-auto" poster="/images/{os.path.basename(res['thumb_path'])}">
+                <source src="/images/{out_filename}" type="video/mp4">
+            </video>
+        </div>
+        """
+        full_content = video_html + article_data["content"]
+
+        slug = database.save_article(
+            title=title.strip(),
+            summary=article_data["summary"],
+            content=full_content,
+            image_path=res["thumb_path"],
+            source="Gündem Analizi",
+            category=category.strip()
+        )
+        site_url = f"{config.SITE_URL}/haber/{slug}"
+
+        # 3. Telegram kanalına logolu videoyu gönder
+        telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+
+        if os.path.exists(raw_path):
+            os.remove(raw_path)
+
+        return {
+            "ok": True,
+            "message": "Video logolandı, sitede yayınlandı ve Telegram kanalına gönderildi!",
+            "download_url": f"/images/{out_filename}",
+            "article_url": f"/haber/{slug}"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Video işleme hatası: {e}")
+
+async def _run_in_thread(func, *args):
+    import asyncio
+    return await asyncio.to_thread(func, *args)
 
 @app.get("/haber/{slug}", response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):

@@ -75,7 +75,7 @@ def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bo
         print(f"Telegram görsel gönderme hatası: {e}")
         return False
 
-def send_telegram_video(video_path: str, caption: str) -> bool:
+def send_telegram_video(video_path: str, caption: str, news_link: str = "") -> bool:
     """Telegram kanalına doğrudan video (Reels / MP4) gönderir."""
     if not config.TELEGRAM_BOT_TOKEN or not config.TELEGRAM_CHAT_ID:
         print("Telegram bot token veya chat ID tanımlı değil.")
@@ -85,10 +85,15 @@ def send_telegram_video(video_path: str, caption: str) -> bool:
         print(f"Video bulunamadı: {video_path}")
         return False
 
+    full_caption = caption
+    if news_link:
+        full_caption += f"\n\n🔗 Haberin Detayı: {news_link}"
+
     url = f"{BASE_URL}/sendVideo"
     payload = {
         "chat_id": config.TELEGRAM_CHAT_ID,
-        "caption": caption[:1000]
+        "caption": full_caption[:1020],
+        "supports_streaming": "true"
     }
 
     try:
