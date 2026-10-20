@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.title }} | Gündem Analizi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#dc2626',
+                            darkred: '#991b1b',
+                            dark: '#0a0d14',
+                            card: '#121722',
+                            border: '#1f293d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- ÜST HEADER -->
+    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3.5 group">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <div>
+                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
+                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    </span>
+                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                        Doğru Haber • Tarafsız Analiz
+                    </p>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+                    ← Ana Sayfa
+                </a>
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        <!-- HABER DETAYI (SOL BÖLÜM - 8 KOLON) -->
+        <article class="lg:col-span-8">
+            
+            <!-- Kategori ve Tarih -->
+            <div class="flex items-center gap-3 text-xs mb-4">
+                <span class="bg-red-600/90 text-white font-bold px-2.5 py-1 rounded-md uppercase tracking-wider text-[11px]">
+                    {{ article.category }}
+                </span>
+                <span class="text-slate-400 flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> {{ article.created_at[:16] }}
+                </span>
+                <span class="text-slate-500">•</span>
+                <span class="text-slate-400 flex items-center gap-1">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> {{ article.views }} Okunma
+                </span>
+            </div>
+
+            <!-- Başlık -->
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight mb-6">
+                {{ article.title }}
+            </h1>
+
+            <!-- Ana Görsel (Haber Kartı) -->
+            <div class="rounded-2xl overflow-hidden border border-brand-border mb-8 shadow-2xl bg-black">
+                {% if article.image_path %}
+                    <img src="/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ article.title }}" class="w-full h-auto object-cover max-h-[500px]">
+                {% endif %}
+            </div>
+
+            <!-- Sosyal Medya Paylaşım Butonları -->
+            <div class="flex flex-wrap items-center gap-2 py-3 px-4 rounded-xl bg-brand-card border border-brand-border mb-8 text-xs font-semibold">
+                <span class="text-slate-400 mr-2 flex items-center gap-1"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Paylaş:</span>
+                <a href="https://wa.me/?text={{ article.title }}%20{{ request.url }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 transition flex items-center gap-1">
+                    WhatsApp
+                </a>
+                <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-sky-600/20 text-sky-400 hover:bg-sky-600/30 transition flex items-center gap-1">
+                    Telegram
+                </a>
+                <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1">
+                    X (Twitter)
+                </a>
+            </div>
+
+            <!-- Makale İçeriği -->
+            <div class="text-slate-200 text-base sm:text-lg leading-relaxed font-normal article-body">
+                {{ article.content | safe }}
+            </div>
+
+            <!-- Kaynak Bilgisi -->
+            <div class="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs text-slate-400">
+                <span>Haber Kaynağı: <strong class="text-slate-300">{{ article.source }}</strong></span>
+                <span>Yayıncı: <strong class="text-red-400">Gündem Analizi Masası</strong></span>
+            </div>
+
+            <!-- TELEGRAM KANAL DAVETİ BANNERI -->
+            <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-red-950/80 to-brand-card border border-red-800/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <img src="/assets/logo.png" alt="Logo" class="w-14 h-14 rounded-full border-2 border-red-500 shadow-md">
+                    <div>
+                        <h4 class="font-extrabold text-white text-base sm:text-lg">Gündemi Anlık Takip Edin!</h4>
+                        <p class="text-xs sm:text-sm text-slate-300">Önemli son dakika gelişmelerini kaçırmamak için Telegram kanalımıza katılın.</p>
+                    </div>
+                </div>
+                <a href="https://t.me/gundemanalizi" target="_blank" class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-900/50 transition whitespace-nowrap flex items-center justify-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i> Kanala Katıl
+                </a>
+            </div>
+
+        </article>
+
+        <!-- YAN SÜTUN (SAĞ BÖLÜM - 4 KOLON) -->
+        <aside class="lg:col-span-4 space-y-6">
+            
+            <div class="rounded-2xl border border-brand-border bg-brand-card p-5">
+                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2 pb-3 border-b border-brand-border">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
+                    DİĞER ÖNEMLİ HABERLER
+                </h3>
+
+                <div class="space-y-4">
+                    {% for other in other_articles %}
+                    <a href="/haber/{{ other.slug }}" class="group block pb-4 border-b border-brand-border/40 last:border-0 last:pb-0">
+                        <div class="flex items-center gap-2 text-[11px] text-slate-500 mb-1">
+                            <span class="text-red-400 font-semibold">{{ other.category }}</span>
+                            <span>•</span>
+                            <span>{{ other.created_at[:16] }}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
+                            {{ other.title }}
+                        </h4>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Gündem Analizi Hakkında Kartı -->
+            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 text-center">
+                <img src="/assets/logo.png" alt="Gündem Analizi" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-red-600">
+                <h4 class="font-extrabold text-white text-sm">GÜNDEM ANALİZİ</h4>
+                <p class="text-xs text-red-400 font-semibold uppercase tracking-wider mb-2">Doğru Haber • Tarafsız Analiz</p>
+                <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                    Türkiye ve dünyada öne çıkan son dakika gelişmelerini tarafsız ve hızlı şekilde okuyucularına ulaştıran bağımsız haber platformu.
+                </p>
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-2 text-xs font-bold text-red-400 hover:text-red-300">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> @gundemanalizi
+                </a>
+            </div>
+
+        </aside>
+
+    </main>
+
+    <footer class="border-t border-brand-border bg-brand-dark py-6 text-xs text-slate-500 mt-12">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>GÜNDEM ANALİZİ © 2026 • Doğru Haber • Tarafsız Analiz</p>
+            <div class="flex items-center gap-4 text-slate-400">
+                <a href="/hakkimizda" class="hover:text-white">Hakkımızda & Künye</a>
+                <span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-white">Gizlilik Politikası</a>
+                <span>•</span>
+                <a href="/iletisim" class="hover:text-white">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası ve Çerezler | Gündem Analizi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#dc2626',
+                            dark: '#0a0d14',
+                            card: '#121722',
+                            border: '#1f293d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3.5 group">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <div>
+                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
+                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    </span>
+                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                        Doğru Haber • Tarafsız Analiz
+                    </p>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+                    ← Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 flex-1 w-full">
+        <div class="rounded-2xl border border-brand-border bg-brand-card p-8 sm:p-12 shadow-2xl space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
+            <h1 class="text-3xl font-extrabold text-white mb-2">Gizlilik Politikası ve KVKK</h1>
+            <p class="text-xs text-slate-400 pb-4 border-b border-brand-border">Son Güncelleme: 20 Ekim 2026</p>
+
+            <p>
+                <strong>Gündem Analizi</strong> (<a href="https://gundemanalizi.com.tr" class="text-red-400 hover:underline">gundemanalizi.com.tr</a>) olarak ziyaretçilerimizin kişisel verilerinin güvenliğine ve gizliliğine azami hassasiyet göstermekteyiz. 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca veri sorumlusu sıfatıyla sizi bilgilendirmek isteriz.
+            </p>
+
+            <h2 class="text-lg font-bold text-white pt-3">1. Toplanan Bilgiler ve Çerezler (Cookies)</h2>
+            <p>
+                Sitemizi ziyaret ettiğinizde standart sunucu günlükleri (IP adresi, tarayıcı türü, ziyaret saati) ve kullanıcı deneyimini iyileştirmek amacıyla çerezler (cookies) kullanılabilir. Bu veriler yalnızca istatistiksel analizler ve sitenin güvenliği amacıyla işlenir.
+            </p>
+
+            <h2 class="text-lg font-bold text-white pt-3">2. Google AdSense ve Üçüncü Taraf Reklamları</h2>
+            <p>
+                Sitemizde Google AdSense ve üçüncü taraf reklam ortaklarının reklamları yayınlanabilir. Google dahil üçüncü taraf tedarikçiler, kullanıcıların sitemize veya diğer web sitelerine yaptıkları önceki ziyaretlere dayalı olarak reklam sunmak için çerezlerden (DoubleClick çerezi vb.) yararlanır. Kullanıcılar, <a href="https://www.google.com/settings/ads" target="_blank" class="text-red-400 underline">Google Reklam Ayarları</a> sayfasını ziyaret ederek kişiselleştirilmiş reklamcılığı devre dışı bırakabilirler.
+            </p>
+
+            <h2 class="text-lg font-bold text-white pt-3">3. Dış Bağlantılar</h2>
+            <p>
+                Sitemiz, haber kaynağı belirtmek amacıyla diğer web sitelerine (ajanslar, resmi kurumlar) bağlantılar içerebilir. Bu sitelerin gizlilik uygulamalarından veya içeriklerinden Gündem Analizi sorumlu tutulamaz.
+            </p>
+
+            <h2 class="text-lg font-bold text-white pt-3">4. Haklarınız ve İletişim</h2>
+            <p>
+                KVKK’nın 11. maddesi kapsamındaki haklarınızı kullanmak ve her türlü gizlilik sorunuz için bizimle <strong>iletisim@gundemanalizi.com.tr</strong> e-posta adresi üzerinden iletişime geçebilirsiniz.
+            </p>
+        </div>
+    </main>
+
+    <footer class="border-t border-brand-border bg-brand-dark py-6 text-center text-xs text-slate-500">
+        <p>GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
+    </footer>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>
