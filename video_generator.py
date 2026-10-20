@@ -388,14 +388,17 @@ def brand_raw_video(
     raw_video_path: str,
     title: str,
     category: str = "SON DAKİKA",
-    output_filename: str = "viral_branded.mp4"
+    output_filename: str = "viral_branded.mp4",
+    start_sec: float = 0.0,
+    max_dur_sec: float = 45.0,
+    wm_pos: str = "center",
+    audio_mode: str = "original"
 ) -> dict:
     """
-    Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama Motoru:
-    - MoviePy / NumPy kare döngüsü KULLANMAZ (Render 512MB RAM sunucuda asla 502 Bad Gateway vermez).
-    - Pillow ile yalnızca 1 adet şeffaf 720x1280 PNG katmanı üretir ve doğrudan FFmpeg C motoruyla
-      (-threads 1 -preset ultrafast) 1-2 saniyede videonun üzerine işler.
-    - Videoyu küçültmez, tam genişlik/tam ekran kullanır ve kendi orijinal sesini korur.
+    Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama & Kurgu Motoru:
+    - start_sec / max_dur_sec ile başlangıç ve bitiş süresini kırpar (trim).
+    - wm_pos ('center', 'right', 'left') ile çalınmaz filigran konumunu ayarlar.
+    - audio_mode ('original', 'ambient', 'mute') ile ses modunu kontrol eder.
     """
     import gc
     import subprocess
@@ -453,10 +456,15 @@ def brand_raw_video(
         ty += 26
 
     # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
-    # 1. Videonun tam orta-alt kısmına (kesilip çalınamayacak bölgeye: y=700) yarı saydam logo + @gundemanalizi rozeti
     wm_y = 700
     wm_box_w = 185
-    wm_x = (VW_OUT - wm_box_w) // 2
+    if wm_pos == "right":
+        wm_x = VW_OUT - wm_box_w - 22
+    elif wm_pos == "left":
+        wm_x = 22
+    else:
+        wm_x = (VW_OUT - wm_box_w) // 2
+
     odraw.rounded_rectangle(
         [wm_x, wm_y, wm_x + wm_box_w, wm_y + 42],
         radius=21,
@@ -494,31 +502,54 @@ def brand_raw_video(
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür (60fps videolarda 8 kat hız kazandırır!), sonra ölçekle ve logoyu bas
+    # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür, sonra ölçekle ve logoyu bas
     filter_complex = (
         f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
         f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
         f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
     )
-    ff_cmd = [
-        ffmpeg_exe, "-y",
-        "-t", "45",
+
+    safe_start = max(0.0, float(start_sec or 0.0))
+    safe_dur = max(3.0, min(60.0, float(max_dur_sec or 45.0)))
+
+    amb_wav = None
+    ff_cmd = [ffmpeg_exe, "-y"]
+    if safe_start > 0:
+        ff_cmd += ["-ss", f"{safe_start:.1f}"]
+    ff_cmd += [
+        "-t", f"{safe_dur:.1f}",
         "-i", raw_video_path,
         "-i", overlay_path,
+    ]
+    if audio_mode == "ambient":
+        amb_wav = os.path.join(OUTPUT_DIR, f"amb_{output_filename}.wav")
+        generate_ambient_news_music(min(safe_dur, 30.0), amb_wav)
+        ff_cmd += ["-i", amb_wav]
+
+    ff_cmd += [
         "-filter_complex", filter_complex,
         "-map", "[v]",
-        "-map", "0:a?",
+    ]
+    if audio_mode == "mute":
+        ff_cmd += ["-an"]
+    elif audio_mode == "ambient" and amb_wav:
+        ff_cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "96k", "-shortest"]
+    else:
+        ff_cmd += ["-map", "0:a?", "-c:a", "copy"]
+
+    ff_cmd += [
         "-c:v", "libx264",
         "-preset", "ultrafast",
         "-tune", "zerolatency",
         "-crf", "27",
-        "-c:a", "copy",
         "-movflags", "+faststart",
         output_path
     ]
     res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=110)
     if os.path.exists(overlay_path):
         os.remove(overlay_path)
+    if amb_wav and os.path.exists(amb_wav):
+        os.remove(amb_wav)
 
     if res_ff.returncode != 0 or not os.path.exists(output_path):
         err_tail = (res_ff.stderr or "")[-300:]

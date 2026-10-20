@@ -120,6 +120,172 @@ async def panel_delete_article(article_id: int, request: Request):
     deleted = database.delete_article(article_id)
     return {"ok": deleted}
 
+@app.get("/api/panel/article/{article_id}")
+async def panel_get_article(article_id: int, request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    art = database.get_article_by_id(article_id)
+    if not art:
+        raise HTTPException(status_code=404, detail="Haber bulunamadı")
+    return {"ok": True, "article": art}
+
+@app.post("/api/panel/edit/{article_id}")
+async def panel_edit_article(
+    article_id: int,
+    request: Request,
+    title: str = Form(...),
+    summary: str = Form(""),
+    content: str = Form(""),
+    category: str = Form("Gündem")
+):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    updated = database.update_article(
+        article_id=article_id,
+        title=title.strip(),
+        summary=summary.strip(),
+        content=content.strip(),
+        category=category.strip()
+    )
+    return {"ok": updated, "message": "Haber başarıyla güncellendi!"}
+
+VIDEO_JOBS = {}
+
+def _process_viral_video_job(
+    job_id: str,
+    raw_path: str,
+    out_filename: str,
+    video_url: str,
+    has_uploaded_file: bool,
+    title: str,
+    summary: str,
+    category: str,
+    start_sec: float,
+    max_dur_sec: float,
+    wm_pos: str,
+    audio_mode: str,
+    pub_site: bool,
+    pub_tg: bool
+):
+    import video_generator
+    import ai_writer
+    import telegram_notifier
+
+    job = VIDEO_JOBS[job_id]
+    try:
+        # ADIM 1: İndirme / Yükleme Kontrolü
+        job.update({
+            "step": 1,
+            "percent": 15,
+            "eta_sec": 22,
+            "step_text": "📥 1/5: Ham video kaynağı indiriliyor ve doğrulanıyor..."
+        })
+        if not has_uploaded_file:
+            video_generator.download_social_video(video_url, raw_path)
+
+        # ADIM 2: FFmpeg ile Tam Ekran Logolama & Filigran & Kırpma
+        job.update({
+            "step": 2,
+            "percent": 42,
+            "eta_sec": 15,
+            "step_text": "🎨 2/5: Tam ekran Gündem Analizi logosu, başlık ve çalınmaz filigran işleniyor..."
+        })
+        res = video_generator.brand_raw_video(
+            raw_video_path=raw_path,
+            title=title,
+            category=category,
+            output_filename=out_filename,
+            start_sec=start_sec,
+            max_dur_sec=max_dur_sec,
+            wm_pos=wm_pos,
+            audio_mode=audio_mode
+        )
+
+        # ADIM 3: Yapay Zeka Haber & Sosyal Medya Metni
+        job.update({
+            "step": 3,
+            "percent": 68,
+            "eta_sec": 9,
+            "step_text": "🤖 3/5: Gemini AI ile haber makalesi ve Reels/TikTok açıklaması hazırlanıyor..."
+        })
+        base_summary = summary or title
+        ai_cap = ai_writer.generate_social_caption(title, base_summary, "Gündem Analizi Özel")
+        article_data = ai_writer.generate_full_article(title, base_summary, "Gündem Analizi Özel")
+
+        slug = None
+        site_url = config.SITE_URL
+        article_id = None
+
+        # ADIM 4: Web Sitesinde Yayınlama
+        if pub_site:
+            job.update({
+                "step": 4,
+                "percent": 84,
+                "eta_sec": 5,
+                "step_text": "🌐 4/5: Haber ve video gündemanalizi.com.tr üzerinde yayınlanıyor..."
+            })
+            video_html = f"""
+            <div class="my-6 rounded-2xl overflow-hidden border border-red-600/40 bg-black shadow-2xl">
+                <video controls playsinline class="w-full max-h-[640px] mx-auto" poster="/images/{os.path.basename(res['thumb_path'])}">
+                    <source src="/images/{out_filename}" type="video/mp4">
+                </video>
+            </div>
+            """
+            full_content = video_html + article_data["content"]
+            slug = database.save_article(
+                title=title,
+                summary=article_data["summary"],
+                content=full_content,
+                image_path=res["thumb_path"],
+                source="Gündem Analizi",
+                category=category
+            )
+            site_url = f"{config.SITE_URL}/haber/{slug}"
+            art_obj = database.get_article_by_slug(slug)
+            if art_obj:
+                article_id = art_obj.get("id")
+
+        # ADIM 5: Telegram Kanalına Gönderim
+        if pub_tg:
+            job.update({
+                "step": 5,
+                "percent": 94,
+                "eta_sec": 2,
+                "step_text": "📲 5/5: Logolu video @gundemanalizi Telegram kanalına gönderiliyor..."
+            })
+            telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+
+        if os.path.exists(raw_path):
+            os.remove(raw_path)
+
+        social_pack = f"{ai_cap['caption']}\n\n🌐 Detaylar: {site_url}\n#gündem #sondakika #haber #gündemanalizi"
+        job.update({
+            "status": "done",
+            "step": 5,
+            "percent": 100,
+            "eta_sec": 0,
+            "step_text": "✅ Tamamlandı! Video logolandı ve tüm platformlar için hazır!",
+            "download_url": f"/images/{out_filename}",
+            "thumb_url": f"/images/{os.path.basename(res['thumb_path'])}",
+            "article_url": f"/haber/{slug}" if slug else "",
+            "article_id": article_id,
+            "social_caption": social_pack
+        })
+    except Exception as e:
+        if os.path.exists(raw_path):
+            try:
+                os.remove(raw_path)
+            except Exception:
+                pass
+        job.update({
+            "status": "error",
+            "eta_sec": 0,
+            "step_text": f"❌ Hata oluştu: {e}",
+            "error": str(e)
+        })
+
 @app.post("/api/panel/viral-video")
 async def panel_viral_video(
     request: Request,
@@ -127,6 +293,12 @@ async def panel_viral_video(
     summary: str = Form(""),
     category: str = Form("Gündem"),
     video_url: str = Form(""),
+    start_sec: float = Form(0.0),
+    max_dur_sec: float = Form(45.0),
+    wm_pos: str = Form("center"),
+    audio_mode: str = Form("original"),
+    pub_site: str = Form("true"),
+    pub_tg: str = Form("true"),
     video_file: UploadFile = File(None)
 ):
     pin = request.headers.get("X-Admin-Pin", "")
@@ -134,78 +306,62 @@ async def panel_viral_video(
         raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
 
     import hashlib
-    import video_generator
-    import ai_writer
-    import telegram_notifier
-
     vid_id = hashlib.md5(f"{title}_{time.time()}".encode("utf-8")).hexdigest()[:10]
     raw_path = os.path.join(OUTPUT_DIR, f"raw_{vid_id}.mp4")
     out_filename = f"viral_{vid_id}.mp4"
 
-    try:
-        if video_file and video_file.filename:
-            content = await video_file.read()
-            with open(raw_path, "wb") as f:
-                f.write(content)
-        elif video_url.strip():
-            await _run_in_thread(video_generator.download_social_video, video_url.strip(), raw_path)
-        else:
-            raise HTTPException(status_code=400, detail="Lütfen bir video dosyası seçin veya video linki girin.")
+    has_uploaded_file = False
+    if video_file and video_file.filename:
+        content = await video_file.read()
+        with open(raw_path, "wb") as f:
+            f.write(content)
+        has_uploaded_file = True
+    elif not video_url.strip():
+        raise HTTPException(status_code=400, detail="Lütfen bir video dosyası seçin veya video linki girin.")
 
-        # 1. Videoyu Gündem Analizi logosu ve başlıkla işle
-        res = await _run_in_thread(
-            video_generator.brand_raw_video,
+    VIDEO_JOBS[vid_id] = {
+        "job_id": vid_id,
+        "status": "running",
+        "step": 1,
+        "percent": 8,
+        "eta_sec": 25,
+        "step_text": "🚀 Video stüdyosu başlatıldı, sıraya alındı...",
+        "started_at": time.time()
+    }
+
+    t = threading.Thread(
+        target=_process_viral_video_job,
+        args=(
+            vid_id,
             raw_path,
+            out_filename,
+            video_url.strip(),
+            has_uploaded_file,
             title.strip(),
+            summary.strip(),
             category.strip(),
-            out_filename
-        )
+            float(start_sec or 0),
+            float(max_dur_sec or 45),
+            wm_pos.strip(),
+            audio_mode.strip(),
+            pub_site.lower() == "true",
+            pub_tg.lower() == "true"
+        ),
+        daemon=True
+    )
+    t.start()
+    return {"ok": True, "job_id": vid_id}
 
-        # 2. Gemini AI ile sosyal medya metni ve web makalesi üret
-        base_summary = summary.strip() or title.strip()
-        ai_cap = ai_writer.generate_social_caption(title.strip(), base_summary, "Gündem Analizi Özel")
-        article_data = ai_writer.generate_full_article(title.strip(), base_summary, "Gündem Analizi Özel")
-
-        # Makale içerisine video oynatıcıyı da ekle
-        video_html = f"""
-        <div class="my-6 rounded-2xl overflow-hidden border border-red-600/40 bg-black shadow-2xl">
-            <video controls playsinline class="w-full max-h-[640px] mx-auto" poster="/images/{os.path.basename(res['thumb_path'])}">
-                <source src="/images/{out_filename}" type="video/mp4">
-            </video>
-        </div>
-        """
-        full_content = video_html + article_data["content"]
-
-        slug = database.save_article(
-            title=title.strip(),
-            summary=article_data["summary"],
-            content=full_content,
-            image_path=res["thumb_path"],
-            source="Gündem Analizi",
-            category=category.strip()
-        )
-        site_url = f"{config.SITE_URL}/haber/{slug}"
-
-        # 3. Telegram kanalına logolu videoyu gönder
-        telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
-
-        if os.path.exists(raw_path):
-            os.remove(raw_path)
-
-        return {
-            "ok": True,
-            "message": "Video logolandı, sitede yayınlandı ve Telegram kanalına gönderildi!",
-            "download_url": f"/images/{out_filename}",
-            "article_url": f"/haber/{slug}"
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Video işleme hatası: {e}")
-
-async def _run_in_thread(func, *args):
-    import asyncio
-    return await asyncio.to_thread(func, *args)
+@app.get("/api/panel/video-job/{job_id}")
+async def panel_video_job_status(job_id: str, request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    job = VIDEO_JOBS.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="İşlem bulunamadı")
+    elapsed = round(time.time() - job.get("started_at", time.time()), 1)
+    return {"ok": True, "elapsed_sec": elapsed, **job}
 
 @app.get("/haber/{slug}", response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):

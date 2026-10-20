@@ -321,6 +321,23 @@ def delete_article(article_id: int) -> bool:
         return (cur.rowcount or 0) > 0
 
 
+def get_article_by_id(article_id: int) -> Optional[Dict]:
+    """ID'ye göre makaleyi döner."""
+    with get_connection() as conn:
+        row = conn.execute("SELECT * FROM articles WHERE id = ?", (article_id,)).fetchone()
+        return _row_to_dict(row) if row else None
+
+
+def update_article(article_id: int, title: str, summary: str, content: str, category: str) -> bool:
+    """Belirtilen ID'li makalenin başlık, özet, içerik ve kategorisini günceller."""
+    with get_connection() as conn:
+        cur = conn.execute(
+            "UPDATE articles SET title = ?, summary = ?, content = ?, category = ? WHERE id = ?",
+            (title, summary, content, category, article_id)
+        )
+        return (cur.rowcount or 0) > 0
+
+
 def record_visit(key: str = "home_visits"):
     """Genel sayfa ziyaret sayacını 1 artırır."""
     try:
