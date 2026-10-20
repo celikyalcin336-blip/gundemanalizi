@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ article.title }} | Gündem Analizi</title>
+    <meta name="description" content="{{ article.summary }}">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ article.title }}">
+    <meta property="og:description" content="{{ article.summary }}">
+    {% if article.image_path %}
+    <meta property="og:image" content="/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
+    {% endif %}
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link rel="alternate" type="application/rss+xml" title="Gündem Analizi RSS" href="/rss.xml">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -100,6 +109,9 @@
                 <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1">
                     X (Twitter)
                 </a>
+                <button onclick="copyArticleLink(this)" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition flex items-center gap-1">
+                    Linki Kopyala
+                </button>
             </div>
 
             <!-- Makale İçeriği -->
@@ -184,8 +196,34 @@
         </div>
     </footer>
 
+    <!-- ÇEREZ & KVKK ONAY BANDI -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900/95 backdrop-blur border-t border-red-600/40 p-4 shadow-2xl">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-slate-300">
+            <p class="leading-relaxed text-center sm:text-left">
+                🍪 Sizlere daha iyi bir haber deneyimi sunmak için çerezler (cookies) kullanıyoruz. Detaylar için <a href="/gizlilik-politikasi" class="text-red-400 underline hover:text-red-300 font-semibold">Gizlilik ve Çerez Politikamızı</a> inceleyebilirsiniz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="/gizlilik-politikasi" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold transition">Detaylar</a>
+                <button onclick="acceptCookies()" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg shadow-red-900/40 transition">Kabul Et</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+        if (!localStorage.getItem('ga_cookie_consent')) {
+            document.getElementById('cookie-banner').classList.remove('hidden');
+        }
+        function acceptCookies() {
+            localStorage.setItem('ga_cookie_consent', 'accepted');
+            document.getElementById('cookie-banner').classList.add('hidden');
+        }
+        function copyArticleLink(btn) {
+            navigator.clipboard.writeText(window.location.href);
+            const orig = btn.innerText;
+            btn.innerText = 'Kopyalandı ✓';
+            setTimeout(() => { btn.innerText = orig; }, 2000);
+        }
     </script>
 </body>
 </html>

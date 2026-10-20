@@ -125,25 +125,72 @@ async def api_articles(limit: int = 10):
 async def api_stats():
     return database.get_storage_stats()
 
-@app.get("/robots.txt", response_class=HTMLResponse)
-async def robots():
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    logo_path = os.path.join(ASSETS_DIR, "logo.png")
+    if os.path.exists(logo_path):
+        return FileResponse(logo_path, media_type="image/png")
+    raise HTTPException(status_code=404)
+
+@app.get("/ads.txt", response_class=PlainTextResponse)
+async def ads_txt():
+    content = os.getenv("ADS_TXT", "# Google AdSense ads.txt - Gündem Analizi\n")
+    return PlainTextResponse(content=content)
+
+@app.get("/robots.txt", response_class=PlainTextResponse)
+async def robots(request: Request):
+    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
+    base_url = f"https://{host}"
     content = f"""User-agent: *
 Allow: /
-Sitemap: {database.config.SITE_URL if hasattr(database, 'config') else 'https://gundemanalizi.com.tr'}/sitemap.xml
+Sitemap: {base_url}/sitemap.xml
 """
-    return HTMLResponse(content=content, media_type="text/plain")
+    return PlainTextResponse(content=content)
 
 @app.get("/sitemap.xml")
-async def sitemap():
-    articles = database.get_articles(limit=100)
-    base_url = "https://gundemanalizi.com.tr"
+async def sitemap(request: Request):
+    articles = database.get_articles(limit=200)
+    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
+    base_url = f"https://{host}"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     for a in articles:
         xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><priority>0.8</priority></url>')
     xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+
+@app.get("/rss.xml")
+async def rss_feed(request: Request):
+    from xml.sax.saxutils import escape
+    articles = database.get_articles(limit=30)
+    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
+    base_url = f"https://{host}"
+    items_xml = []
+    for a in articles:
+        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1]
+        img_url = f"{base_url}/images/{img_name}" if img_name else f"{base_url}/assets/logo.png"
+        items_xml.append(f"""    <item>
+      <title>{escape(a["title"])}</title>
+      <link>{base_url}/haber/{a["slug"]}</link>
+      <guid>{base_url}/haber/{a["slug"]}</guid>
+      <description>{escape(a.get("summary") or a["title"])}</description>
+      <category>{escape(a.get("category") or "Gündem")}</category>
+      <enclosure url="{img_url}" type="image/jpeg"/>
+    </item>""")
+    rss = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
+    <link>{base_url}/</link>
+    <description>Türkiye ve dünyadan son dakika gelişmeleri ve tarafsız analizler.</description>
+    <language>tr-TR</language>
+{chr(10).join(items_xml)}
+  </channel>
+</rss>"""
+    return HTMLResponse(content=rss, media_type="application/rss+xml")
 
 def start_server(host: str = "127.0.0.1", port: int = 8000):
     uvicorn.run("web_server:app", host=host, port=port, reload=False)

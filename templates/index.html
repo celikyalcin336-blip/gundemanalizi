@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
+    <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset ve güncel haberlerin tarafsız analizi.">
+    <meta property="og:title" content="Gündem Analizi | Doğru Haber • Tarafsız Analiz">
+    <meta property="og:description" content="Türkiye ve dünyadan son dakika gelişmeleri ve tarafsız analizler.">
+    <meta property="og:image" content="/assets/logo.png">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link rel="alternate" type="application/rss+xml" title="Gündem Analizi RSS" href="/rss.xml">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -230,8 +236,28 @@
         </div>
     </footer>
 
+    <!-- ÇEREZ & KVKK ONAY BANDI (AdSense Uyumluluğu) -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900/95 backdrop-blur border-t border-red-600/40 p-4 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-slate-300">
+            <p class="leading-relaxed text-center sm:text-left">
+                🍪 Sizlere daha iyi bir haber deneyimi sunmak ve site trafiğini analiz etmek için çerezler (cookies) kullanıyoruz. Detaylar için <a href="/gizlilik-politikasi" class="text-red-400 underline hover:text-red-300 font-semibold">Gizlilik ve Çerez Politikamızı</a> inceleyebilirsiniz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="/gizlilik-politikasi" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold transition">Detaylar</a>
+                <button onclick="acceptCookies()" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg shadow-red-900/40 transition">Kabul Et</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+        if (!localStorage.getItem('ga_cookie_consent')) {
+            document.getElementById('cookie-banner').classList.remove('hidden');
+        }
+        function acceptCookies() {
+            localStorage.setItem('ga_cookie_consent', 'accepted');
+            document.getElementById('cookie-banner').classList.add('hidden');
+        }
     </script>
 </body>
 </html>
