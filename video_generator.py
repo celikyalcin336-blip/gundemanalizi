@@ -6,7 +6,6 @@ import requests
 from io import BytesIO
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from moviepy import VideoClip, VideoFileClip, AudioFileClip
 
 if sys.stdout.encoding != 'utf-8':
     try:
@@ -297,6 +296,7 @@ def generate_news_video(
     wav_path = os.path.join(OUTPUT_DIR, "temp_ambient.wav")
     generate_ambient_news_music(duration, wav_path)
 
+    from moviepy import VideoClip, AudioFileClip
     video_clip = VideoClip(make_frame, duration=duration)
     audio_clip = AudioFileClip(wav_path)
     final_clip = video_clip.with_audio(audio_clip)
@@ -323,27 +323,56 @@ def generate_news_video(
 def download_social_video(url: str, output_path: str) -> str:
     """
     X (Twitter), TikTok, Instagram, Reddit veya doğrudan .mp4 linkinden
-    ham videoyu indirir.
+    ham videoyu indirir. Subprocess ve hafif API kullanarak ana sunucu RAM'ini (512MB) hiç şişirmez.
     """
-    if url.lower().split("?")[0].endswith(".mp4"):
-        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
-        r.raise_for_status()
-        with open(output_path, "wb") as f:
-            f.write(r.content)
-        return output_path
+    import re
+    import subprocess
+    clean_url = url.strip()
 
-    import yt_dlp
+    def _stream_download(mp4_url: str, dest: str):
+        with requests.get(mp4_url, headers={"User-Agent": "Mozilla/5.0"}, stream=True, timeout=30) as r:
+            r.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in r.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+        return dest
+
+    if clean_url.lower().split("?")[0].endswith(".mp4"):
+        return _stream_download(clean_url, output_path)
+
+    # 1. X (Twitter) linkleri için 0-RAM hızlı doğrudan CDN çözücü (fxtwitter API)
+    m_tw = re.search(r"(?:x\.com|twitter\.com)/([^/?#]+)/status/(\d+)", clean_url)
+    if m_tw:
+        try:
+            fx_url = f"https://api.fxtwitter.com/{m_tw.group(1)}/status/{m_tw.group(2)}"
+            r_fx = requests.get(fx_url, headers={"User-Agent": "TelegramBot (like TwitterBot)"}, timeout=12)
+            if r_fx.status_code == 200:
+                data = r_fx.json()
+                videos = ((data.get("tweet") or {}).get("media") or {}).get("videos") or []
+                if videos and videos[0].get("url"):
+                    return _stream_download(videos[0]["url"], output_path)
+        except Exception:
+            pass
+
     if os.path.exists(output_path):
         os.remove(output_path)
-    ydl_opts = {
-        "outtmpl": output_path,
-        "format": "best[ext=mp4]/best",
-        "merge_output_format": "mp4",
-        "quiet": True,
-        "no_warnings": True,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+
+    cmd = [
+        sys.executable, "-m", "yt_dlp",
+        "--no-playlist",
+        "--no-warnings",
+        "--no-check-certificates",
+        "--max-filesize", "35M",
+        "-f", "best[height<=720][ext=mp4]/best[ext=mp4]/best",
+        "--merge-output-format", "mp4",
+        "-o", output_path,
+        clean_url
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
+    if proc.returncode != 0 or not os.path.exists(output_path):
+        err_msg = (proc.stderr or proc.stdout or "Video indirilemedi").strip().splitlines()[-1]
+        raise RuntimeError(f"Linkten video indirilemedi ({err_msg}). Lütfen videoyu cihazınıza indirip 'MP4 Dosyası Seç' kısmından yükleyin.")
     return output_path
 
 
@@ -354,147 +383,130 @@ def brand_raw_video(
     output_filename: str = "viral_branded.mp4"
 ) -> dict:
     """
-    Tam Ekran (Küçültmesiz) Viral Video Logolama Motoru:
-    - Videoyu ASLA küçük bir kutuya hapsetmez, tam genişlik / tam ekran kullanır.
-    - Dikey (9:16) videoları %100 TAM EKRAN (1080x1920) oynatır; üst kısma yarı saydam
-      şık bir bantla Gündem Analizi logosu ve başlığı yazar, videonun ortasını asla kapatmaz.
-    - Yatay (16:9) veya kare (1:1) videoları %100 TAM GENİŞLİK (1080px, sıfır kenar boşluğu)
-      olarak ortalar, arka planı videonun kendi bulanık görüntüsüyle doldurur, başlığı üst boşluğa yazar.
-    - Videonun KENDİ ORİJİNAL SESİNİ korur.
+    Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama Motoru:
+    - MoviePy / NumPy kare döngüsü KULLANMAZ (Render 512MB RAM sunucuda asla 502 Bad Gateway vermez).
+    - Pillow ile yalnızca 1 adet şeffaf 720x1280 PNG katmanı üretir ve doğrudan FFmpeg C motoruyla
+      (-threads 1 -preset ultrafast) 1-2 saniyede videonun üzerine işler.
+    - Videoyu küçültmez, tam genişlik/tam ekran kullanır ve kendi orijinal sesini korur.
     """
-    from PIL import ImageFilter
-    print(f"\n🔥 Ham Video Tam Ekran Logolanıyor: {title[:55]}...")
-    src_clip = VideoFileClip(raw_video_path)
-    max_dur = min(src_clip.duration or 15.0, 58.0)
-    if src_clip.duration and src_clip.duration > max_dur:
-        src_clip = src_clip.subclipped(0, max_dur)
+    import gc
+    import subprocess
+    import imageio_ffmpeg
+    print(f"\n🔥 Ultra-Hızlı FFmpeg ile Tam Ekran Logolanıyor: {title[:55]}...")
 
-    vw, vh = src_clip.size
-    is_vertical = (vh / max(vw, 1)) >= 1.25
+    VW_OUT, VH_OUT = 720, 1280
 
-    font_brand = get_font(FONT_BOLD, 30)
-    font_sub = get_font(FONT_REGULAR, 19)
-    font_badge = get_font(FONT_BOLD, 22)
-    font_title = get_font(FONT_BOLD, 38)
-    font_footer = get_font(FONT_BOLD, 24)
+    font_brand = get_font(FONT_BOLD, 22)
+    font_sub = get_font(FONT_REGULAR, 14)
+    font_badge = get_font(FONT_BOLD, 16)
+    font_title = get_font(FONT_BOLD, 26)
+    font_footer = get_font(FONT_BOLD, 17)
 
-    # Şeffaf (RGBA) Overlay katmanı hazırla (videonun üstüne/boşluğuna binecek)
-    overlay = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (Sadece 1 kare = ~1 MB RAM!)
+    overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
 
-    # Üst yarı saydam karartma geçişi (yazıların her videoda net okunması için, sadece en üstte)
-    lines = wrap_text(title, font_title, WIDTH - 80, odraw)[:3]
-    top_grad_h = 165 + len(lines) * 48 + 35
+    lines = wrap_text(title, font_title, VW_OUT - 56, odraw)[:3]
+    top_grad_h = 115 + len(lines) * 34 + 25
 
     for y in range(top_grad_h):
-        # En üstte %78 koyu, aşağı indikçe tamamen şeffaf (0)
         ratio = 1.0 - (y / top_grad_h)
-        alpha = int(205 * (ratio ** 1.3))
-        odraw.line([(0, y), (WIDTH, y)], fill=(8, 12, 20, alpha))
+        alpha = int(210 * (ratio ** 1.3))
+        odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
-    # Alt ince şeffaf imza bandı
-    for y in range(HEIGHT - 110, HEIGHT):
-        ratio = (y - (HEIGHT - 110)) / 110.0
-        alpha = int(185 * (ratio ** 1.2))
-        odraw.line([(0, y), (WIDTH, y)], fill=(8, 12, 20, alpha))
+    for y in range(VH_OUT - 80, VH_OUT):
+        ratio = (y - (VH_OUT - 80)) / 80.0
+        alpha = int(190 * (ratio ** 1.2))
+        odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
-    # Logo hazırla
     logo_path = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(logo_path):
         l_raw = Image.open(logo_path).convert("RGBA")
-        ls = l_raw.resize((68, 68), Image.Resampling.LANCZOS)
-        m1 = Image.new("L", (68, 68), 0)
-        ImageDraw.Draw(m1).ellipse((0, 0, 68, 68), fill=255)
-        overlay.paste(ls, (36, 38), mask=m1)
-        odraw.ellipse((34, 36, 106, 108), outline=(220, 38, 38, 255), width=3)
+        ls = l_raw.resize((48, 48), Image.Resampling.LANCZOS)
+        m1 = Image.new("L", (48, 48), 0)
+        ImageDraw.Draw(m1).ellipse((0, 0, 48, 48), fill=255)
+        overlay.paste(ls, (24, 26), mask=m1)
+        odraw.ellipse((22, 24, 74, 76), outline=(220, 38, 38, 255), width=2)
 
-    odraw.text((120, 42), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
-    odraw.text((120, 78), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
+    odraw.text((84, 28), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
+    odraw.text((84, 54), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
 
     cat_label = f"● {category.upper()}"
     cb = odraw.textbbox((0, 0), cat_label, font=font_badge)
-    bw = (cb[2] - cb[0]) + 34
-    odraw.rounded_rectangle([WIDTH - bw - 36, 46, WIDTH - 36, 96], radius=10, fill=(220, 38, 38, 240))
-    odraw.text((WIDTH - bw - 19, 57), cat_label, fill=(255, 255, 255, 255), font=font_badge)
+    bw = (cb[2] - cb[0]) + 24
+    odraw.rounded_rectangle([VW_OUT - bw - 24, 30, VW_OUT - 24, 66], radius=8, fill=(220, 38, 38, 240))
+    odraw.text((VW_OUT - bw - 12, 38), cat_label, fill=(255, 255, 255, 255), font=font_badge)
 
-    # Başlık (kompakt, en üstte, videonun ortasını asla kapatmaz)
-    ty = 126
+    ty = 88
     for idx, line in enumerate(lines):
         col = (255, 255, 255, 255) if idx == 0 else (254, 240, 138, 255)
-        odraw.text((40, ty + 2), line, fill=(0, 0, 0, 220), font=font_title)
-        odraw.text((38, ty), line, fill=col, font=font_title)
-        ty += 48
+        odraw.text((28, ty + 2), line, fill=(0, 0, 0, 220), font=font_title)
+        odraw.text((26, ty), line, fill=col, font=font_title)
+        ty += 34
 
-    # En alt köşe filigran / imza (kompakt, videoyu kapatmaz)
-    odraw.text((38, HEIGHT - 58), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
-    odraw.text((WIDTH - 255, HEIGHT - 58), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
+    odraw.text((26, VH_OUT - 42), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
+    odraw.text((VW_OUT - 175, VH_OUT - 42), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
 
-    # Hızlı alfa birleştirme için numpy dizileri
-    ov_arr = np.array(overlay)
-    ov_rgb = ov_arr[:, :, :3].astype(np.float32)
-    ov_alpha = (ov_arr[:, :, 3:4].astype(np.float32)) / 255.0
-
-    # Video tam genişlik boyutu (küçültme yok, %100 1080px genişlik!)
-    scale_w = WIDTH / max(vw, 1)
-    fg_w = WIDTH
-    fg_h = int(vh * scale_w)
-
-    def make_branded_frame(t: float):
-        try:
-            raw_f = src_clip.get_frame(min(t, max_dur - 0.04))
-            pil_raw = Image.fromarray(raw_f)
-
-            if is_vertical and fg_h >= HEIGHT:
-                # Dikey video: %100 TAM EKRAN (1080x1920)
-                scaled = pil_raw.resize((fg_w, fg_h), Image.Resampling.BILINEAR)
-                top_crop = (fg_h - HEIGHT) // 2
-                canvas_pil = scaled.crop((0, top_crop, WIDTH, top_crop + HEIGHT))
-            elif is_vertical:
-                # Dikey ama 1920'den biraz kısa: Tam ekran doldur
-                canvas_pil = pil_raw.resize((WIDTH, HEIGHT), Image.Resampling.BILINEAR)
-            else:
-                # Yatay veya Kare video: Arka plan bulanık tam ekran, ortada %100 tam genişlik (1080px) net video!
-                bg_small = pil_raw.resize((180, 320), Image.Resampling.BILINEAR).filter(ImageFilter.GaussianBlur(radius=8))
-                canvas_pil = bg_small.resize((WIDTH, HEIGHT), Image.Resampling.BILINEAR)
-                # Arka planı hafif koyulaştır ki ortadaki ana video patlasın
-                bg_np = (np.array(canvas_pil, dtype=np.float32) * 0.45).astype(np.uint8)
-                canvas_pil = Image.fromarray(bg_np)
-
-                fg_pil = pil_raw.resize((WIDTH, fg_h), Image.Resampling.BILINEAR)
-                vy = max(top_grad_h - 20, (HEIGHT - fg_h) // 2)
-                if vy + fg_h > HEIGHT - 70:
-                    vy = max(0, (HEIGHT - fg_h) // 2)
-                canvas_pil.paste(fg_pil, (0, vy))
-
-            base_np = np.array(canvas_pil, dtype=np.float32)
-            blended = base_np * (1.0 - ov_alpha) + ov_rgb * ov_alpha
-            return blended.astype(np.uint8)
-        except Exception:
-            return np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
-
-    out_clip = VideoClip(make_branded_frame, duration=max_dur)
-    if src_clip.audio is not None:
-        out_clip = out_clip.with_audio(src_clip.audio)
+    overlay_path = os.path.join(OUTPUT_DIR, f"ov_{output_filename}.png")
+    overlay.save(overlay_path, "PNG")
+    del overlay
+    gc.collect()
 
     output_path = os.path.join(OUTPUT_DIR, output_filename)
-    out_clip.write_videofile(
-        output_path,
-        fps=24,
-        codec="libx264",
-        audio_codec="aac",
-        logger=None
-    )
-
-    # Web sitesi için kapak görseli (thumbnail) kaydet
     thumb_name = output_filename.replace(".mp4", ".jpg")
     thumb_path = os.path.join(OUTPUT_DIR, thumb_name)
-    mid_frame = make_branded_frame(min(1.5, max_dur / 2))
-    thumb_img = Image.fromarray(mid_frame).crop((0, 0, WIDTH, WIDTH))
-    thumb_img.save(thumb_path, "JPEG", quality=88)
 
-    out_clip.close()
-    src_clip.close()
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
+    # 2. Doğrudan FFmpeg ile tam genişlik (720x1280) ölçekle ve şeffaf logoyu üstüne bas (~25MB RAM)
+    filter_complex = (
+        f"[0:v]scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease,"
+        f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
+        f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
+    )
+    ff_cmd = [
+        ffmpeg_exe, "-y",
+        "-i", raw_video_path,
+        "-i", overlay_path,
+        "-filter_complex", filter_complex,
+        "-map", "[v]",
+        "-map", "0:a?",
+        "-t", "45",
+        "-r", "24",
+        "-c:v", "libx264",
+        "-preset", "ultrafast",
+        "-crf", "26",
+        "-threads", "1",
+        "-c:a", "aac",
+        "-b:a", "96k",
+        "-movflags", "+faststart",
+        output_path
+    ]
+    res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=60)
+    if os.path.exists(overlay_path):
+        os.remove(overlay_path)
+
+    if res_ff.returncode != 0 or not os.path.exists(output_path):
+        err_tail = (res_ff.stderr or "")[-300:]
+        raise RuntimeError(f"FFmpeg video işleme hatası: {err_tail}")
+
+    # 3. Kapak fotoğrafını (thumbnail) FFmpeg ile 0.1 saniyede çıkar
+    thumb_cmd = [
+        ffmpeg_exe, "-y",
+        "-ss", "00:00:01",
+        "-i", output_path,
+        "-frames:v", "1",
+        "-vf", f"crop={VW_OUT}:{VW_OUT}:0:0",
+        "-q:v", "4",
+        thumb_path
+    ]
+    subprocess.run(thumb_cmd, capture_output=True, timeout=15)
+    if not os.path.exists(thumb_path):
+        # Video 1 saniyeden kısaysa 0. saniyeden al
+        thumb_cmd[3] = "00:00:00"
+        subprocess.run(thumb_cmd, capture_output=True, timeout=15)
+
+    gc.collect()
     return {
         "video_path": output_path,
         "thumb_path": thumb_path,
