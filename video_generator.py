@@ -444,6 +444,34 @@ def brand_raw_video(
         odraw.text((26, ty), line, fill=col, font=font_title)
         ty += 34
 
+    # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
+    # 1. Videonun tam orta-alt kısmına (kesilip çalınamayacak bölgeye: y=940) yarı saydam logo + @gundemanalizi rozeti
+    wm_y = 935
+    wm_box_w = 236
+    wm_x = (VW_OUT - wm_box_w) // 2
+    odraw.rounded_rectangle(
+        [wm_x, wm_y, wm_x + wm_box_w, wm_y + 54],
+        radius=27,
+        fill=(10, 14, 22, 145),
+        outline=(220, 38, 38, 175),
+        width=2
+    )
+    if os.path.exists(logo_path):
+        l_wm = Image.open(logo_path).convert("RGBA").resize((40, 40), Image.Resampling.LANCZOS)
+        m_wm = Image.new("L", (40, 40), 0)
+        ImageDraw.Draw(m_wm).ellipse((0, 0, 40, 40), fill=215)
+        overlay.paste(l_wm, (wm_x + 10, wm_y + 7), mask=m_wm)
+
+    font_wm_bold = get_font(FONT_BOLD, 17)
+    font_wm_sub = get_font(FONT_REGULAR, 13)
+    odraw.text((wm_x + 58, wm_y + 8), "@gundemanalizi", fill=(255, 255, 255, 225), font=font_wm_bold)
+    odraw.text((wm_x + 58, wm_y + 29), "gündemanalizi.com.tr", fill=(254, 240, 138, 210), font=font_wm_sub)
+
+    # 2. Videonun orta-sağ iç kısmına hafif hayalet (ghost) filigran (kırpılsa bile videonun içinde kalır)
+    font_ghost = get_font(FONT_BOLD, 24)
+    odraw.text((VW_OUT - 255, 610), "@gundemanalizi", fill=(255, 255, 255, 68), font=font_ghost)
+
+    # 3. En alt bar imzası
     odraw.text((26, VH_OUT - 42), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
     odraw.text((VW_OUT - 175, VH_OUT - 42), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
 
