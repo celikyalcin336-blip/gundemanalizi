@@ -55,9 +55,15 @@
                     </p>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
                 <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
                     ← Ana Sayfa
+                </a>
+                <button type="button" onclick="openIhbarModal()" class="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3 py-2 rounded-xl shadow-md transition">
+                    🚨 İhbar Hattı
+                </button>
+                <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="hidden sm:inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-md transition">
+                    💬 WhatsApp
                 </a>
                 <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
@@ -125,18 +131,28 @@
                 <span>Yayıncı: <strong class="text-red-400">Gündem Analizi Masası</strong></span>
             </div>
 
-            <!-- TELEGRAM KANAL DAVETİ BANNERI -->
-            <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-red-950/80 to-brand-card border border-red-800/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-4">
-                    <img src="/assets/logo.png" alt="Logo" class="w-14 h-14 rounded-full border-2 border-red-500 shadow-md">
-                    <div>
-                        <h4 class="font-extrabold text-white text-base sm:text-lg">Gündemi Anlık Takip Edin!</h4>
-                        <p class="text-xs sm:text-sm text-slate-300">Önemli son dakika gelişmelerini kaçırmamak için Telegram kanalımıza katılın.</p>
+            <!-- TÜM SOSYAL MEDYA KANALLARI & İHBAR HATTI BANNERI -->
+            <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-red-950/80 to-brand-card border border-red-800/50 shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/assets/logo.png" alt="Logo" class="w-14 h-14 rounded-full border-2 border-red-500 shadow-md">
+                        <div>
+                            <h4 class="font-extrabold text-white text-base sm:text-lg">Gündemi İstediğiniz Kanaldan Takip Edin!</h4>
+                            <p class="text-xs sm:text-sm text-slate-300">Son dakika gelişmelerini kaçırmamak için resmi sosyal medya hesaplarımıza katılın veya ihbar gönderin.</p>
+                        </div>
                     </div>
+                    <button type="button" onclick="openIhbarModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition whitespace-nowrap">
+                        🚨 7/24 İhbar & Video Gönder
+                    </button>
                 </div>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-900/50 transition whitespace-nowrap flex items-center justify-center gap-2">
-                    <i data-lucide="send" class="w-4 h-4"></i> Kanala Katıl
-                </a>
+                <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-red-900/50 text-xs font-bold">
+                    <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition">💬 WhatsApp Kanalı</a>
+                    <a href="https://t.me/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white transition">📲 Telegram</a>
+                    <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-3.5 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white transition">📸 Instagram</a>
+                    <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white transition">🎵 TikTok</a>
+                    <a href="https://www.facebook.com/profile.php?id=1237983366054395" target="_blank" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition">📘 Facebook</a>
+                    <a href="https://x.com/gndmanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition">🐦 X (Twitter)</a>
+                </div>
             </div>
 
         </article>
@@ -209,6 +225,55 @@
         </div>
     </div>
 
+    <!-- 7/24 ANONİM HABER & VİDEO İHBAR HATTI MODALI -->
+    <div id="ihbar-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-lg rounded-2xl bg-brand-card border-2 border-red-600/60 shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-red-700 to-red-900 px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">🚨</span>
+                    <div>
+                        <h3 class="text-base font-black text-white">7/24 HABER & VİDEO İHBAR HATTI</h3>
+                        <p class="text-[11px] text-red-100">Telefon numarası gerekmez • %100 Anonim & Güvenli</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeIhbarModal()" class="text-white/80 hover:text-white text-xl font-black px-2">✕</button>
+            </div>
+
+            <form id="ihbar-form" onsubmit="submitIhbarForm(event)" class="p-5 space-y-4 text-xs sm:text-sm">
+                <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/90 p-3 rounded-xl border border-brand-border">
+                    📸 Çevrenizde yaşanan son dakika olaylarını, çektiğiniz <strong>video veya fotoğrafları</strong> doğrudan haber merkezimize gönderin.
+                </p>
+
+                <div>
+                    <label class="block text-slate-200 font-bold mb-1">📍 Olay Yeri ve İhbar Detayı *</label>
+                    <textarea id="ih-msg" required rows="3" placeholder="Örn: İstanbul Kadıköy'de kaza / olay yerinden görüntüler..."
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-200 font-bold mb-1">🎬 Video veya Fotoğraf Yükle (İsteğe Bağlı)</label>
+                    <input id="ih-file" type="file" accept="video/*,image/*"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">🔗 Varsa Sosyal Medya Linki veya İsim/İletişim (İsteğe Bağlı)</label>
+                    <input id="ih-contact" type="text" placeholder="Anonim kalmak için boş bırakabilirsiniz"
+                        class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white text-xs focus:outline-none focus:border-red-500">
+                </div>
+
+                <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
+                    <button id="ih-submit" type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-red-900/50 transition">
+                        🚀 İhbarı Haber Merkezine Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
         if (!localStorage.getItem('ga_cookie_consent')) {
@@ -223,6 +288,49 @@
             const orig = btn.innerText;
             btn.innerText = 'Kopyalandı ✓';
             setTimeout(() => { btn.innerText = orig; }, 2000);
+        }
+        function openIhbarModal() {
+            document.getElementById('ihbar-modal').classList.remove('hidden');
+        }
+        function closeIhbarModal() {
+            document.getElementById('ihbar-modal').classList.add('hidden');
+        }
+        async function submitIhbarForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('ih-submit');
+            const st = document.getElementById('ih-status');
+            btn.disabled = true;
+            btn.innerText = '⏳ Gönderiliyor...';
+            st.className = 'hidden';
+
+            const fd = new FormData();
+            fd.append('message', document.getElementById('ih-msg').value);
+            fd.append('contact', document.getElementById('ih-contact').value);
+            const fInput = document.getElementById('ih-file');
+            if (fInput.files.length > 0) {
+                fd.append('media_file', fInput.files[0]);
+            }
+
+            try {
+                const res = await fetch('/api/ihbar', { method: 'POST', body: fd });
+                const data = await res.json();
+                st.classList.remove('hidden');
+                if (res.ok && data.ok) {
+                    st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+                    st.innerText = '✅ ' + data.message;
+                    document.getElementById('ihbar-form').reset();
+                    setTimeout(() => closeIhbarModal(), 2500);
+                } else {
+                    st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-red-950 text-red-300 border border-red-500/40';
+                    st.innerText = '❌ Hata: ' + (data.detail || 'Gönderilemedi');
+                }
+            } catch (err) {
+                st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-red-950 text-red-300 border border-red-500/40';
+                st.innerText = '❌ Bağlantı hatası: ' + err;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🚀 İhbarı Haber Merkezine Gönder';
+            }
         }
     </script>
 </body>

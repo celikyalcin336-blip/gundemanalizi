@@ -111,6 +111,47 @@ def send_telegram_video(video_path: str, caption: str, news_link: str = "") -> b
         print(f"Telegram video hatası: {e}")
         return False
 
+def send_admin_ihbar(message_text: str, media_path: str = "", media_type: str = "") -> bool:
+    """
+    Sitedeki '7/24 İhbar Hattı'ndan gelen mesaj, fotoğraf veya videoyu
+    doğrudan Yalçın Bey'in özel Telegram hesabına (TELEGRAM_ADMIN_ID) iletir.
+    """
+    if not config.TELEGRAM_BOT_TOKEN:
+        return False
+    admin_chat = getattr(config, "TELEGRAM_ADMIN_ID", "") or config.TELEGRAM_CHAT_ID
+    try:
+        if media_path and os.path.exists(media_path):
+            if media_type == "video":
+                with open(media_path, "rb") as vf:
+                    r = requests.post(
+                        f"{BASE_URL}/sendVideo",
+                        data={"chat_id": admin_chat, "caption": message_text[:1020], "supports_streaming": "true"},
+                        files={"video": vf},
+                        timeout=60
+                    )
+                    if r.json().get("ok"):
+                        return True
+            elif media_type == "photo":
+                with open(media_path, "rb") as pf:
+                    r = requests.post(
+                        f"{BASE_URL}/sendPhoto",
+                        data={"chat_id": admin_chat, "caption": message_text[:1020]},
+                        files={"photo": pf},
+                        timeout=45
+                    )
+                    if r.json().get("ok"):
+                        return True
+
+        r = requests.post(
+            f"{BASE_URL}/sendMessage",
+            json={"chat_id": admin_chat, "text": message_text[:4000]},
+            timeout=15
+        )
+        return r.json().get("ok", False)
+    except Exception as e:
+        print(f"İhbar gönderim hatası: {e}")
+        return False
+
 if __name__ == "__main__":
     send_telegram_message("👋 Merhaba Yalçın Bey! Gündem Analizi botu başarıyla bağlandı. Test haberiniz birazdan geliyor...")
     test_img = os.path.join(os.path.dirname(__file__), "output", "test_card.jpg")

@@ -396,6 +396,52 @@ async def panel_video_job_status(job_id: str, request: Request):
     elapsed = round(time.time() - job.get("started_at", time.time()), 1)
     return {"ok": True, "elapsed_sec": elapsed, **job}
 
+@app.post("/api/ihbar")
+async def submit_ihbar(
+    message: str = Form(...),
+    contact: str = Form(""),
+    media_file: UploadFile = File(None)
+):
+    if not message or len(message.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Lütfen ihbar detayını yazın.")
+
+    import hashlib
+    import telegram_notifier
+    ihbar_id = hashlib.md5(f"{message}_{time.time()}".encode("utf-8")).hexdigest()[:8]
+    saved_path = ""
+    media_type = ""
+    studio_link_line = ""
+
+    if media_file and media_file.filename:
+        fname = media_file.filename.lower()
+        content = await media_file.read()
+        if len(content) <= 50 * 1024 * 1024:  # Maks 50 MB
+            if any(fname.endswith(ext) for ext in (".mp4", ".mov", ".webm", ".mkv", ".avi")) or (media_file.content_type or "").startswith("video"):
+                out_name = f"ihbar_{ihbar_id}.mp4"
+                saved_path = os.path.join(OUTPUT_DIR, out_name)
+                media_type = "video"
+                studio_link_line = f"\n\n🎬 Panelde Logolamak İçin Video Linki:\n{config.PUBLIC_MEDIA_BASE}/images/{out_name}"
+            else:
+                out_name = f"ihbar_{ihbar_id}.jpg"
+                saved_path = os.path.join(OUTPUT_DIR, out_name)
+                media_type = "photo"
+                studio_link_line = f"\n\n🖼️ Görsel Linki:\n{config.PUBLIC_MEDIA_BASE}/images/{out_name}"
+            with open(saved_path, "wb") as f:
+                f.write(content)
+
+    report_text = (
+        f"🚨 [YENİ OKUYUCU İHBARI GELDİ!]\n\n"
+        f"📍 İhbar Detayı:\n{message.strip()}\n\n"
+        f"👤 Gönderen / Link: {contact.strip() or 'Anonim Okuyucu'}"
+        f"{studio_link_line}"
+    )
+
+    def _bg_send():
+        telegram_notifier.send_admin_ihbar(report_text, saved_path, media_type)
+
+    threading.Thread(target=_bg_send, daemon=True).start()
+    return {"ok": True, "message": "İhbarınız ve medyanız Haber Merkezimize başarıyla iletildi! Teşekkür ederiz."}
+
 @app.get("/haber/{slug}", response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
     article = database.get_article_by_slug(slug)
