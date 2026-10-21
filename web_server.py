@@ -78,15 +78,24 @@ async def health():
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, kategori: str = None):
+async def home(request: Request, kategori: str = None, q: str = None):
     database.record_visit("home_visits")
-    articles = database.get_articles(limit=24, category=kategori)
+    if q and q.strip():
+        q_low = q.strip().lower()
+        all_arts = database.get_articles(limit=150)
+        articles = [
+            a for a in all_arts
+            if q_low in (a.get("title") or "").lower() or q_low in (a.get("summary") or "").lower()
+        ]
+    else:
+        articles = database.get_articles(limit=24, category=kategori)
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "articles": articles,
-            "active_category": kategori
+            "active_category": kategori,
+            "search_query": q.strip() if q else ""
         }
     )
 
@@ -485,6 +494,10 @@ async def favicon():
         return FileResponse(logo_path, media_type="image/png")
     raise HTTPException(status_code=404)
 
+@app.get("/google51414ee4e22f8aa5.html", response_class=PlainTextResponse)
+async def google_verification():
+    return PlainTextResponse("google-site-verification: google51414ee4e22f8aa5.html")
+
 @app.get("/ads.txt", response_class=PlainTextResponse)
 async def ads_txt():
     content = os.getenv("ADS_TXT", "# Google AdSense ads.txt - Gündem Analizi\n")
@@ -496,22 +509,57 @@ async def robots(request: Request):
     base_url = f"https://{host}"
     content = f"""User-agent: *
 Allow: /
+Disallow: /panel
+Disallow: /api/panel/
 Sitemap: {base_url}/sitemap.xml
+Sitemap: {base_url}/news-sitemap.xml
 """
     return PlainTextResponse(content=content)
 
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
-    articles = database.get_articles(limit=200)
+    articles = database.get_articles(limit=300)
     host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
     base_url = f"https://{host}"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
+    for cat in ("Gündem", "Ekonomi", "Dünya", "Spor", "Asayiş", "Son Dakika"):
+        xml.append(f'  <url><loc>{base_url}/?kategori={cat}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     for a in articles:
-        xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><priority>0.8</priority></url>')
+        xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>')
+    xml.append('</urlset>')
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+
+@app.get("/news-sitemap.xml")
+async def news_sitemap(request: Request):
+    """Google Haberler (Google News & Top Stories) özel XML site haritası."""
+    from xml.sax.saxutils import escape
+    articles = database.get_articles(limit=100)
+    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
+    base_url = f"https://{host}"
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">')
+    for a in articles:
+        raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
+        if len(raw_dt) == 16:
+            raw_dt += ":00+03:00"
+        elif "+" not in raw_dt and "Z" not in raw_dt:
+            raw_dt = raw_dt[:19] + "+03:00"
+        title_esc = escape(a.get("title") or "")
+        xml.append(f"""  <url>
+    <loc>{base_url}/haber/{a["slug"]}</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Gündem Analizi</news:name>
+        <news:language>tr</news:language>
+      </news:publication>
+      <news:publication_date>{raw_dt}</news:publication_date>
+      <news:title>{title_esc}</news:title>
+    </news:news>
+  </url>""")
     xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml")
 
