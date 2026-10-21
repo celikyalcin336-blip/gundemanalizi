@@ -284,7 +284,15 @@
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
                                 <input id="v-pub-fb" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>📘 Facebook Sayfası</span>
+                                <span>📘 Facebook</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input id="v-pub-ig" type="checkbox" class="accent-red-600 w-4 h-4 rounded">
+                                <span>📸 Instagram Reels</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input id="v-pub-x" type="checkbox" class="accent-red-600 w-4 h-4 rounded">
+                                <span>🐦 X (Twitter)</span>
                             </label>
                         </div>
 
@@ -340,6 +348,12 @@
                             </a>
                             <button id="viral-edit-btn" type="button" onclick="openEditModalFromStudio()" class="hidden inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold transition">
                                 ✏️ Haberi Düzenle
+                            </button>
+                            <button type="button" onclick="shareFromPhone()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-fuchsia-600 to-emerald-600 text-white font-extrabold shadow-lg transition">
+                                📤 Telefondan Videoyu Paylaş (TikTok / WhatsApp / IG)
+                            </button>
+                            <button type="button" onclick="shareWhatsAppText()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white font-extrabold shadow-lg transition">
+                                💬 WhatsApp Grubu / Kanalı
                             </button>
                         </div>
                     </div>
@@ -657,6 +671,43 @@
             }
         }
 
+        async function shareFromPhone() {
+            const dl = document.getElementById('viral-dl');
+            const box = document.getElementById('viral-caption-box');
+            const caption = box ? box.value : '';
+            try {
+                await navigator.clipboard.writeText(caption);
+                showToast('📋 Açıklama panoya kopyalandı! Paylaşım menüsü açılıyor...');
+            } catch (e) {}
+            if (navigator.share && dl && dl.href) {
+                try {
+                    const resp = await fetch(dl.href);
+                    const blob = await resp.blob();
+                    const file = new File([blob], 'gundem_analizi_video.mp4', { type: 'video/mp4' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'Gündem Analizi',
+                            text: caption,
+                            files: [file]
+                        });
+                        return;
+                    }
+                    await navigator.share({ title: 'Gündem Analizi', text: caption });
+                    return;
+                } catch (err) {
+                    console.log('Web Share iptal/hata:', err);
+                }
+            }
+            if (dl && dl.href) dl.click();
+        }
+
+        function shareWhatsAppText() {
+            const box = document.getElementById('viral-caption-box');
+            const caption = box ? box.value : '';
+            const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(caption);
+            window.open(url, '_blank');
+        }
+
         function copySocialCaption() {
             const box = document.getElementById('viral-caption-box');
             box.select();
@@ -705,6 +756,8 @@
             fd.append('pub_site', document.getElementById('v-pub-site').checked ? 'true' : 'false');
             fd.append('pub_tg', document.getElementById('v-pub-tg').checked ? 'true' : 'false');
             fd.append('pub_fb', document.getElementById('v-pub-fb').checked ? 'true' : 'false');
+            fd.append('pub_ig', document.getElementById('v-pub-ig').checked ? 'true' : 'false');
+            fd.append('pub_x', document.getElementById('v-pub-x').checked ? 'true' : 'false');
 
             const fileInput = document.getElementById('v-file');
             if (fileInput.files.length > 0) {

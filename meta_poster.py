@@ -224,6 +224,58 @@ def post_to_instagram(caption: str, image_path: str) -> dict:
         print(f"❌ Instagram yayınlama hatası: {publish_data}")
         return {"status": "error", "error": publish_data}
 
+def post_reel_to_instagram(video_public_url: str, caption: str) -> dict:
+    """
+    Instagram Profesyonel hesabına Reels video yayınlar (Meta Graph API - ücretsiz).
+    1. REELS container oluşturur (Instagram videoyu bizim sitemizdeki public URL'den kendisi indirir)
+    2. Instagram videoyu işleyene kadar bekler (status_code == FINISHED)
+    3. Yayınlar (media_publish)
+    """
+    if not config.META_PAGE_ACCESS_TOKEN or not config.INSTAGRAM_ACCOUNT_ID:
+        print("[INSTAGRAM] INSTAGRAM_ACCOUNT_ID henüz tanımlı değil, atlandı.")
+        return {"status": "simulated"}
+
+    base = "https://graph.facebook.com/v21.0"
+    tok = config.META_PAGE_ACCESS_TOKEN
+    try:
+        cr = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media", data={
+            "media_type": "REELS",
+            "video_url": video_public_url,
+            "caption": caption[:2150],
+            "share_to_feed": "true",
+            "access_token": tok
+        }, timeout=30).json()
+        if "id" not in cr:
+            print(f"❌ Instagram Reels container hatası: {cr}")
+            return {"status": "error", "error": cr}
+
+        creation_id = cr["id"]
+        # Instagram videoyu indirip işlesin diye en fazla ~3 dakika bekle
+        for _ in range(36):
+            time.sleep(5)
+            st = requests.get(f"{base}/{creation_id}", params={
+                "fields": "status_code,status", "access_token": tok
+            }, timeout=15).json()
+            code = st.get("status_code")
+            if code == "FINISHED":
+                break
+            if code in ("ERROR", "EXPIRED"):
+                print(f"❌ Instagram video işleme hatası: {st}")
+                return {"status": "error", "error": st}
+
+        pub = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media_publish", data={
+            "creation_id": creation_id, "access_token": tok
+        }, timeout=30).json()
+        if "id" in pub:
+            print(f"✅ Instagram Reels yayınlandı! Media ID: {pub['id']}")
+            return {"status": "success", "media_id": pub["id"]}
+        print(f"❌ Instagram yayınlama hatası: {pub}")
+        return {"status": "error", "error": pub}
+    except Exception as e:
+        print(f"❌ Instagram bağlantı hatası: {e}")
+        return {"status": "error", "error": str(e)}
+
+
 if __name__ == "__main__":
     test_img = os.path.join(os.path.dirname(__file__), "output", "test_card.jpg")
     if os.path.exists(test_img):

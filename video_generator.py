@@ -538,14 +538,14 @@ def brand_raw_video(
     # 2. Doğrudan FFmpeg: ÖNCE fps=18 ile kare sayısını düşür, sonra ölçekle, kayan bandı ve logoyu bas
     if use_ticker and ticker_path:
         filter_complex = (
-            f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
+            f"[0:v]fps=24,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
             f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
             f"[bg][2:v]overlay=x='134-mod(t*115\\,{loop_w})':y={ticker_y}[bg_tk];"
             f"[bg_tk][1:v]overlay=0:0,format=yuv420p[v]"
         )
     else:
         filter_complex = (
-            f"[0:v]fps=18,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
+            f"[0:v]fps=24,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=fast_bilinear,"
             f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
             f"[bg][1:v]overlay=0:0,format=yuv420p[v]"
         )

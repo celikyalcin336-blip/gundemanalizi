@@ -169,7 +169,9 @@ def _process_viral_video_job(
     ticker_text: str,
     pub_site: bool,
     pub_tg: bool,
-    pub_fb: bool
+    pub_fb: bool,
+    pub_ig: bool = False,
+    pub_x: bool = False
 ):
     import video_generator
     import ai_writer
@@ -252,18 +254,32 @@ def _process_viral_video_job(
             if art_obj:
                 article_id = art_obj.get("id")
 
-        # ADIM 5: Seçilen Sosyal Medya Kanallarına Gönderim (Telegram / Facebook)
-        if pub_tg or pub_fb:
+        # ADIM 5: Seçilen Sosyal Medya Kanallarına Gönderim
+        share_report = []
+        if pub_tg or pub_fb or pub_ig or pub_x:
             job.update({
                 "step": 5,
-                "percent": 94,
-                "eta_sec": 3,
+                "percent": 90,
+                "eta_sec": 20 if pub_ig else 4,
                 "step_text": "📲 5/5: Logolu video seçtiğin sosyal medya hesaplarında paylaşılıyor..."
             })
             if pub_tg:
-                telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+                ok = telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+                share_report.append("📲 Telegram: ✅" if ok is not False else "📲 Telegram: ❌")
             if pub_fb:
-                meta_poster.post_video_to_facebook(res["video_path"], ai_cap["caption"], site_url)
+                r_fb = meta_poster.post_video_to_facebook(res["video_path"], ai_cap["caption"], site_url)
+                share_report.append(f"📘 Facebook: {'✅' if r_fb.get('status') == 'success' else '❌ ' + str(r_fb.get('status'))}")
+            if pub_x:
+                import x_poster
+                job.update({"step_text": "🐦 X (Twitter) paylaşımı yapılıyor..."})
+                r_x = x_poster.post_video_to_x(res["video_path"], title, site_url)
+                share_report.append(f"🐦 X: {'✅' if r_x.get('status') == 'success' else '❌ ' + str(r_x.get('status'))}")
+            if pub_ig:
+                job.update({"step_text": "📸 Instagram Reels işleniyor (Instagram videoyu işlerken 30-90 sn sürebilir)..."})
+                public_url = f"{config.PUBLIC_MEDIA_BASE}/images/{out_filename}"
+                ig_caption = f"{ai_cap['caption']}\n\n🌐 Detaylar profildeki linkte: gündemanalizi.com.tr"
+                r_ig = meta_poster.post_reel_to_instagram(public_url, ig_caption)
+                share_report.append(f"📸 Instagram: {'✅' if r_ig.get('status') == 'success' else '❌ ' + str(r_ig.get('status'))}")
 
         if os.path.exists(raw_path):
             os.remove(raw_path)
@@ -274,7 +290,7 @@ def _process_viral_video_job(
             "step": 5,
             "percent": 100,
             "eta_sec": 0,
-            "step_text": "✅ Tamamlandı! Video logolandı ve seçtiğin tüm platformlarda paylaşıldı!",
+            "step_text": "✅ Tamamlandı! " + (" • ".join(share_report) if share_report else "Video hazır."),
             "download_url": f"/images/{out_filename}",
             "thumb_url": f"/images/{os.path.basename(res['thumb_path'])}",
             "article_url": f"/haber/{slug}" if slug else "",
@@ -309,6 +325,8 @@ async def panel_viral_video(
     pub_site: str = Form("true"),
     pub_tg: str = Form("true"),
     pub_fb: str = Form("true"),
+    pub_ig: str = Form("false"),
+    pub_x: str = Form("false"),
     video_file: UploadFile = File(None)
 ):
     pin = request.headers.get("X-Admin-Pin", "")
@@ -357,7 +375,9 @@ async def panel_viral_video(
             ticker_text.strip(),
             pub_site.lower() == "true",
             pub_tg.lower() == "true",
-            pub_fb.lower() == "true"
+            pub_fb.lower() == "true",
+            pub_ig.lower() == "true",
+            pub_x.lower() == "true"
         ),
         daemon=True
     )
