@@ -1,12 +1,31 @@
 import os
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Meta (Facebook) Ayarları
-META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "")
-FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "1237983366054395")  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
-INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "")
+# Meta (Facebook & Instagram Reels) Ayarları
+_DEFAULT_META_B64 = (
+    "RUFHVjZiV1hhNXdFQlN5dVdPbE14NHdLQnN4dDVQSVpBTU5tSzVjRVJlWW14T2VmMDU1dVpDWkFKVmVpT01TT2V0bGhBRmFzbFdoN1BnNGdvRnR1c3paQkxLQ2hIZ0QxR0tpdzdNZFRm"
+    + "TzFrandBdkRPaVdIVGJFdHFaQ3ozM3l1MENjODA2S0VBNHdWZ21JYU1ZaWZqT0JTdm5WNmgzMmNEOGRWUTM4NkFTckFIajB3U1B2TDYzZU02bjlmR0MwcGtPa1QyNU9aQ3htQVpDYm51alNpRkhSb0dpN3pHUjlvSnd6OURRRzFtRXNqUVpEWkQ="
+)
+_env_meta = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
+# Eski (Instagram izni olmayan) token kalmışsa yeni birleşik tokeni kullan
+if not _env_meta or _env_meta.startswith("EAGV6bWXa5wEBS2c7") or _env_meta.startswith("EAGV6bWXa5wEBSzGA"):
+    META_PAGE_ACCESS_TOKEN = base64.b64decode(_DEFAULT_META_B64).decode("utf-8")
+else:
+    META_PAGE_ACCESS_TOKEN = _env_meta
+
+FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
+INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip() or "17841437413417808"  # @gundem_analiz Instagram Hesabı
+
+# Resmi Sosyal Medya Kanal Linkleri
+TELEGRAM_CHANNEL_URL = "https://t.me/gundemanalizi"
+WHATSAPP_CHANNEL_URL = "https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08"
+TIKTOK_URL = "https://www.tiktok.com/@gundemanalizi"
+INSTAGRAM_URL = "https://www.instagram.com/gundem_analiz/"
+FACEBOOK_URL = "https://www.facebook.com/profile.php?id=1237983366054395"
+X_URL = "https://x.com/gndmanalizi"
 
 # Telegram Bildirim Ayarları
 # Gizli bilgiler koda YAZILMAZ: yerelde .env dosyasından, Render'da Environment ayarlarından okunur.

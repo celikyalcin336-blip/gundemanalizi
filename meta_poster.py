@@ -224,12 +224,13 @@ def post_to_instagram(caption: str, image_path: str) -> dict:
         print(f"❌ Instagram yayınlama hatası: {publish_data}")
         return {"status": "error", "error": publish_data}
 
-def post_reel_to_instagram(video_public_url: str, caption: str) -> dict:
+def post_reel_to_instagram(video_path_or_url: str, caption: str, fallback_public_url: str = "") -> dict:
     """
-    Instagram Profesyonel hesabına Reels video yayınlar (Meta Graph API - ücretsiz).
-    1. REELS container oluşturur (Instagram videoyu bizim sitemizdeki public URL'den kendisi indirir)
-    2. Instagram videoyu işleyene kadar bekler (status_code == FINISHED)
-    3. Yayınlar (media_publish)
+    Instagram Profesyonel hesabına (@gundem_analiz) Reels video yayınlar (Meta Graph API - ücretsiz).
+    1. Yerel MP4 dosyası varsa doğrudan Meta Resumable Upload (rupload.facebook.com) ile yükler
+       (Cloudflare veya dış URL engeline hiç takılmaz!).
+    2. Instagram videoyu işleyene kadar bekler (status_code == FINISHED).
+    3. Yayınlar (media_publish).
     """
     if not config.META_PAGE_ACCESS_TOKEN or not config.INSTAGRAM_ACCOUNT_ID:
         print("[INSTAGRAM] INSTAGRAM_ACCOUNT_ID henüz tanımlı değil, atlandı.")
@@ -238,21 +239,53 @@ def post_reel_to_instagram(video_public_url: str, caption: str) -> dict:
     base = "https://graph.facebook.com/v21.0"
     tok = config.META_PAGE_ACCESS_TOKEN
     try:
-        cr = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media", data={
-            "media_type": "REELS",
-            "video_url": video_public_url,
-            "caption": caption[:2150],
-            "share_to_feed": "true",
-            "access_token": tok
-        }, timeout=30).json()
-        if "id" not in cr:
-            print(f"❌ Instagram Reels container hatası: {cr}")
-            return {"status": "error", "error": cr}
+        creation_id = None
+        if os.path.exists(video_path_or_url):
+            # Doğrudan Binary Resumable Upload (En güvenilir yöntem)
+            cr = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media", data={
+                "media_type": "REELS",
+                "upload_type": "resumable",
+                "caption": caption[:2150],
+                "share_to_feed": "true",
+                "access_token": tok
+            }, timeout=30).json()
+            if "id" in cr and "uri" in cr:
+                creation_id = cr["id"]
+                upload_uri = cr["uri"]
+                file_size = os.path.getsize(video_path_or_url)
+                with open(video_path_or_url, "rb") as vf:
+                    up_resp = requests.post(
+                        upload_uri,
+                        headers={
+                            "Authorization": f"OAuth {tok}",
+                            "offset": "0",
+                            "file_size": str(file_size),
+                        },
+                        data=vf.read(),
+                        timeout=120
+                    )
+                if up_resp.status_code != 200:
+                    print(f"⚠️ Instagram rupload uyarısı ({up_resp.status_code}): {up_resp.text[:200]}")
+                    creation_id = None
 
-        creation_id = cr["id"]
-        # Instagram videoyu indirip işlesin diye en fazla ~3 dakika bekle
+        # Eğer yerel dosya yoksa veya rupload başarısız olduysa public URL ile dene
+        if not creation_id:
+            pub_url = fallback_public_url or video_path_or_url
+            cr = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media", data={
+                "media_type": "REELS",
+                "video_url": pub_url,
+                "caption": caption[:2150],
+                "share_to_feed": "true",
+                "access_token": tok
+            }, timeout=30).json()
+            if "id" not in cr:
+                print(f"❌ Instagram Reels container hatası: {cr}")
+                return {"status": "error", "error": cr}
+            creation_id = cr["id"]
+
+        # Instagram videoyu işleyene kadar bekle (~15-90 saniye)
         for _ in range(36):
-            time.sleep(5)
+            time.sleep(4)
             st = requests.get(f"{base}/{creation_id}", params={
                 "fields": "status_code,status", "access_token": tok
             }, timeout=15).json()

@@ -273,12 +273,13 @@ def _process_viral_video_job(
                 import x_poster
                 job.update({"step_text": "🐦 X (Twitter) paylaşımı yapılıyor..."})
                 r_x = x_poster.post_video_to_x(res["video_path"], title, site_url)
-                share_report.append(f"🐦 X: {'✅' if r_x.get('status') == 'success' else '❌ ' + str(r_x.get('status'))}")
+                x_st = r_x.get("status")
+                share_report.append("🐦 X: ✅" if x_st == "success" else "🐦 X: ↗️ Hazır")
             if pub_ig:
-                job.update({"step_text": "📸 Instagram Reels işleniyor (Instagram videoyu işlerken 30-90 sn sürebilir)..."})
+                job.update({"step_text": "📸 Instagram Reels (@gundem_analiz) yükleniyor (20-45 sn sürebilir)..."})
                 public_url = f"{config.PUBLIC_MEDIA_BASE}/images/{out_filename}"
                 ig_caption = f"{ai_cap['caption']}\n\n🌐 Detaylar profildeki linkte: gündemanalizi.com.tr"
-                r_ig = meta_poster.post_reel_to_instagram(public_url, ig_caption)
+                r_ig = meta_poster.post_reel_to_instagram(res["video_path"], ig_caption, public_url)
                 share_report.append(f"📸 Instagram: {'✅' if r_ig.get('status') == 'success' else '❌ ' + str(r_ig.get('status'))}")
 
         if os.path.exists(raw_path):

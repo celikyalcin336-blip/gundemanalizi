@@ -189,6 +189,23 @@
                 </span>
             </div>
 
+            <!-- BAĞLI SOSYAL MEDYA HESAPLARI BAR (7/7 AKTİF) -->
+            <div class="mb-4 p-3 rounded-xl bg-slate-950/80 border border-brand-border flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                <span class="font-extrabold text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Bağlı Medya Ağı (7 Kanal Aktif):
+                </span>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <a href="https://xn--gndemanalizi-dlb.com.tr" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-brand-border font-bold transition">🌐 Web Sitesi ✅</a>
+                    <a href="https://t.me/gundemanalizi" target="_blank" class="px-2.5 py-1 rounded-lg bg-sky-950/60 hover:bg-sky-900/70 text-sky-300 border border-sky-500/30 font-bold transition">📲 Telegram ✅</a>
+                    <a href="https://www.facebook.com/profile.php?id=1237983366054395" target="_blank" class="px-2.5 py-1 rounded-lg bg-blue-950/60 hover:bg-blue-900/70 text-blue-300 border border-blue-500/30 font-bold transition">📘 Facebook ✅</a>
+                    <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-2.5 py-1 rounded-lg bg-pink-950/60 hover:bg-pink-900/70 text-pink-300 border border-pink-500/30 font-bold transition">📸 Instagram (@gundem_analiz) ✅</a>
+                    <a href="https://x.com/gndmanalizi" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-600/40 font-bold transition">🐦 X (@gndmanalizi) ✅</a>
+                    <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-2.5 py-1 rounded-lg bg-fuchsia-950/60 hover:bg-fuchsia-900/70 text-fuchsia-300 border border-fuchsia-500/30 font-bold transition">🎵 TikTok (@gundemanalizi) ✅</a>
+                    <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/30 font-bold transition">💬 WhatsApp Kanalı ✅</a>
+                </div>
+            </div>
+
             <form id="viral-form" onsubmit="submitViralVideo(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-5 text-xs">
                 <!-- Sol Sütun: Başlık, Açıklama ve Video Kaynağı -->
                 <div class="lg:col-span-6 space-y-3.5">
@@ -287,11 +304,11 @@
                                 <span>📘 Facebook</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-ig" type="checkbox" class="accent-red-600 w-4 h-4 rounded">
+                                <input id="v-pub-ig" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
                                 <span>📸 Instagram Reels</span>
                             </label>
                             <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-x" type="checkbox" class="accent-red-600 w-4 h-4 rounded">
+                                <input id="v-pub-x" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
                                 <span>🐦 X (Twitter)</span>
                             </label>
                         </div>
@@ -350,10 +367,16 @@
                                 ✏️ Haberi Düzenle
                             </button>
                             <button type="button" onclick="shareFromPhone()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 via-fuchsia-600 to-emerald-600 text-white font-extrabold shadow-lg transition">
-                                📤 Telefondan Videoyu Paylaş (TikTok / WhatsApp / IG)
+                                📤 Telefondan Videoyu Paylaş (TikTok / WhatsApp / IG / X)
                             </button>
                             <button type="button" onclick="shareWhatsAppText()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-white font-extrabold shadow-lg transition">
-                                💬 WhatsApp Grubu / Kanalı
+                                💬 WhatsApp Kanalı
+                            </button>
+                            <button type="button" onclick="shareTikTokQuick()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-fuchsia-700 hover:bg-fuchsia-600 text-white font-extrabold shadow-lg transition">
+                                🎵 TikTok'a Yükle
+                            </button>
+                            <button type="button" onclick="shareXQuick()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-extrabold border border-slate-600 shadow-lg transition">
+                                🐦 X (Twitter)'da Paylaş
                             </button>
                         </div>
                     </div>
@@ -704,8 +727,38 @@
         function shareWhatsAppText() {
             const box = document.getElementById('viral-caption-box');
             const caption = box ? box.value : '';
+            try { navigator.clipboard.writeText(caption); } catch (e) {}
             const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(caption);
             window.open(url, '_blank');
+        }
+
+        function shareTikTokQuick() {
+            const box = document.getElementById('viral-caption-box');
+            const dl = document.getElementById('viral-dl');
+            const caption = box ? box.value : '';
+            try {
+                navigator.clipboard.writeText(caption);
+                showToast('📋 Açıklama kopyalandı! MP4 indiriliyor ve TikTok Yükleme ekranı açılıyor...');
+            } catch (e) {}
+            if (dl && dl.href) dl.click();
+            setTimeout(() => {
+                window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
+            }, 600);
+        }
+
+        function shareXQuick() {
+            const box = document.getElementById('viral-caption-box');
+            const dl = document.getElementById('viral-dl');
+            const caption = box ? box.value : '';
+            const shortText = caption.length > 260 ? caption.slice(0, 255) + '…' : caption;
+            try {
+                navigator.clipboard.writeText(caption);
+                showToast('📋 Tweet hazır! MP4 indiriliyor ve X ekranı açılıyor...');
+            } catch (e) {}
+            if (dl && dl.href) dl.click();
+            setTimeout(() => {
+                window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(shortText), '_blank');
+            }, 600);
         }
 
         function copySocialCaption() {
