@@ -1,5 +1,5 @@
 """
-X (Twitter) Video Paylaşımcısı (@gndmanalizi) - OAuth 1.0a ve OAuth 2.0 User Context destekli.
+X (Twitter) Video Paylaşımcısı (@gndmanalizi) - OAuth 1.0a destekli.
 """
 import os
 import time
@@ -8,43 +8,40 @@ import requests
 from requests_oauthlib import OAuth1
 
 _DEF_K = base64.b64decode("M05uNWVaMmlnY1NyMXpJbG9oVUQ0QkhqOQ==").decode("utf-8")
-_DEF_S = base64.b64decode("WGd3U3dseEFqdHdXakpDZHd5eVlHUTRpU0loc3lxeWlvSVlCZVpCWXhGVnpmNnJyOFU=").decode("utf-8")
-_DEF_AT = base64.b64decode(
-    "Y1dkc1JYaFZTVVJtVTI4MU9FTndibE95ZGxFdFVtSnJheTFyVlRscUxWUnFlazhZY2tOdVdtZHNaV2RIT2pFM09USTFPRGN5TWpJd09ESTZNVG94T21GME9qRQ=="
-).decode("utf-8")
+_DEF_S = base64.b64decode("WGd3U3dseEFqdHdXakpDZHV5eVlHUTRpU0loc3lxeWlvSVlCZVpCWXhGVnpmNnJyOFU=").decode("utf-8")
+_DEF_AT = base64.b64decode("MjA2MTAyMTg3MDUyMzEwMTE4Ni0wcG9RNm5WWFNzbWRUNFFlMzBXRWRadzFPNXJpZ1I=").decode("utf-8")
+_DEF_ATS = base64.b64decode("SGZYOXdWVVU5dE1nWkxQUEZIemxldFR3MGUzR1JLcHh1c1g1YmtCSE1FRnQz").decode("utf-8")
 
 X_API_KEY = os.getenv("X_API_KEY", "").strip() or _DEF_K
 X_API_SECRET = os.getenv("X_API_SECRET", "").strip() or _DEF_S
 X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "").strip() or _DEF_AT
-X_ACCESS_SECRET = os.getenv("X_ACCESS_SECRET", "").strip()
+X_ACCESS_SECRET = os.getenv("X_ACCESS_SECRET", "").strip() or _DEF_ATS
 
-UPLOAD_V2 = "https://api.x.com/2/media/upload"
+UPLOAD_V1 = "https://upload.twitter.com/1.1/media/upload.json"
 TWEET_URL = "https://api.x.com/2/tweets"
 CHUNK = 4 * 1024 * 1024
 
 
 def is_configured() -> bool:
-    return bool(X_ACCESS_TOKEN)
+    return all([X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET])
 
 
-def _req_kwargs():
-    """OAuth 1.0a (tireli token) veya OAuth 2.0 User Context Bearer token seçer."""
-    if "-" in X_ACCESS_TOKEN and X_API_KEY and X_API_SECRET and X_ACCESS_SECRET:
-        return {"auth": OAuth1(X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)}
-    return {"headers": {"Authorization": f"Bearer {X_ACCESS_TOKEN}"}}
+def _auth():
+    return OAuth1(X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)
 
 
 def _upload_video(video_path: str) -> str:
-    """Videoyu X'e parça parça (chunked) yükler ve media_id döner."""
-    kw = _req_kwargs()
+    """Videoyu X v1.1 Chunked Upload ile yükler ve media_id döner."""
+    auth = _auth()
     total = os.path.getsize(video_path)
 
-    init = requests.post(f"{UPLOAD_V2}/initialize", json={
+    init = requests.post(UPLOAD_V1, auth=auth, data={
+        "command": "INIT",
+        "total_bytes": str(total),
         "media_type": "video/mp4",
-        "total_bytes": total,
         "media_category": "tweet_video"
-    }, timeout=30, **kw).json()
-    media_id = (init.get("data") or {}).get("id")
+    }, timeout=30).json()
+    media_id = str(init.get("media_id") or init.get("media_id_string") or "")
     if not media_id:
         raise RuntimeError(f"X upload init hatası: {init}")
 
@@ -54,58 +51,51 @@ def _upload_video(video_path: str) -> str:
             chunk = f.read(CHUNK)
             if not chunk:
                 break
-            r = requests.post(f"{UPLOAD_V2}/{media_id}/append",
-                              data={"segment_index": idx},
-                              files={"media": chunk}, timeout=60, **kw)
+            r = requests.post(UPLOAD_V1, auth=auth,
+                              data={"command": "APPEND", "media_id": media_id, "segment_index": str(idx)},
+                              files={"media": chunk}, timeout=60)
             if r.status_code >= 300:
                 raise RuntimeError(f"X upload append hatası: {r.text[:300]}")
             idx += 1
 
-    fin = requests.post(f"{UPLOAD_V2}/{media_id}/finalize", timeout=30, **kw).json()
-    info = (fin.get("data") or {}).get("processing_info")
+    fin = requests.post(UPLOAD_V1, auth=auth, data={"command": "FINALIZE", "media_id": media_id}, timeout=30).json()
+    info = fin.get("processing_info")
     for _ in range(30):
         if not info or info.get("state") == "succeeded":
             break
         if info.get("state") == "failed":
             raise RuntimeError(f"X video işleme hatası: {info}")
-        time.sleep(max(2, int(info.get("check_after_secs", 3))))
-        st = requests.get(UPLOAD_V2,
-                          params={"command": "STATUS", "media_id": media_id}, timeout=20, **kw).json()
-        info = (st.get("data") or {}).get("processing_info")
+        time.sleep(max(2, int(info.get("check_after_secs", 2))))
+        st = requests.get(UPLOAD_V1, auth=auth,
+                          params={"command": "STATUS", "media_id": media_id}, timeout=20).json()
+        info = st.get("processing_info")
     return media_id
 
 
 def post_video_to_x(video_path: str, title: str, link: str = "") -> dict:
     """Logolu videoyu kısa başlık + site linki ile X'te paylaşır (280 karakter sınırı)."""
     if not is_configured():
-        print("[X] API anahtarları tanımlı değil, atlandı.")
-        return {"status": "simulated"}
+        return {"status": "intent_ready"}
     tags = " #sondakika #gündem"
     room = 280 - 24 - len(tags) - 4
     text = title.strip()
     if len(text) > room:
         text = text[:room - 1] + "…"
     text = f"🔴 {text}\n{link}{tags}" if link else f"🔴 {text}{tags}"
-    kw = _req_kwargs()
+    auth = _auth()
     try:
         media_id = _upload_video(video_path)
-        r = requests.post(TWEET_URL, json={
+        r = requests.post(TWEET_URL, auth=auth, json={
             "text": text,
-            "media": {"media_ids": [str(media_id)]}
-        }, timeout=30, **kw)
+            "media": {"media_ids": [media_id]}
+        }, timeout=30)
         data = r.json()
         if r.status_code in (200, 201) and data.get("data", {}).get("id"):
             print(f"✅ X paylaşımı başarılı! Tweet ID: {data['data']['id']}")
             return {"status": "success", "tweet_id": data["data"]["id"]}
+        # X 402 Credits Depleted dönerse tek tıkla paylaşımı öner
+        print(f"ℹ️ X API yanıtı ({r.status_code}): {data}")
         return {"status": "intent_ready", "error": data}
     except Exception as e:
-        # Eğer video yükleme paketi (Free tier) kısıtlıysa sadece metin+link tweeti dene
-        try:
-            r2 = requests.post(TWEET_URL, json={"text": text}, timeout=20, **kw)
-            d2 = r2.json()
-            if r2.status_code in (200, 201) and d2.get("data", {}).get("id"):
-                return {"status": "success", "tweet_id": d2["data"]["id"]}
-        except Exception:
-            pass
-        print(f"ℹ️ X API uyarısı (Panelden Tek Tık Paylaşım aktif): {e}")
+        print(f"ℹ️ X video paylaşımı uyarısı: {e}")
         return {"status": "intent_ready", "error": str(e)}
