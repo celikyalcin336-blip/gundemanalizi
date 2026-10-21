@@ -260,7 +260,8 @@ def _process_viral_video_job(
     pub_tg: bool,
     pub_fb: bool,
     pub_ig: bool = False,
-    pub_x: bool = False
+    pub_x: bool = False,
+    source: str = "Gündem Analizi"
 ):
     import video_generator
     import ai_writer
@@ -296,7 +297,8 @@ def _process_viral_video_job(
             max_dur_sec=max_dur_sec,
             wm_pos=wm_pos,
             audio_mode=audio_mode,
-            ticker_text=auto_ticker
+            ticker_text=auto_ticker,
+            source=source
         )
 
         # ADIM 3: Yapay Zeka Haber & Sosyal Medya Metni
@@ -307,8 +309,12 @@ def _process_viral_video_job(
             "step_text": "🤖 3/5: Gemini AI ile haber makalesi ve Reels/TikTok açıklaması hazırlanıyor..."
         })
         base_summary = summary or title
-        ai_cap = ai_writer.generate_social_caption(title, base_summary, "Gündem Analizi Özel")
-        article_data = ai_writer.generate_full_article(title, base_summary, "Gündem Analizi Özel")
+        ai_cap = ai_writer.generate_social_caption(title, base_summary, source or "Gündem Analizi Özel")
+        article_data = ai_writer.generate_full_article(title, base_summary, source or "Gündem Analizi Özel")
+
+        # Sosyal medya metnine kaynak ekle (Hukuki güvence)
+        if source and source.strip().lower() not in ("gündem analizi", "özel", "yok", ""):
+            ai_cap["caption"] = f"{ai_cap['caption']}\n\n📌 Kaynak: {source.strip()}"
 
         slug = None
         site_url = config.SITE_URL
@@ -335,7 +341,7 @@ def _process_viral_video_job(
                 summary=article_data["summary"],
                 content=full_content,
                 image_path=res["thumb_path"],
-                source="Gündem Analizi",
+                source=source.strip() or "Gündem Analizi",
                 category=category
             )
             site_url = f"{config.SITE_URL}/haber/{slug}"
@@ -417,6 +423,7 @@ async def panel_viral_video(
     pub_fb: str = Form("true"),
     pub_ig: str = Form("false"),
     pub_x: str = Form("false"),
+    source: str = Form("Gündem Analizi"),
     video_file: UploadFile = File(None)
 ):
     pin = request.headers.get("X-Admin-Pin", "")
@@ -467,7 +474,8 @@ async def panel_viral_video(
             pub_tg.lower() == "true",
             pub_fb.lower() == "true",
             pub_ig.lower() == "true",
-            pub_x.lower() == "true"
+            pub_x.lower() == "true",
+            source.strip() or "Gündem Analizi"
         ),
         daemon=True
     )

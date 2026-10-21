@@ -482,6 +482,14 @@
                         <textarea id="v-summary" rows="2" placeholder="Olayın kısa detayı (nerede oldu, ne yaşandı)..."
                             class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500"></textarea>
                     </div>
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1 flex items-center justify-between">
+                            <span>📌 Haber & Video Kaynağı (Telif & Hukuki Koruma)</span>
+                            <span class="text-[10px] text-slate-400 font-normal">İsteğe Bağlı</span>
+                        </label>
+                        <input id="v-source" type="text" placeholder="Örn: Mynet, İHA, Habertürk, TRT 1, Sosyal Medya (Boşsa: Gündem Analizi)"
+                            class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500">
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-slate-300 font-bold mb-1">1. Yöntem: Cihazdan Video Seç (.mp4)</label>
@@ -1254,6 +1262,7 @@
             const fd = new FormData();
             fd.append('title', document.getElementById('v-title').value);
             fd.append('summary', document.getElementById('v-summary').value);
+            fd.append('source', (document.getElementById('v-source') ? document.getElementById('v-source').value : '') || 'Gündem Analizi');
             fd.append('category', document.getElementById('v-category').value);
             fd.append('video_url', document.getElementById('v-url').value);
             fd.append('start_sec', document.getElementById('v-start').value || '0');

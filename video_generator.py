@@ -393,7 +393,8 @@ def brand_raw_video(
     max_dur_sec: float = 45.0,
     wm_pos: str = "center",
     audio_mode: str = "original",
-    ticker_text: str = ""
+    ticker_text: str = "",
+    source: str = ""
 ) -> dict:
     """
     Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama & Kurgu Motoru:
@@ -418,7 +419,12 @@ def brand_raw_video(
 
     use_ticker = (ticker_text or "").strip().lower() != "off"
     raw_ticker = (ticker_text or "").strip() or title.strip()
-    ticker_unit = f"   •   {raw_ticker.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
+    clean_src = source.strip() if source else ""
+    has_custom_src = bool(clean_src and clean_src.lower() not in ("gündem analizi", "özel"))
+    if has_custom_src:
+        ticker_unit = f"   •   {raw_ticker.upper()}   •   KAYNAK: {clean_src.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
+    else:
+        ticker_unit = f"   •   {raw_ticker.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
 
     # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (Sadece 1 kare = ~0.5 MB RAM!)
     overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
@@ -454,6 +460,15 @@ def brand_raw_video(
     bw = (cb[2] - cb[0]) + 18
     odraw.rounded_rectangle([VW_OUT - bw - 18, 22, VW_OUT - 18, 50], radius=6, fill=(220, 38, 38, 240))
     odraw.text((VW_OUT - bw - 9, 28), cat_label, fill=(255, 255, 255, 255), font=font_badge)
+
+    # Kaynak Rozeti (Mynet, İHA, Habertürk vb. belirtilmişse şık TV rozeti ekle)
+    if has_custom_src:
+        src_label = f"Kaynak: {clean_src}"
+        font_src = get_font(FONT_BOLD, 10)
+        sb = odraw.textbbox((0, 0), src_label, font=font_src)
+        sw = (sb[2] - sb[0]) + 14
+        odraw.rounded_rectangle([VW_OUT - sw - 18, 54, VW_OUT - 18, 72], radius=4, fill=(15, 23, 42, 210), outline=(203, 213, 225, 120), width=1)
+        odraw.text((VW_OUT - sw - 11, 57), src_label, fill=(241, 245, 249, 235), font=font_src)
 
     ty = 66
     for idx, line in enumerate(lines):
