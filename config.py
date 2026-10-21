@@ -4,20 +4,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Meta (Facebook & Instagram Reels) Ayarları
+# Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Kalıcı / Süresiz Token)
 _DEFAULT_META_B64 = (
-    "RUFHVjZiV1hhNXdFQlN5dVdPbE14NHdLQnN4dDVQSVpBTU5tSzVjRVJlWW14T2VmMDU1dVpDWkFKVmVpT01TT2V0bGhBRmFzbFdoN1BnNGdvRnR1c3paQkxLQ2hIZ0QxR0tpdzdNZFRm"
-    + "TzFrandBdkRPaVdIVGJFdHFaQ3ozM3l1MENjODA2S0VBNHdWZ21JYU1ZaWZqT0JTdm5WNmgzMmNEOGRWUTM4NkFTckFIajB3U1B2TDYzZU02bjlmR0MwcGtPa1QyNU9aQ3htQVpDYm51alNpRkhSb0dpN3pHUjlvSnd6OURRRzFtRXNqUVpEWkQ="
+    "RUFHVjZiV1hhNXdFQlMyOXNVT2xqWVpBRnp3VDJqRVRCRVpCdGRTeDFjaW0zWTdpb0VnVUJWaUtHS3RoYkFNRmNUVVVzOXdGTldLMG8zQmdMSVhydmFYSEc5"
+    + "Y0tMbEhwaVpDMGZKZFZnaGNBTkZ3VHNZV3FOaTFrS3FxaWtlVURra2daQVhMYVpCN1lIczJHOXF6a2Y1cjllOUNaQkZCMXNIU1FVc2FzV0F6OWVaQmpZZGFaQVNiVnJvbWo3Yk1RaEZWUzNVR1Nr"
 )
 _env_meta = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
-# Eski (Instagram izni olmayan) token kalmışsa yeni birleşik tokeni kullan
-if not _env_meta or _env_meta.startswith("EAGV6bWXa5wEBS2c7") or _env_meta.startswith("EAGV6bWXa5wEBSzGA"):
+# Geçici/süresi dolmuş token yerine ömür boyu kalıcı (expires_at=0) tokeni kullan
+if not _env_meta or len(_env_meta) > 230 or _env_meta.startswith("EAGV6bWXa5wEBS2c7") or _env_meta.startswith("EAGV6bWXa5wEBSyu"):
     META_PAGE_ACCESS_TOKEN = base64.b64decode(_DEFAULT_META_B64).decode("utf-8")
 else:
     META_PAGE_ACCESS_TOKEN = _env_meta
 
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip() or "17841437413417808"  # @gundem_analiz Instagram Hesabı
+
+# Otomatik Hikaye (Story) Sıklığı (Saat cinsinden, varsayılan: 4 saatte 1)
+STORY_COOLDOWN_HOURS = float(os.getenv("STORY_COOLDOWN_HOURS", "4.0"))
 
 # Resmi Sosyal Medya Kanal Linkleri
 TELEGRAM_CHANNEL_URL = "https://t.me/gundemanalizi"

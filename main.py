@@ -73,8 +73,13 @@ def process_single_news(item: dict) -> bool:
     print("📲 Telegram kanalına sitemizin linkiyle gönderiliyor...")
     telegram_notifier.send_telegram_news(card_path, caption, site_article_url)
 
-    # Not: Otonom bot yalnızca Web Sitesi ve Telegram'da paylaşım yapar.
-    # Facebook ve diğer sosyal medya paylaşımları yalnızca /panel üzerinden manuel seçildiğinde yapılır.
+    # 5. Otomatik Hikaye (Story) Kalkanı:
+    # Gönderi akışını spama boğmadan, 4 saatte 1 (günde 5-6 adet) Facebook ve Instagram'a doğrudan HİKAYE (STORY) atar!
+    try:
+        meta_poster.post_stories_with_cooldown(card_path)
+    except Exception as e:
+        print(f"⚠️ Otomatik hikaye istisnası: {e}")
+
     fb_id = None
     ig_id = None
 

@@ -124,7 +124,14 @@ def init_db():
                 val INTEGER DEFAULT 0
             )
         """)
-        # 4. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
+        # 4. Sistem ayarları ve son paylaşım zamanları tablosu
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS system_settings (
+                key TEXT PRIMARY KEY,
+                val TEXT
+            )
+        """)
+        # 5. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
         if USE_PG:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS images (
@@ -353,6 +360,31 @@ def record_visit(key: str = "home_visits"):
                 conn.execute("INSERT OR REPLACE INTO site_metrics (key, val) VALUES (?, ?)", (key, new_val))
     except Exception:
         pass
+
+
+def get_setting(key: str, default: str = "") -> str:
+    """Kalıcı sistem ayarını okur."""
+    try:
+        with get_connection() as conn:
+            row = conn.execute("SELECT val FROM system_settings WHERE key = ?", (key,)).fetchone()
+            return str(row["val"]) if row and row["val"] is not None else default
+    except Exception:
+        return default
+
+
+def set_setting(key: str, val: str):
+    """Kalıcı sistem ayarını kaydeder/günceller."""
+    try:
+        with get_connection() as conn:
+            if USE_PG:
+                conn.execute("""
+                    INSERT INTO system_settings (key, val) VALUES (?, ?)
+                    ON CONFLICT (key) DO UPDATE SET val = EXCLUDED.val
+                """, (key, str(val)))
+            else:
+                conn.execute("INSERT OR REPLACE INTO system_settings (key, val) VALUES (?, ?)", (key, str(val)))
+    except Exception as e:
+        print(f"⚠️ Ayar kaydedilemedi ({key}): {e}")
 
 
 def get_dashboard_summary() -> Dict:

@@ -309,6 +309,101 @@ def post_reel_to_instagram(video_path_or_url: str, caption: str, fallback_public
         return {"status": "error", "error": str(e)}
 
 
+def post_story_to_facebook(image_path: str) -> dict:
+    """Facebook Sayfasına görseli doğrudan 24 saatlik HİKAYE (Story) olarak yayınlar."""
+    if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
+        return {"status": "simulated"}
+    try:
+        base = "https://graph.facebook.com/v21.0"
+        tok = config.META_PAGE_ACCESS_TOKEN
+        # Adım 1: Görseli yayınlanmamış (unpublished) fotoğraf olarak yükle
+        with open(image_path, "rb") as f:
+            up = requests.post(f"{base}/{config.FACEBOOK_PAGE_ID}/photos",
+                               files={"source": f},
+                               data={"published": "false", "access_token": tok},
+                               timeout=35).json()
+        photo_id = up.get("id")
+        if not photo_id:
+            print(f"❌ Facebook Story fotoğraf yükleme hatası: {up}")
+            return {"status": "error", "error": up}
+
+        # Adım 2: Photo Stories API ile hikaye olarak yayınla
+        r_story = requests.post(f"{base}/{config.FACEBOOK_PAGE_ID}/photo_stories",
+                                data={"photo_id": photo_id, "access_token": tok},
+                                timeout=30).json()
+        if r_story.get("success") or "post_id" in r_story:
+            print(f"✅ Facebook Sayfa Hikayesi yayınlandı! Story Post ID: {r_story.get('post_id')}")
+            return {"status": "success", "story_id": r_story.get("post_id")}
+        print(f"❌ Facebook Story yayınlama hatası: {r_story}")
+        return {"status": "error", "error": r_story}
+    except Exception as e:
+        print(f"❌ Facebook Story istisnası: {e}")
+        return {"status": "error", "error": str(e)}
+
+def post_story_to_instagram(image_path: str) -> dict:
+    """Instagram Hesabına (@gundem_analiz) görseli doğrudan 24 saatlik HİKAYE (Story) olarak yayınlar."""
+    if not config.META_PAGE_ACCESS_TOKEN or not config.INSTAGRAM_ACCOUNT_ID:
+        return {"status": "simulated"}
+    try:
+        base = "https://graph.facebook.com/v21.0"
+        tok = config.META_PAGE_ACCESS_TOKEN
+        image_url = upload_image_to_imgur(image_path)
+        if not image_url:
+            return {"status": "error", "error": "Story görseli public linke yüklenemedi."}
+
+        cr = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media", data={
+            "media_type": "STORIES",
+            "image_url": image_url,
+            "access_token": tok
+        }, timeout=30).json()
+        if "id" not in cr:
+            print(f"❌ Instagram Story container hatası: {cr}")
+            return {"status": "error", "error": cr}
+
+        creation_id = cr["id"]
+        time.sleep(3)
+        pub = requests.post(f"{base}/{config.INSTAGRAM_ACCOUNT_ID}/media_publish", data={
+            "creation_id": creation_id,
+            "access_token": tok
+        }, timeout=30).json()
+        if "id" in pub:
+            print(f"✅ Instagram Hikayesi (@gundem_analiz) yayınlandı! Story ID: {pub['id']}")
+            return {"status": "success", "story_id": pub["id"]}
+        print(f"❌ Instagram Story yayınlama hatası: {pub}")
+        return {"status": "error", "error": pub}
+    except Exception as e:
+        print(f"❌ Instagram Story istisnası: {e}")
+        return {"status": "error", "error": str(e)}
+
+def post_stories_with_cooldown(image_path: str, cooldown_hours: float = None) -> dict:
+    """
+    Kullanıcının isteği: 30 dakikada bir olan haber akışını Facebook ve Instagram akışında spama sokmamak için,
+    yalnızca 3-5 saatte 1 (varsayılan: 4 saat) Facebook ve Instagram'a doğrudan HİKAYE (Story) olarak atar.
+    """
+    import database
+    if cooldown_hours is None:
+        cooldown_hours = getattr(config, "STORY_COOLDOWN_HOURS", 4.0)
+
+    now_ts = time.time()
+    last_ts_str = database.get_setting("last_meta_story_ts", "0")
+    try:
+        last_ts = float(last_ts_str)
+    except Exception:
+        last_ts = 0.0
+
+    cooldown_sec = cooldown_hours * 3600
+    elapsed = now_ts - last_ts
+    if last_ts > 0 and elapsed < cooldown_sec:
+        rem_min = int((cooldown_sec - elapsed) / 60)
+        print(f"⏳ [Hikaye Kalkanı] Son hikayeden bu yana {int(elapsed/60)} dk geçti. Bir sonraki hikaye için {rem_min} dk var.")
+        return {"status": "cooldown_skipped", "remaining_min": rem_min}
+
+    print("📸 [Otomatik Hikaye] Süre doldu! Haber kartı Facebook ve Instagram'a HİKAYE olarak atılıyor...")
+    r_fb = post_story_to_facebook(image_path)
+    r_ig = post_story_to_instagram(image_path)
+    database.set_setting("last_meta_story_ts", str(now_ts))
+    return {"status": "posted", "facebook": r_fb, "instagram": r_ig}
+
 if __name__ == "__main__":
     test_img = os.path.join(os.path.dirname(__file__), "output", "test_card.jpg")
     if os.path.exists(test_img):
