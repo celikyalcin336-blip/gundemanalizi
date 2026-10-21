@@ -331,7 +331,18 @@
                                         </span>
                                     </td>
                                     <td class="p-2.5 whitespace-nowrap font-sans">{{ lv.device }}</td>
-                                    <td class="p-2.5 whitespace-nowrap">🇹🇷 {{ lv.country }} {{ lv.city }}</td>
+                                    <td class="p-2.5 whitespace-nowrap">
+                                        {% set c = (lv.country or 'TR').upper() %}
+                                        {{ '🇹🇷 Türkiye' if c == 'TR' else
+                                           '🇺🇸 ABD' if c == 'US' else
+                                           '🇩🇪 Almanya' if c == 'DE' else
+                                           '🇳🇱 Hollanda' if c == 'NL' else
+                                           '🇧🇪 Belçika' if c == 'BE' else
+                                           '🇫🇮 Finlandiya' if c == 'FI' else
+                                           '🇬🇧 İngiltere' if c in ('GB', 'UK') else
+                                           '🇦🇿 Azerbaycan' if c == 'AZ' else
+                                           '🌐 ' ~ c }} {{ '(' ~ lv.city ~ ')' if lv.city else '' }}
+                                    </td>
                                     <td class="p-2.5 whitespace-nowrap">
                                         {% if lv.is_first_visit %}
                                             <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>
@@ -1016,12 +1027,27 @@
                                 const firstBadge = lv.is_first_visit 
                                     ? '<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>'
                                     : '<span class="text-slate-400 text-[10px]">🔄 Tekrar Gelen</span>';
+                                const c = (lv.country || 'TR').toUpperCase().trim();
+                                const countryMap = {
+                                    'TR': '🇹🇷 Türkiye',
+                                    'US': '🇺🇸 ABD',
+                                    'DE': '🇩🇪 Almanya',
+                                    'NL': '🇳🇱 Hollanda',
+                                    'BE': '🇧🇪 Belçika',
+                                    'FI': '🇫🇮 Finlandiya',
+                                    'GB': '🇬🇧 İngiltere',
+                                    'UK': '🇬🇧 İngiltere',
+                                    'AZ': '🇦🇿 Azerbaycan',
+                                    'FR': '🇫🇷 Fransa',
+                                    'RU': '🇷🇺 Rusya'
+                                };
+                                const countryBadge = (countryMap[c] || ('🌐 ' + c)) + (lv.city ? ' (' + lv.city + ')' : '');
                                 return `<tr class="hover:bg-slate-900/50 transition">
                                     <td class="p-2.5 text-slate-400 whitespace-nowrap">${timeStr}</td>
                                     <td class="p-2.5 font-sans font-bold text-white truncate max-w-[200px]" title="${lv.page}">${lv.page}</td>
                                     <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${refClass}">${ref}</span></td>
                                     <td class="p-2.5 whitespace-nowrap font-sans">${lv.device || 'Mobil'}</td>
-                                    <td class="p-2.5 whitespace-nowrap">🇹🇷 ${lv.country || 'TR'} ${lv.city || ''}</td>
+                                    <td class="p-2.5 whitespace-nowrap">${countryBadge}</td>
                                     <td class="p-2.5 whitespace-nowrap">${firstBadge}</td>
                                 </tr>`;
                             }).join('');

@@ -71,6 +71,7 @@ async def track_visitors_middleware(request: Request, call_next):
     is_static_or_system = (
         path.startswith("/assets") or
         path.startswith("/images") or
+        path.startswith("/.well-known") or
         path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
     )
     if not (is_panel_or_admin or is_static_or_system):
