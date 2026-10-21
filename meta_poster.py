@@ -12,43 +12,44 @@ if sys.stdout.encoding != 'utf-8':
 
 def upload_image_to_imgur(image_path: str) -> str:
     """
-    Yerel görseli Imgur'a yükleyerek Instagram API'nin gerektirdiği public HTTPS linki döner.
-    IMGUR_CLIENT_ID boşsa basit dosya yükleme servislerini veya doğrudan URL'i dener.
+    Yerel görseli Instagram Graph API'nin istediği doğrudan public JPEG linkine dönüştürür.
+    Öncelik: Uguu.se doğrudan CDN linki veya Imgur.
     """
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"Görsel bulunamadı: {image_path}")
 
-    # 1. Imgur API varsa
-    if config.IMGUR_CLIENT_ID:
-        headers = {"Authorization": f"Client-ID {config.IMGUR_CLIENT_ID}"}
-        with open(image_path, "rb") as f:
-            resp = requests.post(
-                "https://api.imgur.com/3/image",
-                headers=headers,
-                files={"image": f},
-                timeout=20
-            )
-        data = resp.json()
-        if data.get("success"):
-            return data["data"]["link"]
-        else:
-            print(f"Imgur yükleme hatası: {data}")
-
-    # 2. Ücretsiz/Geçici dosya barındırma (tmpfiles.org) fallback
+    # 1. Hızlı ve doğrudan görsel CDN servisi (Uguu.se - Instagram %100 kabul eder)
     try:
         with open(image_path, "rb") as f:
-            resp = requests.post("https://tmpfiles.org/api/v1/upload", files={"file": f}, timeout=15)
+            resp = requests.post("https://uguu.se/upload", files={"files[]": f}, timeout=20)
             if resp.status_code == 200:
                 res = resp.json()
-                if "data" in res and "url" in res["data"]:
-                    # tmpfiles url'si: https://tmpfiles.org/12345/image.jpg -> doğrudan indirme linki: https://tmpfiles.org/dl/12345/image.jpg
-                    raw_url = res["data"]["url"]
-                    direct_url = raw_url.replace("tmpfiles.org/", "tmpfiles.org/dl/")
+                if res.get("success") and res.get("files"):
+                    direct_url = res["files"][0]["url"]
                     return direct_url
     except Exception as e:
-        print(f"Geçici görsel sunucusuna yüklenemedi: {e}")
+        print(f"Uguu görsel yükleme hatası: {e}")
 
-    return ""
+    # 2. Imgur API varsa
+    if config.IMGUR_CLIENT_ID:
+        try:
+            headers = {"Authorization": f"Client-ID {config.IMGUR_CLIENT_ID}"}
+            with open(image_path, "rb") as f:
+                resp = requests.post(
+                    "https://api.imgur.com/3/image",
+                    headers=headers,
+                    files={"image": f},
+                    timeout=20
+                )
+            data = resp.json()
+            if data.get("success"):
+                return data["data"]["link"]
+        except Exception:
+            pass
+
+    # 3. Kendi sitemizin kalıcı görsel linki (Render sunucusunda çalışırken)
+    safe_name = os.path.basename(image_path)
+    return f"{config.PUBLIC_MEDIA_BASE}/images/{safe_name}"
 
 # Son otomatik Facebook paylaşım zamanını takip eder (Anti-Spam & Algoritma Koruması)
 _LAST_FB_AUTO_POST_TIME = 0.0
@@ -111,9 +112,13 @@ def post_to_facebook(caption: str, image_path: str, news_link: str = None, is_ma
     if not is_manual and not _can_auto_post_to_facebook():
         return {"status": "skipped_by_shield", "post_id": None}
 
+    fb_caption = caption
+    if news_link and news_link not in caption:
+        fb_caption = f"{caption}\n\n🌐 Haberin tüm detayları ve canlı gelişmeler:\n👉 {news_link}"
+
     url = f"https://graph.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/photos"
     payload = {
-        "caption": caption,
+        "caption": fb_caption,
         "access_token": config.META_PAGE_ACCESS_TOKEN
     }
 
@@ -146,9 +151,13 @@ def post_video_to_facebook(video_path: str, caption: str, news_link: str = None)
     if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
         return {"status": "simulated"}
 
+    fb_desc = caption
+    if news_link and news_link not in caption:
+        fb_desc = f"{caption}\n\n🌐 Haberin detayları ve videosu:\n👉 {news_link}"
+
     url = f"https://graph-video.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/videos"
     payload = {
-        "description": caption,
+        "description": fb_desc,
         "access_token": config.META_PAGE_ACCESS_TOKEN
     }
 
@@ -383,6 +392,13 @@ def post_stories_with_cooldown(image_path: str, cooldown_hours: float = None) ->
     import database
     if cooldown_hours is None:
         cooldown_hours = getattr(config, "STORY_COOLDOWN_HOURS", 4.0)
+
+    # Saat kontrolü: Sabah 08:00 - Gece 24:00 (TSİ) arası hikaye atılır, gece uyku modu
+    from datetime import datetime, timezone, timedelta
+    tr_now = datetime.now(timezone(timedelta(hours=3)))
+    if not (8 <= tr_now.hour < 24):
+        print(f"🌙 [Hikaye Kalkanı] Gece saatleri ({tr_now.strftime('%H:%M')}) - Hikaye paylaşımı sabah 08:00'de devam edecek.")
+        return {"status": "night_sleep_mode"}
 
     now_ts = time.time()
     last_ts_str = database.get_setting("last_meta_story_ts", "0")
