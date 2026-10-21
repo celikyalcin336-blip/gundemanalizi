@@ -131,7 +131,32 @@ def init_db():
                 val TEXT
             )
         """)
-        # 5. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
+        # 5. Canlı Ziyaretçi ve Trafik Analitiği Tablosu
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS visitor_logs (
+                id SERIAL PRIMARY KEY if_pg,
+                visitor_hash TEXT NOT NULL,
+                is_first_visit INTEGER DEFAULT 1,
+                page TEXT,
+                referrer TEXT,
+                device TEXT,
+                country TEXT,
+                city TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """.replace("SERIAL PRIMARY KEY if_pg", "SERIAL PRIMARY KEY" if USE_PG else "INTEGER PRIMARY KEY AUTOINCREMENT"))
+        # 6. Gelir ve Para Kazanma (AdSense & Sponsorluk) Tablosu
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS revenue_records (
+                id SERIAL PRIMARY KEY if_pg,
+                source TEXT NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """.replace("SERIAL PRIMARY KEY if_pg", "SERIAL PRIMARY KEY" if USE_PG else "INTEGER PRIMARY KEY AUTOINCREMENT"))
+        # 7. Görsel deposu (yalnızca PostgreSQL modunda kullanılır)
         if USE_PG:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS images (
@@ -387,8 +412,49 @@ def set_setting(key: str, val: str):
         print(f"⚠️ Ayar kaydedilemedi ({key}): {e}")
 
 
+def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "") -> bool:
+    """Ziyaretçiyi kaydeder. Kullanıcı siteye ilk defa mı giriyor kontrol eder ve döner."""
+    try:
+        with get_connection() as conn:
+            # Bu ziyaretçi daha önce hiç girdi mi?
+            prev = conn.execute("SELECT 1 FROM visitor_logs WHERE visitor_hash = ? LIMIT 1", (visitor_hash,)).fetchone()
+            is_first = 1 if not prev else 0
+
+            conn.execute("""
+                INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (visitor_hash, is_first, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
+            return bool(is_first)
+    except Exception as e:
+        print(f"⚠️ Ziyaretçi loglanamadı: {e}")
+        return False
+
+
+def add_revenue_record(source: str, amount: float, date_str: str, notes: str = "") -> int:
+    """Yeni gelir kaydı ekler (AdSense, Sponsorluk vb.)."""
+    try:
+        with get_connection() as conn:
+            conn.execute("""
+                INSERT INTO revenue_records (source, amount, date, notes)
+                VALUES (?, ?, ?, ?)
+            """, (source, float(amount), date_str, notes))
+            return 1
+    except Exception as e:
+        print(f"⚠️ Gelir eklenemedi: {e}")
+        return 0
+
+
+def delete_revenue_record(rec_id: int):
+    """Gelir kaydını siler."""
+    try:
+        with get_connection() as conn:
+            conn.execute("DELETE FROM revenue_records WHERE id = ?", (rec_id,))
+    except Exception:
+        pass
+
+
 def get_dashboard_summary() -> Dict:
-    """Yönetim paneli (/panel) için tüm ayrıntılı istatistikleri döner."""
+    """Yönetim paneli (/panel) için tüm ayrıntılı canlı analitik ve istatistikleri döner."""
     with get_connection() as conn:
         totals = conn.execute(
             "SELECT COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS total_views FROM articles"
@@ -415,6 +481,98 @@ def get_dashboard_summary() -> Dict:
             "SELECT source, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY source ORDER BY cnt DESC"
         ).fetchall()
 
+        # CANLI TRAFİK & TEKİL KULLANICI ANALİTİĞİ
+        active_now = 0
+        today_uniques = 0
+        first_time_today = 0
+        live_visitors = []
+        traffic_sources = []
+        device_stats = []
+
+        try:
+            if USE_PG:
+                # Son 5 dakikada aktif olan tekil kişi sayısı
+                act_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= NOW() - INTERVAL '5 minute'"
+                ).fetchone()
+                active_now = act_row["c"] if act_row else 0
+
+                # Bugünün tekil kullanıcı sayısı
+                uniq_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= CURRENT_DATE"
+                ).fetchone()
+                today_uniques = uniq_row["c"] if uniq_row else 0
+
+                # Bugün ilk defa gelen yeni ziyaretçi sayısı
+                first_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= CURRENT_DATE AND is_first_visit = 1"
+                ).fetchone()
+                first_time_today = first_row["c"] if first_row else 0
+
+                # Trafik kaynakları (Bugün)
+                traffic_rows = conn.execute(
+                    "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= CURRENT_DATE - INTERVAL '7 days' GROUP BY referrer ORDER BY cnt DESC LIMIT 7"
+                ).fetchall()
+                traffic_sources = [dict(r) for r in traffic_rows]
+
+                # Cihaz dağılımı
+                dev_rows = conn.execute(
+                    "SELECT device, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= CURRENT_DATE - INTERVAL '7 days' GROUP BY device ORDER BY cnt DESC"
+                ).fetchall()
+                device_stats = [dict(r) for r in dev_rows]
+
+                # Canlı son 15 ziyaretçi
+                lv_rows = conn.execute(
+                    "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
+                ).fetchall()
+                live_visitors = [_row_to_dict(r) for r in lv_rows]
+            else:
+                act_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= datetime('now', '-5 minute')"
+                ).fetchone()
+                active_now = act_row["c"] if act_row else 0
+
+                uniq_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE date(created_at) = date('now')"
+                ).fetchone()
+                today_uniques = uniq_row["c"] if uniq_row else 0
+
+                first_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE date(created_at) = date('now') AND is_first_visit = 1"
+                ).fetchone()
+                first_time_today = first_row["c"] if first_row else 0
+
+                traffic_rows = conn.execute(
+                    "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs GROUP BY referrer ORDER BY cnt DESC LIMIT 7"
+                ).fetchall()
+                traffic_sources = [dict(r) for r in traffic_rows]
+
+                dev_rows = conn.execute(
+                    "SELECT device, COUNT(*) AS cnt FROM visitor_logs GROUP BY device ORDER BY cnt DESC"
+                ).fetchall()
+                device_stats = [dict(r) for r in dev_rows]
+
+                lv_rows = conn.execute(
+                    "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
+                ).fetchall()
+                live_visitors = [_row_to_dict(r) for r in lv_rows]
+        except Exception as e:
+            print(f"⚠️ Analitik sorgulama hatası: {e}")
+
+        # PARA KAZANMA & GELİR VERİLERİ
+        total_revenue = 0.0
+        month_revenue = 0.0
+        revenue_records = []
+        try:
+            rev_all = conn.execute("SELECT COALESCE(SUM(amount), 0) AS s FROM revenue_records").fetchone()
+            total_revenue = round(rev_all["s"] if rev_all else 0.0, 2)
+
+            rev_rows = conn.execute("SELECT * FROM revenue_records ORDER BY id DESC LIMIT 20").fetchall()
+            revenue_records = [_row_to_dict(r) for r in rev_rows]
+            month_revenue = total_revenue  # Başlangıçta toplamı göster
+        except Exception as e:
+            print(f"⚠️ Gelir sorgulama hatası: {e}")
+
         images_count = 0
         db_size_mb = 0.0
         if USE_PG:
@@ -424,12 +582,24 @@ def get_dashboard_summary() -> Dict:
 
     recent_list = [_row_to_dict(r) for r in recent_rows]
     top_list = [_row_to_dict(r) for r in top_rows]
+    returning_today = max(0, today_uniques - first_time_today)
+
     return {
         "total_articles": total_articles,
         "total_views": total_views,
         "home_visits": home_visits,
         "total_all_hits": total_views + home_visits,
         "avg_views": round(total_views / total_articles, 1) if total_articles > 0 else 0,
+        "active_now": max(1, active_now),
+        "today_uniques": today_uniques,
+        "first_time_today": first_time_today,
+        "returning_today": returning_today,
+        "traffic_sources": traffic_sources,
+        "device_stats": device_stats,
+        "live_visitors": live_visitors,
+        "total_revenue": total_revenue,
+        "month_revenue": month_revenue,
+        "revenue_records": revenue_records,
         "images_count": images_count,
         "db_size_mb": db_size_mb,
         "use_pg": USE_PG,

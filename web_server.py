@@ -54,6 +54,52 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
 
+@app.middleware("http")
+async def track_visitors_middleware(request: Request, call_next):
+    path = request.url.path
+    if not (path.startswith("/assets") or path.startswith("/images") or path.startswith("/api/panel/video-job") or path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/health")):
+        try:
+            ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
+            ip = ip.split(",")[0].strip()
+            ua = request.headers.get("user-agent", "")
+            import hashlib
+            vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
+
+            ua_low = ua.lower()
+            if any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
+                device = "Mobil"
+            elif "ipad" in ua_low or "tablet" in ua_low:
+                device = "Tablet"
+            else:
+                device = "Masaüstü"
+
+            ref = request.headers.get("referer", "").lower()
+            if "google." in ref:
+                source = "Google"
+            elif "t.me" in ref or "telegram" in ref:
+                source = "Telegram"
+            elif "instagram.com" in ref:
+                source = "Instagram"
+            elif "tiktok.com" in ref:
+                source = "TikTok"
+            elif "facebook.com" in ref or "fb.com" in ref:
+                source = "Facebook"
+            elif "twitter.com" in ref or "t.co" in ref or "x.com" in ref:
+                source = "X (Twitter)"
+            elif "whatsapp" in ref or "wa.me" in ref:
+                source = "WhatsApp"
+            elif ref:
+                source = "Diğer Web"
+            else:
+                source = "Doğrudan"
+
+            country = request.headers.get("cf-ipcountry", "TR")
+            city = request.headers.get("cf-ipcity", "")
+            database.log_visitor(vis_hash, path, source, device, country, city)
+        except Exception:
+            pass
+    return await call_next(request)
+
 # Statik Dosya Dizinleri
 app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
@@ -404,6 +450,72 @@ async def panel_video_job_status(job_id: str, request: Request):
         raise HTTPException(status_code=404, detail="İşlem bulunamadı")
     elapsed = round(time.time() - job.get("started_at", time.time()), 1)
     return {"ok": True, "elapsed_sec": elapsed, **job}
+
+@app.get("/manifest.json")
+async def pwa_manifest():
+    return JSONResponse({
+        "name": "Gündem Analizi Yönetim Paneli",
+        "short_name": "GA Panel",
+        "description": "Gündem Analizi Canlı Haber ve Sosyal Medya Yönetim Stüdyosu",
+        "start_url": "/panel",
+        "display": "standalone",
+        "background_color": "#0a0d14",
+        "theme_color": "#dc2626",
+        "icons": [
+            {
+                "src": "/assets/logo.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": "/assets/logo.png",
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    })
+
+@app.get("/api/panel/live-stats")
+async def panel_live_stats(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    stats = database.get_dashboard_summary()
+    return {
+        "ok": True,
+        "active_now": stats.get("active_now", 1),
+        "today_uniques": stats.get("today_uniques", 0),
+        "first_time_today": stats.get("first_time_today", 0),
+        "returning_today": stats.get("returning_today", 0),
+        "total_views": stats.get("total_views", 0),
+        "total_all_hits": stats.get("total_all_hits", 0),
+        "live_visitors": stats.get("live_visitors", [])[:8],
+        "total_revenue": stats.get("total_revenue", 0.0)
+    }
+
+@app.post("/api/panel/revenue")
+async def panel_add_revenue(
+    request: Request,
+    source: str = Form(...),
+    amount: float = Form(...),
+    date: str = Form(""),
+    notes: str = Form("")
+):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    if not date:
+        date = time.strftime("%Y-%m-%d")
+    ok = database.add_revenue_record(source, amount, date, notes)
+    return {"ok": bool(ok), "message": "Gelir kaydı başarıyla eklendi."}
+
+@app.post("/api/panel/delete-revenue/{rec_id}")
+async def panel_del_revenue(rec_id: int, request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    database.delete_revenue_record(rec_id)
+    return {"ok": True, "message": "Gelir kaydı silindi."}
 
 @app.post("/api/ihbar")
 async def submit_ihbar(

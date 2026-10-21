@@ -2,10 +2,16 @@
 <html lang="tr" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yönetim & İstatistik Paneli | Gündem Analizi</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#dc2626">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GA Panel">
+    <link rel="apple-touch-icon" href="/assets/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -170,6 +176,252 @@
                     <div class="bg-red-600 h-full rounded-full" style="width: {{ ((stats.db_size_mb / 1024) * 100) | round(1) }}%"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- 📲 MOBİL UYGULAMA (PWA) BİLDİRİM BANDI -->
+        <div id="pwa-banner" class="p-4 rounded-2xl bg-gradient-to-r from-red-950 via-slate-900 to-brand-card border border-red-600/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div class="flex items-center gap-3">
+                <img src="/assets/logo.png" alt="Logo" class="w-11 h-11 rounded-full border-2 border-red-600 shrink-0">
+                <div>
+                    <h4 class="font-black text-white text-sm">📲 Bu Paneli Telefonuna Uygulama Olarak Ekle!</h4>
+                    <p class="text-slate-300 text-[11px] mt-0.5">Telefonundan Chrome / Safari ile girdiğinde <strong>"Ana Ekrana Ekle"</strong> diyerek APK gibi tam ekran uygulama olarak kullanabilirsin.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="showPwaInstructions()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold shadow-lg transition">
+                    Nasıl Eklenir? ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- 🔴 CANLI ZİYARETÇİ VE ANLIK TRAFİK MERKEZİ (PRO ANALİTİK) -->
+        <div class="bg-brand-card border border-brand-border rounded-2xl p-6 shadow-xl space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-brand-border">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+                    <h3 class="text-base font-extrabold text-white">CANLI ZİYARETÇİ VE TRAFİK AKIŞ MERKEZİ</h3>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+                    <span>Canlı İzleme Aktif</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 font-bold border border-emerald-500/40">● 5 sn Canlı Polling</span>
+                </div>
+            </div>
+
+            <!-- Canlı Ziyaretçi 4'lü İstatistik Kartları -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <!-- Şu An Sitede Olanlar -->
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-emerald-500/40">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="font-bold">🔴 ŞU AN CANLI</span>
+                        <span class="text-[10px] text-emerald-400 font-semibold">Son 5 dk</span>
+                    </div>
+                    <div id="live-active-now" class="text-3xl font-black text-emerald-400">{{ stats.active_now }}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Sitede aktif gezinen tekil kullanıcı</div>
+                </div>
+
+                <!-- Bugünkü Tekil Kişi -->
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-sky-500/40">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="font-bold">👥 BUGÜNKÜ TEKİL KİŞİ</span>
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-sky-400"></i>
+                    </div>
+                    <div id="live-today-uniques" class="text-3xl font-black text-sky-400">{{ stats.today_uniques }}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Farklı cihaz ve IP sayısı</div>
+                </div>
+
+                <!-- İlk Defa Giren Yeni Ziyaretçiler -->
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-amber-500/40">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="font-bold">🌟 İLK DEFA GİRENLER</span>
+                        <span class="px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold">Yeni Kullanıcı</span>
+                    </div>
+                    <div id="live-first-time" class="text-3xl font-black text-amber-400">{{ stats.first_time_today }}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Siteye ömründe ilk kez girenler</div>
+                </div>
+
+                <!-- Tekrar Gelen Sadık Okuyucular -->
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-purple-500/40">
+                    <div class="flex items-center justify-between text-slate-400 mb-1">
+                        <span class="font-bold">🔄 TEKRAR GELENLER</span>
+                        <i data-lucide="repeat" class="w-3.5 h-3.5 text-purple-400"></i>
+                    </div>
+                    <div id="live-returning" class="text-3xl font-black text-purple-400">{{ stats.returning_today }}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Geri dönen sadık kitle</div>
+                </div>
+            </div>
+
+            <!-- Trafik Kaynakları (Sosyal Medya Dağılımı) & Cihazlar -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
+                <!-- Trafik Kaynakları (8 Kolon) -->
+                <div class="lg:col-span-8 p-4 rounded-xl bg-slate-950/60 border border-brand-border space-y-3">
+                    <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                        <span>📊 Trafik Nereden Geliyor? (Sosyal Medya & Arama Kaynakları)</span>
+                        <span class="text-[10px] text-slate-500">Son 7 gün</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        {% if stats.traffic_sources %}
+                            {% for src in stats.traffic_sources %}
+                            <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-brand-border flex items-center gap-2">
+                                <span class="font-bold text-white">{{ src.referrer }}</span>
+                                <span class="px-1.5 py-0.5 rounded bg-red-600/30 text-red-300 font-mono font-bold text-[11px]">{{ src.cnt }} giriş</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-xs text-slate-500 italic">Ziyaretçiler girdikçe kaynaklar burada otomatik listelenecektir (Google, Telegram, Instagram, TikTok, vb.).</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Cihaz Dağılımı (4 Kolon) -->
+                <div class="lg:col-span-4 p-4 rounded-xl bg-slate-950/60 border border-brand-border space-y-3">
+                    <div class="text-xs font-bold text-slate-300">📱 Cihaz Dağılımı</div>
+                    <div class="space-y-2 text-xs">
+                        {% if stats.device_stats %}
+                            {% for dev in stats.device_stats %}
+                            <div class="flex items-center justify-between text-slate-300">
+                                <span class="flex items-center gap-1.5">
+                                    <i data-lucide="{{ 'smartphone' if dev.device == 'Mobil' else 'monitor' }}" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    {{ dev.device }}
+                                </span>
+                                <span class="font-mono font-bold text-white">{{ dev.cnt }} ziyaret</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="flex items-center justify-between text-slate-400 text-xs">
+                                <span>📱 Mobil</span>
+                                <span class="font-bold text-white">%85+ (Tahmini)</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- CANLI SON ZİYARETÇİLER AKIŞ TABLOSU -->
+            <div class="space-y-2 pt-2">
+                <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                    <span>🕒 Canlı Son Ziyaretçiler Akışı (Siteye Giren Son Kişiler)</span>
+                    <span class="text-[10px] text-slate-400">Anlık otomatik güncellenir</span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-brand-border bg-slate-950/80">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900/90 text-[11px] uppercase font-bold text-slate-400 border-b border-brand-border">
+                            <tr>
+                                <th class="p-2.5">Zaman</th>
+                                <th class="p-2.5">Gezilen Sayfa</th>
+                                <th class="p-2.5">Nereden Geldi?</th>
+                                <th class="p-2.5">Cihaz</th>
+                                <th class="p-2.5">Ülke/Konum</th>
+                                <th class="p-2.5">Kullanıcı Durumu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="live-visitors-tbody" class="divide-y divide-brand-border/40 font-mono text-[11px]">
+                            {% if stats.live_visitors %}
+                                {% for lv in stats.live_visitors %}
+                                <tr class="hover:bg-slate-900/50 transition">
+                                    <td class="p-2.5 text-slate-400 whitespace-nowrap">{{ lv.created_at[11:19] if lv.created_at else '-' }}</td>
+                                    <td class="p-2.5 font-sans font-bold text-white truncate max-w-[200px]" title="{{ lv.page }}">{{ lv.page }}</td>
+                                    <td class="p-2.5">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold 
+                                            {{ 'bg-sky-950 text-sky-300 border border-sky-500/40' if 'Telegram' in lv.referrer else 
+                                               'bg-emerald-950 text-emerald-300 border border-emerald-500/40' if 'WhatsApp' in lv.referrer else 
+                                               'bg-pink-950 text-pink-300 border border-pink-500/40' if 'Instagram' in lv.referrer else 
+                                               'bg-blue-950 text-blue-300 border border-blue-500/40' if 'Google' in lv.referrer else 
+                                               'bg-slate-800 text-slate-300' }}">
+                                            {{ lv.referrer }}
+                                        </span>
+                                    </td>
+                                    <td class="p-2.5 whitespace-nowrap font-sans">{{ lv.device }}</td>
+                                    <td class="p-2.5 whitespace-nowrap">🇹🇷 {{ lv.country }} {{ lv.city }}</td>
+                                    <td class="p-2.5 whitespace-nowrap">
+                                        {% if lv.is_first_visit %}
+                                            <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>
+                                        {% else %}
+                                            <span class="text-slate-400 text-[10px]">🔄 Tekrar Gelen</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-slate-500 italic font-sans">Henüz loglanan canlı ziyaretçi yok. Kullanıcılar siteye girdikçe burada saniyelik akacaktır.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 💰 PARA KAZANMA & GELİR TAKİP MERKEZİ (ADSENSE & SPONSORLUK) -->
+        <div class="bg-gradient-to-br from-emerald-950/30 via-brand-card to-brand-card border border-emerald-600/40 rounded-2xl p-6 shadow-xl space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-brand-border">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">💰</span>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">PARA KAZANMA & GELİR TAKİP MERKEZİ</h3>
+                        <p class="text-xs text-emerald-400 font-semibold">Google AdSense, Sponsorlu Haber ve Reklam Gelirleri</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="openRevenueModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> + Gelir Kaydet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gelir 3'lü Özet Kartları -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-emerald-500/40">
+                    <div class="text-slate-400 mb-1 font-bold">TOPLAM KAZANÇ</div>
+                    <div class="text-3xl font-black text-emerald-400">₺{{ stats.total_revenue }}</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Bugüne kadar sisteme kaydedilen toplam gelir</div>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-brand-border">
+                    <div class="text-slate-400 mb-1 font-bold">BU AYKİ GELİR</div>
+                    <div class="text-3xl font-black text-white">₺{{ stats.month_revenue }}</div>
+                    <div class="text-[11px] text-slate-400 mt-1">İçinde bulunduğumuz ay</div>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-950/80 border border-brand-border">
+                    <div class="text-slate-400 mb-1 font-bold">TAHMİNİ BGBM (RPM)</div>
+                    <div class="text-3xl font-black text-amber-400">
+                        ₺{{ ((stats.total_revenue / stats.total_views) * 1000) | round(2) if stats.total_views > 0 else '0.00' }}
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-1">1.000 tıklama başına ortalama kazanç</div>
+                </div>
+            </div>
+
+            <!-- Gelir Geçmişi Tablosu -->
+            {% if stats.revenue_records %}
+            <div class="space-y-2 pt-2">
+                <div class="text-xs font-bold text-slate-300">Son Gelir Hareketleri:</div>
+                <div class="overflow-x-auto rounded-xl border border-brand-border bg-slate-950/60">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900 text-[11px] font-bold text-slate-400 border-b border-brand-border">
+                            <tr>
+                                <th class="p-2.5">Tarih</th>
+                                <th class="p-2.5">Gelir Kaynağı</th>
+                                <th class="p-2.5">Tutar</th>
+                                <th class="p-2.5">Açıklama / Not</th>
+                                <th class="p-2.5 text-right">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-border/40 font-mono text-[11px]">
+                            {% for rev in stats.revenue_records %}
+                            <tr class="hover:bg-slate-900/40">
+                                <td class="p-2.5 text-slate-400">{{ rev.date }}</td>
+                                <td class="p-2.5 font-bold text-emerald-400 font-sans">{{ rev.source }}</td>
+                                <td class="p-2.5 font-bold text-white text-sm">₺{{ rev.amount }}</td>
+                                <td class="p-2.5 text-slate-300 font-sans">{{ rev.notes or '-' }}</td>
+                                <td class="p-2.5 text-right">
+                                    <button onclick="deleteRevenue({{ rev.id }})" class="text-red-400 hover:text-red-300 font-sans font-bold">Sil</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- VİRAL VİDEO HABER STÜDYOSU V2 (KURGU, CANLI SAYAÇ, ÖNİZLEME & PAYLAŞIM) -->
@@ -569,6 +821,79 @@
         </div>
     </div>
 
+    <!-- GELİR KAYIT MODALI (ADSENSE & SPONSORLUK) -->
+    <div id="revenue-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-emerald-500/50 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+                <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+                    <span class="text-xl">💰</span> Yeni Gelir Kaydı Ekle
+                </h3>
+                <button type="button" onclick="closeRevenueModal()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <form onsubmit="submitRevenue(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Gelir Kaynağı *</label>
+                    <select id="rev-source" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white">
+                        <option value="Google AdSense">Google AdSense</option>
+                        <option value="Sponsorlu Haber / Tanıtım Yazısı">Sponsorlu Haber / Tanıtım</option>
+                        <option value="Banner / Sabit Reklam">Banner / Sabit Reklam</option>
+                        <option value="Telegram / Sosyal Medya Reklamı">Telegram / Sosyal Medya</option>
+                        <option value="Diğer Gelir">Diğer Gelir</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Tutar (TL) *</label>
+                    <input id="rev-amount" type="number" step="0.01" min="0.01" required placeholder="Örn: 250.00"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-sm focus:border-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Tarih</label>
+                    <input id="rev-date" type="date" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Not / Açıklama</label>
+                    <input id="rev-notes" type="text" placeholder="Örn: Ekim ayı ilk AdSense kesinleşen kazanç"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white">
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeRevenueModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold">İptal</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold shadow-lg">
+                        💰 Geliri Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PWA TELEFON REHBERİ MODALI -->
+    <div id="pwa-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-red-600/50 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-xs text-slate-300">
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+                <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+                    <span>📲</span> Paneli Telefona Nasıl Kurarsın?
+                </h3>
+                <button type="button" onclick="document.getElementById('pwa-modal').classList.add('hidden')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div class="space-y-3 leading-relaxed">
+                <p>Paneli Play Store veya App Store'a ihtiyaç duymadan doğrudan telefonuna tam ekran bir uygulama olarak ekleyebilirsin:</p>
+                <div class="p-3 rounded-xl bg-slate-950 border border-brand-border space-y-2">
+                    <div class="font-bold text-white flex items-center gap-1.5">
+                        <span>🤖</span> Android (Chrome):
+                    </div>
+                    <p class="text-slate-400">1. Telefondan Chrome ile <strong>gündemanalizi.com.tr/panel</strong> adresine gir.<br>2. Sağ üstteki <strong>üç noktaya (⋮)</strong> bas.<br>3. <strong>"Ana Ekrana Ekle"</strong> veya <strong>"Uygulamayı Yükle"</strong> seçeneğine tıkla.</p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950 border border-brand-border space-y-2">
+                    <div class="font-bold text-white flex items-center gap-1.5">
+                        <span>🍏</span> iPhone (Safari):
+                    </div>
+                    <p class="text-slate-400">1. Safari ile panele gir.<br>2. Alttaki <strong>Paylaş (kare ve yukarı ok)</strong> butonuna bas.<br>3. <strong>"Ana Ekrana Ekle"</strong> seçeneğine tıkla.</p>
+                </div>
+                <p class="text-emerald-400 font-semibold">Artık telefonunun masaüstünde "GA Panel" logosu çıkacak ve dokunduğun an bilgisayara ihtiyaç duymadan cebinden yöneteceksin!</p>
+            </div>
+            <button type="button" onclick="document.getElementById('pwa-modal').classList.add('hidden')" class="w-full py-2.5 rounded-xl bg-red-600 text-white font-bold">Tamam, Anladım</button>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
         const DEFAULT_PIN = "1453";
@@ -602,6 +927,83 @@
             document.querySelector('#toast-msg span').innerText = text;
             box.classList.remove('hidden');
         }
+
+        function showPwaInstructions() {
+            document.getElementById('pwa-modal').classList.remove('hidden');
+        }
+
+        function openRevenueModal() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('rev-date').value = today;
+            document.getElementById('revenue-modal').classList.remove('hidden');
+        }
+
+        function closeRevenueModal() {
+            document.getElementById('revenue-modal').classList.add('hidden');
+        }
+
+        async function submitRevenue(e) {
+            e.preventDefault();
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            const fd = new FormData();
+            fd.append('source', document.getElementById('rev-source').value);
+            fd.append('amount', document.getElementById('rev-amount').value);
+            fd.append('date', document.getElementById('rev-date').value);
+            fd.append('notes', document.getElementById('rev-notes').value);
+
+            try {
+                const res = await fetch('/api/panel/revenue', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Pin': pin },
+                    body: fd
+                });
+                const data = await res.json();
+                if (res.ok && data.ok) {
+                    closeRevenueModal();
+                    showToast('💰 ' + data.message);
+                    setTimeout(() => window.location.reload(), 1200);
+                } else {
+                    alert('Hata: ' + (data.detail || 'Eklenemedi'));
+                }
+            } catch (err) {
+                alert('Bağlantı hatası: ' + err);
+            }
+        }
+
+        async function deleteRevenue(id) {
+            if (!confirm('Bu gelir kaydını silmek istediğine emin misin?')) return;
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            const res = await fetch('/api/panel/delete-revenue/' + id, {
+                method: 'POST',
+                headers: { 'X-Admin-Pin': pin }
+            });
+            if (res.ok) {
+                showToast('Gelir kaydı silindi.');
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        }
+
+        // CANLI ZİYARETÇİ 5 SANİYELİK OTOMATİK GÜNCELLEME (POLLING)
+        async function fetchLiveAnalytics() {
+            const pin = localStorage.getItem('ga_admin_pin');
+            if (pin !== DEFAULT_PIN) return;
+            try {
+                const res = await fetch('/api/panel/live-stats', { headers: { 'X-Admin-Pin': pin } });
+                if (!res.ok) return;
+                const d = await res.json();
+                if (d.ok) {
+                    const elAct = document.getElementById('live-active-now');
+                    if (elAct) elAct.innerText = d.active_now;
+                    const elUniq = document.getElementById('live-today-uniques');
+                    if (elUniq) elUniq.innerText = d.today_uniques;
+                    const elFirst = document.getElementById('live-first-time');
+                    if (elFirst) elFirst.innerText = d.first_time_today;
+                    const elRet = document.getElementById('live-returning');
+                    if (elRet) elRet.innerText = d.returning_today;
+                }
+            } catch (e) {}
+        }
+        setInterval(fetchLiveAnalytics, 5000);
 
         async function triggerFetchNow(btn) {
             const pin = localStorage.getItem('ga_admin_pin') || '';
