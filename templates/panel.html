@@ -1000,6 +1000,33 @@
                     if (elFirst) elFirst.innerText = d.first_time_today;
                     const elRet = document.getElementById('live-returning');
                     if (elRet) elRet.innerText = d.returning_today;
+
+                    // Canlı Ziyaretçi Tablosunu da Gerçek Zamanlı Güncelle
+                    if (d.live_visitors && d.live_visitors.length > 0) {
+                        const tbody = document.getElementById('live-visitors-tbody');
+                        if (tbody) {
+                            tbody.innerHTML = d.live_visitors.map(lv => {
+                                const timeStr = lv.created_at ? lv.created_at.substring(11, 19) : '-';
+                                let refClass = 'bg-slate-800 text-slate-300';
+                                const ref = lv.referrer || 'Doğrudan';
+                                if (ref.includes('Telegram')) refClass = 'bg-sky-950 text-sky-300 border border-sky-500/40';
+                                else if (ref.includes('WhatsApp')) refClass = 'bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+                                else if (ref.includes('Instagram')) refClass = 'bg-pink-950 text-pink-300 border border-pink-500/40';
+                                else if (ref.includes('Google')) refClass = 'bg-blue-950 text-blue-300 border border-blue-500/40';
+                                const firstBadge = lv.is_first_visit 
+                                    ? '<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>'
+                                    : '<span class="text-slate-400 text-[10px]">🔄 Tekrar Gelen</span>';
+                                return `<tr class="hover:bg-slate-900/50 transition">
+                                    <td class="p-2.5 text-slate-400 whitespace-nowrap">${timeStr}</td>
+                                    <td class="p-2.5 font-sans font-bold text-white truncate max-w-[200px]" title="${lv.page}">${lv.page}</td>
+                                    <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${refClass}">${ref}</span></td>
+                                    <td class="p-2.5 whitespace-nowrap font-sans">${lv.device || 'Mobil'}</td>
+                                    <td class="p-2.5 whitespace-nowrap">🇹🇷 ${lv.country || 'TR'} ${lv.city || ''}</td>
+                                    <td class="p-2.5 whitespace-nowrap">${firstBadge}</td>
+                                </tr>`;
+                            }).join('');
+                        }
+                    }
                 }
             } catch (e) {}
         }

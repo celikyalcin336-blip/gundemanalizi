@@ -13,6 +13,17 @@ import os
 import re
 import unicodedata
 from typing import List, Dict, Optional
+from datetime import datetime, timezone, timedelta
+
+TR_TZ = timezone(timedelta(hours=3))
+
+def tr_now_str() -> str:
+    """Türkiye yerel saatini (TSİ, UTC+3) string formatında döner."""
+    return datetime.now(TR_TZ).strftime("%Y-%m-%d %H:%M:%S")
+
+def tr_today_str() -> str:
+    """Türkiye bugünün tarihini döner (YYYY-MM-DD)."""
+    return datetime.now(TR_TZ).strftime("%Y-%m-%d")
 
 DB_DIR = os.path.join(os.path.dirname(__file__), "data")
 DB_PATH = os.path.join(DB_DIR, "news_bot.db")
@@ -65,9 +76,22 @@ def get_connection():
 
 def _row_to_dict(row) -> Dict:
     d = dict(row)
-    # PostgreSQL datetime nesnelerini, SQLite ile aynı metin formatına çevir
-    if d.get("created_at") is not None and not isinstance(d["created_at"], str):
-        d["created_at"] = d["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+    # created_at zaman damgasını daima Türkiye Yerel Saatine (TSİ, UTC+3) dönüştür
+    if d.get("created_at") is not None:
+        val = d["created_at"]
+        if isinstance(val, datetime):
+            if val.tzinfo is None:
+                val = val.replace(tzinfo=timezone.utc).astimezone(TR_TZ)
+            else:
+                val = val.astimezone(TR_TZ)
+            d["created_at"] = val.strftime("%Y-%m-%d %H:%M:%S")
+        elif isinstance(val, str) and val.strip():
+            try:
+                clean_str = val.split(".")[0].replace("T", " ")
+                dt = datetime.strptime(clean_str[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).astimezone(TR_TZ)
+                d["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+            except Exception:
+                d["created_at"] = str(val)
     return d
 
 
@@ -490,72 +514,48 @@ def get_dashboard_summary() -> Dict:
         device_stats = []
 
         try:
-            if USE_PG:
-                # Son 5 dakikada aktif olan tekil kişi sayısı
-                act_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= NOW() - INTERVAL '5 minute'"
-                ).fetchone()
-                active_now = act_row["c"] if act_row else 0
+            # Türkiye saatine göre zaman eşikleri (TSİ) -> UTC veritabanı eşdeğerleri
+            now_tr = datetime.now(TR_TZ)
+            today_start_tr = now_tr.replace(hour=0, minute=0, second=0, microsecond=0)
+            today_start_utc = today_start_tr.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            five_min_ago_utc = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+            seven_days_ago_utc = (today_start_tr - timedelta(days=7)).astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
-                # Bugünün tekil kullanıcı sayısı
-                uniq_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= CURRENT_DATE"
-                ).fetchone()
-                today_uniques = uniq_row["c"] if uniq_row else 0
+            # Son 5 dakikada aktif olan tekil kişi sayısı
+            act_row = conn.execute(
+                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (five_min_ago_utc,)
+            ).fetchone()
+            active_now = act_row["c"] if act_row else 0
 
-                # Bugün ilk defa gelen yeni ziyaretçi sayısı
-                first_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= CURRENT_DATE AND is_first_visit = 1"
-                ).fetchone()
-                first_time_today = first_row["c"] if first_row else 0
+            # Bugünün tekil kullanıcı sayısı (TSİ gece 00:00'dan itibaren)
+            uniq_row = conn.execute(
+                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (today_start_utc,)
+            ).fetchone()
+            today_uniques = uniq_row["c"] if uniq_row else 0
 
-                # Trafik kaynakları (Bugün)
-                traffic_rows = conn.execute(
-                    "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= CURRENT_DATE - INTERVAL '7 days' GROUP BY referrer ORDER BY cnt DESC LIMIT 7"
-                ).fetchall()
-                traffic_sources = [dict(r) for r in traffic_rows]
+            # Bugün ilk defa gelen yeni ziyaretçi sayısı
+            first_row = conn.execute(
+                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ? AND is_first_visit = 1", (today_start_utc,)
+            ).fetchone()
+            first_time_today = first_row["c"] if first_row else 0
 
-                # Cihaz dağılımı
-                dev_rows = conn.execute(
-                    "SELECT device, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= CURRENT_DATE - INTERVAL '7 days' GROUP BY device ORDER BY cnt DESC"
-                ).fetchall()
-                device_stats = [dict(r) for r in dev_rows]
+            # Son 7 günün trafik kaynakları
+            traffic_rows = conn.execute(
+                "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
+            ).fetchall()
+            traffic_sources = [dict(r) for r in traffic_rows]
 
-                # Canlı son 15 ziyaretçi
-                lv_rows = conn.execute(
-                    "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
-                ).fetchall()
-                live_visitors = [_row_to_dict(r) for r in lv_rows]
-            else:
-                act_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= datetime('now', '-5 minute')"
-                ).fetchone()
-                active_now = act_row["c"] if act_row else 0
+            # Son 7 günün cihaz dağılımı
+            dev_rows = conn.execute(
+                "SELECT device, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY device ORDER BY cnt DESC", (seven_days_ago_utc,)
+            ).fetchall()
+            device_stats = [dict(r) for r in dev_rows]
 
-                uniq_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE date(created_at) = date('now')"
-                ).fetchone()
-                today_uniques = uniq_row["c"] if uniq_row else 0
-
-                first_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE date(created_at) = date('now') AND is_first_visit = 1"
-                ).fetchone()
-                first_time_today = first_row["c"] if first_row else 0
-
-                traffic_rows = conn.execute(
-                    "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs GROUP BY referrer ORDER BY cnt DESC LIMIT 7"
-                ).fetchall()
-                traffic_sources = [dict(r) for r in traffic_rows]
-
-                dev_rows = conn.execute(
-                    "SELECT device, COUNT(*) AS cnt FROM visitor_logs GROUP BY device ORDER BY cnt DESC"
-                ).fetchall()
-                device_stats = [dict(r) for r in dev_rows]
-
-                lv_rows = conn.execute(
-                    "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
-                ).fetchall()
-                live_visitors = [_row_to_dict(r) for r in lv_rows]
+            # Canlı son 15 ziyaretçi (Türkiye Saatine çevrilmiş olarak)
+            lv_rows = conn.execute(
+                "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
+            ).fetchall()
+            live_visitors = [_row_to_dict(r) for r in lv_rows]
         except Exception as e:
             print(f"⚠️ Analitik sorgulama hatası: {e}")
 

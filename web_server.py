@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse
+from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse, JSONResponse
 import database
 import config
 import main
@@ -52,12 +52,28 @@ async def lifespan(app: FastAPI):
     worker_thread.start()
     yield
 
+ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
+PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
+
 app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
 
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
-    if not (path.startswith("/assets") or path.startswith("/images") or path.startswith("/api/panel/video-job") or path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/health")):
+    # 1. Panel, yönetim sayfaları ve admin API çağrılarını sayaca ASLA dahil etme
+    is_panel_or_admin = (
+        path == "/panel" or
+        path.startswith("/api/panel") or
+        path.startswith(f"/{PANEL_SECRET_SLUG}") or
+        "yonetim" in path
+    )
+    # 2. Statik dosyaları ve sistem uçlarını sayaca dahil etme
+    is_static_or_system = (
+        path.startswith("/assets") or
+        path.startswith("/images") or
+        path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
+    )
+    if not (is_panel_or_admin or is_static_or_system):
         try:
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
             ip = ip.split(",")[0].strip()
@@ -145,9 +161,26 @@ async def home(request: Request, kategori: str = None, q: str = None):
         }
     )
 
-ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
-
 @app.get("/panel", response_class=HTMLResponse)
+async def admin_panel_decoy(request: Request):
+    """Eski veya tahmin edilen /panel adresine gelenlere sahte 404 gösterir."""
+    return HTMLResponse(
+        status_code=404,
+        content="""<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><title>404 - Sayfa Bulunamadı</title>
+<style>body{background:#0a0e17;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;text-align:center;}h1{color:#ef4444;font-size:3rem;margin:0;}p{margin:10px 0 20px;}a{color:#38bdf8;text-decoration:none;font-weight:bold;}</style>
+</head>
+<body>
+<h1>404</h1>
+<p>Aradığınız sayfa mevcut değil veya taşınmış olabilir.</p>
+<a href="/">← Ana Sayfaya Dön</a>
+</body>
+</html>"""
+    )
+
+@app.get(f"/{PANEL_SECRET_SLUG}", response_class=HTMLResponse)
+@app.get("/yonetim-71453", response_class=HTMLResponse)
 async def admin_panel(request: Request):
     stats = database.get_dashboard_summary()
     stats["gemini_active"] = bool(config.GEMINI_API_KEY)
@@ -156,7 +189,7 @@ async def admin_panel(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="panel.html",
-        context={"stats": stats}
+        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG}
     )
 
 @app.post("/api/panel/fetch-now")
@@ -457,7 +490,7 @@ async def pwa_manifest():
         "name": "Gündem Analizi Yönetim Paneli",
         "short_name": "GA Panel",
         "description": "Gündem Analizi Canlı Haber ve Sosyal Medya Yönetim Stüdyosu",
-        "start_url": "/panel",
+        "start_url": f"/{PANEL_SECRET_SLUG}",
         "display": "standalone",
         "background_color": "#0a0d14",
         "theme_color": "#dc2626",
@@ -622,6 +655,8 @@ async def robots(request: Request):
     content = f"""User-agent: *
 Allow: /
 Disallow: /panel
+Disallow: /{PANEL_SECRET_SLUG}
+Disallow: /yonetim*
 Disallow: /api/panel/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml
