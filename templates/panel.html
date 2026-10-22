@@ -512,7 +512,13 @@
                                 class="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold">
                         </div>
                         <div>
-                            <label class="block text-slate-300 font-bold mb-1">2. Yöntem: X / TikTok / Video Linki</label>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-slate-300 font-bold">2. Yöntem: X / TikTok / Video Linki</label>
+                                <button type="button" onclick="openRadarModal()" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white font-black text-[11px] border border-red-500/40 transition">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                                    <span>📡 Sıcak Video Radarı</span>
+                                </button>
+                            </div>
                             <input id="v-url" type="url" placeholder="https://x.com/... veya video linki"
                                 class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500">
                         </div>
@@ -925,6 +931,41 @@
                 <p class="text-emerald-400 font-semibold">Artık telefonunun masaüstünde "GA Panel" logosu çıkacak ve dokunduğun an bilgisayara ihtiyaç duymadan cebinden yöneteceksin!</p>
             </div>
             <button type="button" onclick="document.getElementById('pwa-modal').classList.add('hidden')" class="w-full py-2.5 rounded-xl bg-red-600 text-white font-bold">Tamam, Anladım</button>
+        </div>
+    </div>
+
+    <!-- RADAR MODAL: X ve Telegram Canlı Sıcak Video Avcısı -->
+    <div id="radar-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-red-600/50 rounded-2xl p-6 max-w-xl w-full shadow-2xl space-y-4 text-xs text-slate-300">
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 rounded-lg bg-red-600/20 text-red-400 text-base">📡</span>
+                    <div>
+                        <h3 class="font-black text-sm text-white flex items-center gap-2">
+                            <span>Sıcak Video Radarı (X & Telegram)</span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Canlı</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400">X ve Telegram'da yeni paylaşılan logosuz sokak/trafik olayları</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeRadarModal()" class="text-slate-400 hover:text-white text-base">✕</button>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-bold">Yakalanan Son Videolar:</span>
+                <button type="button" id="btn-scan-radar" onclick="scanRadarNow()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-[11px] transition shadow">
+                    <span>🔄 Şimdi Tara</span>
+                </button>
+            </div>
+
+            <div id="radar-list" class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                <div class="p-4 text-center text-slate-400">Videolar yükleniyor...</div>
+            </div>
+
+            <div class="pt-2 border-t border-brand-border flex items-center justify-between text-[11px] text-slate-400">
+                <span>💡 "Stüdyoya Aktar" dediğinde link ve başlık forma anında doldurulur.</span>
+                <button type="button" onclick="closeRadarModal()" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition">Kapat</button>
+            </div>
         </div>
     </div>
 
@@ -1372,6 +1413,86 @@
                 btn.innerHTML = origHtml;
                 lucide.createIcons();
             }
+        }
+
+        function openRadarModal() {
+            document.getElementById('radar-modal').classList.remove('hidden');
+            loadRadarVideos();
+        }
+
+        function closeRadarModal() {
+            document.getElementById('radar-modal').classList.add('hidden');
+        }
+
+        async function loadRadarVideos() {
+            const list = document.getElementById('radar-list');
+            const pin = localStorage.getItem('ga_admin_pin') || DEFAULT_PIN;
+            try {
+                const res = await fetch('/api/panel/radar-videos', { headers: { 'X-Admin-Pin': pin } });
+                const videos = await res.json();
+                if (!videos || videos.length === 0) {
+                    list.innerHTML = `<div class="p-6 text-center text-slate-400">
+                        <div class="text-2xl mb-1">📡</div>
+                        <div>Henüz radar videosu yakalanmadı.</div>
+                        <button type="button" onclick="scanRadarNow()" class="mt-3 px-3.5 py-1.5 rounded-xl bg-red-600 text-white font-bold">Şimdi Tara</button>
+                    </div>`;
+                    return;
+                }
+                list.innerHTML = videos.map(v => {
+                    const isX = v.source.includes('X');
+                    const badgeCol = isX ? 'bg-slate-800 text-white border-slate-600' : 'bg-blue-950 text-blue-300 border-blue-600/40';
+                    const safeUrl = v.url.replace(/'/g, "\\'");
+                    const safeTitle = v.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    const safeSource = v.source.replace(/'/g, "\\'");
+                    return `
+                    <div class="p-3 rounded-xl bg-slate-900 border border-brand-border hover:border-red-600/50 transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="space-y-1 max-w-md">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeCol}">${v.source}</span>
+                                <span class="text-[10px] text-slate-500">${v.date ? v.date.slice(11, 16) : ''}</span>
+                            </div>
+                            <div class="font-bold text-white text-xs line-clamp-2">${v.title}</div>
+                            <a href="${v.url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-red-400 hover:underline">
+                                <span>🔗 Orijinal Gönderiyi İzle ↗</span>
+                            </a>
+                        </div>
+                        <button type="button" onclick="pickRadarVideo('${safeUrl}', '${safeTitle}', '${safeSource}')"
+                            class="shrink-0 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow transition">
+                            ⚡ Stüdyoya Aktar
+                        </button>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                list.innerHTML = `<div class="p-4 text-center text-red-400">Videolar yüklenirken hata oluştu: ${e}</div>`;
+            }
+        }
+
+        async function scanRadarNow() {
+            const btn = document.getElementById('btn-scan-radar');
+            const pin = localStorage.getItem('ga_admin_pin') || DEFAULT_PIN;
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Taranıyor (15-20 sn)...</span>';
+            try {
+                const res = await fetch('/api/panel/radar-scan', { method: 'POST', headers: { 'X-Admin-Pin': pin } });
+                const d = await res.json();
+                showToast(`✅ Radar tarandı! ${d.count || 0} adet yeni video bulundu.`);
+                loadRadarVideos();
+            } catch (e) {
+                alert('Radar tarama hatası: ' + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        function pickRadarVideo(url, title, source) {
+            document.getElementById('v-url').value = url;
+            document.getElementById('v-title').value = title;
+            document.getElementById('v-source').value = source || 'Sosyal Medya';
+            closeRadarModal();
+            showToast('✅ Video linki ve başlık stüdyoya aktarıldı! Şimdi videoyu işleyebilirsin.');
+            document.getElementById('v-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     </script>
 </body>

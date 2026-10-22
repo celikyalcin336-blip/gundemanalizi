@@ -240,6 +240,30 @@ async def panel_edit_article(
     )
     return {"ok": updated, "message": "Haber başarıyla güncellendi!"}
 
+@app.get("/api/panel/radar-videos")
+def get_radar_videos(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi")
+    import video_scout
+    import sqlite3
+    video_scout.init_scout_db()
+    conn = sqlite3.connect(video_scout.DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT url, title, source, created_at FROM seen_videos ORDER BY rowid DESC LIMIT 10")
+    rows = c.fetchall()
+    conn.close()
+    return [{"url": r[0], "title": r[1], "source": r[2], "date": r[3]} for r in rows]
+
+@app.post("/api/panel/radar-scan")
+def trigger_radar_scan(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi")
+    import video_scout
+    count = video_scout.run_scout_cycle()
+    return {"ok": True, "count": count}
+
 VIDEO_JOBS = {}
 
 def _process_viral_video_job(
