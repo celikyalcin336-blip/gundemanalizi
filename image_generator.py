@@ -1,14 +1,13 @@
 import os
 import requests
 from io import BytesIO
-from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 import config
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Evrensel Yazı Tipleri (Repo içindeki fontlar her ortamda çalışır: Windows & Render Linux)
+# Evrensel Yazı Tipleri (Windows & Render Linux)
 BASE_DIR = os.path.dirname(__file__)
 FONT_BOLD_PATH = os.path.join(BASE_DIR, "assets", "fonts", "segoeuib.ttf")
 FONT_REGULAR_PATH = os.path.join(BASE_DIR, "assets", "fonts", "segoeui.ttf")
@@ -24,7 +23,6 @@ def get_font(path: str, size: int):
             return ImageFont.truetype(path, size)
     except Exception:
         pass
-    # Linux sistem fontları alternatifi
     for fallback in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf", "arial.ttf"]:
         try:
             return ImageFont.truetype(fallback, size)
@@ -32,180 +30,225 @@ def get_font(path: str, size: int):
             continue
     return ImageFont.load_default()
 
-def wrap_text(text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageDraw.ImageDraw) -> list:
-    """Metni belirtilen piksel genişliğine sığacak şekilde satırlara böler."""
-    words = text.split()
-    lines = []
-    current_line = []
-
-    for word in words:
-        current_line.append(word)
-        test_line = " ".join(current_line)
-        bbox = draw.textbbox((0, 0), test_line, font=font)
-        line_width = bbox[2] - bbox[0]
-
-        if line_width > max_width:
-            current_line.pop()
-            if current_line:
-                lines.append(" ".join(current_line))
-            current_line = [word]
-
-    if current_line:
-        lines.append(" ".join(current_line))
-
-    return lines
-
-def create_gradient(width: int, height: int, start_alpha: int = 40, end_alpha: int = 240) -> Image.Image:
-    """Aşağı doğru koyulaşan şık bir karartma katmanı oluşturur."""
-    gradient = Image.new("RGBA", (width, height), color=0)
-    draw = ImageDraw.Draw(gradient)
-    for y in range(height):
-        # Üstten alta doğru artan opaklık
-        ratio = y / height
-        alpha = int(start_alpha + (end_alpha - start_alpha) * (ratio ** 1.5))
-        draw.line([(0, y), (width, y)], fill=(15, 20, 28, alpha))
-    return gradient
-
-def generate_news_card(title: str, source: str, image_url: str = None, tag: str = "TÜRKİYE GÜNDEMİ", output_filename: str = "post.jpg") -> str:
+def download_and_prepare(url: str, target_size: tuple) -> Image.Image:
     """
-    Instagram ve Facebook için 1080x1350 (4:5 dikey) veya 1080x1080 boyutunda profesyonel haber görseli üretir.
+    Görseli orijinal kaynağından indirir, RGB moduna çevirir ve
+    en-boy oranını bozmadan merkezden keserek (center crop) hedef boyuta tam oturtur.
     """
-    width = 1080
-    height = 1080  # Kare format (Facebook ve Instagram için ideal uyumluluk)
-
-    # 1. Taban Görseli (Varsa haber resmi, yoksa koyu şık arkaplan)
-    base_image = None
-    if image_url:
-        try:
-            resp = requests.get(image_url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-            if resp.status_code == 200:
-                raw_img = Image.open(BytesIO(resp.content)).convert("RGBA")
-                # Görseli en-boy oranını koruyarak kırpıp ortala
-                img_ratio = raw_img.width / raw_img.height
-                target_ratio = width / height
-                if img_ratio > target_ratio:
-                    new_width = int(height * img_ratio)
-                    raw_img = raw_img.resize((new_width, height), Image.Resampling.LANCZOS)
-                    crop_x = (new_width - width) // 2
-                    base_image = raw_img.crop((crop_x, 0, crop_x + width, height))
-                else:
-                    new_height = int(width / img_ratio)
-                    raw_img = raw_img.resize((width, new_height), Image.Resampling.LANCZOS)
-                    crop_y = (new_height - height) // 2
-                    base_image = raw_img.crop((0, crop_y, width, crop_y + height))
-        except Exception as e:
-            print(f"Haber görseli indirilemedi, varsayılan arka plan kullanılıyor: {e}")
-
-    if base_image is None:
-        # Görsel yoksa kırmızı-antrasit şık stüdyo arka planı ve ortada büyük logo filigranı
-        base_image = Image.new("RGBA", (width, height), (15, 20, 30, 255))
-        bg_draw = ImageDraw.Draw(base_image)
-        # Kırmızı ve lacivert degrade dokusu
-        for y in range(height):
-            r = int(25 + (60 - 25) * (y / height))
-            g = int(10 + (15 - 10) * (y / height))
-            b = int(20 + (35 - 20) * (y / height))
-            bg_draw.line([(0, y), (width, y)], fill=(r, g, b, 255))
+    if not url or not url.startswith("http"):
+        return None
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8"
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
+        if resp.status_code != 200 or len(resp.content) < 1000:
+            return None
         
-        # Ortada büyük logo filigranı
-        logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
-        if os.path.exists(logo_path):
-            try:
-                watermark = Image.open(logo_path).convert("RGBA")
-                wm_size = 380
-                watermark = watermark.resize((wm_size, wm_size), Image.Resampling.LANCZOS)
-                # Dairesel maske
-                circle_m = Image.new("L", (wm_size, wm_size), 0)
-                m_draw = ImageDraw.Draw(circle_m)
-                m_draw.ellipse((0, 0, wm_size, wm_size), fill=120)  # Yarı saydam
-                pos_x = (width - wm_size) // 2
-                pos_y = (height - wm_size) // 3
-                base_image.paste(watermark, (pos_x, pos_y), mask=circle_m)
-            except Exception as e:
-                print(f"Filigran ekleme hatası: {e}")
+        raw = Image.open(BytesIO(resp.content))
+        if raw.mode in ("RGBA", "LA") or (raw.mode == "P" and "transparency" in raw.info):
+            bg = Image.new("RGB", raw.size, (255, 255, 255))
+            if raw.mode != "RGBA":
+                raw = raw.convert("RGBA")
+            bg.paste(raw, mask=raw.split()[3])
+            img = bg
+        else:
+            img = raw.convert("RGB")
+            
+        if img.width < 180 or img.height < 140:
+            return None
 
-    # 2. Karartma Katmanı Ekle (Metinlerin rahat okunması için)
-    gradient = create_gradient(width, height, start_alpha=80, end_alpha=245)
-    composed = Image.alpha_composite(base_image, gradient)
+        fitted = ImageOps.fit(img, target_size, method=Image.Resampling.LANCZOS)
+        return fitted
+    except Exception as e:
+        print(f"Görsel hazırlama hatası ({url[:45]}...): {e}")
+        return None
 
-    draw = ImageDraw.Draw(composed)
+def get_image_signature(url: str) -> str:
+    """Aynı görselin farklı boyutlardaki kopyalarını (örn: 1200x675 ve 800x450) tespit etmek için dosya adının kökünü çıkarır."""
+    import re, urllib.parse
+    path = urllib.parse.urlparse(url).path
+    fname = path.split('/')[-1]
+    base = re.sub(r'[-_xX]?\d{3,4}x\d{3,4}.*$', '', fname)
+    clean = re.sub(r'\.[a-zA-Z0-9]+$', '', base)
+    return clean.lower()
 
-    # 3. Üst Etiket (Badge: Örn: 🔴 TÜRKİYE GÜNDEMİ)
-    font_badge = get_font(FONT_BOLD_PATH, 28)
-    badge_text = f"●  {tag.upper()}"
-    badge_bbox = draw.textbbox((0, 0), badge_text, font=font_badge)
-    badge_w = badge_bbox[2] - badge_bbox[0]
-    badge_h = badge_bbox[3] - badge_bbox[1]
+def is_valid_secondary_editorial_image(url: str, primary_url: str) -> bool:
+    """
+    İkinci görselin ana görsel ile aynı olmamasını, bir widget/logo/ikon/reklam olmamasını
+    ve aynı haberin editoryal fotoğraf klasöründen gelen gerçek bir ikinci kare olmasını denetler.
+    """
+    if not url or not url.startswith("http"):
+        return False
+    if url == primary_url:
+        return False
 
-    badge_x = 60
-    badge_y = 60
-    padding_x = 24
-    padding_y = 12
+    import urllib.parse
+    p_url = urllib.parse.urlparse(primary_url)
+    s_url = urllib.parse.urlparse(url)
+    
+    # 1. Aynı haber CDN veya kaynak alan adı (domain) olmalı
+    if p_url.netloc != s_url.netloc:
+        return False
+        
+    p_path = p_url.path
+    s_path = s_url.path
+    
+    # 2. Dosya adını ve kökünü al
+    p_fname = p_path.split('/')[-1]
+    s_fname = s_path.split('/')[-1]
+    
+    # Boyut takılarını temizle
+    import re
+    p_base = re.sub(r'[-_xX]?\d{3,4}x\d{3,4}.*$', '', p_fname).split('.')[0].lower()
+    s_base = re.sub(r'[-_xX]?\d{3,4}x\d{3,4}.*$', '', s_fname).split('.')[0].lower()
+    
+    # Aynı görselin farklı boyutuysa reddet
+    if p_base == s_base:
+        return False
+        
+    lower = url.lower()
+    # PNG'ler, oto boyutlandırmalar veya ikon/avatar uzantıları elensin
+    if lower.endswith(".png") or "auto.jpg" in lower or "-400x400" in lower or "-300x300" in lower or "-200x200" in lower or "avatar" in lower or "icon" in lower:
+        return False
 
-    # Kırmızı/Bordo arka plan kutucuğu
-    draw.rounded_rectangle(
-        [badge_x, badge_y, badge_x + badge_w + padding_x * 2, badge_y + badge_h + padding_y * 2],
-        radius=8,
-        fill=(220, 38, 38, 240)  # Canlı Kırmızı
-    )
-    draw.text((badge_x + padding_x, badge_y + padding_y - 2), badge_text, fill=(255, 255, 255), font=font_badge)
+    # 3. Aynı haber klasöründe veya galeri yapısında olmalı (Farklı haberlerin veya kenar çubuğunun fotoğraflarını engeller)
+    p_dir = '/'.join(p_path.split('/')[:-1])
+    s_dir = '/'.join(s_path.split('/')[:-1])
+    if p_dir != s_dir:
+        return False
+        
+    try:
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5, stream=True)
+        if resp.status_code != 200:
+            return False
+        content = resp.raw.read(300000)
+        img = Image.open(BytesIO(content))
+        w, h = img.size
+        # Gerçek haber görseli en az 550px genişliğinde ve yatay formatta olmalıdır
+        if w >= 550 and (w / h) >= 1.15:
+            return True
+        return False
+    except Exception:
+        return False
 
-    # 4. Ana Başlık Metni
-    font_title = get_font(FONT_BOLD_PATH, 52)
-    max_text_width = width - 120  # Sağdan soldan 60px boşluk
-    lines = wrap_text(title, font_title, max_text_width, draw)
+def create_single_news_photo(img_url: str, output_path: str, width: int = 1280, height: int = 720) -> str:
+    """
+    Tekil haber fotoğrafını 16:9 HD (1280x720) formatında, pürüzsüz ve jilet gibi keskin üretir.
+    Üzerinde yazı veya yapay karartma YOKTUR; salt editoryal basın fotoğrafıdır.
+    """
+    target_size = (width, height)
+    img = download_and_prepare(img_url, target_size)
+    if img is None:
+        return None
+        
+    sharp = img.filter(ImageFilter.UnsharpMask(radius=1.2, percent=115, threshold=3))
+    sharp.save(output_path, "JPEG", quality=95)
+    return output_path
 
-    # Başlığın yüksekliğini hesapla
-    line_height = 68
-    total_text_h = len(lines) * line_height
+def create_dual_news_collage(url1: str, url2: str, output_path: str, width: int = 1280, height: int = 720, border_width: int = 4) -> str:
+    """
+    Rakiplerin ve önde gelen Telegram kanallarının (ANA HABER, Asayiş Berkemal) kullandığı
+    yan yana 2'li kolaj (Side-by-Side Split Grid):
+    - Sol: Görsel 1 (Dikey merkez kırpma)
+    - Sağ: Görsel 2 (Dikey merkez kırpma)
+    - Ortada: 4px temiz beyaz ayırıcı çizgi
+    - Kesinlikle üzerinde yazı veya leke yoktur.
+    """
+    half_width = (width - border_width) // 2
+    slot_size = (half_width, height)
+    
+    img1 = download_and_prepare(url1, slot_size)
+    img2 = download_and_prepare(url2, slot_size)
+    
+    if img1 is None and img2 is None:
+        return None
+    if img1 is None:
+        return create_single_news_photo(url2, output_path, width, height)
+    if img2 is None:
+        return create_single_news_photo(url1, output_path, width, height)
+        
+    canvas = Image.new("RGB", (width, height), (255, 255, 255))
+    canvas.paste(img1, (0, 0))
+    canvas.paste(img2, (half_width + border_width, 0))
+    
+    sharp = canvas.filter(ImageFilter.UnsharpMask(radius=1.0, percent=110, threshold=3))
+    sharp.save(output_path, "JPEG", quality=95)
+    return output_path
 
-    # Başlığı alt kısma konumlandır (Instagram haber kartı estetiği)
-    text_start_y = height - total_text_h - 160
-
-    for i, line in enumerate(lines):
-        y = text_start_y + (i * line_height)
-        # Metin gölgesi
-        draw.text((62, y + 2), line, fill=(0, 0, 0, 180), font=font_title)
-        # Asıl metin (Beyaz)
-        draw.text((60, y), line, fill=(255, 255, 255), font=font_title)
-
-    # 5. Alt Bilgi Çubuğu (Kaynak ve Tarih)
-    font_meta = get_font(FONT_REGULAR_PATH, 24)
-    current_date = datetime.now().strftime("%d.%m.%Y • %H:%M")
-    footer_text = f"Kaynak: {source}   |   {current_date}"
-    draw.text((60, height - 80), footer_text, fill=(200, 205, 215), font=font_meta)
-
-    # Sağ alt köşe marka etiketi (GÜNDEM ANALİZİ)
-    font_brand = get_font(FONT_BOLD_PATH, 26)
-    brand_text = f"@{config.BRAND_NAME.replace(' ', '').lower()}"
-    draw.text((width - 270, height - 80), brand_text, fill=(255, 215, 0), font=font_brand)
-
-    # Logo varsa (assets/logo.png), sağ üste şık dairesel rozet olarak ekle
+def create_default_brand_backdrop(output_path: str, title: str = "", category: str = "GÜNDEM", width: int = 1280, height: int = 720) -> str:
+    """Haberde hiç görsel bulunamazsa profesyonel antrasit/lacivert stüdyo arka planı oluşturur."""
+    canvas = Image.new("RGB", (width, height), (15, 23, 42))
+    draw = ImageDraw.Draw(canvas)
+    
+    for y in range(height):
+        r = int(15 + (35 - 15) * (y / height))
+        g = int(23 + (25 - 23) * (y / height))
+        b = int(42 + (55 - 42) * (y / height))
+        draw.line([(0, y), (width, y)], fill=(r, g, b))
+        
     logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
     if os.path.exists(logo_path):
         try:
-            logo_size = 130
-            logo_img = Image.open(logo_path).convert("RGBA")
-            logo_img = logo_img.resize((logo_size, logo_size), Image.Resampling.LANCZOS)
+            wm = Image.open(logo_path).convert("RGBA")
+            wm_size = 240
+            wm = wm.resize((wm_size, wm_size), Image.Resampling.LANCZOS)
+            canvas.paste(wm, ((width - wm_size) // 2, (height - wm_size) // 2), mask=wm)
+        except Exception:
+            pass
             
-            # Dairesel maske oluştur (köşeler şeffaf olsun)
-            circle_mask = Image.new("L", (logo_size, logo_size), 0)
-            mask_draw = ImageDraw.Draw(circle_mask)
-            mask_draw.ellipse((0, 0, logo_size, logo_size), fill=255)
-            
-            composed.paste(logo_img, (width - logo_size - 60, 50), mask=circle_mask)
-        except Exception as e:
-            print(f"Logo eklenirken hata: {e}")
-
-    # 6. Kaydet (JPEG olarak RGB modunda)
-    output_path = os.path.join(OUTPUT_DIR, output_filename)
-    final_rgb = composed.convert("RGB")
-    final_rgb.save(output_path, "JPEG", quality=95)
-
+    canvas.save(output_path, "JPEG", quality=95)
     return output_path
 
+def create_news_visual(candidate_urls: list, output_filename: str, title: str = "", category: str = "Gündem") -> str:
+    """
+    Sitenin ana sayfası ve Telegram kanalı için nihai haber görselini üretir:
+    - 2 veya daha fazla gerçek editoryal haber fotoğrafı varsa -> Yan yana 2'li Split Kolaj
+    - 1 görsel varsa -> 16:9 HD kristal netliğinde tekil fotoğraf
+    - Hiç görsel yoksa -> Şık editoryal marka tuvali
+    """
+    output_path = os.path.join(OUTPUT_DIR, output_filename)
+    
+    cleaned_urls = []
+    for u in candidate_urls:
+        if u and u.startswith("http") and u not in cleaned_urls:
+            cleaned_urls.append(u)
+            
+    if not cleaned_urls:
+        return create_default_brand_backdrop(output_path, title, category)
+        
+    primary_url = cleaned_urls[0]
+    
+    # Gerçek ikincil editoryal görsel ara
+    secondary_url = None
+    if len(cleaned_urls) >= 2:
+        for u in cleaned_urls[1:]:
+            if is_valid_secondary_editorial_image(u, primary_url):
+                secondary_url = u
+                break
+                
+    if secondary_url:
+        res = create_dual_news_collage(primary_url, secondary_url, output_path)
+        if res and os.path.exists(res):
+            return res
+            
+    # Tekil net haber fotoğrafı
+    res = create_single_news_photo(primary_url, output_path)
+    if res and os.path.exists(res):
+        return res
+        
+    return create_default_brand_backdrop(output_path, title, category)
+
+def generate_news_card(title: str, source: str, image_url: str = None, tag: str = "TÜRKİYE GÜNDEMİ", output_filename: str = "post.jpg") -> str:
+    """Geriye uyumluluk fonksiyonu."""
+    urls = [image_url] if image_url else []
+    return create_news_visual(urls, output_filename, title=title, category=tag)
+
 if __name__ == "__main__":
-    test_title = "Hazine ve Maliye Bakanlığı Yeni Ekonomik Tedbirleri ve Enflasyon Hedeflerini Açıkladı"
-    test_img = "https://trthaberstatic.cdn.wp.trt.com.tr/resimler/1666000/meclis-aa-1667780.jpg"
-    out = generate_news_card(test_title, "TRT Haber", image_url=test_img, tag="SON DAKİKA", output_filename="test_card.jpg")
-    print(f"Görsel başarıyla oluşturuldu: {out}")
+    test_urls = [
+        "https://images.ntv.com.tr/images/iStock-148421596-889339.jpg?width=1200",
+        "https://trthaberstatic.cdn.wp.trt.com.tr/resimler/2496000/berlin-sonbahar-aa-2497786_2.jpg"
+    ]
+    res = create_news_visual(test_urls, "test_dual.jpg")
+    print(f"Oluşturulan görsel: {res}")

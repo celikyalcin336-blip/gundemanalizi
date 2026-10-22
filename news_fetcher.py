@@ -1,6 +1,8 @@
 import feedparser
 import hashlib
 import re
+import html
+import requests
 from typing import List, Dict, Optional
 import config
 import database
@@ -37,33 +39,97 @@ def clean_html(text: str) -> str:
     clean = re.sub(r'<[^>]+>', '', text)
     return clean.strip()
 
-def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
+def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
     """
-    Haberin orijinal web sayfasına gidip gerçek makale paragraflarını çeker.
-    Böylece 'İşte o karar...' gibi yarım kalan RSS özetleri yerine haberin
-    gerçek metni (oranlar, kararlar, sayılar) elde edilir.
+    Haberin orijinal web sayfasına gidip:
+    1. Yüksek çözünürlüklü og:image, twitter:image ve içerik içi görselleri ayıklar.
+    2. Gerçek makale paragraflarını (tıklama tuzakları yerine sayılar, oranlar ve kararları) çeker.
     """
     if not link or not link.startswith("http"):
-        return ""
+        return {"body": "", "images": []}
     try:
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        resp = requests.get(link, headers=headers, timeout=6)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+        }
+        resp = requests.get(link, headers=headers, timeout=8)
         if resp.status_code != 200:
-            return ""
-        
-        p_matches = re.findall(r'<p[^>]*>(.*?)</p>', resp.text, re.DOTALL | re.IGNORECASE)
+            return {"body": "", "images": []}
+
+        raw_text = resp.text
+
+        # 1. Görselleri topla (OG Image, Twitter Image, ve Gövde İçi Haber Fotoğrafları)
+        candidate_images = []
+
+        # OG Image (Genelde 1200x630 veya 1920x1080 orijinal editoryal fotoğraftır)
+        og_match = re.search(r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']', raw_text, re.I)
+        if not og_match:
+            og_match = re.search(r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']', raw_text, re.I)
+        if og_match:
+            og_url = html.unescape(og_match.group(1).strip())
+            if og_url.startswith("//"):
+                og_url = "https:" + og_url
+            if og_url.startswith("http"):
+                candidate_images.append(og_url)
+
+        # Twitter Image
+        tw_match = re.search(r'<meta[^>]*name=["\']twitter:image["\'][^>]*content=["\']([^"\']+)["\']', raw_text, re.I)
+        if tw_match:
+            tw_url = html.unescape(tw_match.group(1).strip())
+            if tw_url.startswith("//"):
+                tw_url = "https:" + tw_url
+            if tw_url.startswith("http") and tw_url not in candidate_images:
+                candidate_images.append(tw_url)
+
+        # Gövde İçi Fotoğraflar
+        raw_imgs = re.findall(r'<img[^>]+(?:src|data-src)=["\']([^"\']+)["\']', raw_text, re.I)
+        bad_words = [
+            'logo', 'icon', 'avatar', 'pixel', 'advert', 'banner', 'blank', 'gif',
+            'svg', 'share', 'button', 'badge', 'spinner', 'tracker', 'stats',
+            'footer', 'header', 'gravatar', 'kurdele', 'placeholder', 'transparent', 'emoji'
+        ]
+        for raw_src in raw_imgs:
+            clean_src = html.unescape(raw_src.strip())
+            if clean_src.startswith("//"):
+                clean_src = "https:" + clean_src
+            if not clean_src.startswith("http"):
+                continue
+            if any(b in clean_src.lower() for b in bad_words):
+                continue
+            if any(ext in clean_src.lower() for ext in ['.jpg', '.jpeg', '.webp', '.png', '/resim', '/image', '/img']):
+                if clean_src not in candidate_images:
+                    candidate_images.append(clean_src)
+
+        # 2. Makale Metnini Ayıkla (Script ve stilleri temizle)
+        clean_html_text = re.sub(r'<script[^>]*>.*?</script>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
+        clean_html_text = re.sub(r'<style[^>]*>.*?</style>', '', clean_html_text, flags=re.DOTALL | re.IGNORECASE)
+
+        p_matches = re.findall(r'<p[^>]*>(.*?)</p>', clean_html_text, re.DOTALL | re.IGNORECASE)
         clean_paras = []
+        bad_body_phrases = [
+            "çerez", "cookie", "telif", "copyright", "kullanım koşulları",
+            "gizlilik", "künye", "reklam", "abone", "yayın grubu",
+            "tıklayın", "tıklayınız", "indir", "fotoğraf:", "menüyü aç", "tüm hakları saklıdır"
+        ]
         for p in p_matches:
             c = clean_html(p)
-            # Menü, reklam ve telif yazılarını filtrele (en az 55 karakter)
-            if len(c) > 55 and not any(b in c.lower() for b in ["çerez", "cookie", "telif", "abone", "reklam", "tıklayın", "indir", "fotoğraf:"]):
+            if len(c) > 55 and not any(b in c.lower() for b in bad_body_phrases):
                 clean_paras.append(c)
                 if len(clean_paras) >= max_paragraphs:
                     break
-        
-        return "\n\n".join(clean_paras)
-    except Exception:
-        return ""
+
+        return {
+            "body": "\n\n".join(clean_paras),
+            "images": candidate_images
+        }
+    except Exception as e:
+        print(f"fetch_article_details hatası: {e}")
+        return {"body": "", "images": []}
+
+def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
+    """Haberin orijinal web sayfasından zengin makale metnini çeker."""
+    details = fetch_article_details(link, max_paragraphs)
+    return details.get("body", "")
 
 def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """

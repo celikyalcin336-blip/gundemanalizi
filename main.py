@@ -37,65 +37,59 @@ def process_single_news(item: dict) -> bool:
     print(f"📌 Kaynak: {source}")
     print("="*60)
 
-    # 1. Metin ve Makale Üretimi
-    print("✍️  Sosyal medya metni ve web makalesi hazırlanıyor...")
+    # 1. Metin, Makale ve Yüksek Kaliteli Medya Toplama
+    print("✍️  Sosyal medya metni, web makalesi ve yüksek çözünürlüklü görseller toplanıyor...")
     raw_summary = item.get("summary", "")
-    # Eğer özet çok kısaysa veya 'işte detaylar' gibi yarım kalmışsa, orijinal linkten gerçek paragrafları çek
-    summary = raw_summary
-    if len(raw_summary) < 220 or any(k in raw_summary.lower() for k in ["işte", "ayrıntı", "belli oldu", "..."]):
-        scraped_body = news_fetcher.fetch_article_body(link)
-        if scraped_body and len(scraped_body) > len(raw_summary):
-            summary = scraped_body
+    
+    # Haberin orijinal web sayfasına giderek gerçek paragrafları ve Full HD görselleri al
+    article_details = news_fetcher.fetch_article_details(link)
+    scraped_body = article_details.get("body", "")
+    summary = scraped_body if (scraped_body and len(scraped_body) > len(raw_summary)) else raw_summary
 
+    # Telegram ve Sosyal Medya Metinleri
+    telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
     ai_result = ai_writer.generate_social_caption(title, summary, source)
-    caption = ai_result["caption"]
+    social_caption = ai_result["caption"]
     article_data = ai_writer.generate_full_article(title, summary, source)
-    print(f"   [Kullanılan Yöntem: {ai_result['source_used']}]")
-
-    # 2. Görsel Üretimi
-    print("🎨 Haber kartı görseli tasarlanıyor...")
     category = article_data.get("category", "Gündem")
-    tag_map = {
-        "Ekonomi": "EKONOMİ & PİYASA",
-        "Teknoloji": "TEKNOLOJİ & DİJİTAL",
-        "Yaşam": "YAŞAM & TÜKETİCİ",
-        "Spor": "SPOR GÜNDEMİ",
-        "Dünya": "DÜNYA GÜNDEMİ",
-        "Gündem": "TÜRKİYE GÜNDEMİ"
-    }
-    card_tag = tag_map.get(category, "TÜRKİYE GÜNDEMİ")
+    print(f"   [Kategori: {category} | Telegram Metni Hazır]")
+
+    # 2. Kristal Netliğinde Görsel & Yan Yana 2'li Kolaj Üretimi
+    print("🎨 Yüksek çözünürlüklü haber görseli hazırlanıyor...")
+    candidate_images = article_details.get("images", [])
+    if image_url and image_url not in candidate_images:
+        candidate_images.append(image_url)
 
     img_filename = f"post_{news_hash[:10]}.jpg"
-    card_path = image_generator.generate_news_card(
+    visual_path = image_generator.create_news_visual(
+        candidate_urls=candidate_images,
+        output_filename=img_filename,
         title=title,
-        source=source,
-        image_url=image_url,
-        tag=card_tag,
-        output_filename=img_filename
+        category=category
     )
-    print(f"   [Görsel Kaydedildi: {card_path} | Kategori: {card_tag}]")
+    print(f"   [Görsel Hazırlandı: {visual_path} | Aday Görsel Sayısı: {len(candidate_images)}]")
 
-    # 3. Web Sitesinde Yayınlama
+    # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
     print("🌐 Kendi sitemizde yayınlanıyor...")
     slug = database.save_article(
         title=article_data["title"],
         summary=article_data["summary"],
         content=article_data["content"],
-        image_path=card_path,
+        image_path=visual_path,
         source=source,
-        category=article_data.get("category", "Gündem")
+        category=category
     )
     site_article_url = f"{config.SITE_URL}/haber/{slug}"
     print(f"   [Haber Linki: {site_article_url}]")
 
-    # 4. Telegram Bildirimi (Kendi sitemizin linkiyle gönderim)
-    print("📲 Telegram kanalına sitemizin linkiyle gönderiliyor...")
-    telegram_notifier.send_telegram_news(card_path, caption, site_article_url)
+    # 4. Telegram Bildirimi (Rakiplerin formatında: Net fotoğraf / 2'li kolaj + Maddeli özet)
+    print("📲 Telegram kanalına profesyonel maddeli formatla gönderiliyor...")
+    telegram_notifier.send_telegram_news(visual_path, telegram_caption, site_article_url)
 
     # 5. Otomatik Hikaye (Story) Kalkanı:
     # Gönderi akışını spama boğmadan, 4 saatte 1 (günde 5-6 adet) Facebook ve Instagram'a doğrudan HİKAYE (STORY) atar!
     try:
-        meta_poster.post_stories_with_cooldown(card_path)
+        meta_poster.post_stories_with_cooldown(visual_path)
     except Exception as e:
         print(f"⚠️ Otomatik hikaye istisnası: {e}")
 

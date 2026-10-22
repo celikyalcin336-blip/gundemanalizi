@@ -10,6 +10,83 @@ if sys.stdout.encoding != 'utf-8':
 
 import config
 
+def generate_telegram_post(title: str, summary: str, source: str) -> str:
+    """
+    Önde gelen haber Telegram kanallarının (ANA HABER, Asayiş Berkemal, BPT) tarzında:
+    - İlk satır: Vurucu başlık / giriş
+    - 2-3 adet madde işareti (— ...) ile kritik rakamlar, kararlar, cezalar ve gelişmeler
+    - En altta kaynak parantezi: (Kaynak)
+    - Kesinlikle hashtag veya yapay soru içermez.
+    """
+    headline = title.strip()
+    clean_summary = summary.replace("\r", "").strip() if summary else ""
+
+    if config.GEMINI_API_KEY:
+        try:
+            from google import genai
+            client = genai.Client(api_key=config.GEMINI_API_KEY)
+            prompt = f"""
+Sen Türkiye'nin en popüler haber Telegram kanallarının (BPT, Asayiş Berkemal, Ana Haber) uzman editörüsün.
+Aşağıdaki haber için Telegram takipçilerinin tek bakışta okuyabileceği, net, vurucu ve maddeli bir haber metni hazırla.
+
+Haber Başlığı: {title}
+Haber Detayı: {summary}
+Kaynak: {source}
+
+Format:
+İlk satır: Haberin ana konusu / vurucu özeti (1 kısa cümle).
+Boş satır.
+Maddeler: Haberdeki en kritik sayıları, gelişmeleri ve ayrıntıları içeren 2-3 adet madde işareti (— ile başlayan).
+Son satır: Parantez içinde kaynak, örn: ({source})
+
+Kurallar:
+1. ASLA hashtag (#haber, #sondakika vb.) KULLANMA.
+2. ASLA 'Siz ne düşünüyorsunuz' gibi yapay sorular SORMA.
+3. ASLA link/URL ekleme.
+4. Varsa kesin sayıları, TL tutarlarını, oranları, ceza/hapis sürelerini maddelere koy.
+5. Yalnızca doğrudan paylaşılacak nihai metni yaz.
+"""
+            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+                try:
+                    res = client.models.generate_content(model=m_name, contents=prompt)
+                    if res and res.text:
+                        return res.text.strip()
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+    # Kural Tabanlı Akıllı Editör (Fallback)
+    import re
+    raw_sentences = [s.strip() for s in re.split(r'(?<=[!?:])\s+|(?<=[0-9a-zA-ZçğıöşüÇĞİÖŞÜ]{3}\.)\s+(?=[A-ZÇĞİÖŞÜ0-9])', clean_summary) if len(s.strip()) > 25]
+
+    filtered_sentences = []
+    for s in raw_sentences:
+        if s.lower() == headline.lower():
+            continue
+        if any(b in s.lower() for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha"]):
+            continue
+        filtered_sentences.append(s)
+
+    data_keywords = ["tl", "lira", "dolar", "yüzde", "%", "bin", "milyon", "milyar", "hapis", "yıl", "ay", "ceza", "maliyet", "tutar", "tespit", "karar", "açıkladı", "belirlendi", "kesinleşti", "arttı", "düştü", "zam", "indirim", "metre", "icra", "iade"]
+
+    priority_sentences = []
+    normal_sentences = []
+
+    for s in filtered_sentences:
+        if any(char.isdigit() for char in s) or any(k in s.lower() for k in data_keywords):
+            priority_sentences.append(s)
+        else:
+            normal_sentences.append(s)
+
+    selected_bullets = (priority_sentences + normal_sentences)[:3]
+
+    if selected_bullets:
+        bullet_text = "\n".join([f"— {s}" for s in selected_bullets])
+        return f"{headline}\n\n{bullet_text}\n({source})"
+    else:
+        return f"{headline}\n({source})"
+
 def generate_social_caption(title: str, summary: str, source: str) -> dict:
     """
     Sosyal medya (Facebook, Instagram, Reels, TikTok) için optimize edilmiş metin ve hashtag üretir.
