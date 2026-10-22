@@ -410,15 +410,26 @@ def brand_raw_video(
 
     VW_OUT, VH_OUT = 720, 1280
 
-    font_brand = get_font(FONT_BOLD, 22)
-    font_sub = get_font(FONT_REGULAR, 14)
-    font_badge = get_font(FONT_BOLD, 15)
-    font_title = get_font(FONT_BOLD, 26)
-    font_footer = get_font(FONT_BOLD, 16)
-    font_ticker = get_font(FONT_BOLD, 18)
+    # Reels / Shorts / TikTok için İdeal Viral Tipografi
+    font_brand = get_font(FONT_BOLD, 26)
+    font_sub = get_font(FONT_REGULAR, 15)
+    font_badge = get_font(FONT_BOLD, 18)
+    
+    # Başlık uzunluğuna göre dinamik font ölçekleme (Göz alıcı dev kanca başlık)
+    raw_title = title.strip()
+    if len(raw_title) > 85:
+        title_font_size = 32
+        line_step = 42
+    else:
+        title_font_size = 38
+        line_step = 48
+    font_title = get_font(FONT_BOLD, title_font_size)
+
+    font_footer = get_font(FONT_BOLD, 17)
+    font_ticker = get_font(FONT_BOLD, 20)
 
     use_ticker = (ticker_text or "").strip().lower() != "off"
-    raw_ticker = (ticker_text or "").strip() or title.strip()
+    raw_ticker = (ticker_text or "").strip() or raw_title
     clean_src = source.strip() if source else ""
     has_custom_src = bool(clean_src and clean_src.lower() not in ("gündem analizi", "özel"))
     if has_custom_src:
@@ -430,12 +441,13 @@ def brand_raw_video(
     overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
 
-    lines = wrap_text(title, font_title, VW_OUT - 60, odraw)[:3]
-    top_grad_h = 110 + len(lines) * 34 + 25
+    lines = wrap_text(raw_title, font_title, VW_OUT - 60, odraw)[:3]
+    top_grad_h = 120 + len(lines) * line_step + 35
 
+    # Üst Derin Sinematik Karartma (Videodaki ışık parlamalarını engeller, yazıyı patlatır)
     for y in range(top_grad_h):
         ratio = 1.0 - (y / top_grad_h)
-        alpha = int(220 * (ratio ** 1.3))
+        alpha = int(240 * (ratio ** 1.3))
         odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
 
     for y in range(VH_OUT - 120, VH_OUT):
@@ -446,36 +458,43 @@ def brand_raw_video(
     logo_path = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(logo_path):
         l_raw = Image.open(logo_path).convert("RGBA")
-        ls = l_raw.resize((48, 48), Image.Resampling.LANCZOS)
-        m1 = Image.new("L", (48, 48), 0)
-        ImageDraw.Draw(m1).ellipse((0, 0, 48, 48), fill=255)
-        overlay.paste(ls, (24, 26), mask=m1)
-        odraw.ellipse((22, 24, 74, 76), outline=(220, 38, 38, 255), width=2)
+        ls = l_raw.resize((54, 54), Image.Resampling.LANCZOS)
+        m1 = Image.new("L", (54, 54), 0)
+        ImageDraw.Draw(m1).ellipse((0, 0, 54, 54), fill=255)
+        overlay.paste(ls, (24, 24), mask=m1)
+        odraw.ellipse((22, 22, 80, 80), outline=(220, 38, 38, 255), width=2)
 
-    odraw.text((84, 27), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
-    odraw.text((84, 53), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
+    odraw.text((90, 26), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
+    odraw.text((90, 56), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
 
     cat_label = f"● {category.upper()}"
     cb = odraw.textbbox((0, 0), cat_label, font=font_badge)
-    bw = (cb[2] - cb[0]) + 24
-    odraw.rounded_rectangle([VW_OUT - bw - 24, 28, VW_OUT - 24, 62], radius=8, fill=(220, 38, 38, 245))
-    odraw.text((VW_OUT - bw - 12, 35), cat_label, fill=(255, 255, 255, 255), font=font_badge)
+    bw = (cb[2] - cb[0]) + 28
+    odraw.rounded_rectangle([VW_OUT - bw - 24, 26, VW_OUT - 24, 66], radius=8, fill=(220, 38, 38, 255))
+    odraw.text((VW_OUT - bw - 10, 35), cat_label, fill=(255, 255, 255, 255), font=font_badge)
 
     # Kaynak Rozeti (Mynet, İHA, Habertürk vb. belirtilmişse şık TV rozeti ekle)
     if has_custom_src:
         src_label = f"Kaynak: {clean_src}"
-        font_src = get_font(FONT_BOLD, 13)
+        font_src = get_font(FONT_BOLD, 14)
         sb = odraw.textbbox((0, 0), src_label, font=font_src)
-        sw = (sb[2] - sb[0]) + 18
-        odraw.rounded_rectangle([VW_OUT - sw - 24, 68, VW_OUT - 24, 94], radius=6, fill=(15, 23, 42, 220), outline=(203, 213, 225, 140), width=1)
-        odraw.text((VW_OUT - sw - 15, 73), src_label, fill=(241, 245, 249, 240), font=font_src)
+        sw = (sb[2] - sb[0]) + 20
+        odraw.rounded_rectangle([VW_OUT - sw - 24, 72, VW_OUT - 24, 98], radius=6, fill=(15, 23, 42, 220), outline=(203, 213, 225, 140), width=1)
+        odraw.text((VW_OUT - sw - 14, 76), src_label, fill=(241, 245, 249, 240), font=font_src)
 
-    ty = 88
+    # Dev Vurucu Başlık (1.5 Saniye Kuralı - 3D Siyah Çerçeve ile Maksimum Kontrast)
+    ty = 96
     for idx, line in enumerate(lines):
-        col = (255, 255, 255, 255) if idx == 0 else (254, 240, 138, 255)
-        odraw.text((25, ty + 2), line, fill=(0, 0, 0, 220), font=font_title)
-        odraw.text((24, ty), line, fill=col, font=font_title)
-        ty += 34
+        col = (255, 255, 255, 255) if idx == 0 else (255, 235, 10, 255)
+        odraw.text(
+            (28, ty),
+            line,
+            fill=col,
+            font=font_title,
+            stroke_width=3,
+            stroke_fill=(0, 0, 0, 255)
+        )
+        ty += line_step
 
     # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
     wm_y = 920

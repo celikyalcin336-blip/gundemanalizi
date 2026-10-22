@@ -361,7 +361,10 @@ def _process_viral_video_job(
                 "step_text": "📲 5/5: Logolu video seçtiğin sosyal medya hesaplarında paylaşılıyor..."
             })
             if pub_tg:
-                ok = telegram_notifier.send_telegram_video(res["video_path"], ai_cap["caption"], site_url)
+                vid_caption = ai_cap["caption"]
+                if "instagram.com" not in vid_caption:
+                    vid_caption += "\n\n📸 Instagram'da İzle & Takip Et: https://www.instagram.com/gundem_analiz/"
+                ok = telegram_notifier.send_telegram_video(res["video_path"], vid_caption, site_url)
                 share_report.append("📲 Telegram: ✅" if ok is not False else "📲 Telegram: ❌")
             if pub_fb:
                 r_fb = meta_poster.post_video_to_facebook(res["video_path"], ai_cap["caption"], site_url)

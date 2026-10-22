@@ -33,10 +33,17 @@ def extract_image_url(entry) -> Optional[str]:
     return None
 
 def clean_html(text: str) -> str:
-    """HTML etiketlerini temizler."""
+    """
+    HTML etiketlerini temizler ve HTML entity kodlarını (&#350;, &uuml;, &ccedil;, &amp; vb.)
+    gerçek Türkçe harflere dönüştürür.
+    """
     if not text:
         return ""
+    # 1. HTML etiketlerini kaldır
     clean = re.sub(r'<[^>]+>', '', text)
+    # 2. HTML karakter kodlarını çöz (bazı siteler çift encode ettiği için iki kez uygulanır)
+    clean = html.unescape(clean)
+    clean = html.unescape(clean)
     return clean.strip()
 
 def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:

@@ -1,5 +1,6 @@
 import os
 import sys
+import html
 
 # Windows konsolunda Türkçe ve emoji karakterlerin hatasız yazdırılması için
 if sys.stdout.encoding != 'utf-8':
@@ -18,8 +19,8 @@ def generate_telegram_post(title: str, summary: str, source: str) -> str:
     - En altta kaynak parantezi: (Kaynak)
     - Kesinlikle hashtag veya yapay soru içermez.
     """
-    headline = title.strip()
-    clean_summary = summary.replace("\r", "").strip() if summary else ""
+    headline = html.unescape(html.unescape(title.strip()))
+    clean_summary = html.unescape(html.unescape(summary.replace("\r", "").strip())) if summary else ""
 
     if config.GEMINI_API_KEY:
         try:
@@ -92,6 +93,9 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
     Sosyal medya (Facebook, Instagram, Reels, TikTok) için optimize edilmiş metin ve hashtag üretir.
     Gemini API anahtarı varsa yapay zeka ile yazar, yoksa akıllı formatlama uygular.
     """
+    title = html.unescape(html.unescape(title.strip()))
+    summary = html.unescape(html.unescape(summary.strip())) if summary else ""
+
     if config.GEMINI_API_KEY:
         try:
             from google import genai
@@ -154,6 +158,9 @@ def generate_full_article(title: str, summary: str, source: str) -> dict:
     """
     Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
     """
+    title = html.unescape(html.unescape(title.strip()))
+    summary = html.unescape(html.unescape(summary.strip())) if summary else ""
+
     category = "Gündem"
     lower_title = title.lower()
     if any(k in lower_title for k in ["faiz", "enflasyon", "borsa", "dolar", "bakan şimşek", "ekonomi", "zam", "vergi"]):
