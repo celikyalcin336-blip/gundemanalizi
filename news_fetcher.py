@@ -37,9 +37,83 @@ def clean_html(text: str) -> str:
     clean = re.sub(r'<[^>]+>', '', text)
     return clean.strip()
 
-def fetch_latest_news(limit_per_feed: int = 5) -> List[Dict]:
+def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """
-    Tanımlı RSS kaynaklarını tarar ve daha önce paylaşılmamış en yeni haberleri döner.
+    Haberin halkın ilgisini, cüzdanını ve günlük yaşamını ne kadar etkilediğini puanlar.
+    Yüksek puan = Viral, tıklanma garantili, halkın cebine ve hayatına dokunan haber.
+    Düşük puan = Kuru resmi protokol, bürokratik sıkıcı haberler.
+    """
+    text = f"{title} {summary}".lower()
+    score = 50  # Taban puan
+
+    # 1. HALKIN CÜZDANI, ALIŞVERİŞ, TAKSİT & PARA (+35 - +60 Puan)
+    cuzdan_keywords = [
+        "taksit", "kredi kartı", "kredi", "bddk", "alışveriş", "zam", "indirim",
+        "asgari ücret", "emekli", "maaş", "ikramiye", "promosyon", "altın", "dolar",
+        "euro", "faiz", "mevduat", "akaryakıt", "benzin", "motorin", "lpg",
+        "vergi", "ceza", "yapılandırma", "fatura", "elektrik", "doğalgaz",
+        "kira", "ev sahibi", "kiracı", "konut kredisi", "toki", "borsa", "hisse",
+        "para", "fiyat", "enflasyon", "market", "kdv", "ötv", "kota", "limit"
+    ]
+    for kw in cuzdan_keywords:
+        if kw in text:
+            score += 35
+            break
+
+    # Ekstra yüksek tetikleyiciler (taksit, kota, zam, emekli, asgari ücret, altın)
+    super_triggers = ["taksit", "kota", "limit", "asgari ücret", "emekli maaşı", "akaryakıt", "altın", "faiz kararı"]
+    for st in super_triggers:
+        if st in text:
+            score += 25
+            break
+
+    # 2. GÜNLÜK YAŞAM, TÜKETİCİ & RESMİ HAKLAR (+25 Puan)
+    yasam_keywords = [
+        "ehliyet", "pasaport", "kimlik", "bayram", "tatil", "okul", "milli eğitim",
+        "üniversite", "sınav", "ösym", "yks", "kpss", "e-devlet", "sgk",
+        "sağlık", "hastane", "randevu", "mhrs", "ulaşım", "metro", "marmaray"
+    ]
+    for kw in yasam_keywords:
+        if kw in text:
+            score += 25
+            break
+
+    # 3. DİJİTAL & TEKNOLOJİ TÜKETİCİSİ (+20 Puan)
+    tekno_keywords = [
+        "whatsapp", "instagram", "apple", "iphone", "android", "telefon",
+        "dolandırıcılık", "oltalama", "yapay zeka", "tiktok", "sosyal medya"
+    ]
+    for kw in tekno_keywords:
+        if kw in text:
+            score += 20
+            break
+
+    # 4. BÜYÜK AFETLER & HAVA DURUMU (+30 Puan)
+    afet_keywords = ["deprem", "kandilli", "afad", "fırtına", "meteoroloji", "sarı kod", "turuncu kod"]
+    for kw in afet_keywords:
+        if kw in text:
+            score += 30
+            break
+
+    # 5. PROTOKOL & KURU BÜROKRATİK SİYASET CEZASI (-45 Puan)
+    # Halkı ilgilendirmeyen protokol temasları ve kuru demeçleri geri plana at
+    protokol_keywords = [
+        "kabul etti", "ziyaret etti", "bir araya geldi", "görüştü",
+        "tebrik etti", "basın toplantısı düzenledi", "heyetini ağırladı",
+        "açıklamalarda bulundu", "tbmm komisyon", "toplantısı sona erdi",
+        "protokol imzalandı", "büyükelçisi", "diplomatik temas"
+    ]
+    for pk in protokol_keywords:
+        if pk in text:
+            score -= 45
+            break
+
+    return score
+
+def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
+    """
+    Tanımlı seçkin RSS kaynaklarını tarar ve 'Halkın İlgisi ve Cüzdan Puanı'na göre
+    en yüksekten en düşüğe sıralanmış paylaşılmaya hazır haberleri döner.
     """
     database.init_db()
     unposted_news = []
@@ -64,6 +138,12 @@ def fetch_latest_news(limit_per_feed: int = 5) -> List[Dict]:
 
                 # Daha önce paylaşılmış mı kontrol et
                 if not database.is_already_posted(news_hash):
+                    # Haberin viral/tüketici/cüzdan ilgi puanını hesapla
+                    score = calculate_virality_score(title, summary, feed_name)
+                    # Görseli olan haberlere +10 avantaj puanı
+                    if image_url:
+                        score += 10
+
                     unposted_news.append({
                         "hash": news_hash,
                         "title": title,
@@ -71,11 +151,14 @@ def fetch_latest_news(limit_per_feed: int = 5) -> List[Dict]:
                         "link": link,
                         "image_url": image_url,
                         "source": feed_name,
-                        "published": published
+                        "published": published,
+                        "score": score
                     })
         except Exception as e:
             print(f"[{feed_name}] RSS okunurken hata oluştu: {e}")
 
+    # En yüksek puanlı (en çok merak edilen, halkın cebine dokunan) haberi en başa al
+    unposted_news.sort(key=lambda x: x.get("score", 0), reverse=True)
     return unposted_news
 
 if __name__ == "__main__":

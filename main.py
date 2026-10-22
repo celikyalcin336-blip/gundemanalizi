@@ -46,15 +46,26 @@ def process_single_news(item: dict) -> bool:
 
     # 2. Görsel Üretimi
     print("🎨 Haber kartı görseli tasarlanıyor...")
+    category = article_data.get("category", "Gündem")
+    tag_map = {
+        "Ekonomi": "EKONOMİ & PİYASA",
+        "Teknoloji": "TEKNOLOJİ & DİJİTAL",
+        "Yaşam": "YAŞAM & TÜKETİCİ",
+        "Spor": "SPOR GÜNDEMİ",
+        "Dünya": "DÜNYA GÜNDEMİ",
+        "Gündem": "TÜRKİYE GÜNDEMİ"
+    }
+    card_tag = tag_map.get(category, "TÜRKİYE GÜNDEMİ")
+
     img_filename = f"post_{news_hash[:10]}.jpg"
     card_path = image_generator.generate_news_card(
         title=title,
         source=source,
         image_url=image_url,
-        tag="TÜRKİYE GÜNDEMİ",
+        tag=card_tag,
         output_filename=img_filename
     )
-    print(f"   [Görsel Kaydedildi: {card_path}]")
+    print(f"   [Görsel Kaydedildi: {card_path} | Kategori: {card_tag}]")
 
     # 3. Web Sitesinde Yayınlama
     print("🌐 Kendi sitemizde yayınlanıyor...")

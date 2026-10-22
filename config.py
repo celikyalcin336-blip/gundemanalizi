@@ -48,10 +48,50 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Resim Barındırma
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID", "")
 
-# RSS Kaynakları (Hepsi yüksek çözünürlüklü haber fotoğraflı kaynaklar)
+# RSS Kaynakları (Ekonomi, Tüketici, Taksit, Finans ve Sıcak Gündem Odaklı Seçkin Medya Havuzu)
 RSS_FEEDS = [
     {
-        "name": "TRT Haber",
+        "name": "Ensonhaber Ekonomi",
+        "url": "https://www.ensonhaber.com/rss/ekonomi.xml"
+    },
+    {
+        "name": "Mynet Finans",
+        "url": "https://finans.mynet.com/haber/rss/kategori/ekonomi/"
+    },
+    {
+        "name": "Webtekno Tüketici & Teknoloji",
+        "url": "https://www.webtekno.com/rss.xml"
+    },
+    {
+        "name": "Habertürk Ekonomi",
+        "url": "https://www.haberturk.com/rss/kategori/ekonomi.xml"
+    },
+    {
+        "name": "Bloomberg HT",
+        "url": "https://www.bloomberght.com/rss"
+    },
+    {
+        "name": "Ekonomim",
+        "url": "https://www.ekonomim.com/rss"
+    },
+    {
+        "name": "Sözcü Ekonomi",
+        "url": "https://www.sozcu.com.tr/rss/ekonomi.xml"
+    },
+    {
+        "name": "Gazete Duvar Ekonomi",
+        "url": "https://www.gazeteduvar.com.tr/rss/ekonomi"
+    },
+    {
+        "name": "TRT Haber Ekonomi",
+        "url": "https://www.trthaber.com/ekonomi_articles.rss"
+    },
+    {
+        "name": "Ensonhaber Gündem",
+        "url": "https://www.ensonhaber.com/rss/ensonhaber.xml"
+    },
+    {
+        "name": "TRT Haber Gündem",
         "url": "https://www.trthaber.com/gundem_articles.rss"
     },
     {
