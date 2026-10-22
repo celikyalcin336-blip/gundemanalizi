@@ -27,7 +27,7 @@ TELEGRAM_CHANNEL_URL = "https://t.me/gundemanalizi"
 WHATSAPP_CHANNEL_URL = "https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08"
 TIKTOK_URL = "https://www.tiktok.com/@gundemanalizi"
 INSTAGRAM_URL = "https://www.instagram.com/gundem_analiz/"
-FACEBOOK_URL = "https://www.facebook.com/profile.php?id=1237983366054395"
+FACEBOOK_URL = "https://www.facebook.com/gundemanalizi"
 X_URL = "https://x.com/gndmanalizi"
 
 # Telegram Bildirim Ayarları
