@@ -355,8 +355,8 @@ def _process_viral_video_job(
                 "step_text": "🌐 4/5: Haber ve video gündemanalizi.com.tr üzerinde yayınlanıyor..."
             })
             video_html = f"""
-            <div class="my-6 rounded-2xl overflow-hidden border border-red-600/40 bg-black shadow-2xl">
-                <video controls playsinline class="w-full max-h-[640px] mx-auto" poster="/images/{os.path.basename(res['thumb_path'])}">
+            <div class="my-6 rounded-2xl overflow-hidden border border-red-600/40 bg-black shadow-2xl relative select-none">
+                <video controls playsinline controlsList="nodownload noplaybackrate" disablePictureInPicture oncontextmenu="return false;" class="w-full max-h-[640px] mx-auto" poster="/images/{os.path.basename(res['thumb_path'])}">
                     <source src="/images/{out_filename}" type="video/mp4">
                 </video>
             </div>
