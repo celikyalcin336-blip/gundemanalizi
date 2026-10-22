@@ -26,6 +26,19 @@
       gtag('config', '{{ ad_settings.ga_tracking_id }}');
     </script>
     {% endif %}
+
+    <!-- Google Reader Revenue Manager (Bülten & Okuyucu Gelir Scripti) -->
+    <script async type="application/javascript" src="https://news.google.com/swg/js/v1/swg-basic.js"></script>
+    <script>
+      (self.SWG_BASIC = self.SWG_BASIC || []).push( basicSubscriptions => {
+        basicSubscriptions.init({
+          type: "NewsArticle",
+          isPartOfType: ["Product"],
+          isPartOfProductId: "CAowvbrODA:openaccess",
+          clientOptions: { theme: "light", lang: "tr" },
+        });
+      });
+    </script>
     <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, asayiş ve güncel haberlerin tarafsız analizi.">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="{{ request.url }}">
