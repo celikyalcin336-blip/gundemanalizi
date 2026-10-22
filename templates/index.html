@@ -484,14 +484,15 @@
         }
 
         function shareSiteWhatsApp() {
-            const shareText = "🔴 Türkiye'nin en hızlı ve tarafsız haber sitesi Gündem Analizi'ni mutlaka takip et:\nhttps://gundemanalizi.com.tr";
+            const currentOrigin = window.location.origin || 'https://gündemanalizi.com.tr';
+            const shareText = "🔴 Türkiye'nin en hızlı ve tarafsız haber sitesi Gündem Analizi'ni mutlaka takip et:\n" + currentOrigin;
             const whatsappUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText);
             
             if (navigator.share && /mobile|android|iphone/i.test(navigator.userAgent)) {
                 navigator.share({
                     title: "Gündem Analizi - Doğru Haber, Tarafsız Analiz",
                     text: shareText,
-                    url: "https://gundemanalizi.com.tr"
+                    url: currentOrigin
                 }).catch(() => {
                     window.location.href = whatsappUrl;
                 });
