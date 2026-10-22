@@ -37,6 +37,34 @@ def clean_html(text: str) -> str:
     clean = re.sub(r'<[^>]+>', '', text)
     return clean.strip()
 
+def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
+    """
+    Haberin orijinal web sayfasına gidip gerçek makale paragraflarını çeker.
+    Böylece 'İşte o karar...' gibi yarım kalan RSS özetleri yerine haberin
+    gerçek metni (oranlar, kararlar, sayılar) elde edilir.
+    """
+    if not link or not link.startswith("http"):
+        return ""
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        resp = requests.get(link, headers=headers, timeout=6)
+        if resp.status_code != 200:
+            return ""
+        
+        p_matches = re.findall(r'<p[^>]*>(.*?)</p>', resp.text, re.DOTALL | re.IGNORECASE)
+        clean_paras = []
+        for p in p_matches:
+            c = clean_html(p)
+            # Menü, reklam ve telif yazılarını filtrele (en az 55 karakter)
+            if len(c) > 55 and not any(b in c.lower() for b in ["çerez", "cookie", "telif", "abone", "reklam", "tıklayın", "indir", "fotoğraf:"]):
+                clean_paras.append(c)
+                if len(clean_paras) >= max_paragraphs:
+                    break
+        
+        return "\n\n".join(clean_paras)
+    except Exception:
+        return ""
+
 def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """
     Haberin halkın ilgisini, cüzdanını ve günlük yaşamını ne kadar etkilediğini puanlar.

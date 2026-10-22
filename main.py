@@ -39,9 +39,17 @@ def process_single_news(item: dict) -> bool:
 
     # 1. Metin ve Makale Üretimi
     print("✍️  Sosyal medya metni ve web makalesi hazırlanıyor...")
-    ai_result = ai_writer.generate_social_caption(title, item.get("summary", ""), source)
+    raw_summary = item.get("summary", "")
+    # Eğer özet çok kısaysa veya 'işte detaylar' gibi yarım kalmışsa, orijinal linkten gerçek paragrafları çek
+    summary = raw_summary
+    if len(raw_summary) < 220 or any(k in raw_summary.lower() for k in ["işte", "ayrıntı", "belli oldu", "..."]):
+        scraped_body = news_fetcher.fetch_article_body(link)
+        if scraped_body and len(scraped_body) > len(raw_summary):
+            summary = scraped_body
+
+    ai_result = ai_writer.generate_social_caption(title, summary, source)
     caption = ai_result["caption"]
-    article_data = ai_writer.generate_full_article(title, item.get("summary", ""), source)
+    article_data = ai_writer.generate_full_article(title, summary, source)
     print(f"   [Kullanılan Yöntem: {ai_result['source_used']}]")
 
     # 2. Görsel Üretimi

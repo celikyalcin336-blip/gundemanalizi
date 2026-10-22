@@ -123,37 +123,36 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
         except Exception as e:
             print(f"Gemini makale üretimi hatası: {e}")
 
-    # Fallback (Şablon Makale)
-    clean_summary = summary.replace("\n", " ").strip() if summary else title
+    # Fallback (Şablon Makale - Gerçek Paragraflar ve Sayılarla Doldurur, Asla Boş Şablon Cümlesi Yazmaz)
+    raw_paras = [p.strip() for p in summary.split("\n") if len(p.strip()) > 35]
+    if len(raw_paras) >= 2:
+        lead_para = raw_paras[0]
+        body_paras = "".join(f'<p class="text-slate-300 leading-relaxed mb-4">{p}</p>' for p in raw_paras[1:])
+    else:
+        lead_para = summary.replace("\n", " ").strip() if summary else title
+        body_paras = f'<p class="text-slate-300 leading-relaxed mb-4">{lead_para}</p>'
+
     content_html = f"""
-    <p class="lead font-medium text-lg text-slate-300 mb-6">
-        {clean_summary}
+    <p class="lead font-medium text-lg text-slate-200 mb-6">
+        {lead_para}
     </p>
     
     <h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları</h3>
-    <p class="text-slate-300 leading-relaxed mb-4">
-        Türkiye ve dünya gündeminde dikkat çeken <strong>{title}</strong> başlığı altında yeni gelişmeler kaydedildi. 
-        Gelen son bilgilere göre, sürecin etkileri kamuoyunda yakından takip ediliyor.
-    </p>
-    
-    <p class="text-slate-300 leading-relaxed mb-6">
-        Uzmanlar ve ilgili kurumlar konuya ilişkin değerlendirmelerini sürdürürken, önümüzdeki günlerde sürecin seyrine dair yeni açıklamaların yapılması bekleniyor. 
-        Olayla ilgili resmi kanallardan yapılacak bilgilendirmeler kamuoyu ile paylaşılmaya devam edecek.
-    </p>
+    {body_paras}
 
     <div class="p-5 rounded-xl bg-red-950/40 border border-red-800/40 my-6">
         <h4 class="font-bold text-red-400 flex items-center gap-2 mb-2">
             <span>🔴</span> GÜNDEM ANALİZİ DEĞERLENDİRMESİ
         </h4>
         <p class="text-slate-300 text-sm leading-relaxed">
-            Bu gelişme, ilgili sektör ve kamuoyu nezdinde önemli yankılar uyandırabilir. Gündem Analizi ekibi olarak sürecin perde arkasını ve olası yansımalarını tarafsız bir bakış açısıyla takip etmeyi sürdüreceğiz.
+            Gelişmenin piyasalar ve kamuoyu üzerindeki yansımaları ekonomi masamız tarafından yakından takip edilmektedir. Sürece dair resmi makamlardan gelecek yeni veriler anlık olarak aktarılacaktır.
         </p>
     </div>
     """
 
     return {
         "title": title,
-        "summary": clean_summary[:200],
+        "summary": lead_para[:200],
         "content": content_html,
         "category": category
     }
