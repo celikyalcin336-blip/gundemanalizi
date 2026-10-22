@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if search_query %}{{ search_query }} Haberleri | {% elif active_category %}{{ active_category }} Haberleri | {% endif %}Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
+    
+    {% if ad_settings and ad_settings.google_site_verification %}
+        {% if "<meta" in ad_settings.google_site_verification %}
+            {{ ad_settings.google_site_verification | safe }}
+        {% else %}
+            <meta name="google-site-verification" content="{{ ad_settings.google_site_verification }}">
+        {% endif %}
+    {% endif %}
+
+    {% if ad_settings and ad_settings.ads_enabled and ad_settings.adsense_client_id %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_settings.adsense_client_id }}" crossorigin="anonymous"></script>
+    {% endif %}
+
+    {% if ad_settings and ad_settings.ga_tracking_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ ad_settings.ga_tracking_id }}');
+    </script>
+    {% endif %}
     <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, asayiş ve güncel haberlerin tarafsız analizi.">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="{{ request.url }}">
@@ -166,6 +188,16 @@
 
     <!-- ANA İÇERİK ALANI -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_top %}
+        <!-- REKLAM ALANI: MANŞET ÜSTÜ LEADERBOARD BANNER (728x90 / 320x100) -->
+        <div class="mb-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-2xl bg-brand-card/80 border border-brand-border/60 p-2 shadow-lg">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
+            <div class="w-full flex justify-center items-center overflow-hidden">
+                {{ ad_settings.ad_slot_top | safe }}
+            </div>
+        </div>
+        {% endif %}
 
         <!-- TÜM SOSYAL MEDYA HESAPLARI & 7/24 İHBAR HATTI BARI -->
         <div class="mb-6 p-3.5 rounded-2xl bg-brand-card border border-brand-border shadow-xl flex flex-col lg:flex-row items-center justify-between gap-3">

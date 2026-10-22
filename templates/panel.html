@@ -374,6 +374,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button type="button" onclick="openAdSettingsModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs shadow-lg transition">
+                        <i data-lucide="sliders" class="w-4 h-4"></i> ⚙️ Reklam & Google Ayarları
+                    </button>
                     <button type="button" onclick="openRevenueModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i> + Gelir Kaydet
                     </button>
@@ -905,6 +908,110 @@
         </div>
     </div>
 
+    <!-- ⚙️ GOOGLE & REKLAM / ADSENSE AYARLARI MODALI -->
+    <div id="ad-settings-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-brand-card border border-amber-500/50 rounded-2xl p-5 sm:p-6 max-w-2xl w-full shadow-2xl space-y-4 my-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 border-b border-brand-border">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">⚙️</span>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">Google & Reklam Yönetim Merkezi</h3>
+                        <p class="text-xs text-amber-400 font-semibold">Search Console, AdSense, Analytics ve Banner Yerleşimleri</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAdSettingsModal()" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
+            </div>
+
+            <form onsubmit="saveAdSettings(event)" class="space-y-4 text-xs">
+                <!-- Reklam Ana Şalteri -->
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-brand-border flex items-center justify-between">
+                    <div>
+                        <div class="font-bold text-white text-sm">Site Geneli Reklam Yayını</div>
+                        <div class="text-slate-400 text-[11px]">Tüm AdSense ve banner reklamlarını tek tuşla açıp kapatır.</div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="ad-enabled-toggle" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                    </label>
+                </div>
+
+                <!-- Google Search Console -->
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-brand-border space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-slate-200 font-bold">🔍 Google Search Console Doğrulama Kodu</label>
+                        <span class="text-[10px] text-sky-400 font-mono">Meta etiketi veya kod</span>
+                    </div>
+                    <input id="ad-g-verify" type="text" placeholder="Örn: google-site-verification=abc123xyz veya tam <meta...> kodu"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none">
+                    <p class="text-[10px] text-slate-400">Google Search Console'un verdiği HTML etiketini veya kodunu buraya yapıştırman yeterlidir.</p>
+                </div>
+
+                <!-- Google AdSense Yayıncı ID -->
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-brand-border space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-slate-200 font-bold">💰 Google AdSense Yayıncı Kimliği (Client ID)</label>
+                        <span class="text-[10px] text-emerald-400 font-mono">ca-pub-XXXXXXXXXXXXXXXX</span>
+                    </div>
+                    <input id="ad-adsense-id" type="text" placeholder="Örn: ca-pub-1234567890123456"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none">
+                    <p class="text-[10px] text-slate-400">AdSense onay aldığında yayıncı numaranı buraya gir, otomatik AdSense kodunu sitenin &lt;head&gt; alanına basacaktır.</p>
+                </div>
+
+                <!-- Google Analytics 4 (GA4) -->
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-brand-border space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-slate-200 font-bold">📊 Google Analytics 4 (GA4) Ölçüm Kimliği</label>
+                        <span class="text-[10px] text-blue-400 font-mono">G-XXXXXXXXXX</span>
+                    </div>
+                    <input id="ad-ga-id" type="text" placeholder="Örn: G-12345ABCDE"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none">
+                    <p class="text-[10px] text-slate-400">Google Analytics anlık ziyaretçi sayacını çalıştırmak istersen buraya girebilirsin.</p>
+                </div>
+
+                <!-- ads.txt Dosyası -->
+                <div class="p-3.5 rounded-xl bg-slate-950/60 border border-brand-border space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-slate-200 font-bold">📄 ads.txt İçeriği (AdSense Gelir Yetkilendirmesi)</label>
+                        <span class="text-[10px] text-amber-400 font-mono">/ads.txt</span>
+                    </div>
+                    <textarea id="ad-ads-txt" rows="2" placeholder="Örn: google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
+                    <p class="text-[10px] text-slate-400">AdSense başvurun kabul olduğunda sana verilecek yetkilendirme satırını buraya yazman yeterlidir.</p>
+                </div>
+
+                <!-- Reklam Yuvaları (HTML / Banner Kodu) -->
+                <div class="space-y-3 pt-1">
+                    <div class="font-extrabold text-white text-xs uppercase tracking-wider text-amber-400">Reklam Yerleşim Yuvaları (Ad Slots):</div>
+
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">1. Manşet Üstü Reklam (Desktop 728x90 / Mobil 320x100)</label>
+                        <textarea id="ad-slot-top" rows="2" placeholder="AdSense responsive kod veya doğrudan sponsor banner HTML kodu yapıştırın..."
+                            class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">2. Haber Detay Başlık Altı Reklam</label>
+                        <textarea id="ad-slot-art-top" rows="2" placeholder="Haber metninden önce çıkacak AdSense veya sponsor reklam kodu..."
+                            class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">3. Haber Detay Altı Reklam (Metin Sonu)</label>
+                        <textarea id="ad-slot-art-bot" rows="2" placeholder="Haber metninin bitiminde çıkacak AdSense veya sponsor reklam kodu..."
+                            class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-brand-border">
+                    <button type="button" onclick="closeAdSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold">İptal</button>
+                    <button type="submit" id="btn-save-ads" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-emerald-600 hover:from-amber-500 hover:to-emerald-500 text-white font-extrabold shadow-xl transition flex items-center gap-1.5">
+                        <span>💾 Reklam & Google Ayarlarını Kaydet</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- PWA TELEFON REHBERİ MODALI -->
     <div id="pwa-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-brand-card border border-red-600/50 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-xs text-slate-300">
@@ -1055,6 +1162,78 @@
             if (res.ok) {
                 showToast('Gelir kaydı silindi.');
                 setTimeout(() => window.location.reload(), 1000);
+            }
+        }
+
+        // GOOGLE & REKLAM AYARLARI FONKSİYONLARI
+        async function openAdSettingsModal() {
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            try {
+                const res = await fetch('/api/panel/ad-settings', {
+                    headers: { 'X-Admin-Pin': pin }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const s = data.settings || {};
+                    document.getElementById('ad-enabled-toggle').checked = !!s.ads_enabled;
+                    document.getElementById('ad-g-verify').value = s.google_site_verification || '';
+                    document.getElementById('ad-adsense-id').value = s.adsense_client_id || '';
+                    document.getElementById('ad-ga-id').value = s.ga_tracking_id || '';
+                    document.getElementById('ad-ads-txt').value = s.ads_txt_content || '';
+                    document.getElementById('ad-slot-top').value = s.ad_slot_top || '';
+                    document.getElementById('ad-slot-art-top').value = s.ad_slot_article_top || '';
+                    document.getElementById('ad-slot-art-bot').value = s.ad_slot_article_bottom || '';
+                }
+            } catch (e) {
+                console.error('Ayarlar yüklenemedi:', e);
+            }
+            document.getElementById('ad-settings-modal').classList.remove('hidden');
+        }
+
+        function closeAdSettingsModal() {
+            document.getElementById('ad-settings-modal').classList.add('hidden');
+        }
+
+        async function saveAdSettings(e) {
+            e.preventDefault();
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            const btn = document.getElementById('btn-save-ads');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Kaydediliyor...</span>';
+
+            const payload = {
+                ads_enabled: document.getElementById('ad-enabled-toggle').checked ? '1' : '0',
+                google_site_verification: document.getElementById('ad-g-verify').value.trim(),
+                adsense_client_id: document.getElementById('ad-adsense-id').value.trim(),
+                ga_tracking_id: document.getElementById('ad-ga-id').value.trim(),
+                ads_txt_content: document.getElementById('ad-ads-txt').value.trim(),
+                ad_slot_top: document.getElementById('ad-slot-top').value.trim(),
+                ad_slot_article_top: document.getElementById('ad-slot-art-top').value.trim(),
+                ad_slot_article_bottom: document.getElementById('ad-slot-art-bot').value.trim()
+            };
+
+            try {
+                const res = await fetch('/api/panel/ad-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Pin': pin
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok && data.ok) {
+                    showToast('✅ ' + data.message);
+                    closeAdSettingsModal();
+                } else {
+                    alert('Hata: ' + (data.detail || 'Ayarlar kaydedilemedi'));
+                }
+            } catch (err) {
+                alert('Bağlantı hatası: ' + err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
 

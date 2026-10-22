@@ -140,6 +140,31 @@ async def health():
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
+def get_site_ad_settings() -> dict:
+    """Tüm reklam, AdSense, Google Search Console ve Analytics ayarlarını çeker."""
+    try:
+        return {
+            "google_site_verification": database.get_setting("google_site_verification", ""),
+            "adsense_client_id": database.get_setting("adsense_client_id", ""),
+            "ga_tracking_id": database.get_setting("ga_tracking_id", ""),
+            "ads_enabled": database.get_setting("ads_enabled", "1") == "1",
+            "ads_txt_content": database.get_setting("ads_txt_content", ""),
+            "ad_slot_top": database.get_setting("ad_slot_top", ""),
+            "ad_slot_article_top": database.get_setting("ad_slot_article_top", ""),
+            "ad_slot_article_bottom": database.get_setting("ad_slot_article_bottom", ""),
+        }
+    except Exception:
+        return {
+            "google_site_verification": "",
+            "adsense_client_id": "",
+            "ga_tracking_id": "",
+            "ads_enabled": True,
+            "ads_txt_content": "",
+            "ad_slot_top": "",
+            "ad_slot_article_top": "",
+            "ad_slot_article_bottom": "",
+        }
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None):
     database.record_visit("home_visits")
@@ -158,7 +183,8 @@ async def home(request: Request, kategori: str = None, q: str = None):
         context={
             "articles": articles,
             "active_category": kategori,
-            "search_query": q.strip() if q else ""
+            "search_query": q.strip() if q else "",
+            "ad_settings": get_site_ad_settings()
         }
     )
 
@@ -190,7 +216,7 @@ async def admin_panel(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="panel.html",
-        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG}
+        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG, "ad_settings": get_site_ad_settings()}
     )
 
 @app.post("/api/panel/fetch-now")
@@ -588,6 +614,37 @@ async def panel_del_revenue(rec_id: int, request: Request):
     database.delete_revenue_record(rec_id)
     return {"ok": True, "message": "Gelir kaydı silindi."}
 
+@app.get("/api/panel/ad-settings")
+async def get_panel_ad_settings(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    return {"ok": True, "settings": get_site_ad_settings()}
+
+@app.post("/api/panel/ad-settings")
+async def save_panel_ad_settings(request: Request):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    keys = [
+        "google_site_verification",
+        "adsense_client_id",
+        "ga_tracking_id",
+        "ads_enabled",
+        "ads_txt_content",
+        "ad_slot_top",
+        "ad_slot_article_top",
+        "ad_slot_article_bottom"
+    ]
+    for k in keys:
+        if k in data:
+            database.set_setting(k, str(data[k]))
+    return {"ok": True, "message": "Reklam ve Google ayarları başarıyla kaydedildi!"}
+
 @app.post("/api/ihbar")
 async def submit_ihbar(
     message: str = Form(...),
@@ -646,7 +703,8 @@ async def article_detail(request: Request, slug: str):
         name="article.html",
         context={
             "article": article,
-            "other_articles": other_articles
+            "other_articles": other_articles,
+            "ad_settings": get_site_ad_settings()
         }
     )
 
@@ -683,6 +741,9 @@ async def google_verification():
 
 @app.get("/ads.txt", response_class=PlainTextResponse)
 async def ads_txt():
+    custom = database.get_setting("ads_txt_content", "").strip()
+    if custom:
+        return PlainTextResponse(content=custom + "\n")
     content = os.getenv("ADS_TXT", "# Google AdSense ads.txt - Gündem Analizi\n")
     return PlainTextResponse(content=content)
 

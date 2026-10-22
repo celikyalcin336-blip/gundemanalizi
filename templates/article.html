@@ -5,6 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ article.title }} | Gündem Analizi</title>
     <meta name="description" content="{{ article.summary }}">
+    <link rel="canonical" href="{{ request.url }}">
+
+    {% if ad_settings and ad_settings.google_site_verification %}
+        {% if "<meta" in ad_settings.google_site_verification %}
+            {{ ad_settings.google_site_verification | safe }}
+        {% else %}
+            <meta name="google-site-verification" content="{{ ad_settings.google_site_verification }}">
+        {% endif %}
+    {% endif %}
+
+    {% if ad_settings and ad_settings.ads_enabled and ad_settings.adsense_client_id %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ ad_settings.adsense_client_id }}" crossorigin="anonymous"></script>
+    {% endif %}
+
+    {% if ad_settings and ad_settings.ga_tracking_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ ad_settings.ga_tracking_id }}');
+    </script>
+    {% endif %}
+
+    <!-- Google News & Discover Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ request.url }}"
+      },
+      "headline": {{ article.title | tojson }},
+      "description": {{ article.summary | tojson }},
+      "image": [
+        {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
+      ],
+      "datePublished": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
+      "dateModified": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
+      "author": {
+        "@type": "Organization",
+        "name": "Gündem Analizi Haber Masası",
+        "url": "https://xn--gndemanalizi-dlb.com.tr"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Gündem Analizi",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"
+        }
+      }
+    }
+    </script>
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="Gündem Analizi">
     <meta property="og:title" content="{{ article.title }}">
@@ -147,10 +202,30 @@
                 </button>
             </div>
 
+            {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_article_top %}
+            <!-- REKLAM ALANI: HABER İÇİ ÜST BANNER -->
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+                <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
+                <div class="w-full flex justify-center items-center overflow-hidden">
+                    {{ ad_settings.ad_slot_article_top | safe }}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Makale İçeriği -->
             <div class="text-slate-200 text-base sm:text-lg leading-relaxed font-normal article-body">
                 {{ article.content | safe }}
             </div>
+
+            {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_article_bottom %}
+            <!-- REKLAM ALANI: HABER İÇİ ALT BANNER -->
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+                <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
+                <div class="w-full flex justify-center items-center overflow-hidden">
+                    {{ ad_settings.ad_slot_article_bottom | safe }}
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Kaynak Bilgisi -->
             <div class="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs text-slate-400">
