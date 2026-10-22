@@ -19,8 +19,9 @@ def generate_telegram_post(title: str, summary: str, source: str) -> str:
     - En altta kaynak parantezi: (Kaynak)
     - Kesinlikle hashtag veya yapay soru içermez.
     """
-    headline = html.unescape(html.unescape(title.strip()))
-    clean_summary = html.unescape(html.unescape(summary.replace("\r", "").strip())) if summary else ""
+    import news_fetcher
+    headline = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
+    clean_summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.replace("\r", "").strip()))) if summary else ""
 
     if config.GEMINI_API_KEY:
         try:
@@ -93,8 +94,9 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
     Sosyal medya (Facebook, Instagram, Reels, TikTok) için optimize edilmiş metin ve hashtag üretir.
     Gemini API anahtarı varsa yapay zeka ile yazar, yoksa akıllı formatlama uygular.
     """
-    title = html.unescape(html.unescape(title.strip()))
-    summary = html.unescape(html.unescape(summary.strip())) if summary else ""
+    import news_fetcher
+    title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
+    summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
     if config.GEMINI_API_KEY:
         try:
@@ -158,8 +160,9 @@ def generate_full_article(title: str, summary: str, source: str) -> dict:
     """
     Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
     """
-    title = html.unescape(html.unescape(title.strip()))
-    summary = html.unescape(html.unescape(summary.strip())) if summary else ""
+    import news_fetcher
+    title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
+    summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
     category = "Gündem"
     lower_title = title.lower()

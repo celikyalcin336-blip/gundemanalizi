@@ -39,12 +39,43 @@ def clean_html(text: str) -> str:
     """
     if not text:
         return ""
-    # 1. HTML etiketlerini kaldır
-    clean = re.sub(r'<[^>]+>', '', text)
+    # 1. HTML etiketlerini kaldır (kelimelerin birbirine yapışmaması için boşluk bırak)
+    clean = re.sub(r'<[^>]+>', ' ', text)
     # 2. HTML karakter kodlarını çöz (bazı siteler çift encode ettiği için iki kez uygulanır)
     clean = html.unescape(clean)
     clean = html.unescape(clean)
+    clean = re.sub(r'\s+', ' ', clean)
     return clean.strip()
+
+def sanitize_news_text(text: str) -> str:
+    """Haber metnindeki ajans/site butonlarını, paylaşım çöplerini ve Google promosyonlarını temizler."""
+    if not text:
+        return ""
+    t = text
+    # 1. Yapışık kelimeleri ve noktalama bitişikliklerini ayır
+    t = re.sub(r'([a-zçğıöşü\)])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
+    t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
+    t = re.sub(r'([\.!?])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
+
+    # 2. Site buton, menü, SEO ve breadcrumb çöplerini kaldır
+    junk_patterns = [
+        r'\bHABERLER\b.*?(?:Haberleri|Gündem)',
+        r'Font\s*Boyutu.*?Linki\s*Kopyala',
+        r'Haberlerimizi\s+Google.*?Haberin\s+Devam[ıi]',
+        r'Google(?:\'da|\s+da)\s+tercih\s+edilen.*?ekleyin',
+        r'Gelişmelerden\s+anında\s+haberdar\s+olun\.?',
+        r'Haberin\s+Devam[ıi]',
+        r'Gelişmenin\s+Ayrıntıları',
+        r'\b(?:Güncelleme|Oluşturulma)\s*Tarihi:[^\.\n\r]*?(?:\d{2}:\d{2}|\d{4})',
+        r'[A-ZÇĞİÖŞÜ\s]{2,25}/\s+[A-ZÇĞİÖŞÜ\s]{2,25}\s*\([^)]+\)\s*,\s*\([A-ZÇĞİÖŞÜ]+\)',
+        r'Fotoğraf:\s*[A-Za-zÇĞİÖŞÜçğıöşü0-9\s/]+',
+        r'Paylaş\s*N?Sosyal.*?(?:Flipboard|Kopyala)',
+    ]
+    for p in junk_patterns:
+        t = re.sub(p, ' ', t, flags=re.IGNORECASE)
+    t = re.sub(r'\s+', ' ', t).strip()
+    return t
+
 
 def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
     """
@@ -116,11 +147,16 @@ def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
         bad_body_phrases = [
             "çerez", "cookie", "telif", "copyright", "kullanım koşulları",
             "gizlilik", "künye", "reklam", "abone", "yayın grubu",
-            "tıklayın", "tıklayınız", "indir", "fotoğraf:", "menüyü aç", "tüm hakları saklıdır"
+            "tıklayın", "tıklayınız", "indir", "fotoğraf:", "menüyü aç", "tüm hakları saklıdır",
+            "font boyutu", "yazıyı büyüt", "yazıyı küçült", "linki kopyala",
+            "google'da takip edin", "google'da tercih edilen", "haberin devamı",
+            "gelişmelerden anında", "oluşturulma tarihi", "güncelleme tarihi",
+            "flipboard", "nsosyal", "yazı boyutu", "paylaş"
         ]
         for p in p_matches:
             c = clean_html(p)
-            if len(c) > 55 and not any(b in c.lower() for b in bad_body_phrases):
+            c = sanitize_news_text(c)
+            if len(c) > 40 and not any(b in c.lower() for b in bad_body_phrases):
                 clean_paras.append(c)
                 if len(clean_paras) >= max_paragraphs:
                     break
