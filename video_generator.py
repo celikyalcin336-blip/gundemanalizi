@@ -597,17 +597,20 @@ def brand_raw_video(
     elif audio_mode == "ambient" and amb_wav:
         ff_cmd += ["-map", f"{amb_input_idx}:a", "-c:a", "aac", "-b:a", "128k", "-shortest"]
     else:
-        ff_cmd += ["-map", "0:a?", "-c:a", "copy"]
+        # Twitter veya internet videolarındaki Opus/farklı sesleri standart AAC formatına dönüştür (MP4 uyumsuzluğunu önler)
+        ff_cmd += ["-map", "0:a?", "-c:a", "aac", "-b:a", "128k"]
 
     ff_cmd += [
         "-c:v", "libx264",
-        "-preset", "faster",
-        "-crf", "22",
+        "-preset", "ultrafast",
+        "-tune", "zerolatency",
+        "-crf", "23",
+        "-threads", "2",
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
         output_path
     ]
-    res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=120)
+    res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=300)
     if os.path.exists(overlay_path):
         os.remove(overlay_path)
     if ticker_path and os.path.exists(ticker_path):
