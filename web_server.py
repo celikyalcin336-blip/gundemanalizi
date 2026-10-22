@@ -312,9 +312,11 @@ def _process_viral_video_job(
         ai_cap = ai_writer.generate_social_caption(title, base_summary, source or "Gündem Analizi Özel")
         article_data = ai_writer.generate_full_article(title, base_summary, source or "Gündem Analizi Özel")
 
-        # Sosyal medya metnine kaynak ekle (Hukuki güvence)
-        if source and source.strip().lower() not in ("gündem analizi", "özel", "yok", ""):
-            ai_cap["caption"] = f"{ai_cap['caption']}\n\n📌 Kaynak: {source.strip()}"
+        # Sosyal medya metnine kaynak ekle (Hukuki güvence) - Tek seferlik ekleme garantisi
+        clean_src = source.strip() if source else ""
+        if clean_src and clean_src.lower() not in ("gündem analizi", "özel", "yok", ""):
+            if "kaynak:" not in ai_cap["caption"].lower():
+                ai_cap["caption"] = f"{ai_cap['caption']}\n\n📌 Kaynak: {clean_src}"
 
         slug = None
         site_url = config.SITE_URL
@@ -380,7 +382,7 @@ def _process_viral_video_job(
         if os.path.exists(raw_path):
             os.remove(raw_path)
 
-        social_pack = f"{ai_cap['caption']}\n\n🌐 Detaylar: {site_url}\n#gündem #sondakika #haber #gündemanalizi"
+        social_pack = f"{ai_cap['caption']}\n\n🌐 Detaylar: {site_url}"
         job.update({
             "status": "done",
             "step": 5,

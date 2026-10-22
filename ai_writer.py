@@ -12,8 +12,8 @@ import config
 
 def generate_social_caption(title: str, summary: str, source: str) -> dict:
     """
-    Sosyal medya (Facebook ve Instagram) için optimize edilmiş metin ve hashtag üretir.
-    Gemini API anahtarı varsa yapay zeka ile yazar, yoksa şablon tabanlı akıllı formatlama uygular.
+    Sosyal medya (Facebook, Instagram, Reels, TikTok) için optimize edilmiş metin ve hashtag üretir.
+    Gemini API anahtarı varsa yapay zeka ile yazar, yoksa akıllı formatlama uygular.
     """
     if config.GEMINI_API_KEY:
         try:
@@ -21,48 +21,52 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
             client = genai.Client(api_key=config.GEMINI_API_KEY)
             
             prompt = f"""
-Sen Türkiye gündemini takip eden profesyonel bir sosyal medya içerik yöneticisisin.
-Aşağıdaki haber için Instagram ve Facebook'ta yüksek etkileşim alacak Türkçe bir paylaşım metni hazırla.
+Sen Türkiye gündemini yakından takip eden profesyonel bir sosyal medya içerik yöneticisisin.
+Aşağıdaki haber için Instagram (Reels) ve Facebook'ta yüksek organik erişim ve etkileşim alacak Türkçe bir paylaşım metni hazırla.
 
 Haber Başlığı: {title}
-Haber Özeti: {summary}
-Kaynak: {source}
+Haber Detayı: {summary}
 
-İstenen Format:
-1. Dikkat çekici, merak uyandıran 1-2 cümlelik açılış cümlesi (emoji ile).
-2. Haberin en önemli detayını anlatan 1-2 cümlelik özet.
-3. Takipçilere yönelik kısa bir soru/etkileşim cümlesi (Örn: "Siz bu konuda ne düşünüyorsunuz? Yorumlarda buluşalım.").
-4. Türkiye gündemine ve haber konusuna uygun 4-6 popüler hashtag (#türkiyegündemi, #sondakika vb.).
-
-Lütfen sadece doğrudan paylaşılacak nihai metni yaz, fazladan açıklama veya başlık koyma.
+UYULMASI ZORUNLU KURALLAR:
+1. Haberin en can alıcı noktasını tek ve akıcı bir ana paragrafta anlat. Başlığı veya aynı cümleyi ASLA iki kez tekrar etme.
+2. Metnin içine ASLA "Kaynak: ..." yazma (kaynak sistem tarafından otomatik ve tek seferlik eklenecektir).
+3. Metnin içine ASLA dış web linki veya URL yazma.
+4. Metnin sonuna takipçileri yorum yapmaya teşvik eden merak uyandırıcı tek bir soru cümlesi ekle (Örn: "Siz bu konuda ne düşünüyorsunuz? Yorumlarda buluşalım.").
+5. En alta haber konusuna uygun 4-5 popüler Türkçe hashtag ekle (#sondakika #haber #gündem vb.).
+6. Sadece doğrudan paylaşılacak nihai metni yaz, fazladan selamlama veya açıklama koyma.
 """
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-            if response and response.text:
-                return {
-                    "caption": response.text.strip(),
-                    "source_used": "Gemini AI"
-                }
+            # Model denemesi (önce 2.5-flash, sonra 2.0-flash, sonra 1.5-flash)
+            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+                try:
+                    response = client.models.generate_content(
+                        model=m_name,
+                        contents=prompt
+                    )
+                    if response and response.text:
+                        return {
+                            "caption": response.text.strip(),
+                            "source_used": f"Gemini AI ({m_name})"
+                        }
+                except Exception:
+                    continue
         except Exception as e:
             print(f"Gemini API çağrısı başarısız, şablon fallback kullanılıyor: {e}")
 
-    # Fallback (API anahtarı girilmediğinde veya hata olduğunda çalışan şablon)
-    clean_summary = summary.replace("\n", " ").strip()
-    if len(clean_summary) > 220:
-        clean_summary = clean_summary[:217] + "..."
+    # Fallback (API anahtarı girilmediğinde veya kota aşıldığında çalışan akıllı şablon)
+    clean_summary = summary.replace("\n", " ").strip() if summary else ""
+    # Başlık ile özet aynıysa veya özet boşsa tekrarlama yapma
+    if clean_summary and clean_summary.lower() != title.strip().lower():
+        if len(clean_summary) > 220:
+            clean_summary = clean_summary[:217] + "..."
+        body = f"📢 {title}\n\n📰 {clean_summary}"
+    else:
+        body = f"📢 {title}"
 
-    caption_text = f"""📢 {title}
+    caption_text = f"""{body}
 
-📰 {clean_summary if clean_summary else title}
+💬 Siz bu konuda ne düşünüyorsunuz? Görüşlerinizi yorumlarda paylaşın!
 
-📌 Gelişmeleri ve son dakika haberlerini kaçırmamak için takipte kalın!
-💬 Sizce bu durum nasıl sonuçlanır? Görüşlerinizi yorumlarda paylaşın!
-
-Kaynak: {source}
----
-#türkiyegündemi #sondakika #haber #gündem #türkiye #haberler"""
+#sondakika #haber #gündem #türkiye #gündemanalizi"""
 
     return {
         "caption": caption_text,
@@ -101,17 +105,21 @@ Kaynak: {source}
 
 Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara başlıklar (<h3>...</h3>) olarak ver.
 """
-            res = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-            if res and res.text:
-                return {
-                    "title": title,
-                    "summary": summary[:200] if summary else title,
-                    "content": res.text.strip(),
-                    "category": category
-                }
+            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+                try:
+                    res = client.models.generate_content(
+                        model=m_name,
+                        contents=prompt
+                    )
+                    if res and res.text:
+                        return {
+                            "title": title,
+                            "summary": summary[:200] if summary else title,
+                            "content": res.text.strip(),
+                            "category": category
+                        }
+                except Exception:
+                    continue
         except Exception as e:
             print(f"Gemini makale üretimi hatası: {e}")
 

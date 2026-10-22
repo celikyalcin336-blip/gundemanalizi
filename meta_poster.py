@@ -90,19 +90,23 @@ def _post_first_comment(object_id: str, news_link: str):
         time.sleep(2)
         c_url = f"https://graph.facebook.com/v21.0/{object_id}/comments"
         c_payload = {
-            "message": f"📰 Haberin tüm detayları ve gelişmeler için tıklayın:\n👉 {news_link}",
+            "message": f"📰 Haberin tüm detayları ve canlı gelişmeler için tıklayın:\n👉 {news_link}",
             "access_token": config.META_PAGE_ACCESS_TOKEN
         }
-        requests.post(c_url, data=c_payload, timeout=15)
-    except Exception:
-        pass
+        resp = requests.post(c_url, data=c_payload, timeout=15)
+        if resp.status_code == 200:
+            print(f"💬 Facebook ilk yorum eklendi ({object_id})")
+        else:
+            print(f"⚠️ Facebook ilk yorum eklenemedi ({resp.status_code}): {resp.text[:150]}")
+    except Exception as e:
+        print(f"⚠️ Facebook ilk yorum hatası: {e}")
 
 
 def post_to_facebook(caption: str, image_path: str, news_link: str = None, is_manual: bool = False) -> dict:
     """
     Facebook Sayfasına görsel ve açıklama metnini yayınlar.
     - Otomatik paylaşımlarda 3 saat kuralı ve gece uyku modunu uygular.
-    - Erişim düşmemesi için linki ana açıklamaya değil, otomatik İLK YORUMA ekler.
+    - Erişim düşmemesi için uzun linki ana açıklamaya değil, otomatik İLK YORUMA ekler.
     """
     global _LAST_FB_AUTO_POST_TIME
     if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
@@ -113,8 +117,9 @@ def post_to_facebook(caption: str, image_path: str, news_link: str = None, is_ma
         return {"status": "skipped_by_shield", "post_id": None}
 
     fb_caption = caption
-    if news_link and news_link not in caption:
-        fb_caption = f"{caption}\n\n🌐 Haberin tüm detayları ve canlı gelişmeler:\n👉 {news_link}"
+    # Ana açıklamada uzun ham link yerine tertemiz marka adresi gösterilir (algoritma dostu)
+    if "gündemanalizi" not in fb_caption.lower():
+        fb_caption = f"{fb_caption}\n\n🌐 www.gündemanalizi.com.tr"
 
     url = f"https://graph.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/photos"
     payload = {
@@ -146,14 +151,15 @@ def post_to_facebook(caption: str, image_path: str, news_link: str = None, is_ma
 
 def post_video_to_facebook(video_path: str, caption: str, news_link: str = None) -> dict:
     """
-    Facebook Sayfasına doğrudan MP4/Reels video yayınlar ve linki ilk yoruma bırakır.
+    Facebook Sayfasına doğrudan MP4/Reels video yayınlar.
+    Erişimi düşürmemek için ana metne ham link konulmaz, temiz marka adı eklenir ve link ilk yoruma bırakılır.
     """
     if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
         return {"status": "simulated"}
 
     fb_desc = caption
-    if news_link and news_link not in caption:
-        fb_desc = f"{caption}\n\n🌐 Haberin detayları ve videosu:\n👉 {news_link}"
+    if "gündemanalizi" not in fb_desc.lower():
+        fb_desc = f"{fb_desc}\n\n🌐 www.gündemanalizi.com.tr"
 
     url = f"https://graph-video.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/videos"
     payload = {
