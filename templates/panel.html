@@ -1257,12 +1257,13 @@
             const caption = box ? box.value : '';
             try {
                 navigator.clipboard.writeText(caption);
-                showToast('📋 Açıklama kopyalandı! MP4 indiriliyor ve TikTok Yükleme ekranı açılıyor...');
+                showToast('📋 Açıklama kopyalandı! MP4 indiriliyor ve TikTok açılıyor...');
             } catch (e) {}
-            if (dl && dl.href) dl.click();
-            setTimeout(() => {
-                window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
-            }, 600);
+            // Pop-up engelleyiciye takılmamak için yeni sekmeyi doğrudan kullanıcı tıklamasıyla aç:
+            window.open('https://www.tiktok.com/tiktokstudio/upload', '_blank');
+            if (dl && dl.href && dl.href !== '#') {
+                setTimeout(() => { dl.click(); }, 300);
+            }
         }
 
         function shareXQuick() {
@@ -1272,12 +1273,13 @@
             const shortText = caption.length > 260 ? caption.slice(0, 255) + '…' : caption;
             try {
                 navigator.clipboard.writeText(caption);
-                showToast('📋 Tweet hazır! MP4 indiriliyor ve X ekranı açılıyor...');
+                showToast('📋 Tweet hazır! MP4 indiriliyor ve X açılıyor...');
             } catch (e) {}
-            if (dl && dl.href) dl.click();
-            setTimeout(() => {
-                window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(shortText), '_blank');
-            }, 600);
+            // Pop-up engelleyiciye takılmamak için doğrudan aç:
+            window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(shortText), '_blank');
+            if (dl && dl.href && dl.href !== '#') {
+                setTimeout(() => { dl.click(); }, 300);
+            }
         }
 
         function copySocialCaption() {

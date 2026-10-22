@@ -493,10 +493,10 @@
                     text: shareText,
                     url: "https://gundemanalizi.com.tr"
                 }).catch(() => {
-                    window.open(whatsappUrl, '_blank');
+                    window.location.href = whatsappUrl;
                 });
             } else {
-                window.open(whatsappUrl, '_blank');
+                window.location.href = whatsappUrl;
             }
         }
     </script>

@@ -380,10 +380,10 @@
                     text: text,
                     url: pageUrl
                 }).catch(() => {
-                    window.open(waUrl, "_blank");
+                    window.location.href = waUrl;
                 });
             } else {
-                window.open(waUrl, "_blank");
+                window.location.href = waUrl;
             }
         }
 
