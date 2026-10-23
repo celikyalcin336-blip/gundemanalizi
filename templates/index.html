@@ -102,6 +102,26 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
     </style>
+<style id="a11y-custom-style">
+        body.a11y-contrast {
+            filter: contrast(135%) brightness(105%);
+        }
+        body.a11y-large {
+            font-size: 115% !important;
+        }
+        body.a11y-xlarge {
+            font-size: 130% !important;
+        }
+        body.a11y-dyslexia {
+            letter-spacing: 0.06em !important;
+            word-spacing: 0.12em !important;
+            line-height: 1.85 !important;
+        }
+        body.a11y-focus-visible *:focus-visible {
+            outline: 3px solid #facc15 !important;
+            outline-offset: 3px !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-10">
 
@@ -524,7 +544,7 @@
                         </div>
                                                 <div class="space-y-2.5 text-xs">
                             <!-- Canlı Dinamik Namaz Vakti Butonu -->
-                            <button type="button" onclick="openNamazModal()"
+                            <button type="button" onclick="openNamazModal()" aria-label="81 İl Canlı Namaz Vakitleri Sayfasını Aç"
                                 class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🕌</span>
@@ -539,7 +559,7 @@
                             </button>
 
                             <!-- Tıklanabilir Nöbetçi Eczaneler Butonu -->
-                            <button type="button" onclick="openNobetciModal()"
+                            <button type="button" onclick="openNobetciModal()" aria-label="81 İl Nöbetçi Eczaneler Rehberini Aç"
                                 class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">💊</span>
@@ -554,7 +574,7 @@
                             </button>
 
                              <!-- Son Depremler Butonu (AFAD & Kandilli Resmi Canlı Portalları) -->
-                            <button type="button" onclick="openDepremModal()"
+                            <button type="button" onclick="openDepremModal()" aria-label="Kandilli ve AFAD Son Depremler Sayfasını Aç"
                                 class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🌐</span>
@@ -1367,5 +1387,143 @@
             </div>
         </div>
     </div>
+<!-- ♿ ERİŞİLEBİLİRLİK (ACCESSIBILITY - GÖRME ENGELLİ & KOLAY GEZİNME) -->
+    <div class="fixed bottom-20 sm:bottom-6 left-4 sm:left-5 z-50">
+        <button type="button" onclick="toggleA11yModal()" id="a11y-trigger-btn"
+            class="p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-2xl border-2 border-blue-400/50 transition-all duration-200 flex items-center gap-2 group cursor-pointer focus:ring-4 focus:ring-blue-400"
+            title="Erişilebilirlik Seçenekleri (Görme Engelli & Rahat Gezinme Modu)"
+            aria-label="Erişilebilirlik Menüsünü Aç">
+            <span class="text-xl">♿</span>
+            <span class="hidden md:group-hover:inline text-xs font-bold pr-1 transition">Erişilebilirlik</span>
+        </button>
+
+        <!-- Erişilebilirlik Ayarları Modalı -->
+        <div id="a11y-modal" class="hidden absolute bottom-14 left-0 w-80 sm:w-88 p-4 rounded-2xl bg-slate-950 border-2 border-blue-500 text-white shadow-2xl space-y-3.5 backdrop-blur-md z-50">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">♿</span>
+                    <h4 class="font-black text-sm text-white">Erişilebilirlik & Kolay Gezinme</h4>
+                </div>
+                <button type="button" onclick="toggleA11yModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-900 border border-slate-800" aria-label="Kapat">
+                    ✕
+                </button>
+            </div>
+
+            <!-- 1. Metin Boyutu -->
+            <div>
+                <label class="text-xs font-bold text-slate-300 block mb-1.5">🔤 Metin Boyutu</label>
+                <div class="grid grid-cols-3 gap-1.5 text-xs font-bold">
+                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="normal">Normal</button>
+                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="large">Büyük</button>
+                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="xlarge">Çok Büyük</button>
+                </div>
+            </div>
+
+            <!-- 2. Yüksek Kontrast (Az Görenler İçin) -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast</div>
+                    <div class="text-[10px] text-slate-400">Az görenler için net zıtlık</div>
+                </div>
+                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Kapalı
+                </button>
+            </div>
+
+            <!-- 3. Disleksi & Kolay Okunur Yazı Tipi -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">📖 Net Okuma Yazı Tipi</div>
+                    <div class="text-[10px] text-slate-400">Geniş harf aralıklı belirgin font</div>
+                </div>
+                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Kapalı
+                </button>
+            </div>
+
+            <!-- 4. Klavye Odak Çerçevesi -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">⌨️ Klavye Gezinme Çerçevesi</div>
+                    <div class="text-[10px] text-slate-400">Tab tuşunda belirgin sarı çerçeve</div>
+                </div>
+                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Açık
+                </button>
+            </div>
+
+            <!-- Sıfırla -->
+            <button type="button" onclick="resetA11ySettings()" class="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-semibold text-slate-400 hover:text-white border border-slate-800 transition">
+                Ayarları Varsayılana Sıfırla
+            </button>
+        </div>
+    </div>
+<script>
+        // ♿ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU
+        function toggleA11yModal() {
+            const m = document.getElementById('a11y-modal');
+            if (m) m.classList.toggle('hidden');
+        }
+
+        function applyA11ySettings() {
+            const fs = localStorage.getItem('a11y_fs') || 'normal';
+            document.body.classList.remove('a11y-large', 'a11y-xlarge');
+            if (fs === 'large') document.body.classList.add('a11y-large');
+            if (fs === 'xlarge') document.body.classList.add('a11y-xlarge');
+
+            const contrast = localStorage.getItem('a11y_contrast') === 'true';
+            document.body.classList.toggle('a11y-contrast', contrast);
+            const contrastBtn = document.getElementById('a11y-contrast-toggle');
+            if (contrastBtn) contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
+
+            const dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
+            document.body.classList.toggle('a11y-dyslexia', dyslexia);
+            const dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
+            if (dyslexiaBtn) dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
+
+            const focus = localStorage.getItem('a11y_focus') !== 'false'; // varsayılan açık
+            document.body.classList.toggle('a11y-focus-visible', focus);
+            const focusBtn = document.getElementById('a11y-focus-toggle');
+            if (focusBtn) focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
+        }
+
+        window.setA11yFontSize = function(val) {
+            localStorage.setItem('a11y_fs', val);
+            applyA11ySettings();
+        };
+
+        window.toggleA11yContrast = function() {
+            const cur = localStorage.getItem('a11y_contrast') === 'true';
+            localStorage.setItem('a11y_contrast', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yDyslexia = function() {
+            const cur = localStorage.getItem('a11y_dyslexia') === 'true';
+            localStorage.setItem('a11y_dyslexia', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yFocus = function() {
+            const cur = localStorage.getItem('a11y_focus') !== 'false';
+            localStorage.setItem('a11y_focus', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.resetA11ySettings = function() {
+            localStorage.removeItem('a11y_fs');
+            localStorage.removeItem('a11y_contrast');
+            localStorage.removeItem('a11y_dyslexia');
+            localStorage.removeItem('a11y_focus');
+            applyA11ySettings();
+        };
+
+        // Sayfa açıldığında erişilebilirlik tercihlerini uygula
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyA11ySettings);
+        } else {
+            applyA11ySettings();
+        }
+    </script>
 </body>
 </html>

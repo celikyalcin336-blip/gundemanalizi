@@ -139,6 +139,26 @@
         video::-webkit-media-controls-enclosure { overflow: hidden !important; }
         .no-save { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
     </style>
+<style id="a11y-custom-style">
+        body.a11y-contrast {
+            filter: contrast(135%) brightness(105%);
+        }
+        body.a11y-large {
+            font-size: 115% !important;
+        }
+        body.a11y-xlarge {
+            font-size: 130% !important;
+        }
+        body.a11y-dyslexia {
+            letter-spacing: 0.06em !important;
+            word-spacing: 0.12em !important;
+            line-height: 1.85 !important;
+        }
+        body.a11y-focus-visible *:focus-visible {
+            outline: 3px solid #facc15 !important;
+            outline-offset: 3px !important;
+        }
+    </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-10">
 
@@ -175,9 +195,9 @@
                     <span>{{ reading_time_min or 2 }} dk</span>
                 </span>
                 <div class="hidden sm:inline-flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full text-[11px] text-slate-300">
-                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült">A-</button>
+                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
                     <span class="text-slate-600">|</span>
-                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt">A+</button>
+                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
                 </div>
                 <button type="button" onclick="shareArticleWhatsApp()" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-full transition shadow">
                     💬 <span class="hidden sm:inline">Paylaş</span>
@@ -291,9 +311,9 @@
                 </span>
                 <div class="inline-flex items-center gap-1.5 bg-slate-800/80 px-2 py-0.5 rounded-md text-[11px] text-slate-300 ml-auto border border-slate-700/60">
                     <span class="text-[10px] text-slate-400">Yazı:</span>
-                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült">A-</button>
+                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
                     <span class="text-slate-600">|</span>
-                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt">A+</button>
+                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
                 </div>
             </div>
 
@@ -306,7 +326,7 @@
             <div id="audio-reader-box" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-brand-card to-slate-900 border border-brand-border shadow-xl">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                     <div class="flex items-center gap-3">
-                        <button type="button" id="audio-play-btn" onclick="toggleAudioReading()" class="w-12 h-12 rounded-2xl bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/40 transition active:scale-95 flex-shrink-0 group">
+                        <button type="button" id="audio-play-btn" onclick="toggleAudioReading()" aria-label="Haberi sesli dinlemeyi başlat veya duraklat" role="button" class="w-12 h-12 rounded-2xl bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/40 transition active:scale-95 flex-shrink-0 group">
                             <i id="audio-play-icon" data-lucide="play" class="w-6 h-6 ml-0.5 fill-white"></i>
                         </button>
                         <div>
@@ -326,10 +346,10 @@
                             <span class="w-1 bg-red-500 rounded-full animate-bounce h-4" style="animation-delay: 0.3s"></span>
                             <span class="w-1 bg-amber-500 rounded-full animate-bounce h-2" style="animation-delay: 0.45s"></span>
                         </div>
-                        <button type="button" onclick="cycleAudioRate()" id="audio-rate-btn" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-mono font-bold text-xs border border-slate-700 transition" title="Okuma Hızı">
+                        <button type="button" onclick="cycleAudioRate()" id="audio-rate-btn" aria-label="Sesli okuma hızını değiştir" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-mono font-bold text-xs border border-slate-700 transition" title="Okuma Hızı">
                             1.0x
                         </button>
-                        <button type="button" onclick="stopAudioReading()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs border border-slate-700 transition" title="Durdur">
+                        <button type="button" onclick="stopAudioReading()" aria-label="Sesli okumayı tamamen durdur" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs border border-slate-700 transition" title="Durdur">
                             <i data-lucide="square" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -369,7 +389,7 @@
                 <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1">
                     X (Twitter)
                 </a>
-                <button onclick="copyArticleLink(this)" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition flex items-center gap-1">
+                <button onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition flex items-center gap-1">
                     Linki Kopyala
                 </button>
             </div>
@@ -824,7 +844,20 @@
         }
 
         function splitTextIntoSentences(text) {
-            return text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+            // Cümleleri 200 karakterlik akıcı bloklara birleştir (mobildeki hantal duraklamaları önler)
+            const raw = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+            const chunks = [];
+            let buffer = "";
+            raw.forEach(s => {
+                if ((buffer + " " + s).length < 220) {
+                    buffer = (buffer + " " + s).trim();
+                } else {
+                    if (buffer) chunks.push(buffer);
+                    buffer = s.trim();
+                }
+            });
+            if (buffer) chunks.push(buffer);
+            return chunks.length > 0 ? chunks : [text];
         }
 
         window.toggleAudioReading = function() {
@@ -879,11 +912,17 @@
 
             const utterance = new SpeechSynthesisUtterance(chunk);
             utterance.lang = 'tr-TR';
-            utterance.rate = audioRate;
+            
+            // Telefonlarda Google TTS hantal kalmasın diye tempoyu canlı haber spikeri hızına (%12) ayarla
+            const isMobile = /mobile|android|iphone|ipad/i.test(navigator.userAgent);
+            utterance.rate = isMobile ? (audioRate * 1.12) : audioRate;
+            utterance.pitch = isMobile ? 1.02 : 1.0;
 
             const voices = window.speechSynthesis.getVoices();
-            const trVoice = voices.find(v => (v.lang && v.lang.toLowerCase().includes('tr')) || (v.name && v.name.toLowerCase().includes('turkish')));
-            if (trVoice) utterance.voice = trVoice;
+            const trVoices = voices.filter(v => (v.lang && v.lang.toLowerCase().includes('tr')) || (v.name && v.name.toLowerCase().includes('turkish')));
+            // Kaliteli Doğal / Network / Google sesini önceliklendir
+            const bestVoice = trVoices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Online')) || trVoices[0];
+            if (bestVoice) utterance.voice = bestVoice;
 
             utterance.onend = () => {
                 currentChunkIndex++;
@@ -913,7 +952,7 @@
         };
 
         window.cycleAudioRate = function() {
-            const rates = [1.0, 1.25, 1.5];
+            const rates = [0.8, 1.0, 1.25, 1.5];
             let idx = (rates.indexOf(audioRate) + 1) % rates.length;
             audioRate = rates[idx];
             const btn = document.getElementById('audio-rate-btn');
@@ -953,5 +992,143 @@
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-5 z-40 p-3 rounded-full bg-red-600/90 hover:bg-red-500 text-white shadow-2xl border border-red-400/40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center justify-center" title="Yukarı Çık">
         <i data-lucide="chevron-up" class="w-5 h-5"></i>
     </button>
+<!-- ♿ ERİŞİLEBİLİRLİK (ACCESSIBILITY - GÖRME ENGELLİ & KOLAY GEZİNME) -->
+    <div class="fixed bottom-20 sm:bottom-6 left-4 sm:left-5 z-50">
+        <button type="button" onclick="toggleA11yModal()" id="a11y-trigger-btn"
+            class="p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-2xl border-2 border-blue-400/50 transition-all duration-200 flex items-center gap-2 group cursor-pointer focus:ring-4 focus:ring-blue-400"
+            title="Erişilebilirlik Seçenekleri (Görme Engelli & Rahat Gezinme Modu)"
+            aria-label="Erişilebilirlik Menüsünü Aç">
+            <span class="text-xl">♿</span>
+            <span class="hidden md:group-hover:inline text-xs font-bold pr-1 transition">Erişilebilirlik</span>
+        </button>
+
+        <!-- Erişilebilirlik Ayarları Modalı -->
+        <div id="a11y-modal" class="hidden absolute bottom-14 left-0 w-80 sm:w-88 p-4 rounded-2xl bg-slate-950 border-2 border-blue-500 text-white shadow-2xl space-y-3.5 backdrop-blur-md z-50">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">♿</span>
+                    <h4 class="font-black text-sm text-white">Erişilebilirlik & Kolay Gezinme</h4>
+                </div>
+                <button type="button" onclick="toggleA11yModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-900 border border-slate-800" aria-label="Kapat">
+                    ✕
+                </button>
+            </div>
+
+            <!-- 1. Metin Boyutu -->
+            <div>
+                <label class="text-xs font-bold text-slate-300 block mb-1.5">🔤 Metin Boyutu</label>
+                <div class="grid grid-cols-3 gap-1.5 text-xs font-bold">
+                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="normal">Normal</button>
+                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="large">Büyük</button>
+                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="xlarge">Çok Büyük</button>
+                </div>
+            </div>
+
+            <!-- 2. Yüksek Kontrast (Az Görenler İçin) -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast</div>
+                    <div class="text-[10px] text-slate-400">Az görenler için net zıtlık</div>
+                </div>
+                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Kapalı
+                </button>
+            </div>
+
+            <!-- 3. Disleksi & Kolay Okunur Yazı Tipi -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">📖 Net Okuma Yazı Tipi</div>
+                    <div class="text-[10px] text-slate-400">Geniş harf aralıklı belirgin font</div>
+                </div>
+                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Kapalı
+                </button>
+            </div>
+
+            <!-- 4. Klavye Odak Çerçevesi -->
+            <div class="flex items-center justify-between py-1">
+                <div>
+                    <div class="text-xs font-bold text-white">⌨️ Klavye Gezinme Çerçevesi</div>
+                    <div class="text-[10px] text-slate-400">Tab tuşunda belirgin sarı çerçeve</div>
+                </div>
+                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                    Açık
+                </button>
+            </div>
+
+            <!-- Sıfırla -->
+            <button type="button" onclick="resetA11ySettings()" class="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-semibold text-slate-400 hover:text-white border border-slate-800 transition">
+                Ayarları Varsayılana Sıfırla
+            </button>
+        </div>
+    </div>
+<script>
+        // ♿ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU
+        function toggleA11yModal() {
+            const m = document.getElementById('a11y-modal');
+            if (m) m.classList.toggle('hidden');
+        }
+
+        function applyA11ySettings() {
+            const fs = localStorage.getItem('a11y_fs') || 'normal';
+            document.body.classList.remove('a11y-large', 'a11y-xlarge');
+            if (fs === 'large') document.body.classList.add('a11y-large');
+            if (fs === 'xlarge') document.body.classList.add('a11y-xlarge');
+
+            const contrast = localStorage.getItem('a11y_contrast') === 'true';
+            document.body.classList.toggle('a11y-contrast', contrast);
+            const contrastBtn = document.getElementById('a11y-contrast-toggle');
+            if (contrastBtn) contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
+
+            const dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
+            document.body.classList.toggle('a11y-dyslexia', dyslexia);
+            const dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
+            if (dyslexiaBtn) dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
+
+            const focus = localStorage.getItem('a11y_focus') !== 'false'; // varsayılan açık
+            document.body.classList.toggle('a11y-focus-visible', focus);
+            const focusBtn = document.getElementById('a11y-focus-toggle');
+            if (focusBtn) focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
+        }
+
+        window.setA11yFontSize = function(val) {
+            localStorage.setItem('a11y_fs', val);
+            applyA11ySettings();
+        };
+
+        window.toggleA11yContrast = function() {
+            const cur = localStorage.getItem('a11y_contrast') === 'true';
+            localStorage.setItem('a11y_contrast', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yDyslexia = function() {
+            const cur = localStorage.getItem('a11y_dyslexia') === 'true';
+            localStorage.setItem('a11y_dyslexia', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yFocus = function() {
+            const cur = localStorage.getItem('a11y_focus') !== 'false';
+            localStorage.setItem('a11y_focus', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.resetA11ySettings = function() {
+            localStorage.removeItem('a11y_fs');
+            localStorage.removeItem('a11y_contrast');
+            localStorage.removeItem('a11y_dyslexia');
+            localStorage.removeItem('a11y_focus');
+            applyA11ySettings();
+        };
+
+        // Sayfa açıldığında erişilebilirlik tercihlerini uygula
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyA11ySettings);
+        } else {
+            applyA11ySettings();
+        }
+    </script>
 </body>
 </html>
