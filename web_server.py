@@ -147,10 +147,10 @@ def get_site_ad_settings() -> dict:
     try:
         return {
             "google_site_verification": database.get_setting("google_site_verification", ""),
-            "adsense_client_id": database.get_setting("adsense_client_id", ""),
+            "adsense_client_id": database.get_setting("adsense_client_id", "") or "ca-pub-1415664741128989",
             "ga_tracking_id": database.get_setting("ga_tracking_id", ""),
             "ads_enabled": database.get_setting("ads_enabled", "1") == "1",
-            "ads_txt_content": database.get_setting("ads_txt_content", ""),
+            "ads_txt_content": database.get_setting("ads_txt_content", "") or "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": database.get_setting("ad_slot_top", ""),
             "ad_slot_article_top": database.get_setting("ad_slot_article_top", ""),
             "ad_slot_article_bottom": database.get_setting("ad_slot_article_bottom", ""),
@@ -158,10 +158,10 @@ def get_site_ad_settings() -> dict:
     except Exception:
         return {
             "google_site_verification": "",
-            "adsense_client_id": "",
+            "adsense_client_id": "ca-pub-1415664741128989",
             "ga_tracking_id": "",
             "ads_enabled": True,
-            "ads_txt_content": "",
+            "ads_txt_content": "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": "",
             "ad_slot_article_top": "",
             "ad_slot_article_bottom": "",
@@ -870,6 +870,10 @@ async def article_detail(request: Request, slug: str):
 async def about_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
 
+@app.get("/kunye", response_class=HTMLResponse)
+async def kunye_page(request: Request):
+    return templates.TemplateResponse(request=request, name="about.html", context={})
+
 @app.get("/gizlilik-politikasi", response_class=HTMLResponse)
 async def privacy_page(request: Request):
     return templates.TemplateResponse(request=request, name="privacy.html", context={})
@@ -902,8 +906,7 @@ async def ads_txt():
     custom = database.get_setting("ads_txt_content", "").strip()
     if custom:
         return PlainTextResponse(content=custom + "\n")
-    content = os.getenv("ADS_TXT", "# Google AdSense ads.txt - Gündem Analizi\n")
-    return PlainTextResponse(content=content)
+    return PlainTextResponse(content="google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0\n")
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots(request: Request):
@@ -931,6 +934,8 @@ async def sitemap(request: Request):
     for cat in ("Gündem", "Ekonomi", "Dünya", "Spor", "Asayiş", "Son Dakika"):
         xml.append(f'  <url><loc>{base_url}/?kategori={cat}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     for a in articles:
         xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>')
