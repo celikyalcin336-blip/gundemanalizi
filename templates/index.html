@@ -199,6 +199,53 @@
         </div>
     </header>
 
+    <!-- CANLI PİYASA & FİNANS BANDI (Altın, Dolar, Euro, Bitcoin) -->
+    <section class="bg-brand-card/90 border-b border-brand-border/70 backdrop-blur py-2 px-3 sm:px-6 shadow-md relative z-40">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+            <!-- Sol Başlık Rozeti (Masaüstü & Tablet) -->
+            <div class="hidden md:flex items-center gap-2 pr-3.5 border-r border-brand-border/70">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <div>
+                    <span class="text-[11px] font-black tracking-wider text-white uppercase whitespace-nowrap block leading-tight">
+                        CANLI PİYASA
+                    </span>
+                    <span class="text-[9px] font-medium text-slate-400 block leading-none">
+                        Anlık Kurlar
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4'lü Finans Şeridi (Mobilde 2 sütun / Masaüstünde 4 sütun) -->
+            <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
+                {% if market_rates %}
+                    {% for r in market_rates %}
+                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition shadow-sm">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="text-base sm:text-lg select-none">{{ r.icon }}</span>
+                            <div>
+                                <div class="font-bold text-slate-200 text-[11px] sm:text-xs leading-tight">{{ r.name }}</div>
+                                <div class="text-[9px] text-slate-400 font-mono hidden sm:block leading-none">{{ r.symbol }}</div>
+                            </div>
+                        </div>
+                        <div class="text-right pl-2">
+                            <div class="font-black text-white text-xs sm:text-sm tracking-tight font-mono leading-tight">
+                                {{ r.price }} <span class="text-[10px] font-semibold text-slate-400">{{ r.unit }}</span>
+                            </div>
+                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none {{ 'text-emerald-400' if r.direction == 'up' else 'text-red-400' }}">
+                                <span>{{ '▲' if r.direction == 'up' else '▼' }}</span>
+                                <span>%{{ r.change|abs }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
     <!-- ANA İÇERİK ALANI -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
 
@@ -545,6 +592,39 @@
                 window.location.href = whatsappUrl;
             }
         }
+
+        // Canlı Finans & Piyasa Kurları Otomatik Güncelleme (Her 60 saniyede bir)
+        async function refreshMarketRates() {
+            try {
+                const res = await fetch('/api/market-rates');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data.ok || !data.rates) return;
+                const container = document.getElementById('market-rates-bar');
+                if (!container) return;
+                container.innerHTML = data.rates.map(r => `
+                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition shadow-sm">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="text-base sm:text-lg select-none">${r.icon}</span>
+                            <div>
+                                <div class="font-bold text-slate-200 text-[11px] sm:text-xs leading-tight">${r.name}</div>
+                                <div class="text-[9px] text-slate-400 font-mono hidden sm:block leading-none">${r.symbol}</div>
+                            </div>
+                        </div>
+                        <div class="text-right pl-2">
+                            <div class="font-black text-white text-xs sm:text-sm tracking-tight font-mono leading-tight">
+                                ${r.price} <span class="text-[10px] font-semibold text-slate-400">${r.unit}</span>
+                            </div>
+                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none ${r.direction === 'up' ? 'text-emerald-400' : 'text-red-400'}">
+                                <span>${r.direction === 'up' ? '▲' : '▼'}</span>
+                                <span>%${Math.abs(r.change)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {}
+        }
+        setInterval(refreshMarketRates, 60000);
     </script>
 </body>
 </html>
