@@ -529,8 +529,8 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🕌</span>
                                     <div>
-                                        <div class="font-bold text-slate-200 group-hover:text-amber-400 transition">Namaz Vakitleri</div>
-                                        <div class="text-[10px] text-slate-500">Tüm vakitleri görmek için tıkla</div>
+                                        <div class="font-bold text-slate-200 group-hover:text-amber-400 transition"><span id="card-city-name">İstanbul</span> Namaz Vakitleri</div>
+                                        <div class="text-[10px] text-slate-500">81 İl vakitleri için tıkla</div>
                                     </div>
                                 </div>
                                 <span id="live-namaz-vakti" class="font-mono text-amber-400 font-extrabold text-xs px-2 py-0.5 rounded bg-amber-950/60 border border-amber-500/30">
@@ -553,20 +553,20 @@
                                 </span>
                             </button>
 
-                            <!-- Son Depremler Butonu (Kandilli Canlı) -->
-                            <a href="http://www.koeri.boun.edu.tr/scripts/lst0.asp" target="_blank"
+                             <!-- Son Depremler Butonu (AFAD & Kandilli Resmi Canlı Portalları) -->
+                            <button type="button" onclick="openDepremModal()"
                                 class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🌐</span>
                                     <div>
                                         <div class="font-bold text-slate-200 group-hover:text-sky-400 transition">Son Depremler</div>
-                                        <div class="text-[10px] text-slate-500">Kandilli Rasathanesi Anlık</div>
+                                        <div class="text-[10px] text-slate-500">AFAD & Kandilli Canlı Harita</div>
                                     </div>
                                 </div>
                                 <span class="font-mono text-sky-400 text-xs font-bold flex items-center gap-1">
-                                    Canlı Liste <i data-lucide="external-link" class="w-3 h-3 group-hover:translate-x-0.5 transition"></i>
+                                    Canlı Takip <i data-lucide="chevron-right" class="w-3 h-3 group-hover:translate-x-0.5 transition"></i>
                                 </span>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
@@ -987,7 +987,7 @@
         })();
 
     
-        // Nöbetçi Eczaneler & Namaz Vakitleri Modal Fonksiyonları
+                // Nöbetçi Eczaneler, Deprem & Namaz Vakitleri Modal Fonksiyonları
         function openNobetciModal() {
             document.getElementById('nobetci-modal')?.classList.remove('hidden');
         }
@@ -1000,37 +1000,141 @@
         function closeNamazModal() {
             document.getElementById('namaz-modal')?.classList.add('hidden');
         }
+        function openDepremModal() {
+            document.getElementById('deprem-modal')?.classList.remove('hidden');
+        }
+        function closeDepremModal() {
+            document.getElementById('deprem-modal')?.classList.add('hidden');
+        }
 
-        // Anlık Canlı Namaz Vakti Hesaplayıcı (Türkiye Saatine Göre)
-        function updateLiveNamaz() {
+        // 81 İL DİNAMİK CANLI NAMAZ VAKTİ MOTORU
+        const CITY_OFFSETS = {
+            "Adana": -19, "Adıyaman": -27, "Afyonkarahisar": -5, "Ağrı": -45, "Amasya": -18,
+            "Ankara": -14, "Antalya": -6, "Artvin": -37, "Aydın": 6, "Balıkesir": 4,
+            "Bilecik": -1, "Bingöl": -35, "Bitlis": -42, "Bolu": -8, "Burdur": -5,
+            "Bursa": 1, "Çanakkale": 9, "Çankırı": -14, "Çorum": -18, "Denizli": 3,
+            "Diyarbakır": -34, "Edirne": 6, "Elazığ": -31, "Erzincan": -33, "Erzurum": -39,
+            "Eskişehir": -4, "Gaziantep": -25, "Giresun": -26, "Gümüşhane": -30, "Hakkari": -46,
+            "Hatay": -21, "Isparta": -5, "Mersin": -17, "İstanbul": 0, "İzmir": 6,
+            "Kars": -44, "Kastamonu": -13, "Kayseri": -17, "Kırklareli": 5, "Kırşehir": -15,
+            "Kocaeli": -3, "Konya": -13, "Kütahya": -1, "Malatya": -28, "Manisa": 6,
+            "Kahramanmaraş": -22, "Mardin": -34, "Muğla": 5, "Muş": -39, "Nevşehir": -16,
+            "Niğde": -16, "Ordu": -24, "Rize": -31, "Sakarya": -5, "Samsun": -16,
+            "Siirt": -39, "Sinop": -14, "Sivas": -25, "Tekirdağ": 4, "Tokat": -21,
+            "Trabzon": -28, "Tunceli": -32, "Şanlıurfa": -29, "Uşak": 2, "Van": -48,
+            "Yozgat": -17, "Zonguldak": -7, "Aksaray": -15, "Bayburt": -32, "Karaman": -14,
+            "Kırıkkale": -14, "Batman": -36, "Şırnak": -41, "Bartın": -7, "Ardahan": -42,
+            "Iğdır": -49, "Yalova": 1, "Karabük": -9, "Kilis": -24, "Osmaniye": -20, "Düzce": -7
+        };
+
+        // İstanbul Baz Vakitleri (dakika)
+        const BASE_TIMES = {
+            imsak: 346,  // 05:46
+            gunes: 431,  // 07:11
+            ogle: 774,   // 12:54
+            ikindi: 953, // 15:53
+            aksam: 1105, // 18:25
+            yatsi: 1184  // 19:44
+        };
+
+        function formatMins(m) {
+            let h = Math.floor(m / 60) % 24;
+            let min = Math.floor(m % 60);
+            return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
+        }
+
+        function calculateTimesForCity(cityName) {
+            const offset = CITY_OFFSETS[cityName] !== undefined ? CITY_OFFSETS[cityName] : 0;
+            return {
+                imsak: BASE_TIMES.imsak + offset,
+                gunes: BASE_TIMES.gunes + offset,
+                ogle: BASE_TIMES.ogle + offset,
+                ikindi: BASE_TIMES.ikindi + offset,
+                aksam: BASE_TIMES.aksam + offset,
+                yatsi: BASE_TIMES.yatsi + offset
+            };
+        }
+
+        function updateNamazDisplay(cityName) {
+            const times = calculateTimesForCity(cityName);
             const now = new Date();
-            const hours = now.getHours();
-            const mins = now.getMinutes();
-            const totalMins = hours * 60 + mins;
+            const totalNow = now.getHours() * 60 + now.getMinutes();
 
-            // İstanbul Güncel Vakitler (dakika cinsinden):
-            // İmsak: 05:46 (346 dk), Güneş: 07:11 (431 dk), Öğle: 12:54 (774 dk)
-            // İkindi: 15:53 (953 dk), Akşam: 18:25 (1105 dk), Yatsı: 19:44 (1184 dk)
-            let vText = 'Yatsı 19:44';
-            if (totalMins >= 346 && totalMins < 431) {
-                vText = 'İmsak 05:46';
-            } else if (totalMins >= 431 && totalMins < 774) {
-                vText = 'Güneş 07:11';
-            } else if (totalMins >= 774 && totalMins < 953) {
-                vText = 'Öğle 12:54';
-            } else if (totalMins >= 953 && totalMins < 1105) {
-                vText = 'İkindi 15:53';
-            } else if (totalMins >= 1105 && totalMins < 1184) {
-                vText = 'Akşam 18:25';
+            // Set grid labels
+            if (document.getElementById('v-imsak')) document.getElementById('v-imsak').innerText = formatMins(times.imsak);
+            if (document.getElementById('v-gunes')) document.getElementById('v-gunes').innerText = formatMins(times.gunes);
+            if (document.getElementById('v-ogle')) document.getElementById('v-ogle').innerText = formatMins(times.ogle);
+            if (document.getElementById('v-ikindi')) document.getElementById('v-ikindi').innerText = formatMins(times.ikindi);
+            if (document.getElementById('v-aksam')) document.getElementById('v-aksam').innerText = formatMins(times.aksam);
+            if (document.getElementById('v-yatsi')) document.getElementById('v-yatsi').innerText = formatMins(times.yatsi);
+
+            // Determine active vakit
+            let activeName = 'Yatsı';
+            let activeTimeStr = formatMins(times.yatsi);
+            let activeBoxId = 'v-yatsi-box';
+
+            if (totalNow >= times.imsak && totalNow < times.gunes) {
+                activeName = 'İmsak';
+                activeTimeStr = formatMins(times.imsak);
+                activeBoxId = 'v-imsak-box';
+            } else if (totalNow >= times.gunes && totalNow < times.ogle) {
+                activeName = 'Güneş';
+                activeTimeStr = formatMins(times.gunes);
+                activeBoxId = 'v-gunes-box';
+            } else if (totalNow >= times.ogle && totalNow < times.ikindi) {
+                activeName = 'Öğle';
+                activeTimeStr = formatMins(times.ogle);
+                activeBoxId = 'v-ogle-box';
+            } else if (totalNow >= times.ikindi && totalNow < times.aksam) {
+                activeName = 'İkindi';
+                activeTimeStr = formatMins(times.ikindi);
+                activeBoxId = 'v-ikindi-box';
+            } else if (totalNow >= times.aksam && totalNow < times.yatsi) {
+                activeName = 'Akşam';
+                activeTimeStr = formatMins(times.aksam);
+                activeBoxId = 'v-aksam-box';
             } else {
-                vText = 'Yatsı 19:44';
+                activeName = 'Yatsı';
+                activeTimeStr = formatMins(times.yatsi);
+                activeBoxId = 'v-yatsi-box';
             }
 
-            const el = document.getElementById('live-namaz-vakti');
-            if (el) el.innerText = vText;
+            // Update card pill
+            const cardPill = document.getElementById('live-namaz-vakti');
+            if (cardPill) cardPill.innerText = activeName + ' ' + activeTimeStr;
+
+            const cardCity = document.getElementById('card-city-name');
+            if (cardCity) cardCity.innerText = cityName;
+
+            // Highlight in modal
+            ['v-imsak-box', 'v-gunes-box', 'v-ogle-box', 'v-ikindi-box', 'v-aksam-box', 'v-yatsi-box'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === activeBoxId) {
+                        el.className = 'p-2.5 rounded-xl bg-amber-950/80 border border-amber-500/60 flex items-center justify-between text-amber-300 font-extrabold shadow-sm';
+                    } else {
+                        el.className = 'p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between';
+                    }
+                }
+            });
         }
-        updateLiveNamaz();
-        setInterval(updateLiveNamaz, 60000);
+
+        window.changeNamazCity = function(city) {
+            localStorage.setItem('user_namaz_city', city);
+            updateNamazDisplay(city);
+        };
+
+        // Init on load
+        (function() {
+            const savedCity = localStorage.getItem('user_namaz_city') || 'İstanbul';
+            const sel = document.getElementById('namaz-city-select');
+            if (sel) sel.value = savedCity;
+            updateNamazDisplay(savedCity);
+            setInterval(() => {
+                const cur = localStorage.getItem('user_namaz_city') || 'İstanbul';
+                updateNamazDisplay(cur);
+            }, 60000);
+        })();
 
     </script>
 

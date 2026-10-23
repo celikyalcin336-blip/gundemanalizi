@@ -25,16 +25,13 @@ os.makedirs(ASSETS_DIR, exist_ok=True)
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - İlk açılışta sitede haber yoksa hemen 5-6 haber çeker.
+    - İlk açılışta hemen 1 taze haber çeker (Otomobil, Teknoloji, Ekonomi döngüsünü başlatır).
     - Her CHECK_INTERVAL_MINUTES dakikada bir otomatik haber tarayıp siteye ve Telegram'a atar.
     """
-    time.sleep(3)
-    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi.")
+    time.sleep(5)
+    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi, ilk haber taranıyor...")
     try:
-        articles = database.get_articles(limit=10)
-        if len(articles) < 5:
-            print("🌱 [Otonom Bot] Site için başlangıç haberleri yükleniyor...")
-            main.run_bot(max_items=5)
+        main.run_bot(max_items=1)
     except Exception as e:
         print(f"❌ Başlangıç bot hatası: {e}")
 
