@@ -115,16 +115,16 @@
         body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-10">
 
-    <!-- ÜST BİLGİ & SON DAKİKA CANLI BANDI (STICKY OKUYUCUYLA İNER) -->
-    <div class="sticky top-0 z-50 bg-gradient-to-r from-red-800 via-red-900 to-slate-950 text-white text-xs sm:text-sm font-semibold py-2 px-4 shadow-xl border-b border-red-950/70 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+    <!-- 100% FIXED ÜST BİLGİ & SON DAKİKA CANLI BANDI (MOBİLDE VE PC'DE ASLA KAYBOLMAZ) -->
+    <div id="floating-breaking-bar" class="fixed top-0 left-0 right-0 w-full z-50 bg-slate-950/95 backdrop-blur-md text-white text-xs sm:text-sm border-b border-red-900/60 shadow-2xl h-10 flex items-center">
+        <div class="max-w-7xl mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 overflow-hidden flex-1 min-w-0">
-                <span class="inline-flex items-center gap-1.5 bg-red-950/90 border border-red-400/30 px-2.5 py-0.5 rounded-full text-red-100 font-extrabold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0 shadow-sm">
+                <span class="inline-flex items-center gap-1.5 bg-red-600 px-2.5 py-0.5 rounded-full text-white font-extrabold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0 shadow-sm">
                     <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-300"></span>
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                     </span>
                     SON DAKİKA
                 </span>
@@ -688,6 +688,23 @@
                 items[idx].classList.add('opacity-100', 'translate-y-0');
             }
         })();
+
+        // Yukarı Çık Buton Görünürlüğü (Mobilde ve PC'de)
+        const bttBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 350) {
+                bttBtn?.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                bttBtn?.classList.add('opacity-100', 'translate-y-0');
+            } else {
+                bttBtn?.classList.remove('opacity-100', 'translate-y-0');
+                bttBtn?.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            }
+        });
     </script>
+
+    <!-- MOBİL & MASAÜSTÜ YUKARI ÇIK BUTONU -->
+    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-5 z-40 p-3 rounded-full bg-red-600/90 hover:bg-red-500 text-white shadow-2xl border border-red-400/40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center justify-center" title="Yukarı Çık">
+        <i data-lucide="chevron-up" class="w-5 h-5"></i>
+    </button>
 </body>
 </html>
