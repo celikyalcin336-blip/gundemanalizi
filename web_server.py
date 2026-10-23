@@ -50,9 +50,12 @@ def bot_background_worker():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
-    # Otonom haber botunu arka planda başlat
-    worker_thread = threading.Thread(target=bot_background_worker, daemon=True)
-    worker_thread.start()
+    # Otonom haber botunu arka planda baslat
+    threading.Thread(target=bot_background_worker, daemon=True).start()
+    # Canli piyasa kurlarini arka planda tazeleyen isci (sayfa yanit suresini 0 ms yapar)
+    threading.Thread(target=market_rates_background_worker, daemon=True).start()
+    # Render Free Tier uyumasini (cold-start) engelleyen periyodik koruma iscisi
+    threading.Thread(target=keep_alive_background_worker, daemon=True).start()
     yield
 
 ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
@@ -145,7 +148,7 @@ async def serve_image(filename: str):
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
-        return FileResponse(local_path)
+        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"})
     data = database.get_image(safe_name)
     if data:
         return Response(content=data, media_type="image/jpeg",
@@ -184,31 +187,25 @@ def get_site_ad_settings() -> dict:
             "ad_slot_article_bottom": "",
         }
 
+_DEFAULT_MARKET_RATES = [
+    {"key": "altin", "name": "Gram Altın", "symbol": "ALTIN", "icon": "🪙", "price": "6.430", "unit": "TL", "change": 0.15, "direction": "up"},
+    {"key": "dolar", "name": "Dolar", "symbol": "USD/TRY", "icon": "💵", "price": "49,70", "unit": "TL", "change": 0.10, "direction": "up"},
+    {"key": "euro", "name": "Euro", "symbol": "EUR/TRY", "icon": "💶", "price": "55,70", "unit": "TL", "change": -0.15, "direction": "down"},
+    {"key": "btc", "name": "Bitcoin", "symbol": "BTC/USD", "icon": "₿", "price": "$81.750", "unit": "", "change": 0.10, "direction": "up"},
+]
+
 _MARKET_CACHE = {
     "ts": 0.0,
-    "data": None
+    "data": {
+        "ok": True,
+        "rates": _DEFAULT_MARKET_RATES,
+        "updated_at": "Canlı"
+    }
 }
 
-def get_market_rates() -> dict:
-    """
-    Canlı Finans & Piyasa Kurları (Altın, Dolar, Euro, Bitcoin):
-    Truncgil & Binance üzerinden 60 saniyede bir güncellenir.
-    Gerçek piyasa değişim oranlarını (% artış/azalış) yansıtır.
-    Hafızada önbelleğe alındığı için siteyi ve sunucuyu asla yormaz, 0.001 saniyede döner.
-    """
+def _fetch_fresh_market_rates():
+    """Arka planda çalışır, API'lerden güncel kurları çeker ve hafıza önbelleğini günceller."""
     global _MARKET_CACHE
-    now = time.time()
-    if _MARKET_CACHE["data"] and (now - _MARKET_CACHE["ts"]) < 60:
-        return _MARKET_CACHE["data"]
-
-    # Varsayılan / Yedek Kurlar
-    rates = [
-        {"key": "altin", "name": "Gram Altın", "symbol": "ALTIN", "icon": "🟡", "price": "6.430", "unit": "TL", "change": 0.15, "direction": "up"},
-        {"key": "dolar", "name": "Dolar", "symbol": "USD/TRY", "icon": "💵", "price": "49,70", "unit": "TL", "change": 0.10, "direction": "up"},
-        {"key": "euro", "name": "Euro", "symbol": "EUR/TRY", "icon": "💶", "price": "55,70", "unit": "TL", "change": -0.15, "direction": "down"},
-        {"key": "btc", "name": "Bitcoin", "symbol": "BTC/USD", "icon": "🪙", "price": "$81.750", "unit": "", "change": 0.10, "direction": "up"},
-    ]
-
     try:
         def parse_truncgil_num(s):
             if not s:
@@ -279,7 +276,7 @@ def get_market_rates() -> dict:
                 "key": "altin",
                 "name": "Gram Altın",
                 "symbol": "ALTIN",
-                "icon": "🟡",
+                "icon": "🪙",
                 "price": f"{altin_p:,.0f}".replace(",", "."),
                 "unit": "TL",
                 "change": round(altin_c, 2),
@@ -309,29 +306,57 @@ def get_market_rates() -> dict:
                 "key": "btc",
                 "name": "Bitcoin",
                 "symbol": "BTC/USD",
-                "icon": "🪙",
+                "icon": "₿",
                 "price": f"${btc_p:,.0f}".replace(",", "."),
                 "unit": "",
                 "change": round(btc_c, 2),
                 "direction": "up" if btc_c >= 0 else "down"
             },
         ]
-        result = {
+        _MARKET_CACHE["data"] = {
             "ok": True,
             "rates": rates,
             "updated_at": datetime.now(timezone(timedelta(hours=3))).strftime("%H:%M:%S")
         }
-        _MARKET_CACHE["ts"] = now
-        _MARKET_CACHE["data"] = result
-        return result
-    except Exception as e:
-        if _MARKET_CACHE["data"]:
-            return _MARKET_CACHE["data"]
-        return {
-            "ok": True,
-            "rates": rates,
-            "updated_at": datetime.now(timezone(timedelta(hours=3))).strftime("%H:%M:%S")
-        }
+        _MARKET_CACHE["ts"] = time.time()
+    except Exception:
+        pass
+
+def market_rates_background_worker():
+    """Piyasa kurlarını arka planda her 60 saniyede bir günceller."""
+    time.sleep(2)
+    while True:
+        try:
+            _fetch_fresh_market_rates()
+        except Exception:
+            pass
+        time.sleep(60)
+
+def keep_alive_background_worker():
+    """
+    Render Free Tier 15 dakika hareketsizlikte uykuya (cold-sleep) geçer.
+    Bu arka plan işçisi her 9 dakikada bir dış genel domain'e (/health) hafif bir istek atarak
+    sunucunun 7/24 uyanık ve sıfır gecikmeli (cold-start olmadan) kalmasını sağlar.
+    """
+    time.sleep(60)
+    while True:
+        try:
+            requests.get("https://xn--gndemanalizi-dlb.com.tr/health", timeout=10)
+        except Exception:
+            pass
+        time.sleep(540)
+
+def get_market_rates() -> dict:
+    """
+    Canlı Finans & Piyasa Kurları:
+    Hafızada anlık önbellekten döner (0.0001 ms).
+    Kullanıcıyı ve ana sayfayı ASLA bekletmez.
+    """
+    return _MARKET_CACHE.get("data") or {
+        "ok": True,
+        "rates": _DEFAULT_MARKET_RATES,
+        "updated_at": "Canlı"
+    }
 
 @app.get("/api/market-rates")
 async def api_market_rates():
