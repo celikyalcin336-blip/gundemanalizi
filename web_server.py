@@ -936,6 +936,37 @@ async def submit_ihbar(
     threading.Thread(target=_bg_send, daemon=True).start()
     return {"ok": True, "message": "İhbarınız ve medyanız Haber Merkezimize başarıyla iletildi! Teşekkür ederiz."}
 
+def extract_clean_highlights(content: str, summary: str, title: str) -> list:
+    """Haberin içinden tam, anlamlı ve kesilmemiş 2-3 adet madde/özet çıkarır."""
+    import re, html
+    paras = re.findall(r'<p[^>]*>(.*?)</p>', content or "", flags=re.DOTALL)
+    bullets = []
+
+    # 1. İçerik paragraflarından tam cümleleri al
+    if paras:
+        for p in paras:
+            clean_p = re.sub(r'<[^>]+>', '', p).strip()
+            clean_p = html.unescape(clean_p)
+            if any(b in clean_p.lower() for b in ['gündem analizi değerlendirmesi', 'piyasalar ve kamuoyu', 'abone olun', 'tıklayınız', 'fotoğraf:']):
+                continue
+            # Noktalama ile biten tam cümlelere böl
+            sents = [s.strip() for s in re.split(r'(?<=[.!?])\s+', clean_p) if len(s.strip()) > 35]
+            for s in sents:
+                if (s.endswith(('.', '!', '?')) or s.endswith('."') or s.endswith('".')) and s not in bullets and s.lower() != title.lower():
+                    bullets.append(s)
+                    if len(bullets) >= 3:
+                        break
+            if len(bullets) >= 3:
+                break
+
+    # 2. Eğer içerikten tam cümle çıkmadıysa ve summary tam bir cümle ise onu ekle
+    if not bullets and summary:
+        clean_sum = html.unescape(summary.strip())
+        if clean_sum.endswith(('.', '!', '?')) and len(clean_sum) > 30 and clean_sum.lower() != title.lower():
+            bullets.append(clean_sum)
+
+    return bullets[:3]
+
 @app.api_route("/haber/{slug}", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
     article = database.get_article_by_slug(slug)
@@ -958,12 +989,16 @@ async def article_detail(request: Request, slug: str):
     word_count = len(text_content.split())
     reading_time_min = max(1, round(word_count / 140))
 
+    # Kesilmeyen tam özet maddeleri
+    highlights = extract_clean_highlights(article.get("content", ""), article.get("summary", ""), article.get("title", ""))
+
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     return templates.TemplateResponse(
         request=request,
         name="article.html",
         context={
             "article": article,
+            "highlights": highlights,
             "related_articles": related_articles,
             "other_articles": other_articles,
             "breaking_news": breaking_news,

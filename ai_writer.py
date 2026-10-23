@@ -207,7 +207,7 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
                     if res and res.text:
                         return {
                             "title": title,
-                            "summary": summary[:200] if summary else title,
+                            "summary": summary if summary else title,
                             "content": res.text.strip(),
                             "category": category
                         }
@@ -289,7 +289,7 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
 
     return {
         "title": title,
-        "summary": lead_para[:200],
+        "summary": lead_para,
         "content": content_html,
         "category": category
     }
