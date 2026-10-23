@@ -1067,18 +1067,19 @@ async def article_detail(request: Request, slug: str):
         }
     )
 
+@app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
+@app.get("/kunye", response_class=HTMLResponse)
 async def about_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
 
-@app.get("/kunye", response_class=HTMLResponse)
-async def kunye_page(request: Request):
-    return templates.TemplateResponse(request=request, name="about.html", context={})
-
+@app.get("/privacy", response_class=HTMLResponse)
 @app.get("/gizlilik-politikasi", response_class=HTMLResponse)
+@app.get("/gizlilik", response_class=HTMLResponse)
 async def privacy_page(request: Request):
     return templates.TemplateResponse(request=request, name="privacy.html", context={})
 
+@app.get("/contact", response_class=HTMLResponse)
 @app.get("/iletisim", response_class=HTMLResponse)
 async def contact_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
