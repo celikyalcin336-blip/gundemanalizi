@@ -162,7 +162,7 @@ UYULMASI ZORUNLU KURALLAR:
         "source_used": "Corporate Template"
     }
 
-def generate_full_article(title: str, summary: str, source: str) -> dict:
+def generate_full_article(title: str, summary: str, source: str, force_category: str = None) -> dict:
     """
     Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
     """
@@ -170,14 +170,33 @@ def generate_full_article(title: str, summary: str, source: str) -> dict:
     title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
-    category = "Gündem"
-    lower_title = title.lower()
-    if any(k in lower_title for k in ["faiz", "enflasyon", "borsa", "dolar", "bakan şimşek", "ekonomi", "zam", "vergi"]):
+    lower_all = f"{title} {summary}".lower()
+    if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Sağlık", "Dünya", "Spor", "Gündem"]:
+        category = force_category
+    elif any(k in lower_all for k in ["otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg", "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd", "renault", "fiat", "peugeot", "skoda"]):
+        category = "Otomobil"
+    elif any(k in lower_all for k in ["yapay zeka", "chatgpt", "openai", "gemini", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "akıllı telefon", "ios", "yazılım", "donanım"]):
+        category = "Teknoloji"
+    elif any(k in lower_all for k in ["sağlık", "hastane", "grip", "aşı", "beslenme", "diyet", "kolesterol", "tansiyon", "kanser", "tedavi", "ilaç", "check-up", "kalp sağlığı", "doktor", "mhrs", "sağlık bakanlığı"]):
+        category = "Sağlık"
+    elif any(k in lower_all for k in ["faiz", "enflasyon", "borsa", "dolar", "euro", "bakan şimşek", "ekonomi", "zam", "vergi", "mevduat", "asgari ücret", "emekli", "promosyon", "altın", "akaryakıt", "benzin"]):
         category = "Ekonomi"
-    elif any(k in lower_title for k in ["savaş", "abd", "rusya", "israil", "avrupa", "gazze", "iran", "dünya"]):
-        category = "Dünya"
-    elif any(k in lower_title for k in ["maç", "futbol", "fenerbahçe", "galatasaray", "beşiktaş", "şampiyon"]):
+    elif any(k in lower_all for k in ["maç", "futbol", "fenerbahçe", "galatasaray", "beşiktaş", "şampiyon", "süper lig", "uefa", "transfer"]):
         category = "Spor"
+    elif any(k in lower_all for k in ["savaş", "abd", "rusya", "israil", "avrupa", "gazze", "iran", "dünya", "nato", "ukrayna", "çin"]):
+        category = "Dünya"
+    else:
+        category = "Gündem"
+
+    category_guide = ""
+    if category == "Otomobil":
+        category_guide = "Bu bir OTOMOBİL & KAMPANYA haberidir. Kampanya şartları, fiyatlar, faizsiz kredi/taksit seçenekleri, model özellikleri ve tüketicinin nasıl yararlanacağını açıkça vurgula."
+    elif category == "Teknoloji":
+        category_guide = "Bu bir TEKNOLOJİ & YAPAY ZEKA haberidir. Cihazın veya teknolojinin öne çıkan özellikleri, tahmini/kesin Türkiye fiyatı, çıkış tarihi ve günlük hayattaki faydalarını tüketici odaklı anlat."
+    elif category == "Sağlık":
+        category_guide = "Bu bir SAĞLIK & YAŞAM haberidir. Belirtileri, uzman tavsiyelerini ve dikkat edilmesi gereken noktaları güvenilir ve bilgilendirici bir dille anlat."
+    elif category == "Ekonomi":
+        category_guide = "Bu bir EKONOMİ & FİNANS haberidir. Rakamları, piyasa oranlarını ve vatandaşın bütçesine/cüzdanına yansımalarını somut verilerle açıkla."
 
     if config.GEMINI_API_KEY:
         try:
@@ -190,6 +209,8 @@ Aşağıdaki haber için tarafsız, profesyonel, okuyucu dostu bir Türkçe habe
 Başlık: {title}
 Özet Bilgi: {summary}
 Kaynak: {source}
+Kategori: {category}
+Özel Talimat: {category_guide}
 
 İstenen Format:
 - Giriş: Haberin ana gelişmesini anlatan çarpıcı bir paragraf.

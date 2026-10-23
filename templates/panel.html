@@ -544,7 +544,10 @@
                                     <option value="Ekonomi">Ekonomi</option>
                                     <option value="Dünya">Dünya</option>
                                     <option value="Spor">Spor</option>
-                                </select>
+                                    <option value="Otomobil">Otomobil</option>
+    <option value="Teknoloji">Teknoloji</option>
+    <option value="Sağlık">Sağlık</option>
+</select>
                             </div>
                             <div>
                                 <label class="block text-slate-400 font-semibold mb-1">Başlangıç (Kırp)</label>
@@ -846,7 +849,9 @@
                         <option value="Dünya">Dünya</option>
                         <option value="Spor">Spor</option>
                         <option value="Teknoloji">Teknoloji</option>
-                    </select>
+                        <option value="Otomobil">Otomobil</option>
+    <option value="Sağlık">Sağlık</option>
+</select>
                 </div>
             </div>
             <div>
@@ -996,7 +1001,13 @@
                     </div>
 
                     <div>
-                        <label class="block text-slate-300 font-bold mb-1">3. Haber Detay Altı Reklam (Metin Sonu)</label>
+                        <label class="block text-slate-300 font-bold mb-1">3. Haber İçi (Paragraf Arası) Reklam Kodu</label>
+                        <textarea id="ad-slot-art-mid" rows="2" placeholder="2. paragraftan sonra okuyucunun tam göz hizasında çıkacak AdSense veya sponsor reklam kodu..."
+                            class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 font-bold mb-1">4. Haber Detay Altı Reklam (Metin Sonu)</label>
                         <textarea id="ad-slot-art-bot" rows="2" placeholder="Haber metninin bitiminde çıkacak AdSense veya sponsor reklam kodu..."
                             class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white font-mono text-xs focus:border-amber-500 focus:outline-none"></textarea>
                     </div>
@@ -1182,6 +1193,7 @@
                     document.getElementById('ad-ads-txt').value = s.ads_txt_content || '';
                     document.getElementById('ad-slot-top').value = s.ad_slot_top || '';
                     document.getElementById('ad-slot-art-top').value = s.ad_slot_article_top || '';
+                    document.getElementById('ad-slot-art-mid').value = s.ad_slot_article_mid || '';
                     document.getElementById('ad-slot-art-bot').value = s.ad_slot_article_bottom || '';
                 }
             } catch (e) {
@@ -1210,6 +1222,7 @@
                 ads_txt_content: document.getElementById('ad-ads-txt').value.trim(),
                 ad_slot_top: document.getElementById('ad-slot-top').value.trim(),
                 ad_slot_article_top: document.getElementById('ad-slot-art-top').value.trim(),
+                ad_slot_article_mid: document.getElementById('ad-slot-art-mid').value.trim(),
                 ad_slot_article_bottom: document.getElementById('ad-slot-art-bot').value.trim()
             };
 

@@ -279,17 +279,41 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
             score += 25
             break
 
-    # 3. DİJİTAL & TEKNOLOJİ TÜKETİCİSİ (+20 Puan)
+        # 3. OTOMOBİL & TAŞIT KAMPANYALARI (+35 Puan)
+    oto_keywords = [
+        "otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg",
+        "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi",
+        "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd",
+        "renault", "fiat", "peugeot", "skoda", "indirimli fiyat"
+    ]
+    for kw in oto_keywords:
+        if kw in text:
+            score += 35
+            break
+
+    # 4. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+30 Puan)
     tekno_keywords = [
         "whatsapp", "instagram", "apple", "iphone", "android", "telefon",
-        "dolandırıcılık", "oltalama", "yapay zeka", "tiktok", "sosyal medya"
+        "dolandırıcılık", "oltalama", "yapay zeka", "chatgpt", "openai", "gemini",
+        "samsung", "galaxy", "nvidia", "işlemci", "akıllı telefon", "ios", "güncelleme"
     ]
     for kw in tekno_keywords:
         if kw in text:
-            score += 20
+            score += 30
             break
 
-    # 4. BÜYÜK AFETLER & HAVA DURUMU (+30 Puan)
+    # 5. SAĞLIK & BESLENME (+30 Puan)
+    saglik_keywords = [
+        "sağlık bakanlığı", "grip", "aşı", "beslenme", "diyet", "kolesterol",
+        "tansiyon", "kanser", "tedavi", "ilaç", "check-up", "kalp sağlığı",
+        "bağışıklık", "vitamin", "doktor"
+    ]
+    for kw in saglik_keywords:
+        if kw in text:
+            score += 30
+            break
+
+# 4. BÜYÜK AFETLER & HAVA DURUMU (+30 Puan)
     afet_keywords = ["deprem", "kandilli", "afad", "fırtına", "meteoroloji", "sarı kod", "turuncu kod"]
     for kw in afet_keywords:
         if kw in text:
@@ -349,6 +373,7 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
                     if image_url:
                         score += 10
 
+                    feed_cat = feed_info.get("category", "Gündem")
                     unposted_news.append({
                         "hash": news_hash,
                         "title": title,
@@ -356,6 +381,7 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
                         "link": link,
                         "image_url": image_url,
                         "source": feed_name,
+                        "category": feed_cat,
                         "published": published,
                         "score": score
                     })

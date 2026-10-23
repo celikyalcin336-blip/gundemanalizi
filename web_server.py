@@ -173,6 +173,7 @@ def get_site_ad_settings() -> dict:
             "ads_txt_content": database.get_setting("ads_txt_content", "") or "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": database.get_setting("ad_slot_top", ""),
             "ad_slot_article_top": database.get_setting("ad_slot_article_top", ""),
+            "ad_slot_article_mid": database.get_setting("ad_slot_article_mid", ""),
             "ad_slot_article_bottom": database.get_setting("ad_slot_article_bottom", ""),
         }
     except Exception:
@@ -184,6 +185,7 @@ def get_site_ad_settings() -> dict:
             "ads_txt_content": "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": "",
             "ad_slot_article_top": "",
+            "ad_slot_article_mid": "",
             "ad_slot_article_bottom": "",
         }
 
@@ -908,6 +910,7 @@ async def save_panel_ad_settings(request: Request):
         "ads_txt_content",
         "ad_slot_top",
         "ad_slot_article_top",
+        "ad_slot_article_mid",
         "ad_slot_article_bottom"
     ]
     for k in keys:
@@ -1017,12 +1020,27 @@ async def article_detail(request: Request, slug: str):
     # Kesilmeyen tam özet maddeleri
     highlights = extract_clean_highlights(article.get("content", ""), article.get("summary", ""), article.get("title", ""))
 
+    ad_settings = get_site_ad_settings()
+    ad_mid = ad_settings.get("ad_slot_article_mid", "").strip() if ad_settings.get("ads_enabled") else ""
+    raw_content = article.get("content", "")
+    if ad_mid and "</p>" in raw_content:
+        parts = raw_content.split("</p>")
+        if len(parts) >= 3:
+            mid_banner = f'''</p>
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+                <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
+                <div class="w-full flex justify-center items-center overflow-hidden">
+                    {ad_mid}
+                </div>
+            </div>'''
+            raw_content = "</p>".join(parts[:2]) + mid_banner + "</p>".join(parts[2:])
+
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     return templates.TemplateResponse(
         request=request,
         name="article.html",
         context={
-            "article": article,
+            "article": {**article, "content": raw_content},
             "highlights": highlights,
             "related_articles": related_articles,
             "other_articles": other_articles,

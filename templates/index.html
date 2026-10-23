@@ -173,12 +173,16 @@
             </a>
 
             <!-- Kategoriler & Sosyal Bağlantı -->
-            <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-300">
-                <a href="/" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if not active_category else '' }}">Tümü</a>
-                <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Gündem' else '' }}">Gündem</a>
-                <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Ekonomi' else '' }}">Ekonomi</a>
-                <a href="/?kategori=Dünya" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Dünya' else '' }}">Dünya</a>
-                <a href="/?kategori=Spor" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Spor' else '' }}">Spor</a>
+                        <!-- Kategoriler & Sosyal Bağlantı -->
+            <nav class="hidden lg:flex items-center gap-0.5 text-xs xl:text-sm font-medium text-slate-300">
+                <a href="/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if not active_category else '' }}">Tümü</a>
+                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Gündem' else '' }}">Gündem</a>
+                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Ekonomi' else '' }}">Ekonomi</a>
+                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Otomobil' else '' }}">Otomobil</a>
+                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Teknoloji' else '' }}">Teknoloji</a>
+                <a href="/?kategori=Sağlık" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Sağlık' else '' }}">Sağlık</a>
+                <a href="/?kategori=Dünya" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Dünya' else '' }}">Dünya</a>
+                <a href="/?kategori=Spor" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800/60 transition {{ 'text-red-500 font-bold' if active_category == 'Spor' else '' }}">Spor</a>
             </nav>
 
             <div class="flex items-center gap-2">
@@ -293,12 +297,16 @@
             </div>
         </div>
 
-        <!-- Kategori Filtresi (Mobil İçin) -->
-        <div class="flex md:hidden gap-2 overflow-x-auto pb-4 mb-4 text-xs font-semibold no-scrollbar">
+        <!-- Kategori Filtresi (Mobil İçin Kaydırılabilir Bant) -->
+        <div class="flex lg:hidden gap-1.5 overflow-x-auto pb-3 mb-4 text-xs font-semibold no-scrollbar">
             <a href="/" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if not active_category else 'bg-slate-800 text-slate-300' }}">Tümü</a>
             <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Gündem' else 'bg-slate-800 text-slate-300' }}">Gündem</a>
             <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Ekonomi' else 'bg-slate-800 text-slate-300' }}">Ekonomi</a>
+            <a href="/?kategori=Otomobil" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Otomobil' else 'bg-slate-800 text-slate-300' }}">🚗 Otomobil</a>
+            <a href="/?kategori=Teknoloji" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Teknoloji' else 'bg-slate-800 text-slate-300' }}">🚀 Teknoloji</a>
+            <a href="/?kategori=Sağlık" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Sağlık' else 'bg-slate-800 text-slate-300' }}">🩺 Sağlık</a>
             <a href="/?kategori=Dünya" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Dünya' else 'bg-slate-800 text-slate-300' }}">Dünya</a>
+            <a href="/?kategori=Spor" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if active_category == 'Spor' else 'bg-slate-800 text-slate-300' }}">Spor</a>
         </div>
 
         {% if not articles or articles|length == 0 %}

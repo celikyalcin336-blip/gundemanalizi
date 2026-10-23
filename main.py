@@ -50,7 +50,8 @@ def process_single_news(item: dict) -> bool:
     telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
     ai_result = ai_writer.generate_social_caption(title, summary, source)
     social_caption = ai_result["caption"]
-    article_data = ai_writer.generate_full_article(title, summary, source)
+    item_category = item.get("category")
+    article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
     category = article_data.get("category", "Gündem")
     print(f"   [Kategori: {category} | Telegram Metni Hazır]")
 
@@ -118,7 +119,7 @@ def process_single_news(item: dict) -> bool:
     return True
 
 def run_bot(max_items: int = 1):
-    """Gündemi kontrol edip en güncel haberleri paylaşır."""
+    """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
     news_items = news_fetcher.fetch_latest_news(limit_per_feed=3)
 
@@ -126,45 +127,37 @@ def run_bot(max_items: int = 1):
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
         return 0
 
-    print(f"🎯 Paylaşılmaya hazır {len(news_items)} yeni haber tespit edildi.")
-    processed_count = 0
+    print(f"📡 Paylaşılmaya hazır {len(news_items)} yeni haber tespit edildi.")
 
-    for item in news_items[:max_items]:
+    # 4 Yüksek Gelirli Kategori Döngüsü (Otomobil -> Teknoloji -> Ekonomi -> Sağlık)
+    ROTATION = ["Otomobil", "Teknoloji", "Ekonomi", "Sağlık"]
+    last_cat = database.get_setting("last_bot_category", "")
+    try:
+        next_idx = (ROTATION.index(last_cat) + 1) % len(ROTATION) if last_cat in ROTATION else 0
+    except Exception:
+        next_idx = 0
+    target_cat = ROTATION[next_idx]
+    print(f"🎯 Hedef Kategori Sırası: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
+
+    # Hedef kategoriden bekleyen haberleri filtrele
+    target_items = [item for item in news_items if item.get("category") == target_cat]
+    if target_items:
+        selected_pool = target_items
+        print(f"✅ [{target_cat}] kategorisinden {len(target_items)} adet güncel haber bulundu.")
+    else:
+        print(f"⚠️ [{target_cat}] kategorisinde henüz yeni haber yok, en yüksek puanlı alternatif seçiliyor...")
+        selected_pool = news_items
+
+    processed_count = 0
+    for item in selected_pool[:max_items]:
         try:
             success = process_single_news(item)
             if success:
                 processed_count += 1
+                cat_saved = item.get("category") or target_cat
+                database.set_setting("last_bot_category", cat_saved)
                 time.sleep(2)
         except Exception as e:
             print(f"❌ Haber işlenirken hata oluştu: {e}")
 
     return processed_count
-
-def main():
-    parser = argparse.ArgumentParser(description="Otonom Sosyal Medya Haber Botu (Facebook & Instagram)")
-    parser.add_argument("--loop", action="store_true", help="Sürekli arka planda döngü olarak çalıştır")
-    parser.add_argument("--count", type=int, default=1, help="Tek seferde paylaşılacak maksimum haber sayısı (Varsayılan: 1)")
-    args = parser.parse_args()
-
-    database.init_db()
-
-    print("\n" + "#"*60)
-    print("🤖 Otonom Sosyal Medya Haber Botu Başlatıldı")
-    print(f"⚙️  Dry Run Modu: {'AÇIK (Test Modu - Gerçek Paylaşım Yapılmaz)' if config.DRY_RUN else 'KAPALI (CANLI PAYLAŞIM MODU)'}")
-    print("#"*60)
-
-    if args.loop:
-        print(f"⏱️  Döngü Modu Aktif: Her {config.CHECK_INTERVAL_MINUTES} dakikada bir kontrol edilecek.\n")
-        while True:
-            try:
-                run_bot(max_items=args.count)
-            except Exception as e:
-                print(f"⚠️  Döngü sırasında beklenmeyen bir hata oluştu: {e}")
-            print(f"\n💤 {config.CHECK_INTERVAL_MINUTES} dakika bekleniyor... (Durdurmak için Ctrl+C)")
-            time.sleep(config.CHECK_INTERVAL_MINUTES * 60)
-    else:
-        run_bot(max_items=args.count)
-        print("\n✨ Görev tamamlandı.")
-
-if __name__ == "__main__":
-    main()

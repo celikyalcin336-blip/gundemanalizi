@@ -48,63 +48,111 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 # Resim Barındırma
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID", "")
 
-# RSS Kaynakları (Ekonomi, Tüketici, Taksit, Finans ve Sıcak Gündem Odaklı Seçkin Medya Havuzu)
+# RSS Kaynakları (Otomobil, Teknoloji, Ekonomi, Sağlık ve Sıcak Gündem Odaklı Yüksek Gelirli Medya Havuzu)
 RSS_FEEDS = [
+    # 🚗 OTOMOBİL & KAMPANYALAR (Yüksek Tık & Gelir Değeri)
     {
-        "name": "Ensonhaber Ekonomi",
-        "url": "https://www.ensonhaber.com/rss/ekonomi.xml"
+        "name": "Motor1 Otomobil",
+        "url": "https://tr.motor1.com/rss/news/all/",
+        "category": "Otomobil"
     },
     {
-        "name": "Mynet Finans",
-        "url": "https://finans.mynet.com/haber/rss/kategori/ekonomi/"
+        "name": "Otomobil Haber",
+        "url": "https://www.otomobilhaber.com.tr/feed/",
+        "category": "Otomobil"
     },
     {
-        "name": "Webtekno Tüketici & Teknoloji",
-        "url": "https://www.webtekno.com/rss.xml"
+        "name": "Ensonhaber Otomobil",
+        "url": "https://www.ensonhaber.com/rss/otomobil.xml",
+        "category": "Otomobil"
+    },
+
+    # 🚀 TEKNOLOJİ & YAPAY ZEKA (Yüksek Tık & Gelir Değeri)
+    {
+        "name": "Webtekno Teknoloji",
+        "url": "https://www.webtekno.com/rss.xml",
+        "category": "Teknoloji"
     },
     {
-        "name": "Habertürk Ekonomi",
-        "url": "https://www.haberturk.com/rss/kategori/ekonomi.xml"
+        "name": "ShiftDelete Teknoloji",
+        "url": "https://shiftdelete.net/feed",
+        "category": "Teknoloji"
     },
+    {
+        "name": "DonanımHaber",
+        "url": "https://www.donanimhaber.com/rss/tum/",
+        "category": "Teknoloji"
+    },
+    {
+        "name": "CHIP Online Teknoloji",
+        "url": "https://www.chip.com.tr/rss/",
+        "category": "Teknoloji"
+    },
+
+    # 💰 EKONOMİ, FİNANS & TÜKETİCİ (Yüksek Tık & Gelir Değeri)
     {
         "name": "Bloomberg HT",
-        "url": "https://www.bloomberght.com/rss"
+        "url": "https://www.bloomberght.com/rss",
+        "category": "Ekonomi"
     },
     {
         "name": "Ekonomim",
-        "url": "https://www.ekonomim.com/rss"
+        "url": "https://www.ekonomim.com/rss",
+        "category": "Ekonomi"
     },
     {
-        "name": "Sözcü Ekonomi",
-        "url": "https://www.sozcu.com.tr/rss/ekonomi.xml"
+        "name": "Mynet Finans",
+        "url": "https://finans.mynet.com/haber/rss/kategori/ekonomi/",
+        "category": "Ekonomi"
     },
     {
-        "name": "Gazete Duvar Ekonomi",
-        "url": "https://www.gazeteduvar.com.tr/rss/ekonomi"
+        "name": "Ensonhaber Ekonomi",
+        "url": "https://www.ensonhaber.com/rss/ekonomi.xml",
+        "category": "Ekonomi"
     },
     {
         "name": "TRT Haber Ekonomi",
-        "url": "https://www.trthaber.com/ekonomi_articles.rss"
+        "url": "https://www.trthaber.com/ekonomi_articles.rss",
+        "category": "Ekonomi"
+    },
+
+    # 🩺 SAĞLIK & YAŞAM (Yüksek Tık & Gelir Değeri)
+    {
+        "name": "TRT Haber Sağlık",
+        "url": "https://www.trthaber.com/saglik_articles.rss",
+        "category": "Sağlık"
     },
     {
-        "name": "Ensonhaber Gündem",
-        "url": "https://www.ensonhaber.com/rss/ensonhaber.xml"
+        "name": "NTV Sağlık",
+        "url": "https://www.ntv.com.tr/saglik.rss",
+        "category": "Sağlık"
     },
+    {
+        "name": "Habertürk Sağlık",
+        "url": "https://www.haberturk.com/rss/kategori/saglik.xml",
+        "category": "Sağlık"
+    },
+
+    # 🚨 SICAK GÜNDEM & SON DAKİKA
     {
         "name": "TRT Haber Gündem",
-        "url": "https://www.trthaber.com/gundem_articles.rss"
+        "url": "https://www.trthaber.com/gundem_articles.rss",
+        "category": "Gündem"
     },
     {
         "name": "Habertürk Gündem",
-        "url": "https://www.haberturk.com/rss/kategori/gundem.xml"
+        "url": "https://www.haberturk.com/rss/kategori/gundem.xml",
+        "category": "Gündem"
     },
     {
-        "name": "Hürriyet Gündem",
-        "url": "https://www.hurriyet.com.tr/rss/gundem"
+        "name": "Ensonhaber Gündem",
+        "url": "https://www.ensonhaber.com/rss/ensonhaber.xml",
+        "category": "Gündem"
     },
     {
         "name": "NTV Gündem",
-        "url": "https://www.ntv.com.tr/gundem.rss"
+        "url": "https://www.ntv.com.tr/gundem.rss",
+        "category": "Gündem"
     }
 ]
 
@@ -113,4 +161,4 @@ RSS_FEEDS = [
 DRY_RUN = os.getenv("DRY_RUN", "True").lower() in ("true", "1", "yes")
 
 # Kontrol Sıklığı (Dakika)
-CHECK_INTERVAL_MINUTES = int(os.getenv("CHECK_INTERVAL_MINUTES", "30"))
+CHECK_INTERVAL_MINUTES = int(os.getenv("CHECK_INTERVAL_MINUTES", "15"))
