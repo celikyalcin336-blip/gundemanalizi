@@ -339,7 +339,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
                 <!-- SOL / ORTA (8 KOLON): 1..14 NUMARALI MANŞET SLIDER -->
                 <div class="lg:col-span-8 flex flex-col">
-                    <div id="main-manset-slider" class="relative rounded-2xl overflow-hidden border border-brand-border bg-black shadow-2xl group h-[290px] sm:h-[400px] md:h-[450px]">
+                    <div id="main-manset-slider" class="relative rounded-2xl overflow-hidden border border-brand-border bg-black shadow-2xl group h-[290px] sm:h-[400px] md:h-[450px] cursor-grab active:cursor-grabbing touch-pan-y select-none">
                         {% for a in slider_articles %}
                         <div class="manset-slide absolute inset-0 transition-opacity duration-300 {% if loop.first %}opacity-100 z-10 pointer-events-auto{% else %}opacity-0 z-0 pointer-events-none{% endif %}" data-index="{{ loop.index0 }}">
                             <a href="/haber/{{ a.slug }}" class="block w-full h-full relative">
@@ -970,10 +970,86 @@
                 startAuto();
             };
 
+            // ELLE KAYDIRMA / DOKUNMA & SÜRÜKLEME MOTORU (TOUCH SWIPE & MOUSE DRAG)
             const sliderBox = document.getElementById('main-manset-slider');
             if (sliderBox) {
-                sliderBox.addEventListener('mouseenter', stopAuto);
-                sliderBox.addEventListener('mouseleave', startAuto);
+                let isMouseDown = false;
+                let mouseStartX = 0;
+                let mouseDiffX = 0;
+                let dragged = false;
+
+                sliderBox.addEventListener('mouseenter', () => { if (!isMouseDown) stopAuto(); });
+                sliderBox.addEventListener('mouseleave', () => { if (!isMouseDown) startAuto(); });
+
+                // Dokunmatik Ekranlar (Mobil & Tablet Swipe)
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchDiffX = 0;
+                let touchDiffY = 0;
+
+                sliderBox.addEventListener('touchstart', (e) => {
+                    stopAuto();
+                    touchStartX = e.changedTouches[0].clientX;
+                    touchStartY = e.changedTouches[0].clientY;
+                    touchDiffX = 0;
+                    touchDiffY = 0;
+                }, { passive: true });
+
+                sliderBox.addEventListener('touchmove', (e) => {
+                    touchDiffX = e.changedTouches[0].clientX - touchStartX;
+                    touchDiffY = e.changedTouches[0].clientY - touchStartY;
+                }, { passive: true });
+
+                sliderBox.addEventListener('touchend', (e) => {
+                    // Yatay kaydırma dikey kaydırmadan belirgin ve en az 35px ise
+                    if (Math.abs(touchDiffX) > 35 && Math.abs(touchDiffX) > Math.abs(touchDiffY)) {
+                        if (touchDiffX < 0) {
+                            showSlide(curIndex + 1); // Parmağı sola çekince: Sonraki Manşet
+                        } else {
+                            showSlide(curIndex - 1); // Parmağı sağa çekince: Önceki Manşet
+                        }
+                    }
+                    startAuto();
+                }, { passive: true });
+
+                // Masaüstü Fare İle Tutup Sürükleme (Mouse Drag)
+                sliderBox.addEventListener('mousedown', (e) => {
+                    isMouseDown = true;
+                    dragged = false;
+                    mouseStartX = e.clientX;
+                    mouseDiffX = 0;
+                    stopAuto();
+                });
+
+                window.addEventListener('mousemove', (e) => {
+                    if (!isMouseDown) return;
+                    mouseDiffX = e.clientX - mouseStartX;
+                    if (Math.abs(mouseDiffX) > 10) {
+                        dragged = true;
+                    }
+                });
+
+                window.addEventListener('mouseup', () => {
+                    if (!isMouseDown) return;
+                    isMouseDown = false;
+                    if (Math.abs(mouseDiffX) > 40) {
+                        if (mouseDiffX < 0) {
+                            showSlide(curIndex + 1); // Fareyi sola sürükleyince: Sonraki Manşet
+                        } else {
+                            showSlide(curIndex - 1); // Fareyi sağa sürükleyince: Önceki Manşet
+                        }
+                    }
+                    startAuto();
+                });
+
+                // Sürükleme yapıldığında yanlışlıkla linke tıklanmasını engelle
+                sliderBox.addEventListener('click', (e) => {
+                    if (dragged) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dragged = false;
+                    }
+                }, true);
             }
 
             const pillsBox = document.getElementById('manset-pills');
