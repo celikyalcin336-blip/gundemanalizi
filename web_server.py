@@ -366,12 +366,14 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             canonical_url = f"{config.SITE_URL}/"
 
     total_pages = max(1, math.ceil(total_count / limit))
+    breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
 
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "articles": articles,
+            "breaking_news": breaking_news,
             "active_category": kategori,
             "search_query": q.strip() if q else "",
             "ad_settings": get_site_ad_settings(),
@@ -940,14 +942,32 @@ async def article_detail(request: Request, slug: str):
     if not article:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
 
-    other_articles = [a for a in database.get_articles(limit=6) if a["slug"] != slug][:5]
+    category = article.get("category") or "Gündem"
+    cat_articles = [a for a in database.get_articles(limit=8, category=category) if a.get("slug") != slug]
+    if len(cat_articles) < 4:
+        recent = [a for a in database.get_articles(limit=8) if a.get("slug") != slug and a.get("slug") not in [x.get("slug") for x in cat_articles]]
+        related_articles = (cat_articles + recent)[:4]
+    else:
+        related_articles = cat_articles[:4]
+
+    other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
+    breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
+
+    # Tahmini okuma süresi (140 kelime/dk)
+    text_content = f"{article.get('title', '')} {article.get('summary', '')} {article.get('content', '')}"
+    word_count = len(text_content.split())
+    reading_time_min = max(1, round(word_count / 140))
+
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     return templates.TemplateResponse(
         request=request,
         name="article.html",
         context={
             "article": article,
+            "related_articles": related_articles,
             "other_articles": other_articles,
+            "breaking_news": breaking_news,
+            "reading_time_min": reading_time_min,
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
             "canonical_url": canonical_url

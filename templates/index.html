@@ -117,23 +117,35 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
-    <!-- ÜST BİLGİ & SON DAKİKA BANDI -->
-    <div class="bg-red-700 text-white text-xs sm:text-sm font-semibold py-2 px-4 shadow-md">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
-                <span class="inline-flex items-center gap-1.5 bg-red-950 px-2 py-0.5 rounded text-red-200 font-bold uppercase tracking-wider text-[11px]">
-                    <span class="w-2 h-2 rounded-full bg-red-400 animate-ping"></span>
+    <!-- ÜST BİLGİ & SON DAKİKA CANLI BANDI -->
+    <div class="bg-gradient-to-r from-red-700 via-red-800 to-red-900 text-white text-xs sm:text-sm font-semibold py-2 px-4 shadow-md border-b border-red-950/40">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 overflow-hidden flex-1 min-w-0">
+                <span class="inline-flex items-center gap-1.5 bg-red-950/90 border border-red-400/30 px-2.5 py-0.5 rounded-full text-red-100 font-extrabold uppercase tracking-wider text-[10px] sm:text-[11px] shrink-0 shadow-sm">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-300"></span>
+                    </span>
                     SON DAKİKA
                 </span>
-                <span class="truncate text-red-50">
-                    {% if articles and articles|length > 0 %}
-                        {{ articles[0].title }}
+                <div id="breaking-ticker-container" class="overflow-hidden flex-1 relative h-5 sm:h-6 flex items-center">
+                    {% if breaking_news and breaking_news|length > 0 %}
+                        {% for b in breaking_news %}
+                        <a href="/haber/{{ b.slug }}" class="breaking-item absolute inset-0 flex items-center text-red-50 hover:text-white transition-all duration-500 truncate text-xs sm:text-sm {% if loop.first %}opacity-100 translate-y-0{% else %}opacity-0 translate-y-3 pointer-events-none{% endif %}" title="{{ b.title }}">
+                            <span class="text-red-300 text-xs mr-2 font-mono font-bold hidden sm:inline">[{{ b.category }}]</span>
+                            <span class="truncate hover:underline">{{ b.title }}</span>
+                        </a>
+                        {% endfor %}
+                    {% elif articles and articles|length > 0 %}
+                        <a href="/haber/{{ articles[0].slug }}" class="text-red-50 hover:underline truncate text-xs sm:text-sm">
+                            {{ articles[0].title }}
+                        </a>
                     {% else %}
-                        Gündem Analizi yayın hayatına başladı. Güncel haberler anlık aktarılıyor.
+                        <span class="text-red-100 text-xs sm:text-sm truncate">Gündem Analizi yayın hayatına başladı. Güncel haberler anlık aktarılıyor.</span>
                     {% endif %}
-                </span>
+                </div>
             </div>
-            <div class="hidden sm:flex items-center gap-1.5">
+            <div class="hidden sm:flex items-center gap-1.5 shrink-0">
                 <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap shadow">
                     💬 WhatsApp
                 </a>
@@ -656,6 +668,26 @@
             } catch (e) {}
         }
         setInterval(refreshMarketRates, 60000);
+
+        // Son Dakika Kayan Bant Otomatik Döndürücü (Ticker)
+        (function() {
+            const items = document.querySelectorAll('.breaking-item');
+            if (items.length <= 1) return;
+            let idx = 0;
+            let timer = setInterval(nextBreaking, 4500);
+            const container = document.getElementById('breaking-ticker-container');
+            if (container) {
+                container.addEventListener('mouseenter', () => clearInterval(timer));
+                container.addEventListener('mouseleave', () => timer = setInterval(nextBreaking, 4500));
+            }
+            function nextBreaking() {
+                items[idx].classList.remove('opacity-100', 'translate-y-0');
+                items[idx].classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+                idx = (idx + 1) % items.length;
+                items[idx].classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
+                items[idx].classList.add('opacity-100', 'translate-y-0');
+            }
+        })();
     </script>
 </body>
 </html>
