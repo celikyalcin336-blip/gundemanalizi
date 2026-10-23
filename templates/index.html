@@ -272,7 +272,7 @@
             </div>
             <!-- CNN Türk tarzı koyu yuvarlatılmış kare butonlar -->
             <div class="flex flex-wrap items-center gap-2 text-white">
-                <a href="https://news.google.com/publications/CAowvbrODA?hl=tr&gl=TR&ceid=TR:tr" target="_blank" title="Google News'te Takip Et"
+                <a href="https://news.google.com/search?q=g%C3%BCndemanalizi.com.tr&hl=tr&gl=TR&ceid=TR:tr" target="_blank" title="Google News'te Takip Et"
                    class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
                     <span class="font-black text-sm text-red-500 group-hover:scale-110 transition">N</span>
                 </a>
@@ -1055,10 +1055,29 @@
             };
         }
 
+        function populateNamazCities() {
+            const sel = document.getElementById('namaz-city-select');
+            if (!sel || sel.options.length > 0) return;
+            const cities = Object.keys(CITY_OFFSETS).sort((a,b) => a.localeCompare('tr', {sensitivity: 'base'}));
+            cities.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                sel.appendChild(opt);
+            });
+        }
+
         function updateNamazDisplay(cityName) {
+            populateNamazCities();
             const times = calculateTimesForCity(cityName);
             const now = new Date();
             const totalNow = now.getHours() * 60 + now.getMinutes();
+
+            // Set modal title & select
+            const titleEl = document.getElementById('namaz-modal-city-title');
+            if (titleEl) titleEl.innerText = cityName;
+            const sel = document.getElementById('namaz-city-select');
+            if (sel) sel.value = cityName;
 
             // Set grid labels
             if (document.getElementById('v-imsak')) document.getElementById('v-imsak').innerText = formatMins(times.imsak);
@@ -1099,14 +1118,14 @@
                 activeBoxId = 'v-yatsi-box';
             }
 
-            // Update card pill
+            // Update card pill on homepage
             const cardPill = document.getElementById('live-namaz-vakti');
             if (cardPill) cardPill.innerText = activeName + ' ' + activeTimeStr;
 
             const cardCity = document.getElementById('card-city-name');
             if (cardCity) cardCity.innerText = cityName;
 
-            // Highlight in modal
+            // Highlight active in modal
             ['v-imsak-box', 'v-gunes-box', 'v-ogle-box', 'v-ikindi-box', 'v-aksam-box', 'v-yatsi-box'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -1203,54 +1222,74 @@
         </div>
     </div>
 
-    <!-- NAMAZ VAKİTLERİ MODALI -->
+    <!-- NAMAZ VAKİTLERİ MODALI (81 İL ETKİLEŞİMLİ) -->
     <div id="namaz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
         <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative">
-            <button onclick="closeNamazModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
+            <button onclick="closeNamazModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
             <div class="flex items-center gap-2.5 mb-4">
-                <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400">
-                    <span class="text-xl">🕌</span>
+                <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 text-xl flex items-center justify-center">
+                    <span>🕌</span>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-white">İstanbul Namaz Vakitleri</h3>
-                    <p class="text-xs text-slate-400">Diyanet İşleri Başkanlığı Güncel Takvimi</p>
+                    <h3 class="text-base sm:text-lg font-black text-white"><span id="namaz-modal-city-title">İstanbul</span> Namaz Vakitleri</h3>
+                    <p class="text-xs text-slate-400">81 İl Diyanet İşleri Başkanlığı Güncel Takvimi</p>
                 </div>
             </div>
 
+            <!-- 81 İL SEÇİCİ DROPDOWN & HIZLI SEÇİM BUTONLARI -->
+            <div class="mb-4 space-y-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                <div class="flex items-center justify-between">
+                    <label for="namaz-city-select" class="text-xs font-bold text-slate-300">📍 Şehir Seçin (81 İl):</label>
+                    <span class="text-[10px] text-amber-400 font-semibold">Otomatik Kaydedilir</span>
+                </div>
+                <select id="namaz-city-select" onchange="changeNamazCity(this.value)" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none cursor-pointer">
+                </select>
+                <!-- Popüler Şehirler Hızlı Butonlar -->
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                    <button type="button" onclick="changeNamazCity('İstanbul')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">İstanbul</button>
+                    <button type="button" onclick="changeNamazCity('Ankara')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Ankara</button>
+                    <button type="button" onclick="changeNamazCity('İzmir')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">İzmir</button>
+                    <button type="button" onclick="changeNamazCity('Bursa')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Bursa</button>
+                    <button type="button" onclick="changeNamazCity('Antalya')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Antalya</button>
+                    <button type="button" onclick="changeNamazCity('Adana')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Adana</button>
+                </div>
+            </div>
+
+            <!-- DİNAMİK 6 VAKİT KUTULARI -->
             <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-4" id="namaz-times-grid">
-                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div id="v-imsak-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
                     <span class="text-slate-400">İmsak</span>
-                    <span class="font-mono text-white font-bold">05:46</span>
+                    <span id="v-imsak" class="font-mono text-white font-bold">05:46</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div id="v-gunes-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
                     <span class="text-slate-400">Güneş</span>
-                    <span class="font-mono text-white font-bold">07:11</span>
+                    <span id="v-gunes" class="font-mono text-white font-bold">07:11</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div id="v-ogle-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
                     <span class="text-slate-400">Öğle</span>
-                    <span class="font-mono text-white font-bold">12:54</span>
+                    <span id="v-ogle" class="font-mono text-white font-bold">12:54</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div id="v-ikindi-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
                     <span class="text-slate-400">İkindi</span>
-                    <span class="font-mono text-white font-bold">15:53</span>
+                    <span id="v-ikindi" class="font-mono text-white font-bold">15:53</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div id="v-aksam-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
                     <span class="text-slate-400">Akşam</span>
-                    <span class="font-mono text-white font-bold">18:25</span>
+                    <span id="v-aksam" class="font-mono text-white font-bold">18:25</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-amber-950/70 border border-amber-500/40 flex items-center justify-between">
-                    <span class="text-amber-400 font-bold">Yatsı (Aktif)</span>
-                    <span class="font-mono text-amber-300 font-black">19:44</span>
+                <div id="v-yatsi-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
+                    <span class="text-slate-400">Yatsı</span>
+                    <span id="v-yatsi" class="font-mono text-white font-bold">19:44</span>
                 </div>
             </div>
 
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400">
-                Vakitler her gün Diyanet takvimine göre otomatik yenilenir.
+            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400 flex items-center justify-between">
+                <span>Diyanet İşleri Başkanlığı</span>
+                <span class="text-amber-400 font-medium">Canlı Otomatik Takip</span>
             </div>
         </div>
     </div>
-
 </body>
 </html>
