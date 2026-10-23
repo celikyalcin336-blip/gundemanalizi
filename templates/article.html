@@ -214,37 +214,40 @@
     </div>
 
     <!-- ÜST HEADER -->
-    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur">
-        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-3.5 group">
-                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+        <header class="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur border-b border-brand-border shadow-md transition-all">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <!-- Logo & Marka -->
+            <a href="/" class="flex items-center gap-3 group shrink-0">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md group-hover:scale-105 transition">
                 <div>
                     <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
                         GÜNDEM <span class="text-red-500">ANALİZİ</span>
                     </span>
-                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                    <p class="text-[9px] font-semibold text-slate-400 tracking-wider uppercase hidden sm:block">
                         Doğru Haber • Tarafsız Analiz
                     </p>
                 </div>
             </a>
-            <div class="flex items-center gap-2">
-                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+
+            <!-- Kategori Linkleri -->
+            <nav class="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-300">
+                <a href="/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Ana Sayfa</a>
+                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Gündem</a>
+                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Ekonomi</a>
+                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Otomobil</a>
+                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Teknoloji</a>
+                <a href="/?kategori=Spor" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Spor</a>
+            </nav>
+
+            <!-- Sağ Taraf: Ana Sayfa & Erişilebilirlik Butonları -->
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="/" class="text-xs font-bold text-slate-300 hover:text-white px-3 py-1.5 rounded-xl border border-brand-border bg-slate-900/60 hover:bg-slate-800 transition">
                     ← Ana Sayfa
                 </a>
-                <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
+                <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü, Görme Engelli ve Kolay Okuma Seçenekleri">
                     <span class="text-sm">♿</span>
                     <span class="hidden sm:inline">Erişilebilirlik</span>
                 </button>
-                <button type="button" onclick="openIhbarModal()" class="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3 py-2 rounded-xl shadow-md transition">
-                    🚨 İhbar Hattı
-                </button>
-                <a href="https://news.google.com/search?q=g%C3%BCndemanalizi.com.tr&hl=tr&gl=TR&ceid=TR:tr" target="_blank" class="hidden md:inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-red-400 border border-slate-700 font-bold text-xs px-3 py-2 rounded-xl shadow-md transition"><span class="font-black text-red-500">N</span> Google News</a>
-                    <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="hidden sm:inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-md transition">
-                    💬 WhatsApp
-                </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
-                    <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
-                </a>
             </div>
         </div>
     </header>

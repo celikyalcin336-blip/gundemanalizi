@@ -391,12 +391,24 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
 
     total_pages = max(1, math.ceil(total_count / limit))
     breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
+    slider_articles = database.get_articles(limit=14)
+    auto_articles = database.get_articles(limit=5, category="Otomobil")
+    tech_articles = database.get_articles(limit=5, category="Teknoloji")
+    economy_articles = database.get_articles(limit=5, category="Ekonomi")
+    sports_articles = database.get_articles(limit=5, category="Spor")
+    health_articles = database.get_articles(limit=5, category="Sağlık")
 
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "articles": articles,
+            "slider_articles": slider_articles,
+            "auto_articles": auto_articles,
+            "tech_articles": tech_articles,
+            "economy_articles": economy_articles,
+            "sports_articles": sports_articles,
+            "health_articles": health_articles,
             "breaking_news": breaking_news,
             "active_category": kategori,
             "search_query": q.strip() if q else "",
@@ -1008,6 +1020,12 @@ async def article_detail(request: Request, slug: str):
 
     other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
     breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
+    slider_articles = database.get_articles(limit=14)
+    auto_articles = database.get_articles(limit=5, category="Otomobil")
+    tech_articles = database.get_articles(limit=5, category="Teknoloji")
+    economy_articles = database.get_articles(limit=5, category="Ekonomi")
+    sports_articles = database.get_articles(limit=5, category="Spor")
+    health_articles = database.get_articles(limit=5, category="Sağlık")
 
     # Tahmini okuma süresi (140 kelime/dk)
     text_content = f"{article.get('title', '')} {article.get('summary', '')} {article.get('content', '')}"
