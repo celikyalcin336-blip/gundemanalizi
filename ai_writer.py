@@ -91,10 +91,14 @@ Kurallar:
 
 def generate_social_caption(title: str, summary: str, source: str) -> dict:
     """
-    Sosyal medya (Facebook, Instagram, Reels, TikTok) için optimize edilmiş metin ve hashtag üretir.
-    Gemini API anahtarı varsa yapay zeka ile yazar, yoksa akıllı formatlama uygular.
+    Saygın ve kurumsal bir haber medya kuruluşu (Gündem Analizi) tarzında:
+    - Net, tarafsız ve akıcı editoryal basın dili (1-2 paragraf)
+    - KESİNLİKLE yapay sorular ("Siz ne düşünüyorsunuz?", "Yorumlarda buluşalım" vb.) İÇERMEZ.
+    - KESİNLİKLE hashtag (#haber, #sondakika vb.) İÇERMEZ.
+    - Haberin ne olduğunu, nerede ve nasıl gerçekleştiğini doğrudan aktarır.
     """
     import news_fetcher
+    import re
     title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
@@ -104,19 +108,19 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
             client = genai.Client(api_key=config.GEMINI_API_KEY)
             
             prompt = f"""
-Sen Türkiye gündemini yakından takip eden profesyonel bir sosyal medya içerik yöneticisisin.
-Aşağıdaki haber için Instagram (Reels) ve Facebook'ta yüksek organik erişim ve etkileşim alacak Türkçe bir paylaşım metni hazırla.
+Sen saygın ve profesyonel bir ulusal haber ajansının (Gündem Analizi) kıdemli baş editörüsün.
+Aşağıdaki haber için kurumsal haber medya kuruluşlarının (BBC Türkçe, TRT Haber, NTV) standartlarına uygun, sade, tarafsız ve net bir Türkçe haber paylaşım metni hazırla.
 
 Haber Başlığı: {title}
 Haber Detayı: {summary}
 
 UYULMASI ZORUNLU KURALLAR:
-1. Haberin en can alıcı noktasını tek ve akıcı bir ana paragrafta anlat. Başlığı veya aynı cümleyi ASLA iki kez tekrar etme.
-2. Metnin içine ASLA "Kaynak: ..." yazma (kaynak sistem tarafından otomatik ve tek seferlik eklenecektir).
-3. Metnin içine ASLA dış web linki veya URL yazma.
-4. Metnin sonuna takipçileri yorum yapmaya teşvik eden merak uyandırıcı tek bir soru cümlesi ekle (Örn: "Siz bu konuda ne düşünüyorsunuz? Yorumlarda buluşalım.").
-5. En alta haber konusuna uygun 4-5 popüler Türkçe hashtag ekle (#sondakika #haber #gündem vb.).
-6. Sadece doğrudan paylaşılacak nihai metni yaz, fazladan selamlama veya açıklama koyma.
+1. Basın ve ajans ciddiyetine uygun, tarafsız, bilgilendirici ve profesyonel bir dil kullan (1 veya en fazla 2 akıcı paragraf).
+2. ASLA takipçilere yapay sorular sorma (Örn: 'Siz ne düşünüyorsunuz?', 'Yorumlarda buluşalım', 'Sizce ne yapılmalı?' gibi amatör etkileşim tuzaklarını KESİNLİKLE KULLANMA).
+3. ASLA hashtag (#haber, #sondakika, #gündem vb.) KULLANMA. Metin tamamen temiz, kurumsal ve sade olmalıdır.
+4. Başlığı veya aynı cümleyi metin içinde ASLA iki kez tekrar etme.
+5. Metnin içine link/URL veya 'Kaynak: ...' yazma (kaynak ve link sistem tarafından otomatik ve tek seferlik eklenecektir).
+6. Yalnızca doğrudan yayınlanacak nihai basın metnini yaz; selamlama, kapanış veya fazladan açıklama ekleme.
 """
             # Model denemesi (önce 2.5-flash, sonra 2.0-flash, sonra 1.5-flash)
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
@@ -126,8 +130,13 @@ UYULMASI ZORUNLU KURALLAR:
                         contents=prompt
                     )
                     if response and response.text:
+                        raw_ai = response.text.strip()
+                        # Güvenlik filtresi: Olası soru ve hashtag kalıntılarını temizle
+                        clean_ai = re.sub(r'#\w+', '', raw_ai)
+                        clean_ai = re.sub(r'(?:sizce|siz\s+bu\s+konuda|ne\s+düşünüyorsunuz|yorumlarda\s+buluşalım|görüşlerinizi\s+paylaşın)[^\.\n]*[\.\?!]?', '', clean_ai, flags=re.I)
+                        clean_ai = re.sub(r'\n{3,}', '\n\n', clean_ai).strip()
                         return {
-                            "caption": response.text.strip(),
+                            "caption": clean_ai,
                             "source_used": f"Gemini AI ({m_name})"
                         }
                 except Exception:
@@ -135,25 +144,22 @@ UYULMASI ZORUNLU KURALLAR:
         except Exception as e:
             print(f"Gemini API çağrısı başarısız, şablon fallback kullanılıyor: {e}")
 
-    # Fallback (API anahtarı girilmediğinde veya kota aşıldığında çalışan akıllı şablon)
+    # Kural Tabanlı Kurumsal Medya Formatı (Fallback)
     clean_summary = summary.replace("\n", " ").strip() if summary else ""
+    # Metin içindeki yapay soru ve yorum çağrılarını temizle
+    clean_summary = re.sub(r'(?:sizce|siz\s+bu\s+konuda|ne\s+düşünüyorsunuz|yorumlarda\s+buluşalım|görüşlerinizi\s+paylaşın)[^\.\n]*[\.\?!]?', '', clean_summary, flags=re.I).strip()
+    
     # Başlık ile özet aynıysa veya özet boşsa tekrarlama yapma
     if clean_summary and clean_summary.lower() != title.strip().lower():
-        if len(clean_summary) > 220:
-            clean_summary = clean_summary[:217] + "..."
-        body = f"📢 {title}\n\n📰 {clean_summary}"
+        if len(clean_summary) > 280:
+            clean_summary = clean_summary[:275].rsplit(' ', 1)[0] + "..."
+        caption_text = f"{title}\n\n{clean_summary}"
     else:
-        body = f"📢 {title}"
-
-    caption_text = f"""{body}
-
-💬 Siz bu konuda ne düşünüyorsunuz? Görüşlerinizi yorumlarda paylaşın!
-
-#sondakika #haber #gündem #türkiye #gündemanalizi"""
+        caption_text = f"{title}"
 
     return {
         "caption": caption_text,
-        "source_used": "Template"
+        "source_used": "Corporate Template"
     }
 
 def generate_full_article(title: str, summary: str, source: str) -> dict:
