@@ -117,6 +117,10 @@
             word-spacing: 0.12em !important;
             line-height: 1.85 !important;
         }
+        body.a11y-underline a {
+            text-decoration: underline !important;
+            text-underline-offset: 3px !important;
+        }
         body.a11y-focus-visible *:focus-visible {
             outline: 3px solid #facc15 !important;
             outline-offset: 3px !important;
@@ -207,6 +211,10 @@
             </nav>
 
             <div class="flex items-center gap-2">
+                <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
+                    <span class="text-sm">♿</span>
+                    <span class="hidden sm:inline">Erişilebilirlik</span>
+                </button>
                 <button type="button" onclick="shareSiteWhatsApp()" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm px-3.5 py-2 rounded-xl shadow-lg shadow-emerald-900/40 transition">
                     <span>📲 WhatsApp'ta Paylaş</span>
                 </button>
@@ -1387,83 +1395,102 @@
             </div>
         </div>
     </div>
-<!-- ♿ ERİŞİLEBİLİRLİK (ACCESSIBILITY - GÖRME ENGELLİ & KOLAY GEZİNME) -->
-    <div class="fixed bottom-20 sm:bottom-6 left-4 sm:left-5 z-50">
-        <button type="button" onclick="toggleA11yModal()" id="a11y-trigger-btn"
-            class="p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-2xl border-2 border-blue-400/50 transition-all duration-200 flex items-center gap-2 group cursor-pointer focus:ring-4 focus:ring-blue-400"
-            title="Erişilebilirlik Seçenekleri (Görme Engelli & Rahat Gezinme Modu)"
-            aria-label="Erişilebilirlik Menüsünü Aç">
-            <span class="text-xl">♿</span>
-            <span class="hidden md:group-hover:inline text-xs font-bold pr-1 transition">Erişilebilirlik</span>
-        </button>
-
-        <!-- Erişilebilirlik Ayarları Modalı -->
-        <div id="a11y-modal" class="hidden absolute bottom-14 left-0 w-80 sm:w-88 p-4 rounded-2xl bg-slate-950 border-2 border-blue-500 text-white shadow-2xl space-y-3.5 backdrop-blur-md z-50">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">♿</span>
-                    <h4 class="font-black text-sm text-white">Erişilebilirlik & Kolay Gezinme</h4>
+    <!-- ♿ ERİŞİLEBİLİRLİK MERKEZİ (SAYFAYI ASLA KAYDIRMAYAN CENTER MODAL) -->
+    <div id="a11y-modal-backdrop" onclick="if(event.target === this) closeA11yModal()" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-950 border-2 border-blue-500/80 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white space-y-4">
+            <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
+                <div class="p-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-2xl flex items-center justify-center">
+                    <span>♿</span>
                 </div>
-                <button type="button" onclick="toggleA11yModal()" class="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-900 border border-slate-800" aria-label="Kapat">
-                    ✕
-                </button>
+                <div>
+                    <h3 class="text-base sm:text-lg font-black text-white">Erişilebilirlik Merkezi</h3>
+                    <p class="text-xs text-slate-400">Görme engelli ve rahat gezinme ayarları</p>
+                </div>
             </div>
 
             <!-- 1. Metin Boyutu -->
             <div>
                 <label class="text-xs font-bold text-slate-300 block mb-1.5">🔤 Metin Boyutu</label>
-                <div class="grid grid-cols-3 gap-1.5 text-xs font-bold">
-                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="normal">Normal</button>
-                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="large">Büyük</button>
-                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-font-btn py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-400 text-center" data-val="xlarge">Çok Büyük</button>
+                <div class="grid grid-cols-3 gap-2 text-xs font-bold">
+                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Normal</button>
+                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Büyük (+15%)</button>
+                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Çok Büyük</button>
                 </div>
             </div>
 
-            <!-- 2. Yüksek Kontrast (Az Görenler İçin) -->
-            <div class="flex items-center justify-between py-1">
+            <!-- 2. Yüksek Kontrast Modu -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div>
-                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast</div>
-                    <div class="text-[10px] text-slate-400">Az görenler için net zıtlık</div>
+                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast Modu</div>
+                    <div class="text-[11px] text-slate-400">Az görenler için net zıtlık</div>
                 </div>
-                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
                     Kapalı
                 </button>
             </div>
 
-            <!-- 3. Disleksi & Kolay Okunur Yazı Tipi -->
-            <div class="flex items-center justify-between py-1">
+            <!-- 3. Net & Disleksi Dostu Yazı Tipi -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div>
                     <div class="text-xs font-bold text-white">📖 Net Okuma Yazı Tipi</div>
-                    <div class="text-[10px] text-slate-400">Geniş harf aralıklı belirgin font</div>
+                    <div class="text-[11px] text-slate-400">Geniş harf ve satır aralığı</div>
                 </div>
-                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
                     Kapalı
                 </button>
             </div>
 
-            <!-- 4. Klavye Odak Çerçevesi -->
-            <div class="flex items-center justify-between py-1">
+            <!-- 4. Bağlantıların Altını Çiz -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                <div>
+                    <div class="text-xs font-bold text-white">🔗 Bağlantıların Altını Çiz</div>
+                    <div class="text-[11px] text-slate-400">Tıklanabilir yerleri belirginleştir</div>
+                </div>
+                <button type="button" id="a11y-underline-toggle" onclick="toggleA11yUnderline()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                    Kapalı
+                </button>
+            </div>
+
+            <!-- 5. Klavye Odak Çerçevesi -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
                 <div>
                     <div class="text-xs font-bold text-white">⌨️ Klavye Gezinme Çerçevesi</div>
-                    <div class="text-[10px] text-slate-400">Tab tuşunda belirgin sarı çerçeve</div>
+                    <div class="text-[11px] text-slate-400">Tab tuşunda sarı odaklama</div>
                 </div>
-                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 border border-slate-700 text-slate-300 hover:text-white">
+                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
                     Açık
                 </button>
             </div>
 
-            <!-- Sıfırla -->
-            <button type="button" onclick="resetA11ySettings()" class="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-semibold text-slate-400 hover:text-white border border-slate-800 transition">
-                Ayarları Varsayılana Sıfırla
-            </button>
+            <!-- Alt Kısım: Sıfırla & Tamam -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
+                <button type="button" onclick="resetA11ySettings()" class="text-slate-400 hover:text-red-400 transition font-semibold">
+                    🔄 Ayarları Sıfırla
+                </button>
+                <button type="button" onclick="closeA11yModal()" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-black text-white transition">
+                    Tamam
+                </button>
+            </div>
         </div>
     </div>
-<script>
-        // ♿ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU
-        function toggleA11yModal() {
-            const m = document.getElementById('a11y-modal');
-            if (m) m.classList.toggle('hidden');
-        }
+    <script>
+        // ♿ GELİŞMİŞ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU
+        window.openA11yModal = function() {
+            const el = document.getElementById('a11y-modal-backdrop');
+            if (el) el.classList.remove('hidden');
+        };
+
+        window.closeA11yModal = function() {
+            const el = document.getElementById('a11y-modal-backdrop');
+            if (el) el.classList.add('hidden');
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeA11yModal();
+        });
 
         function applyA11ySettings() {
             const fs = localStorage.getItem('a11y_fs') || 'normal';
@@ -1474,17 +1501,34 @@
             const contrast = localStorage.getItem('a11y_contrast') === 'true';
             document.body.classList.toggle('a11y-contrast', contrast);
             const contrastBtn = document.getElementById('a11y-contrast-toggle');
-            if (contrastBtn) contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
+            if (contrastBtn) {
+                contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
+                contrastBtn.className = contrast ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
+            }
 
             const dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
             document.body.classList.toggle('a11y-dyslexia', dyslexia);
             const dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
-            if (dyslexiaBtn) dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
+            if (dyslexiaBtn) {
+                dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
+                dyslexiaBtn.className = dyslexia ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
+            }
 
-            const focus = localStorage.getItem('a11y_focus') !== 'false'; // varsayılan açık
+            const underline = localStorage.getItem('a11y_underline') === 'true';
+            document.body.classList.toggle('a11y-underline', underline);
+            const underlineBtn = document.getElementById('a11y-underline-toggle');
+            if (underlineBtn) {
+                underlineBtn.innerText = underline ? 'Açık' : 'Kapalı';
+                underlineBtn.className = underline ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
+            }
+
+            const focus = localStorage.getItem('a11y_focus') !== 'false';
             document.body.classList.toggle('a11y-focus-visible', focus);
             const focusBtn = document.getElementById('a11y-focus-toggle');
-            if (focusBtn) focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
+            if (focusBtn) {
+                focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
+                focusBtn.className = focus ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
+            }
         }
 
         window.setA11yFontSize = function(val) {
@@ -1504,6 +1548,12 @@
             applyA11ySettings();
         };
 
+        window.toggleA11yUnderline = function() {
+            const cur = localStorage.getItem('a11y_underline') === 'true';
+            localStorage.setItem('a11y_underline', (!cur).toString());
+            applyA11ySettings();
+        };
+
         window.toggleA11yFocus = function() {
             const cur = localStorage.getItem('a11y_focus') !== 'false';
             localStorage.setItem('a11y_focus', (!cur).toString());
@@ -1514,11 +1564,11 @@
             localStorage.removeItem('a11y_fs');
             localStorage.removeItem('a11y_contrast');
             localStorage.removeItem('a11y_dyslexia');
+            localStorage.removeItem('a11y_underline');
             localStorage.removeItem('a11y_focus');
             applyA11ySettings();
         };
 
-        // Sayfa açıldığında erişilebilirlik tercihlerini uygula
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', applyA11ySettings);
         } else {
