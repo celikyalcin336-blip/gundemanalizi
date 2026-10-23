@@ -244,7 +244,7 @@
                    class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-pink-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
                     <svg class="w-4 h-4 fill-white group-hover:text-pink-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <button type="button" onclick="openIhbarModal()" title="WhatsApp İhbar Hattı" aria-label="WhatsApp İhbar Hattı"
+                <button type="button" onclick="openIhbarModal()" title="7/24 Haber & Video İhbar Hattı" aria-label="7/24 Haber & Video İhbar Hattı"
                    class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow animate-pulse">
                     <span>🚨 İhbar</span>
                 </button>
@@ -1150,10 +1150,10 @@
             </div>
             <div>
                 <h4 class="font-bold text-white text-sm mb-3">İletişim & İhbar</h4>
-                <p class="text-[11px] text-slate-400 mb-2">WhatsApp ve e-posta ihbar hatlarımız 7/24 aktiftir.</p>
-                <div class="space-y-1 text-xs">
+                <p class="text-[11px] text-slate-400 mb-2">Haber merkezimiz ve ihbar hattımız 7/24 aktiftir.</p>
+                <div class="space-y-1.5 text-xs">
                     <div>📧 iletisim@gundemanalizi.com.tr</div>
-                    <div>📱 WhatsApp: +90 (Kanal & İhbar)</div>
+                    <div>📲 Telegram: @gundemanalizi</div>
                 </div>
             </div>
         </div>
@@ -1455,32 +1455,63 @@
     </div>
 
 
-    <!-- 🚨 WHATSAPP İHBAR MODALI -->
-    <div id="ihbar-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-white">
-            <button onclick="closeIhbarModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-            <div class="flex items-center gap-3 mb-4">
-                <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 text-2xl">
-                    <span>🚨</span>
+    <!-- 🚨 7/24 HABER & VİDEO İHBAR HATTI MODALI -->
+    <div id="ihbar-modal" style="display: none;" onclick="if(event.target===this)closeIhbarModal()" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-lg rounded-2xl bg-brand-card border-2 border-red-600/60 shadow-2xl overflow-hidden relative text-white">
+            <!-- Modal Başlık Çubuğu -->
+            <div class="bg-gradient-to-r from-red-700 to-red-900 px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🚨</span>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-white">7/24 HABER & VİDEO İHBAR HATTI</h3>
+                        <p class="text-[11px] text-red-100">Telefon numarası gerekmez • %100 Anonim & Güvenli</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeIhbarModal()" class="text-white/80 hover:text-white p-1 rounded-lg bg-black/30 hover:bg-black/50 transition" aria-label="Kapat">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- İhbar Formu -->
+            <form id="ihbar-form" onsubmit="submitIhbarForm(event)" class="p-5 space-y-4 text-xs sm:text-sm">
+                <p class="text-xs text-slate-300 leading-relaxed bg-slate-900/90 p-3 rounded-xl border border-brand-border">
+                    📸 Çevrenizde yaşanan sıcak gelişmeleri, trafik/kaza, asayiş olaylarını veya çektiğiniz <strong>video ve fotoğrafları</strong> doğrudan haber merkezimize ulaştırın.
+                </p>
+
                 <div>
-                    <h3 class="text-lg font-black text-white">Gündem Analizi İhbar Hattı</h3>
-                    <p class="text-xs text-slate-400">Fotoğraf, video ve son dakika ihbarlarınızı iletin</p>
+                    <label class="block text-slate-200 font-bold mb-1">📍 Olay Yeri ve İhbar Detayı *</label>
+                    <textarea id="ih-msg" required rows="3" placeholder="Örn: İstanbul Kadıköy'de kaza / olay yerinden görüntüler ve detaylar..."
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition"></textarea>
                 </div>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                Şahit olduğunuz asayiş, kaza, yol durumu veya özel haberleri WhatsApp ve Telegram haber merkezimize 7/24 ulaştırabilirsiniz.
-            </p>
-            <div class="space-y-2.5">
-                <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition">
-                    <span>💬 WhatsApp İhbar Kanalı</span>
-                </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition">
-                    <span>📲 Telegram İhbar Merkezi</span>
-                </a>
-            </div>
+
+                <div>
+                    <label class="block text-slate-200 font-bold mb-1">🎬 Video veya Fotoğraf Yükle (İsteğe Bağlı)</label>
+                    <input id="ih-file" type="file" accept="video/*,image/*"
+                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold hover:file:bg-red-500 cursor-pointer">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">🔗 Varsa Sosyal Medya Linki veya İsim/İletişim (İsteğe Bağlı)</label>
+                    <input id="ih-contact" type="text" placeholder="Anonim kalmak için boş bırakabilirsiniz"
+                        class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white placeholder-slate-500 text-xs focus:outline-none focus:border-red-500 transition">
+                </div>
+
+                <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-800">
+                    <a href="https://t.me/gundemanalizi" target="_blank" class="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-semibold">
+                        <span>📲 Telegram İhbar Hattı</span>
+                    </a>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+                            Vazgeç
+                        </button>
+                        <button id="ih-submit" type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-red-900/50 transition flex items-center gap-1.5 cursor-pointer">
+                            <span>🚀 İhbarı Gönder</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1660,6 +1691,49 @@
         function closeDepremModal() { closeModal('deprem-modal'); }
         function openIhbarModal() { openModal('ihbar-modal'); }
         function closeIhbarModal() { closeModal('ihbar-modal'); }
+
+        async function submitIhbarForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('ih-submit');
+            const st = document.getElementById('ih-status');
+            const msgInput = document.getElementById('ih-msg');
+            if (!msgInput || !msgInput.value.trim()) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ Gönderiliyor...</span>';
+            st.className = 'hidden';
+
+            const fd = new FormData();
+            fd.append('message', msgInput.value.trim());
+            fd.append('contact', (document.getElementById('ih-contact')?.value || '').trim());
+            const fInput = document.getElementById('ih-file');
+            if (fInput && fInput.files && fInput.files.length > 0) {
+                fd.append('media_file', fInput.files[0]);
+            }
+
+            try {
+                const res = await fetch('/api/ihbar', { method: 'POST', body: fd });
+                const data = await res.json();
+                st.classList.remove('hidden');
+                if (res.ok && data.ok) {
+                    st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+                    st.innerText = '✅ ' + (data.message || 'İhbarınız haber merkezimize başarıyla iletildi!');
+                    document.getElementById('ihbar-form').reset();
+                    setTimeout(() => closeIhbarModal(), 2500);
+                } else {
+                    st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-red-950 text-red-300 border border-red-500/40';
+                    st.innerText = '⚠️ ' + (data.detail || 'Bir hata oluştu, lütfen tekrar deneyin.');
+                }
+            } catch (err) {
+                st.classList.remove('hidden');
+                st.className = 'p-3 rounded-xl text-xs font-bold text-center bg-red-950 text-red-300 border border-red-500/40';
+                st.innerText = '⚠️ Bağlantı hatası oluştu. Lütfen tekrar deneyin.';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀 İhbarı Gönder</span>';
+            }
+        }
+        window.submitIhbarForm = submitIhbarForm;
         function openA11yModal() { openModal('a11y-modal-backdrop'); }
         function closeA11yModal() { closeModal('a11y-modal-backdrop'); }
 
