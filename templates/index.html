@@ -610,19 +610,19 @@
 
                 <!-- Sağ Taraf: Canlı Puan Durumu (Genel / İç / Dış) + Haftalık Fikstür (4 Kolon) -->
                 <div class="lg:col-span-4 space-y-4">
-                    <!-- Canlı Puan Durumu Tablosu -->
+                    <!-- Canlı Puan Durumu Tablosu (İnteraktif Genel / İç Saha / Deplasman) -->
                     <div class="p-4 rounded-2xl bg-brand-card border border-brand-border shadow-xl">
                         <div class="flex items-center justify-between pb-2 mb-2 border-b border-brand-border">
                             <h3 class="text-xs font-black text-white uppercase flex items-center gap-1.5">
                                 🏆 SÜPER LİG PUAN DURUMU
                             </h3>
-                            <span class="text-[10px] text-green-400 font-bold">2026 Sezonu</span>
+                            <span id="standings-status-label" class="text-[10px] text-green-400 font-bold">Genel Sıralama</span>
                         </div>
                         <!-- Genel / İç / Deplasman Sekmeleri -->
-                        <div class="flex items-center gap-1 mb-2 bg-slate-900 p-1 rounded-lg text-[10px] font-bold">
-                            <button type="button" class="flex-1 py-1 rounded bg-red-600 text-white text-center">Genel</button>
-                            <button type="button" class="flex-1 py-1 rounded text-slate-400 hover:text-white text-center">İç Saha</button>
-                            <button type="button" class="flex-1 py-1 rounded text-slate-400 hover:text-white text-center">Deplasman</button>
+                        <div class="flex items-center gap-1 mb-2.5 bg-slate-900 p-1 rounded-xl text-xs font-bold">
+                            <button type="button" id="tab-standings-genel" onclick="switchStandings('genel')" class="flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer">Genel</button>
+                            <button type="button" id="tab-standings-icsaha" onclick="switchStandings('icsaha')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">İç Saha</button>
+                            <button type="button" id="tab-standings-deplasman" onclick="switchStandings('deplasman')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">Deplasman</button>
                         </div>
                         <div class="overflow-x-auto text-[11px]">
                             <table class="w-full text-left font-medium">
@@ -636,38 +636,36 @@
                                         <th class="py-1 text-right font-black text-white">P</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-800/60 text-slate-200">
-                                    <tr class="hover:bg-slate-800/40"><td class="py-1 font-bold text-amber-400">1</td><td class="py-1 font-bold flex items-center gap-1">🦁 Galatasaray</td><td class="text-center">8</td><td class="text-center">7</td><td class="text-center">+16</td><td class="text-right font-black text-amber-400">22</td></tr>
-                                    <tr class="hover:bg-slate-800/40"><td class="py-1 font-bold text-slate-400">2</td><td class="py-1 font-bold flex items-center gap-1">🟡 Fenerbahçe</td><td class="text-center">8</td><td class="text-center">6</td><td class="text-center">+14</td><td class="text-right font-black text-white">19</td></tr>
-                                    <tr class="hover:bg-slate-800/40"><td class="py-1 font-bold text-slate-400">3</td><td class="py-1 font-bold flex items-center gap-1">🔴 Samsunspor</td><td class="text-center">8</td><td class="text-center">6</td><td class="text-center">+8</td><td class="text-right font-black text-white">18</td></tr>
-                                    <tr class="hover:bg-slate-800/40"><td class="py-1 font-bold text-slate-400">4</td><td class="py-1 font-bold flex items-center gap-1">🦅 Beşiktaş</td><td class="text-center">8</td><td class="text-center">5</td><td class="text-center">+7</td><td class="text-right font-black text-white">17</td></tr>
-                                    <tr class="hover:bg-slate-800/40"><td class="py-1 font-bold text-slate-400">5</td><td class="py-1 font-bold flex items-center gap-1">🌊 Trabzonspor</td><td class="text-center">8</td><td class="text-center">4</td><td class="text-center">+5</td><td class="text-right font-black text-white">15</td></tr>
+                                <tbody id="standings-table-body" class="divide-y divide-slate-800/60 text-slate-200">
+                                    <!-- Rendered dynamically via switchStandings -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Haftalık Fikstür & Maç Programı -->
+                    <!-- Haftalık Fikstür & Maç Programı (Hafta Hafta Değişebilen İnteraktif Motor) -->
                     <div class="p-4 rounded-2xl bg-brand-card border border-brand-border shadow-xl">
                         <div class="flex items-center justify-between pb-2 mb-2 border-b border-brand-border">
                             <h3 class="text-xs font-black text-white uppercase flex items-center gap-1.5">
                                 📅 HAFTANIN MAÇLARI & FİKSTÜR
                             </h3>
-                            <span class="text-[10px] text-amber-400 font-bold">9. Hafta</span>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="changeFixtureWeek(-1)" class="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center text-xs font-bold transition" title="Önceki Hafta">‹</button>
+                                <span id="fixture-week-badge" class="text-[10px] text-amber-400 font-extrabold px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-500/30">9. Hafta</span>
+                                <button type="button" onclick="changeFixtureWeek(1)" class="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center text-xs font-bold transition" title="Sonraki Hafta">›</button>
+                            </div>
                         </div>
-                        <div class="space-y-2 text-xs">
-                            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                                <span class="font-bold text-slate-200">Alanyaspor - Kocaelispor</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">24 Eki 20:00</span>
-                            </div>
-                            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                                <span class="font-bold text-amber-300">Galatasaray - Beşiktaş (Derbi)</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-500/30">25 Eki 19:00</span>
-                            </div>
-                            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                                <span class="font-bold text-slate-200">Fenerbahçe - Trabzonspor</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-500/30">26 Eki 20:00</span>
-                            </div>
+
+                        <!-- Hızlı Hafta Butonları -->
+                        <div class="flex items-center gap-1 mb-2.5 bg-slate-900 p-1 rounded-xl text-[11px] font-bold">
+                            <button type="button" id="tab-week-9" onclick="setFixtureWeek(9)" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer">9. Hafta</button>
+                            <button type="button" id="tab-week-10" onclick="setFixtureWeek(10)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">10. Hafta</button>
+                            <button type="button" id="tab-week-11" onclick="setFixtureWeek(11)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">11. Hafta</button>
+                        </div>
+
+                        <!-- Maç Listesi Kutusu -->
+                        <div id="fixture-matches-list" class="space-y-2 text-xs">
+                            <!-- Rendered dynamically via renderFixtures -->
                         </div>
                     </div>
                 </div>
@@ -823,7 +821,7 @@
     <!-- ==================== TÜM MERKEZİ OVERLAY MODALLAR ==================== -->
 
     <!-- ♿ ERİŞİLEBİLİRLİK MERKEZİ (SAYFAYI ASLA KAYDIRMAYAN CENTER MODAL) -->
-    <div id="a11y-modal-backdrop" onclick="if(event.target === this) closeA11yModal()" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div id="a11y-modal-backdrop" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-950 border-2 border-blue-500/80 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white space-y-4">
             <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -904,47 +902,72 @@
         </div>
     </div>
 
-    <!-- 🔮 ASTROLOJİ & GÜNLÜK BURÇ YORUMU MODALI -->
-    <div id="astro-modal" onclick="if(event.target === this) closeAstroModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-purple-500/60 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white space-y-4">
-            <button onclick="closeAstroModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+    <!-- 🔮 ASTROLOJİ & GÜNLÜK BURÇ YORUMU MODALI (YAPAY ZEKA GÜNLÜK OTOMATİK MOTOR) -->
+    <div id="astro-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-brand-card border-2 border-purple-500/80 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('astro-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <div class="flex items-center gap-3 pb-3 border-b border-purple-500/30">
-                <span id="astro-modal-symbol" class="text-3xl text-purple-400">♈</span>
+            <div class="flex items-center gap-3 pb-3 border-b border-purple-500/40">
+                <div class="p-3 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-3xl text-purple-400 flex items-center justify-center shadow-lg">
+                    <span id="astro-modal-symbol">♈</span>
+                </div>
                 <div>
-                    <h3 class="text-lg font-black text-white"><span id="astro-modal-name">Koç</span> Burcu Günlük Yorumu</h3>
-                    <p id="astro-modal-dates" class="text-xs text-purple-300">21 Mart - 19 Nisan</p>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-lg sm:text-xl font-black text-white"><span id="astro-modal-name">Koç</span> Burcu Günlük Yorumu</h3>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/30 text-purple-300 border border-purple-400/40 uppercase">AI Astroloji</span>
+                    </div>
+                    <p id="astro-modal-dates" class="text-xs text-purple-300 font-semibold mt-0.5">21 Mart - 19 Nisan</p>
                 </div>
             </div>
-            <div class="space-y-3 text-xs leading-relaxed text-slate-300">
-                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span class="text-amber-400 font-bold block mb-1">🌟 Genel Durum:</span>
-                    <p id="astro-text-general">Bugün enerjiniz oldukça yüksek. Kafanızdaki yeni planları hayata geçirmek için harika bir gün. Çevrenizden alacağınız destek moralinizi yükseltecek.</p>
+
+            <!-- Günün Tarihi Bildirimi -->
+            <div class="flex items-center justify-between text-xs px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200">
+                <span>🗓️ <span id="astro-today-date">Bugün</span> Günlük Analizi</span>
+                <span class="text-amber-400 font-bold">✨ Yapay Zeka Güncel</span>
+            </div>
+
+            <!-- 4'lü Detaylı Yorum Kartları -->
+            <div class="space-y-3 text-xs leading-relaxed text-slate-200">
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="text-amber-400 font-black text-sm block mb-1">🌟 Günlük Genel Enerji & Tavsiye</span>
+                    <p id="astro-text-general" class="text-slate-300"></p>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                        <span class="text-pink-400 font-bold block mb-1">💖 Aşk & İlişkiler:</span>
-                        <p id="astro-text-love">İletişimde açık ve samimi olun; küçük sürprizler bağları güçlendirecek.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="text-pink-400 font-black text-sm block mb-1">💖 Aşk & İlişkiler</span>
+                        <p id="astro-text-love" class="text-slate-300"></p>
                     </div>
-                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                        <span class="text-emerald-400 font-bold block mb-1">💼 Kariyer & Para:</span>
-                        <p id="astro-text-money">Maddi konularda temkinli adımlar kazandırıyor. Fırsatları değerlendirin.</p>
+                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="text-emerald-400 font-black text-sm block mb-1">💼 İş, Para & Kariyer</span>
+                        <p id="astro-text-money" class="text-slate-300"></p>
                     </div>
                 </div>
-                <div class="flex items-center justify-between text-[11px] pt-1 text-slate-400">
-                    <span>Günün Şanslı Sayısı: <b class="text-amber-400">7</b></span>
-                    <span>Şanslı Rengi: <b class="text-purple-400">Bordo / Mavi</b></span>
+
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span class="text-sky-400 font-black text-sm block mb-1">🩺 Sağlık & Zindelik</span>
+                    <p id="astro-text-health" class="text-slate-300"></p>
+                </div>
+
+                <!-- Şanslı Rakam & Renk -->
+                <div class="p-3 rounded-xl bg-gradient-to-r from-purple-950/60 to-slate-900 border border-purple-500/30 flex items-center justify-between font-bold text-xs">
+                    <span>Günün Şanslı Rakamı: <span id="astro-lucky-num" class="text-amber-400 text-sm font-black">7</span></span>
+                    <span>Uğurlu Rengi: <span id="astro-lucky-color" class="text-purple-300 font-bold">Gece Mavisi</span></span>
                 </div>
             </div>
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-500">
-                Gündem Analizi Günlük Astroloji Servisi • Her gün 06:00'da güncellenir.
+
+            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400 flex items-center justify-between">
+                <span>Gündem Analizi Astroloji Masası</span>
+                <button type="button" onclick="closeModal('astro-modal')" class="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white transition text-xs">
+                    Kapat
+                </button>
             </div>
         </div>
     </div>
 
     <!-- 🕌 NAMAZ VAKİTLERİ MODALI (81 İL SEÇİCİLİ) -->
-    <div id="namaz-modal" onclick="if(event.target === this) closeNamazModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="namaz-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white">
             <button onclick="closeNamazModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -1013,7 +1036,7 @@
     </div>
 
     <!-- 💊 NÖBETÇİ ECZANELER MODALI -->
-    <div id="nobetci-modal" onclick="if(event.target === this) closeNobetciModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="nobetci-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white">
             <button onclick="closeNobetciModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -1052,7 +1075,7 @@
     </div>
 
     <!-- 📉 SON DEPREMLER MODALI -->
-    <div id="deprem-modal" onclick="if(event.target === this) closeDepremModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="deprem-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white">
             <button onclick="closeDepremModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -1088,7 +1111,7 @@
     </div>
 
     <!-- 🚨 WHATSAPP İHBAR MODALI -->
-    <div id="ihbar-modal" onclick="if(event.target === this) closeIhbarModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div id="ihbar-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-white">
             <button onclick="closeIhbarModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
                 <i data-lucide="x" class="w-5 h-5"></i>
@@ -1261,24 +1284,314 @@
             startAuto();
         })();
 
-        // MODAL FONKSİYONLARI
-        function openNobetciModal() { document.getElementById('nobetci-modal')?.classList.remove('hidden'); }
-        function closeNobetciModal() { document.getElementById('nobetci-modal')?.classList.add('hidden'); }
-        function openNamazModal() { document.getElementById('namaz-modal')?.classList.remove('hidden'); }
-        function closeNamazModal() { document.getElementById('namaz-modal')?.classList.add('hidden'); }
-        function openDepremModal() { document.getElementById('deprem-modal')?.classList.remove('hidden'); }
-        function closeDepremModal() { document.getElementById('deprem-modal')?.classList.add('hidden'); }
-        function openIhbarModal() { document.getElementById('ihbar-modal')?.classList.remove('hidden'); }
-        function closeIhbarModal() { document.getElementById('ihbar-modal')?.classList.add('hidden'); }
+        // ==================== GLOBAL MODAL AÇMA / KAPAMA SİSTEMİ ====================
+        window.openModal = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('hidden');
+                el.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        };
 
-        // ASTROLOJİ MODAL FONKSİYONU
-        function openAstroModal(name, symbol, dates) {
+        window.closeModal = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        };
+
+        // Buton Kısayolları (Geriye Dönük Uyumluluk)
+        window.openNamazModal = function() { window.openModal('namaz-modal'); };
+        window.closeNamazModal = function() { window.closeModal('namaz-modal'); };
+        window.openNobetciModal = function() { window.openModal('nobetci-modal'); };
+        window.closeNobetciModal = function() { window.closeModal('nobetci-modal'); };
+        window.openDepremModal = function() { window.openModal('deprem-modal'); };
+        window.closeDepremModal = function() { window.closeModal('deprem-modal'); };
+        window.openIhbarModal = function() { window.openModal('ihbar-modal'); };
+        window.closeIhbarModal = function() { window.closeModal('ihbar-modal'); };
+        window.openA11yModal = function() { window.openModal('a11y-modal-backdrop'); };
+        window.closeA11yModal = function() { window.closeModal('a11y-modal-backdrop'); };
+
+        // ESC Tuşuyla Tüm Modalları Kapat
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                ['namaz-modal', 'nobetci-modal', 'deprem-modal', 'ihbar-modal', 'astro-modal', 'a11y-modal-backdrop'].forEach(id => {
+                    window.closeModal(id);
+                });
+            }
+        });
+
+        // ==================== 1. CANLI SÜPER LİG PUAN DURUMU (GENEL / İÇ / DIŞ) ====================
+        const STANDINGS_DATA = {
+            genel: [
+                { rank: 1, team: "🦁 Galatasaray", o: 8, g: 7, b: 1, m: 0, av: "+16", p: 22, lead: true },
+                { rank: 2, team: "🟡 Fenerbahçe", o: 8, g: 6, b: 1, m: 1, av: "+14", p: 19 },
+                { rank: 3, team: "🔴 Samsunspor", o: 8, g: 6, b: 0, m: 2, av: "+8", p: 18 },
+                { rank: 4, team: "🦅 Beşiktaş", o: 8, g: 5, b: 2, m: 1, av: "+7", p: 17 },
+                { rank: 5, team: "🌊 Trabzonspor", o: 8, g: 4, b: 3, m: 1, av: "+5", p: 15 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 8, g: 3, b: 3, m: 2, av: "+3", p: 12 }
+            ],
+            icsaha: [
+                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 4, b: 0, m: 0, av: "+10", p: 12, lead: true },
+                { rank: 2, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 1, m: 0, av: "+8", p: 10 },
+                { rank: 3, team: "🦅 Beşiktaş", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10 },
+                { rank: 4, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
+                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 2, m: 0, av: "+3", p: 8 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 }
+            ],
+            deplasman: [
+                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10, lead: true },
+                { rank: 2, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
+                { rank: 3, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 0, m: 1, av: "+6", p: 9 },
+                { rank: 4, team: "🌊 Trabzonspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 },
+                { rank: 5, team: "🦅 Beşiktaş", o: 4, g: 2, b: 1, m: 1, av: "+1", p: 7 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 1, b: 2, m: 1, av: "+1", p: 5 }
+            ]
+        };
+
+        window.switchStandings = function(type) {
+            ['genel', 'icsaha', 'deplasman'].forEach(t => {
+                const btn = document.getElementById('tab-standings-' + t);
+                if (btn) {
+                    if (t === type) {
+                        btn.className = 'flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow';
+                    } else {
+                        btn.className = 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
+                    }
+                }
+            });
+
+            const labelEl = document.getElementById('standings-status-label');
+            if (labelEl) {
+                labelEl.innerText = type === 'genel' ? 'Genel Sıralama' : (type === 'icsaha' ? 'İç Saha Sıralaması' : 'Deplasman Sıralaması');
+            }
+
+            const data = STANDINGS_DATA[type] || STANDINGS_DATA.genel;
+            const tbody = document.getElementById('standings-table-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = data.map(item => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="py-1 font-bold ${item.lead ? 'text-amber-400' : 'text-slate-400'}">${item.rank}</td>
+                    <td class="py-1 font-bold flex items-center gap-1">${item.team}</td>
+                    <td class="text-center">${item.o}</td>
+                    <td class="text-center">${item.g}</td>
+                    <td class="text-center">${item.av}</td>
+                    <td class="text-right font-black ${item.lead ? 'text-amber-400' : 'text-white'}">${item.p}</td>
+                </tr>
+            `).join('');
+        };
+
+        // ==================== 2. HAFTALIK FİKSTÜR GEÇİŞLERİ (9, 10, 11. HAFTA) ====================
+        const FIXTURES_DATA = {
+            9: {
+                title: "9. Hafta",
+                matches: [
+                    { home: "Alanyaspor", away: "Kocaelispor", date: "24 Eki 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
+                    { home: "Galatasaray", away: "Beşiktaş (Derbi)", date: "25 Eki 19:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true },
+                    { home: "Fenerbahçe", away: "Trabzonspor", date: "26 Eki 20:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30 font-black", highlight: true },
+                    { home: "Kasımpaşa", away: "Samsunspor", date: "27 Eki 20:00", badge: "bg-slate-800 text-slate-300 border-slate-700" }
+                ]
+            },
+            10: {
+                title: "10. Hafta",
+                matches: [
+                    { home: "Trabzonspor", away: "Kayserispor", date: "31 Eki 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
+                    { home: "Beşiktaş", away: "Kasımpaşa", date: "1 Kas 19:00", badge: "bg-slate-800 text-slate-300 border-slate-700" },
+                    { home: "Bodrum FK", away: "Fenerbahçe", date: "2 Kas 19:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30" },
+                    { home: "Gaziantep FK", away: "Galatasaray", date: "3 Kas 20:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true }
+                ]
+            },
+            11: {
+                title: "11. Hafta",
+                matches: [
+                    { home: "Sivasspor", away: "Çaykur Rizespor", date: "7 Kas 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
+                    { home: "Galatasaray", away: "Samsunspor", date: "8 Kas 19:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true },
+                    { home: "Fenerbahçe", away: "Sivasspor", date: "9 Kas 19:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30" },
+                    { home: "Başakşehir", away: "Beşiktaş (Derbi)", date: "10 Kas 20:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true }
+                ]
+            }
+        };
+
+        let currentFixtureWeek = 9;
+
+        window.renderFixtures = function(week) {
+            if (!FIXTURES_DATA[week]) return;
+            currentFixtureWeek = week;
+
+            // Hafta butonları stili
+            [9, 10, 11].forEach(w => {
+                const btn = document.getElementById('tab-week-' + w);
+                if (btn) {
+                    if (w === week) {
+                        btn.className = 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow';
+                    } else {
+                        btn.className = 'flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
+                    }
+                }
+            });
+
+            // Rozet metni
+            const badge = document.getElementById('fixture-week-badge');
+            if (badge) badge.innerText = week + '. Hafta';
+
+            // Maç listesi HTML
+            const container = document.getElementById('fixture-matches-list');
+            if (!container) return;
+
+            const matches = FIXTURES_DATA[week].matches;
+            container.innerHTML = matches.map(m => `
+                <div class="p-2 rounded-xl bg-slate-900 border ${m.highlight ? 'border-amber-500/40 bg-amber-950/20' : 'border-slate-800'} flex items-center justify-between transition hover:border-slate-700">
+                    <span class="font-bold ${m.highlight ? 'text-amber-300' : 'text-slate-200'}">${m.home} - ${m.away}</span>
+                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${m.badge}">${m.date}</span>
+                </div>
+            `).join('');
+        };
+
+        window.setFixtureWeek = function(w) {
+            renderFixtures(w);
+        };
+
+        window.changeFixtureWeek = function(delta) {
+            let next = currentFixtureWeek + delta;
+            if (next < 9) next = 11;
+            if (next > 11) next = 9;
+            renderFixtures(next);
+        };
+
+        // ==================== 3. 12 BURÇ YAPAY ZEKA GÜNLÜK YORUM MOTORU ====================
+        const ZODIAC_AI_DATA = {
+            'Koç': {
+                symbol: '♈', dates: '21 Mart - 19 Nisan', element: 'Ateş',
+                general: 'Bugün gökyüzü sizin için liderlik ve cesaret enerjisi yayıyor. Kafanızda ertelediğiniz projeleri başlatmak için mükemmel bir gün. Çevrenizden takdir toplayacaksınız.',
+                love: 'Aşk hayatınızda tutkulu ve samimi konuşmalar gündemde. Partnerinizle aranızdaki buzlar tamamen eriyor.',
+                money: 'Maddi konularda cesur adımlar atmak yerine sağlam ve stratejik kararlar kazandıracak.',
+                health: 'Enerjiniz çok yüksek; hafif tempolu yürüyüşler zihninizi dinlendirecek.',
+                luckyNum: '9', luckyColor: 'Kırmızı / Ateş Sarısı'
+            },
+            'Boğa': {
+                symbol: '♉', dates: '20 Nisan - 20 Mayıs', element: 'Toprak',
+                general: 'Sabırlı ve kararlı duruşunuz bugün meyvelerini vermeye başlıyor. Finansal veya ailevi konularda beklediğiniz bir haber lehinize sonuçlanabilir.',
+                love: 'İlişkinizde güven ve sadakat ön planda. Birlikte geleceğe dair güzel kararlar alabilirsiniz.',
+                money: 'Yatırım ve birikim için şanslı bir gün. Karşınıza çıkacak yeni iş tekliflerini iyi değerlendirin.',
+                health: 'Boğaz ve boyun bölgenizi soğuk havalara karşı korumaya özen gösterin.',
+                luckyNum: '6', luckyColor: 'Zümrüt Yeşili'
+            },
+            'İkizler': {
+                symbol: '♊', dates: '21 Mayıs - 20 Haziran', element: 'Hava',
+                general: 'İletişim trafiğinizin tavan yapacağı hareketli bir gün! Sosyal çevrenizden gelen davetler yeni kapılar açabilir. Fikirlerinizle parlayacaksınız.',
+                love: 'Flörtöz ve neşeli enerjiniz dikkat çekiyor. Bekarlar için sürpriz bir tanışma kapıda.',
+                money: 'Birden fazla işle aynı anda ilgilenmeniz gerekebilir; planlı hareket etmek bütçenizi korur.',
+                health: 'Zihinsel yorgunluğu önlemek için ekran sürenizi biraz azaltmanız iyi gelir.',
+                luckyNum: '5', luckyColor: 'Sarı / Canlı Turuncu'
+            },
+            'Yengeç': {
+                symbol: '♋', dates: '21 Haziran - 22 Temmuz', element: 'Su',
+                general: 'Sezgilerinizin çok kuvvetli olduğu bir gün. İç sesinize güvenin, sizi yanıltmayacak. Ev ve aile hayatınızda huzurlu gelişmeler var.',
+                love: 'Duygusal derinlik ve romantizm artıyor. Sevdiğiniz kişiye içten bir sarılma gününüzü güzelleştirir.',
+                money: 'Gereksiz masraflardan kaçınarak bütçenizde rahat bir nefes alacaksınız.',
+                health: 'Mide hassasiyetine dikkat edin; hafif ve sağlıklı besinleri tercih edin.',
+                luckyNum: '2', luckyColor: 'Gümüş / İnci Beyazı'
+            },
+            'Aslan': {
+                symbol: '♌', dates: '23 Temmuz - 22 Ağustos', element: 'Ateş',
+                general: 'Işığınız ve karizmanızla girdiğiniz her ortamda dikkatleri üzerinize çekiyorsunuz. İş yerinde ya da sosyal ortamlarda sözünüz dinlenecek.',
+                love: 'Cömert ve korumacı tavrınız partnerinizin kalbini bir kez daha fethedecek.',
+                money: 'Kariyerinizde yükselme veya beklenen bir ödemenin hesaba geçmesi an meselesi.',
+                health: 'Sırt ve omurga duruşunuza dikkat edin, esneme hareketleri yapın.',
+                luckyNum: '1', luckyColor: 'Altın Sarısı / Kehribar'
+            },
+            'Başak': {
+                symbol: '♍', dates: '23 Ağustos - 22 Eylül', element: 'Toprak',
+                general: 'Detayları görme ve işleri toparlama yeteneğiniz bugün herkesin kurtarıcısı olacak. Yarım kalan işleri tamamlamak için mükemmel bir zaman.',
+                love: 'İlişkinizde eleştirel olmak yerine yapıcı ve şefkatli bir yaklaşım benimseyin.',
+                money: 'Hesap kitap işlerinde tam bir uzmansınız; gereksiz harcamaları başarıyla kısacaksınız.',
+                health: 'Sindiriminizi desteklemek için bol su içmeyi ve bitki çaylarını ihmal etmeyin.',
+                luckyNum: '4', luckyColor: 'Toprak Tonları / Lacivert'
+            },
+            'Terazi': {
+                symbol: '♎', dates: '23 Eylül - 22 Ekim', element: 'Hava',
+                general: 'Denge, zarafet ve adalet arayışınız bugün hayatınıza huzur getiriyor. İkili ilişkilerde uzlaşmacı tavrınızla sorunları çözeceksiniz.',
+                love: 'Aşkta uyum ve estetik ön planda. Romantik bir akşam yemeği için şahane bir gün.',
+                money: 'Ortaklı işler veya iş birlikleri için elverişli fırsatlar doğabilir.',
+                health: 'Böbrek sağlığı ve su tüketiminize özen gösterin.',
+                luckyNum: '7', luckyColor: 'Pudra Pembe / Pastel Mavi'
+            },
+            'Akrep': {
+                symbol: '♏', dates: '23 Ekim - 21 Kasım', element: 'Su',
+                general: 'Dönüşüm ve güç günü! Karşınıza çıkan engelleri kararlılığınızla birer avantaja çevireceksiniz. Gizli kalmış gerçekler önünüze düşebilir.',
+                love: 'Tutkulu ve derin hisler içindesiniz; partnerinizle güçlü bir bağ kuracaksınız.',
+                money: 'Maddi konularda gizli fırsatlar doğuyor, stratejik yatırımlar kazandırır.',
+                health: 'Detoks yapmak ve bedeni arındırmak için harika bir dönem.',
+                luckyNum: '8', luckyColor: 'Bordo / Gece Siyahı'
+            },
+            'Yay': {
+                symbol: '♐', dates: '22 Kasım - 21 Aralık', element: 'Ateş',
+                general: 'İyimserlik, keşif ve neşe dolu bir gün! Yeni bir seyahat, eğitim veya ufuk açıcı bir fikir hayatınıza heyecan katacak.',
+                love: 'Özgürlükçü ruhunuz aşkta pozitif bir rüzgar estiriyor; birlikte gülmek size çok iyi gelecek.',
+                money: 'Yurtdışı veya dijital projelerden yeni gelir kapıları aralanabilir.',
+                health: 'Açık hava aktiviteleri enerjinizi ikiye katlayacak.',
+                luckyNum: '3', luckyColor: 'Mor / Gece Mavisi'
+            },
+            'Oğlak': {
+                symbol: '♑', dates: '22 Aralık - 19 Ocak', element: 'Toprak',
+                general: 'Hedeflerinize adım adım, sağlam adımlarla ilerliyorsunuz. Disiplininiz sayesinde üstlerinizden veya müşterilerinizden büyük övgü alacaksınız.',
+                love: 'Duygularınızı kelimelerle olmasa da davranışlarınızla çok net ifade ediyorsunuz.',
+                money: 'Kariyerinizde kalıcı başarılar ve uzun vadeli kazançlar kapıda.',
+                health: 'Kemik ve eklemlerinize iyi bakın, kalsiyum alımına dikkat edin.',
+                luckyNum: '10', luckyColor: 'Antrasit / Koyu Kahve'
+            },
+            'Kova': {
+                symbol: '♒', dates: '20 Ocak - 18 Şubat', element: 'Hava',
+                general: 'Sıra dışı fikirleriniz ve vizyonunuzla geleceği bugünden görüyorsunuz. Teknoloji, toplumsal projeler ve dostluklar açısından verimli bir gün.',
+                love: 'Aşkta arkadaşlık ve zihinsel uyum sizin için vazgeçilmez; hoş sohbetler var.',
+                money: 'Teknolojik araçlar veya yenilikçi iş alanları kazanç sağlayabilir.',
+                health: 'Dolaşım sisteminizi canlı tutmak için bacak esnetmeleri yapın.',
+                luckyNum: '11', luckyColor: 'Elektrik Mavisi / Turkuaz'
+            },
+            'Balık': {
+                symbol: '♓', dates: '19 Şubat - 20 Mart', element: 'Su',
+                general: 'Hayal gücünüz ve sanatsal yönünüz zirvede. İlham dolu bir gün sizi bekliyor. İhtiyacı olan birine yardım etmek ruhunuza şifa verecek.',
+                love: 'Şefkat, empati ve masalsı bir romantizm kapınızı çalıyor. Kalbinizi açın.',
+                money: 'Sezgileriniz para yönetiminde size doğru yolu gösterecek.',
+                health: 'Ayak bakımı ve ılık bir duş günün yorgunluğunu anında alacaktır.',
+                luckyNum: '12', luckyColor: 'Deniz Yeşili / Lavanta'
+            }
+        };
+
+        window.openAstroModal = function(name, symbol, dates) {
+            const data = ZODIAC_AI_DATA[name] || ZODIAC_AI_DATA['Koç'];
+
             document.getElementById('astro-modal-name').innerText = name;
-            document.getElementById('astro-modal-symbol').innerText = symbol;
-            document.getElementById('astro-modal-dates').innerText = dates;
-            document.getElementById('astro-modal')?.classList.remove('hidden');
-        }
-        function closeAstroModal() { document.getElementById('astro-modal')?.classList.add('hidden'); }
+            document.getElementById('astro-modal-symbol').innerText = data.symbol || symbol;
+            document.getElementById('astro-modal-dates').innerText = data.dates || dates;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            const dateEl = document.getElementById('astro-today-date');
+            if (dateEl) dateEl.innerText = dateStr;
+
+            document.getElementById('astro-text-general').innerText = data.general;
+            document.getElementById('astro-text-love').innerText = data.love;
+            document.getElementById('astro-text-money').innerText = data.money;
+            document.getElementById('astro-text-health').innerText = data.health;
+            document.getElementById('astro-lucky-num').innerText = data.luckyNum;
+            document.getElementById('astro-lucky-color').innerText = data.luckyColor;
+
+            window.openModal('astro-modal');
+        };
+
+        // Sayfa Açıldığında Fikstür ve Puan Durumunu Başlat
+        document.addEventListener('DOMContentLoaded', () => {
+            switchStandings('genel');
+            renderFixtures(9);
+        });
+        // DOMContentLoaded kaçırılmışsa anında çalıştır
+        switchStandings('genel');
+        renderFixtures(9);
 
         // 81 İL DİNAMİK CANLI NAMAZ VAKTİ MOTORU
         const CITY_OFFSETS = {
