@@ -371,6 +371,8 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     limit = 24
     offset = (page - 1) * limit
 
+    norm_kategori = database.normalize_category_name(kategori) if kategori else None
+
     if q and q.strip():
         q_low = q.strip().lower()
         all_arts = database.get_articles(limit=150)
@@ -382,10 +384,10 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         articles = matched[offset:offset + limit]
         canonical_url = f"{config.SITE_URL}/"
     else:
-        articles = database.get_articles(limit=limit, category=kategori, offset=offset)
-        total_count = database.get_articles_total_count(category=kategori)
-        if kategori:
-            canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(kategori)}"
+        articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
+        total_count = database.get_articles_total_count(category=norm_kategori)
+        if norm_kategori:
+            canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(norm_kategori)}"
         else:
             canonical_url = f"{config.SITE_URL}/"
 
@@ -410,7 +412,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "sports_articles": sports_articles,
             "health_articles": health_articles,
             "breaking_news": breaking_news,
-            "active_category": kategori,
+            "active_category": norm_kategori,
             "search_query": q.strip() if q else "",
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
@@ -420,6 +422,11 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "total_articles": total_count
         }
     )
+
+@app.api_route("/kategori/{kategori_adi}", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
+    """Kategori bazlı haber akışı rotası (/kategori/saglik, /kategori/Sağlık vb.)"""
+    return await home(request=request, kategori=kategori_adi, sayfa=sayfa)
 
 @app.get("/panel", response_class=HTMLResponse)
 async def admin_panel_decoy(request: Request):

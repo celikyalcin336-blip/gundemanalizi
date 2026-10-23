@@ -439,14 +439,64 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
     return slug
 
 
+def normalize_category_name(cat: Optional[str]) -> Optional[str]:
+    """Kategori isimlerini ve takma adlarını standartlaştırır."""
+    if not cat:
+        return None
+    c = cat.strip().lower()
+    mapping = {
+        "saglik": "Sağlık",
+        "sağlık": "Sağlık",
+        "ekonomi": "Ekonomi",
+        "otomobil": "Otomobil",
+        "oto": "Otomobil",
+        "araba": "Otomobil",
+        "teknoloji": "Teknoloji",
+        "tekno": "Teknoloji",
+        "bilim": "Teknoloji",
+        "spor": "Spor",
+        "futbol": "Spor",
+        "dunya": "Dünya",
+        "dünya": "Dünya",
+        "gundem": "Gündem",
+        "gündem": "Gündem",
+        "son-dakika": "Son Dakika",
+        "sondakika": "Son Dakika",
+        "son dakika": "Son Dakika",
+        "asayis": "Asayiş",
+        "asayiş": "Asayiş",
+        "magazin": "Magazin",
+        "yasam": "Yaşam",
+        "yaşam": "Yaşam"
+    }
+    return mapping.get(c, cat.strip())
+
+
 def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List[Dict]:
     """Son yayınlanan makaleleri listeler."""
     with get_connection() as conn:
         if category:
-            cur = conn.execute("SELECT * FROM articles WHERE category = ? ORDER BY id DESC LIMIT ? OFFSET ?", (category, limit, offset))
+            cat_norm = normalize_category_name(category) or category
+            cur = conn.execute(
+                """SELECT * FROM articles 
+                   WHERE category = ? OR LOWER(category) = LOWER(?) OR category = ?
+                   ORDER BY id DESC LIMIT ? OFFSET ?""",
+                (cat_norm, cat_norm, category.strip(), limit, offset)
+            )
+            rows = [_row_to_dict(row) for row in cur.fetchall()]
+            if not rows and offset == 0:
+                kw = cat_norm.lower()
+                cur = conn.execute(
+                    """SELECT * FROM articles 
+                       WHERE title LIKE ? OR summary LIKE ? OR category LIKE ?
+                       ORDER BY id DESC LIMIT ? OFFSET ?""",
+                    (f"%{kw}%", f"%{kw}%", f"%{kw}%", limit, offset)
+                )
+                rows = [_row_to_dict(row) for row in cur.fetchall()]
+            return rows
         else:
             cur = conn.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
-        return [_row_to_dict(row) for row in cur.fetchall()]
+            return [_row_to_dict(row) for row in cur.fetchall()]
 
 
 def get_articles_total_count(category: str = None) -> int:
@@ -454,10 +504,25 @@ def get_articles_total_count(category: str = None) -> int:
     try:
         with get_connection() as conn:
             if category:
-                row = conn.execute("SELECT COUNT(*) AS c FROM articles WHERE category = ?", (category,)).fetchone()
+                cat_norm = normalize_category_name(category) or category
+                row = conn.execute(
+                    """SELECT COUNT(*) AS c FROM articles 
+                       WHERE category = ? OR LOWER(category) = LOWER(?) OR category = ?""",
+                    (cat_norm, cat_norm, category.strip())
+                )
+                c = row["c"] if row else 0
+                if c == 0:
+                    kw = cat_norm.lower()
+                    row2 = conn.execute(
+                        """SELECT COUNT(*) AS c FROM articles 
+                           WHERE title LIKE ? OR summary LIKE ? OR category LIKE ?""",
+                        (f"%{kw}%", f"%{kw}%", f"%{kw}%")
+                    )
+                    return row2["c"] if row2 else 0
+                return c
             else:
                 row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
-            return row["c"] if row else 0
+                return row["c"] if row else 0
     except Exception:
         return 0
 
