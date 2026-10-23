@@ -1126,12 +1126,32 @@ Sitemap: {base_url}/video-sitemap.xml
 """
     return PlainTextResponse(content=content)
 
+@app.get("/site-haritasi", response_class=HTMLResponse)
+async def html_sitemap(request: Request):
+    """Ziyaretçiler için görsel ve tıklanabilir HTML Site Haritası."""
+    articles = database.get_articles(limit=60)
+    return templates.TemplateResponse(
+        request=request,
+        name="sitemap.html",
+        context={"articles": articles}
+    )
+
+@app.get("/sitemap.xsl")
+async def sitemap_xsl():
+    """XML Site Haritalarını tarayıcıda görselleştiren XSLT şablonu."""
+    import os
+    xsl_path = os.path.join(os.path.dirname(__file__), "templates", "sitemap.xsl")
+    with open(xsl_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    return HTMLResponse(content=content, media_type="application/xml")
+
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
     articles = database.get_articles(limit=300)
     host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
     base_url = f"https://{host}"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
     import urllib.parse
@@ -1155,6 +1175,7 @@ async def news_sitemap(request: Request):
     host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
     base_url = f"https://{host}"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">')
     for a in articles:
         raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
@@ -1185,6 +1206,7 @@ async def video_sitemap(request: Request):
     host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
     base_url = f"https://{host}"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
     for a in articles:
         raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
