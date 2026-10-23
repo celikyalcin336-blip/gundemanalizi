@@ -41,12 +41,12 @@
     </script>
     <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, asayiş ve güncel haberlerin tarafsız analizi.">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <link rel="canonical" href="{{ request.url }}">
+    <link rel="canonical" href="{{ canonical_url or 'https://xn--gndemanalizi-dlb.com.tr/' }}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Gündem Analizi">
     <meta property="og:title" content="Gündem Analizi | Doğru Haber • Tarafsız Analiz">
     <meta property="og:description" content="Türkiye ve dünyadan son dakika gelişmeleri ve tarafsız analizler.">
-    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:url" content="{{ canonical_url or 'https://xn--gndemanalizi-dlb.com.tr/' }}">
     <meta property="og:image" content="https://xn--gndemanalizi-dlb.com.tr/assets/logo.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@gndmanalizi">
@@ -317,7 +317,7 @@
                         <!-- Görsel -->
                         <div class="lg:col-span-7 relative h-72 sm:h-96 lg:h-[420px] overflow-hidden bg-slate-900">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ hero.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ hero.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ hero.title }}" fetchpriority="high" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             {% else %}
                                 <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-slate-600">
                                     <i data-lucide="image" class="w-16 h-16"></i>
@@ -371,7 +371,7 @@
                     <!-- Görsel -->
                     <div class="relative h-48 overflow-hidden bg-slate-900">
                         {% if item.image_path %}
-                            <img src="/images/{{ item.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ item.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="/images/{{ item.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         {% else %}
                             <div class="w-full h-full flex items-center justify-center bg-slate-800 text-slate-600">
                                 <i data-lucide="image" class="w-12 h-12"></i>
@@ -404,6 +404,37 @@
                 </a>
                 {% endfor %}
             </div>
+
+            <!-- SAYFALAMA (PAGINATION) -->
+            {% if total_pages and total_pages > 1 %}
+            <div class="mt-12 mb-4 flex flex-wrap items-center justify-center gap-2">
+                {% if current_page > 1 %}
+                <a href="/?{% if active_category %}kategori={{ active_category }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}sayfa={{ current_page - 1 }}" class="px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-white text-xs font-bold transition flex items-center gap-1 shadow-md">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i> Önceki
+                </a>
+                {% endif %}
+
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == current_page %}
+                        <span class="px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-black shadow-lg shadow-red-900/40">
+                            {{ p }}
+                        </span>
+                    {% elif p <= 3 or p >= total_pages - 1 or (p >= current_page - 1 and p <= current_page + 1) %}
+                        <a href="/?{% if active_category %}kategori={{ active_category }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}sayfa={{ p }}" class="px-3.5 py-2 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-slate-300 text-xs font-bold transition">
+                            {{ p }}
+                        </a>
+                    {% elif p == 4 or p == total_pages - 2 %}
+                        <span class="px-2 text-slate-500 text-xs">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if current_page < total_pages %}
+                <a href="/?{% if active_category %}kategori={{ active_category }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}sayfa={{ current_page + 1 }}" class="px-4 py-2 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-white text-xs font-bold transition flex items-center gap-1 shadow-md">
+                    Sonraki <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
 
         {% endif %}
 

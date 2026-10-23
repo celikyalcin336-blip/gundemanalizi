@@ -439,14 +439,27 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
     return slug
 
 
-def get_articles(limit: int = 20, category: str = None) -> List[Dict]:
+def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List[Dict]:
     """Son yayınlanan makaleleri listeler."""
     with get_connection() as conn:
         if category:
-            cur = conn.execute("SELECT * FROM articles WHERE category = ? ORDER BY id DESC LIMIT ?", (category, limit))
+            cur = conn.execute("SELECT * FROM articles WHERE category = ? ORDER BY id DESC LIMIT ? OFFSET ?", (category, limit, offset))
         else:
-            cur = conn.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ?", (limit,))
+            cur = conn.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
         return [_row_to_dict(row) for row in cur.fetchall()]
+
+
+def get_articles_total_count(category: str = None) -> int:
+    """Toplam yayınlanmış haber sayısını döner."""
+    try:
+        with get_connection() as conn:
+            if category:
+                row = conn.execute("SELECT COUNT(*) AS c FROM articles WHERE category = ?", (category,)).fetchone()
+            else:
+                row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
+            return row["c"] if row else 0
+    except Exception:
+        return 0
 
 
 def get_article_by_slug(slug: str) -> Optional[Dict]:

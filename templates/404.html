@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayfa Bulunamadı (404) | Gündem Analizi</title>
+    <meta name="robots" content="noindex, follow">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#dc2626',
+                            dark: '#0a0d14',
+                            card: '#121722',
+                            border: '#1f293d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3.5 group">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <div>
+                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
+                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    </span>
+                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                        Doğru Haber • Tarafsız Analiz
+                    </p>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="/" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition">
+                    <i data-lucide="home" class="w-3.5 h-3.5"></i> Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 404 BODY -->
+    <main class="max-w-3xl mx-auto px-4 py-16 flex-1 flex flex-col items-center justify-center text-center">
+        <div class="w-24 h-24 rounded-3xl bg-red-600/10 border-2 border-red-600/30 flex items-center justify-center mb-6 shadow-2xl">
+            <span class="text-5xl font-black text-red-500">404</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">
+            Aradığınız Sayfa Bulunamadı
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base max-w-lg mb-8 leading-relaxed">
+            Ulaşmaya çalıştığınız haber yayından kaldırılmış, bağlantı adresi değişmiş ya da geçici olarak taşınmış olabilir.
+        </p>
+
+        <!-- Arama Formu -->
+        <form action="/" method="GET" class="w-full max-w-md mb-8">
+            <div class="relative">
+                <input type="text" name="q" placeholder="Sitede haber ara (Örn: Dolar, Asgari Ücret, Zonguldak)..." class="w-full bg-brand-card border border-brand-border rounded-xl py-3 pl-4 pr-12 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+                <button type="submit" class="absolute right-2 top-2 p-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Hızlı Kategori ve Ana Sayfa Butonları -->
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <a href="/" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-lg shadow-red-900/30 transition flex items-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Güncel Haberlere Dön
+            </a>
+            <a href="/?kategori=Ekonomi" class="px-4 py-2.5 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-slate-300 font-semibold text-sm transition">
+                Ekonomi
+            </a>
+            <a href="/?kategori=Gündem" class="px-4 py-2.5 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-slate-300 font-semibold text-sm transition">
+                Gündem
+            </a>
+            <a href="/?kategori=Dünya" class="px-4 py-2.5 rounded-xl bg-brand-card hover:bg-brand-border border border-brand-border text-slate-300 font-semibold text-sm transition">
+                Dünya
+            </a>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-brand-border/80 bg-brand-dark py-6 text-center text-xs text-slate-500">
+        <p>© 2026 Gündem Analizi. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

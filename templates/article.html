@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ article.title }} | Gündem Analizi</title>
     <meta name="description" content="{{ article.summary }}">
-    <link rel="canonical" href="{{ request.url }}">
+    <link rel="canonical" href="{{ canonical_url or ('https://xn--gndemanalizi-dlb.com.tr/haber/' ~ article.slug) }}">
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
@@ -42,49 +42,76 @@
       });
     </script>
 
-    <!-- Google News & Discover Schema (JSON-LD) -->
+    <!-- Google News, Discover & Breadcrumb Schema (JSON-LD) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "{{ request.url }}"
-      },
-      "isPartOf": {
-        "@type": ["CreativeWork", "Product"],
-        "name": "Gündem Analizi",
-        "productID": "CAowvbrODA:openaccess"
-      },
-      "headline": {{ article.title | tojson }},
-      "description": {{ article.summary | tojson }},
-      "image": [
-        {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
-      ],
-      "datePublished": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
-      "dateModified": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
-      "author": {
-        "@type": "Organization",
-        "name": "Gündem Analizi Haber Masası",
-        "url": "https://xn--gndemanalizi-dlb.com.tr"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Gündem Analizi",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"
+      "@graph": [
+        {
+          "@type": "NewsArticle",
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://xn--gndemanalizi-dlb.com.tr/haber/{{ article.slug }}"
+          },
+          "isPartOf": {
+            "@type": ["CreativeWork", "Product"],
+            "name": "Gündem Analizi",
+            "productID": "CAowvbrODA:openaccess"
+          },
+          "headline": {{ article.title | tojson }},
+          "description": {{ article.summary | tojson }},
+          "image": [
+            {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
+          ],
+          "datePublished": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
+          "dateModified": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
+          "author": {
+            "@type": "Organization",
+            "name": "Gündem Analizi Haber Masası",
+            "url": "https://xn--gndemanalizi-dlb.com.tr"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Gündem Analizi",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"
+            }
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Ana Sayfa",
+              "item": "https://xn--gndemanalizi-dlb.com.tr"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "{{ article.category }}",
+              "item": "https://xn--gndemanalizi-dlb.com.tr/?kategori={{ article.category }}"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": {{ article.title | tojson }},
+              "item": "https://xn--gndemanalizi-dlb.com.tr/haber/{{ article.slug }}"
+            }
+          ]
         }
-      }
+      ]
     }
     </script>
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="Gündem Analizi">
     <meta property="og:title" content="{{ article.title }}">
     <meta property="og:description" content="{{ article.summary }}">
-    <meta property="og:url" content="https://gündemanalizi.com.tr/haber/{{ article.slug }}">
+    <meta property="og:url" content="https://xn--gndemanalizi-dlb.com.tr/haber/{{ article.slug }}">
     {% if article.image_path %}
-    <meta property="og:image" content="https://gündemanalizi.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
+    <meta property="og:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     {% endif %}
@@ -92,7 +119,7 @@
     <meta name="twitter:title" content="{{ article.title }}">
     <meta name="twitter:description" content="{{ article.summary }}">
     {% if article.image_path %}
-    <meta name="twitter:image" content="https://gündemanalizi.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
+    <meta name="twitter:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
     {% endif %}
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="alternate" type="application/rss+xml" title="Gündem Analizi RSS" href="/rss.xml">
@@ -232,7 +259,7 @@
             <!-- Ana Görsel (Haber Kartı) -->
             <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ article.title }}" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
+                    <img src="/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
                 {% endif %}
             </div>
 

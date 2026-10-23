@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse, JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import database
 import config
 import main
@@ -58,6 +59,22 @@ ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
 PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
 
 app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
+
+@app.exception_handler(404)
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        # Eğer istek bir API sorgusuysa JSON dön
+        if request.url.path.startswith("/api/"):
+            return JSONResponse(status_code=404, content={"detail": exc.detail or "Not Found"})
+        # Web kullanıcısıysa şık markalı HTML 404 şablonu dön
+        return templates.TemplateResponse(
+            request=request,
+            name="404.html",
+            context={},
+            status_code=404
+        )
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
@@ -321,18 +338,35 @@ async def api_market_rates():
     """Canlı altın, dolar, euro ve bitcoin fiyatlarını JSON olarak döner."""
     return JSONResponse(get_market_rates())
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request, kategori: str = None, q: str = None):
+@app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
     database.record_visit("home_visits")
+    import math
+    import urllib.parse
+    page = max(1, sayfa)
+    limit = 24
+    offset = (page - 1) * limit
+
     if q and q.strip():
         q_low = q.strip().lower()
         all_arts = database.get_articles(limit=150)
-        articles = [
+        matched = [
             a for a in all_arts
             if q_low in (a.get("title") or "").lower() or q_low in (a.get("summary") or "").lower()
         ]
+        total_count = len(matched)
+        articles = matched[offset:offset + limit]
+        canonical_url = f"{config.SITE_URL}/"
     else:
-        articles = database.get_articles(limit=24, category=kategori)
+        articles = database.get_articles(limit=limit, category=kategori, offset=offset)
+        total_count = database.get_articles_total_count(category=kategori)
+        if kategori:
+            canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(kategori)}"
+        else:
+            canonical_url = f"{config.SITE_URL}/"
+
+    total_pages = max(1, math.ceil(total_count / limit))
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -341,7 +375,11 @@ async def home(request: Request, kategori: str = None, q: str = None):
             "active_category": kategori,
             "search_query": q.strip() if q else "",
             "ad_settings": get_site_ad_settings(),
-            "market_rates": get_market_rates()["rates"]
+            "market_rates": get_market_rates()["rates"],
+            "canonical_url": canonical_url,
+            "current_page": page,
+            "total_pages": total_pages,
+            "total_articles": total_count
         }
     )
 
@@ -896,13 +934,14 @@ async def submit_ihbar(
     threading.Thread(target=_bg_send, daemon=True).start()
     return {"ok": True, "message": "İhbarınız ve medyanız Haber Merkezimize başarıyla iletildi! Teşekkür ederiz."}
 
-@app.get("/haber/{slug}", response_class=HTMLResponse)
+@app.api_route("/haber/{slug}", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
     article = database.get_article_by_slug(slug)
     if not article:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
-    
+
     other_articles = [a for a in database.get_articles(limit=6) if a["slug"] != slug][:5]
+    canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     return templates.TemplateResponse(
         request=request,
         name="article.html",
@@ -910,7 +949,8 @@ async def article_detail(request: Request, slug: str):
             "article": article,
             "other_articles": other_articles,
             "ad_settings": get_site_ad_settings(),
-            "market_rates": get_market_rates()["rates"]
+            "market_rates": get_market_rates()["rates"],
+            "canonical_url": canonical_url
         }
     )
 
@@ -979,8 +1019,10 @@ async def sitemap(request: Request):
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
+    import urllib.parse
     for cat in ("Gündem", "Ekonomi", "Dünya", "Spor", "Asayiş", "Son Dakika"):
-        xml.append(f'  <url><loc>{base_url}/?kategori={cat}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+        cat_enc = urllib.parse.quote(cat)
+        xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
