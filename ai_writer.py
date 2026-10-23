@@ -210,14 +210,58 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
         except Exception as e:
             print(f"Gemini makale üretimi hatası: {e}")
 
-    # Fallback (Şablon Makale - Gerçek Paragraflar ve Sayılarla Doldurur, Asla Boş Şablon Cümlesi Yazmaz)
-    raw_paras = [p.strip() for p in summary.split("\n") if len(p.strip()) > 35]
-    if len(raw_paras) >= 2:
-        lead_para = raw_paras[0]
-        body_paras = "".join(f'<p class="text-slate-300 leading-relaxed mb-4">{p}</p>' for p in raw_paras[1:])
+    # Fallback (Şablon Makale - Asla Metni İki Kez Tekrarlamaz, Zengin ve Profesyonel Paragraflar Üretir)
+    import re
+    raw_clean = summary.strip()
+    # Metni cümlelere ayır (Türkçe kısaltmaları ve noktalama işaretlerini gözeterek)
+    sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', raw_clean) if len(s.strip()) > 20]
+    
+    # Başlıkla aynı olan veya çöp soru olan cümleleri filtrele
+    filtered = []
+    for s in sentences:
+        if s.lower() == title.lower() or title.lower() in s.lower():
+            continue
+        if s.endswith('?') and len(s) < 55:
+            continue
+        filtered.append(s)
+
+    if filtered:
+        lead_para = filtered[0]
+        remaining = filtered[1:]
     else:
-        lead_para = summary.replace("\n", " ").strip() if summary else title
-        body_paras = f'<p class="text-slate-300 leading-relaxed mb-4">{lead_para}</p>'
+        lead_para = raw_clean if raw_clean else title
+        remaining = []
+
+    body_paras_list = []
+    if remaining:
+        # Kalan cümleleri 2'şerli paragraflara grupla
+        chunk1 = " ".join(remaining[:2])
+        body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk1}</p>')
+        if len(remaining) > 2:
+            chunk2 = " ".join(remaining[2:5])
+            body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk2}</p>')
+    else:
+        # Tek cümlelik haberlerde ASLA girişi tekrar etme; kategoriye özel editoryal arka plan ekle
+        if category == "Ekonomi":
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler ve tüketici üzerindeki yansımaların önümüzdeki günlerde netleşeceğini belirtiyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sektör temsilcileri ve ilgili finans kurumlarının alacağı yeni kararlar yakından takip edilirken, sürecin piyasa dinamiklerine etkisi ekonomi masamız tarafından izlenmektedir.</p>')
+        elif category == "Spor":
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Spor camiasında geniş yankı uyandıran gelişmeyle ilgili taraflardan gelecek yeni açıklamalar merakla beklenirken, teknik heyet ve yönetimin atacağı adımlar takip ediliyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmenin ligdeki dengelere ve takımın önümüzdeki fikstürüne olası etkileri spor masamız tarafından aktarılmaya devam edecektir.</p>')
+        elif category == "Dünya":
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgesel ve uluslararası dengeleri yakından ilgilendiren olay sonrasında ilgili ülkelerin diplomatik temasları hız kazandı.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Uluslararası gözlemciler ve diplomasi çevreleri sürecin seyrine ilişkin değerlendirmelerini sürdürürken, gelişmeler anlık olarak takip edilmektedir.</p>')
+        else:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sürecin detayları ve yaşanacak yeni gelişmeler anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
+
+    body_paras = "\n".join(body_paras_list)
+
+    eval_text = "Gelişmenin piyasalar ve kamuoyu üzerindeki yansımaları masamız tarafından yakından takip edilmektedir. Sürece dair resmi makamlardan gelecek yeni veriler anlık olarak aktarılacaktır."
+    if category == "Ekonomi":
+        eval_text = "Piyasalardaki fiyatlamalar, tüketici hakları ve makroekonomik dengeler açısından sürecin seyri ekonomi servisimiz tarafından yakından izlenmektedir."
+    elif category == "Spor":
+        eval_text = "Müsabaka takvimi ve spor kamuoyunun nabzı doğrultusunda kulüplerden gelecek resmi açıklamalar anlık olarak sayfalarımızda yer alacaktır."
 
     content_html = f"""
     <p class="lead font-medium text-lg text-slate-200 mb-6">
@@ -232,7 +276,7 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
             <span>🔴</span> GÜNDEM ANALİZİ DEĞERLENDİRMESİ
         </h4>
         <p class="text-slate-300 text-sm leading-relaxed">
-            Gelişmenin piyasalar ve kamuoyu üzerindeki yansımaları ekonomi masamız tarafından yakından takip edilmektedir. Sürece dair resmi makamlardan gelecek yeni veriler anlık olarak aktarılacaktır.
+            {eval_text}
         </p>
     </div>
     """

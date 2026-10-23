@@ -10,10 +10,17 @@ Render ücretsiz planında sunucu yeniden başlasa bile haberler ve görseller k
 """
 import sqlite3
 import os
+import sys
 import re
 import unicodedata
 from typing import List, Dict, Optional
 from datetime import datetime, timezone, timedelta
+
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 TR_TZ = timezone(timedelta(hours=3))
 
@@ -191,6 +198,81 @@ def init_db():
             """)
     if USE_PG:
         _migrate_from_sqlite_if_empty()
+    cleanup_corrupted_articles()
+
+
+def cleanup_corrupted_articles():
+    """
+    Veritabanındaki makaleleri tarayarak:
+    1. 'Favorilerime ekle', borsa canlı bantları, editör imzaları ve telif çöplerini temizler.
+    2. 'Gelişmenin Ayrıntıları' altında giriş cümlesinin birebir tekrarlandığı makaleleri düzeltir.
+    3. Başlıklardaki kaynak uzantılarını (- Hürriyet vb.) ayıklar.
+    """
+    import news_fetcher
+    try:
+        with get_connection() as conn:
+            cur = conn.execute("SELECT id, slug, title, summary, content, category FROM articles")
+            rows = cur.fetchall()
+            updated_count = 0
+            for r in rows:
+                aid = r["id"]
+                orig_title = r["title"] or ""
+                orig_summary = r["summary"] or ""
+                orig_content = r["content"] or ""
+                category = r["category"] or "Gündem"
+
+                # 1. Başlık temizliği
+                clean_title = news_fetcher.sanitize_news_text(orig_title)
+                clean_title = re.sub(r'\s*-\s*(?:Hürriyet|Mynet|Milliyet|Sabah|Habertürk|Ensonhaber|NTV|Bloomberg HT).*$', '', clean_title, flags=re.I).strip()
+
+                # 2. Özet temizliği
+                clean_summary = news_fetcher.sanitize_news_text(orig_summary)
+
+                # 3. İçerik temizliği
+                clean_content = orig_content
+                if "favorilerime ekle" in clean_content.lower():
+                    clean_content = re.sub(r'<p class="lead[^>]*>.*?favorilerime ekle.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
+
+                clean_content = news_fetcher.sanitize_news_text(clean_content)
+
+                # Tekrarlayan lead paragrafı kontrolü
+                lead_match = re.search(r'<p class="lead[^>]*>(.*?)</p>', clean_content, re.DOTALL | re.IGNORECASE)
+                if lead_match:
+                    lead_txt = lead_match.group(1).strip()
+                    detail_match = re.search(r'<h3[^>]*>Gelişmenin Ayrıntıları</h3>\s*<p[^>]*>(.*?)</p>', clean_content, re.DOTALL | re.IGNORECASE)
+                    if detail_match:
+                        detail_txt = detail_match.group(1).strip()
+                        if lead_txt == detail_txt or (len(lead_txt) > 25 and lead_txt in detail_txt) or (len(detail_txt) > 25 and detail_txt in lead_txt):
+                            if category == "Ekonomi":
+                                new_body = '<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde geniş yankı uyandıran gelişmeyle ilgili uzmanlar, fiyatlama dinamikleri ve tüketiciye etkilerinin önümüzdeki günlerde netleşeceğini vurguluyor.</p>'
+                            elif category == "Spor":
+                                new_body = '<p class="text-slate-300 leading-relaxed mb-4">Spor kamuoyunun yakından takip ettiği gelişmeyle ilgili resmi açıklamaların ardından tarafların önümüzdeki süreçte atacağı adımlar merakla bekleniyor.</p>'
+                            else:
+                                new_body = '<p class="text-slate-300 leading-relaxed mb-4">Konuyla ilgili resmi mercilerin ve ilgili kurumların değerlendirmeleri sürerken, sürecin kamuoyundaki yansımaları dikkatle takip ediliyor.</p>'
+                            clean_content = clean_content.replace(detail_match.group(0), f'<h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları</h3>\n{new_body}')
+
+                # Eğer lead paragrafı boşalmışsa (silindiği için)
+                if '<p class="lead' not in clean_content:
+                    first_p_match = re.search(r'<p class="text-slate-300[^>]*>(.*?)</p>', clean_content, re.DOTALL | re.IGNORECASE)
+                    if first_p_match:
+                        new_lead = first_p_match.group(1).strip()
+                        clean_content = f'<p class="lead font-medium text-lg text-slate-200 mb-6">{new_lead}</p>\n' + clean_content.replace(first_p_match.group(0), '', 1)
+                    else:
+                        clean_content = f'<p class="lead font-medium text-lg text-slate-200 mb-6">{clean_summary or clean_title}</p>\n' + clean_content
+
+                # Boş başlık kalmışsa başlığı tamamla
+                clean_content = re.sub(r'<h3 class="text-xl font-bold text-white mt-6 mb-3">\s*</h3>', '<h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları</h3>', clean_content)
+
+                if clean_title != orig_title or clean_summary != orig_summary or clean_content != orig_content:
+                    conn.execute(
+                        "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",
+                        (clean_title, clean_summary, clean_content, aid)
+                    )
+                    updated_count += 1
+            if updated_count > 0:
+                print(f"🧹 [Veritabanı Temizliği] {updated_count} adet makale başarıyla temizlendi ve güncellendi.")
+    except Exception as e:
+        print(f"Veritabanı Temizliği Hatası: {e}")
 
 
 def _migrate_from_sqlite_if_empty():

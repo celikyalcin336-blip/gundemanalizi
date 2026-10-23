@@ -44,11 +44,16 @@ def clean_html(text: str) -> str:
     # 2. HTML karakter kodlarını çöz (bazı siteler çift encode ettiği için iki kez uygulanır)
     clean = html.unescape(clean)
     clean = html.unescape(clean)
+    # 3. Google News ve benzeri RSS'lerin sonuna eklediği diğer kaynak zincirlerini temizle
+    clean = re.sub(r'\s+(?:Hürriyet|Milliyet|NTV Haber|Haberler|Sözcü|Sabah|Habertürk|Ensonhaber|Mynet)[A-ZÇĞİÖŞÜ].*$', '', clean)
     clean = re.sub(r'\s+', ' ', clean)
     return clean.strip()
 
 def sanitize_news_text(text: str) -> str:
-    """Haber metnindeki ajans/site butonlarını, paylaşım çöplerini ve Google promosyonlarını temizler."""
+    """
+    Haber metnindeki ajans/site butonlarını, paylaşım çöplerini, borsa bantlarını,
+    editör imzalarını, telif uyarılarını ve arama motoru tuzaklarını temizler.
+    """
     if not text:
         return ""
     t = text
@@ -57,15 +62,33 @@ def sanitize_news_text(text: str) -> str:
     t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'([\.!?])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
 
-    # 2. Site buton, menü, SEO ve breadcrumb çöplerini kaldır
+    # 2. Site buton, menü, SEO, borsa bandı ve telif çöplerini kaldır
     junk_patterns = [
+        # Mynet / Haber siteleri favori butonları
+        r'Favorilerime\s+ekle.*?(?:ekleyebilirsin[i\.]?|ekleyin[i\.]?|kaydet|ikonuna\s+tıklayarak[^\.\n]*)',
+        r'Favorilerime\s+ekle\s*\([^\)]*\)[^\.\n]*',
+        # Finans / Borsa / Kripto canlı döviz bantları (DOLAR 49,7373 GRAM ALTIN 6.425,77...)
+        r'(?:DOLAR|EURO|BİST\s*100|GRAM\s+ALTIN|ALTIN|BİTCOİN|PETROL)\s+[\d\.,]+.*?(?:PETROL|BİTCOİN|EURO|DOLAR|ALTIN|BİST|ÇEYREK)\s+[\d\.,]+',
+        # Editör / Yazar / Ajans imzaları (Cansu Çamcı / Mynet Haber / İçerik Editörü...)
+        r'[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}/\s*(?:Mynet|Hürriyet|Milliyet|Sabah|DHA|İHA|AA|Ensonhaber)?\s*Haber\s*/\s*İçerik Editörü[^\.\n]*',
+        r'(?:Editör|Muhabir|Fotoğraf):\s*[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,30}',
+        # Telif ve Hürriyet / Mynet kopyalama yasak uyarıları
+        r'(?:Hurriyet\.com\.tr|Mynet|Milliyet|Sabah|TRT Haber).*?haber içerikleri kaynak gösterilmeden alıntı yapılamaz[^\.\n]*',
+        r'Kanuna aykırı ve izinsiz olarak kopyalanamaz[^\.\n]*',
+        r'başka yerde yayınlanamaz\.?',
+        r'Hürriyet\'in internet haber sitesi hurriyet\.com\.tr;[^\.\n]*',
+        r'Tüm hakları saklıdır\.?',
+        # Tıklama ve bekleme tuzakları
+        r'Ayrıntılar Geliyor\.+',
+        r'Detaylar birazdan\.+',
+        r'Haberin devamı aşağıdadır\.?',
+        # Standart buton ve Google promosyon çöpleri
         r'\bHABERLER\b.*?(?:Haberleri|Gündem)',
         r'Font\s*Boyutu.*?Linki\s*Kopyala',
         r'Haberlerimizi\s+Google.*?Haberin\s+Devam[ıi]',
         r'Google(?:\'da|\s+da)\s+tercih\s+edilen.*?ekleyin',
         r'Gelişmelerden\s+anında\s+haberdar\s+olun\.?',
         r'Haberin\s+Devam[ıi]',
-        r'Gelişmenin\s+Ayrıntıları',
         r'\b(?:Güncelleme|Oluşturulma)\s*Tarihi:[^\.\n\r]*?(?:\d{2}:\d{2}|\d{4})',
         r'[A-ZÇĞİÖŞÜ\s]{2,25}/\s+[A-ZÇĞİÖŞÜ\s]{2,25}\s*\([^)]+\)\s*,\s*\([A-ZÇĞİÖŞÜ]+\)',
         r'Fotoğraf:\s*[A-Za-zÇĞİÖŞÜçğıöşü0-9\s/]+',
@@ -75,6 +98,40 @@ def sanitize_news_text(text: str) -> str:
         t = re.sub(p, ' ', t, flags=re.IGNORECASE)
     t = re.sub(r'\s+', ' ', t).strip()
     return t
+
+def is_valueless_clickbait(title: str, text: str) -> bool:
+    """
+    Fiyat, zam, indirim veya kur sorgulayan ama içinde hiçbir sayı,
+    fiyat (TL, lira, kuruş, $) veya somut bilgi barındırmayan
+    kullanıcıyı kandıran arama motoru (SEO) tuzaklarını tespit eder.
+    (Örn: 'Benzin ne kadar oldu? Motorin kaç TL?' sorup hiç fiyat vermeyen çöp haberler)
+    """
+    combined = f"{title} {text}".lower()
+    price_keywords = [
+        "akaryakıt", "benzin", "motorin", "lpg", "altın fiyat", "çeyrek altın",
+        "gram altın", "kaç tl", "kaç lira", "fiyatı ne kadar", "ne kadar oldu",
+        "zam geldi mi", "indirim var mı", "dolar ne kadar", "euro ne kadar"
+    ]
+    is_price_topic = any(k in combined for k in price_keywords)
+    if not is_price_topic:
+        return False
+
+    # İçinde gerçek para/fiyat birimi veya rakam var mı?
+    has_prices = bool(re.search(r'\b\d{1,3}(?:[\.,]\d{1,4})?\s*(?:tl|lira|kuruş|dolar|\$|€|euro)\b', text, re.I))
+    if not has_prices:
+        # 43,50 veya 44.10 gibi ondalıklı fiyat rakamları var mı?
+        has_floating_nums = bool(re.search(r'\b\d{2}[\.,]\d{2}\b', text))
+        if not has_floating_nums:
+            return True
+
+    # Soru döngüsü kontrolü: Cümlelerin yüzde 40'ından fazlası soru işareti içeriyorsa ve bilgi vermiyorsa
+    sentences = [s.strip() for s in re.split(r'[\.!\?]\s+', text) if s.strip()]
+    if sentences:
+        question_count = sum(1 for char in text if char == '?')
+        if question_count >= 3 and (question_count / len(sentences)) > 0.4:
+            return True
+
+    return False
 
 
 def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
@@ -151,15 +208,22 @@ def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
             "font boyutu", "yazıyı büyüt", "yazıyı küçült", "linki kopyala",
             "google'da takip edin", "google'da tercih edilen", "haberin devamı",
             "gelişmelerden anında", "oluşturulma tarihi", "güncelleme tarihi",
-            "flipboard", "nsosyal", "yazı boyutu", "paylaş"
+            "flipboard", "nsosyal", "yazı boyutu", "paylaş",
+            "favorilerime ekle", "ikonuna tıklayarak", "içerik editörü", "haber / içerik",
+            "kanuna aykırı ve izinsiz", "kaynak gösterilmeden alıntı yapılamaz", "ayrıntılar geliyor",
+            "detaylar birazdan", "hurriyet.com.tr", "mynet haber", "bist 100", "gram altın",
+            "whatsapp kanalımıza", "bizi takip edin", "e-bülten", "ayrıntılar için tıklayın"
         ]
         for p in p_matches:
             c = clean_html(p)
             c = sanitize_news_text(c)
-            if len(c) > 40 and not any(b in c.lower() for b in bad_body_phrases):
-                clean_paras.append(c)
-                if len(clean_paras) >= max_paragraphs:
-                    break
+            # 50 karakterden uzun, çöp içermeyen ve daha önce listeye eklenmemiş özgün paragraflar
+            if len(c) > 50 and not any(b in c.lower() for b in bad_body_phrases):
+                # Tekrarlayan paragrafları engelle
+                if not any(c.lower() in existing.lower() or existing.lower() in c.lower() for existing in clean_paras):
+                    clean_paras.append(c)
+                    if len(clean_paras) >= max_paragraphs:
+                        break
 
         return {
             "body": "\n\n".join(clean_paras),
@@ -269,6 +333,10 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
                 published = entry.get("published", "")
 
                 if not title or not link:
+                    continue
+
+                # Somut veri/fiyat içermeyen, yalnızca soru sorup duran arama motoru tuzaklarını baştan ele
+                if is_valueless_clickbait(title, summary):
                     continue
 
                 news_hash = get_news_hash(title, link)

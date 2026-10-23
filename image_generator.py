@@ -240,6 +240,151 @@ def create_news_visual(candidate_urls: list, output_filename: str, title: str = 
         
     return create_default_brand_backdrop(output_path, title, category)
 
+def wrap_text(text: str, font, max_width: int) -> list:
+    """Metni verilen piksel genişliğini aşmayacak şekilde satırlara böler."""
+    words = text.split()
+    lines = []
+    current = []
+    for word in words:
+        test = ' '.join(current + [word])
+        bbox = font.getbbox(test)
+        if bbox[2] - bbox[0] <= max_width:
+            current.append(word)
+        else:
+            if current:
+                lines.append(' '.join(current))
+            current = [word]
+    if current:
+        lines.append(' '.join(current))
+    return lines
+
+def create_story_card(candidate_urls: list, output_filename: str, title: str = "", category: str = "Gündem") -> str:
+    """
+    Instagram ve Facebook Hikayeleri (Story - 9:16 dikey format 1080x1920) için
+    haber başlığı, kategori rozeti, Gündem Analizi logosu ve web sitesi yönlendirmesi
+    içeren, televizyon bülteni kalitesinde özel dikey hikaye kartı üretir.
+    Çıplak veya yazısız görsel paylaşımını kesin olarak engeller.
+    """
+    output_path = os.path.join(OUTPUT_DIR, output_filename)
+    width, height = 1080, 1920
+    canvas = Image.new("RGB", (width, height), (10, 13, 20))
+    draw = ImageDraw.Draw(canvas)
+
+    cleaned_urls = [u for u in candidate_urls if u and u.startswith("http")]
+    primary_url = cleaned_urls[0] if cleaned_urls else None
+
+    # 1. Sinematik Arka Plan (Görsel varsa bulanık derinlik, yoksa premium koyu degrade)
+    photo_raw = None
+    if primary_url:
+        try:
+            headers = {"User-Agent": "Mozilla/5.0"}
+            resp = requests.get(primary_url, headers=headers, timeout=8)
+            if resp.status_code == 200 and len(resp.content) > 1000:
+                raw_img = Image.open(BytesIO(resp.content)).convert("RGB")
+                photo_raw = raw_img
+                # Arka plan için bulanık versiyon
+                bg_blur = ImageOps.fit(raw_img, (width, height), method=Image.Resampling.LANCZOS)
+                bg_blur = bg_blur.filter(ImageFilter.GaussianBlur(radius=45))
+                # Koyu renk filtre katmanı ekle
+                dark_overlay = Image.new("RGBA", (width, height), (10, 13, 20, 205))
+                bg_blur.paste(dark_overlay, (0, 0), mask=dark_overlay)
+                canvas.paste(bg_blur, (0, 0))
+        except Exception as e:
+            print(f"Hikaye arka plan hazırlama hatası: {e}")
+
+    if photo_raw is None:
+        for y in range(height):
+            ratio = y / height
+            r = int(10 + (22 - 10) * ratio)
+            g = int(13 + (28 - 13) * ratio)
+            b = int(20 + (42 - 20) * ratio)
+            draw.line([(0, y), (width, y)], fill=(r, g, b))
+
+    # 2. Üst Header (Logo + Marka + Kategori Rozeti)
+    logo_path = os.path.join(BASE_DIR, "assets", "logo.png")
+    if os.path.exists(logo_path):
+        try:
+            logo = Image.open(logo_path).convert("RGBA")
+            logo = logo.resize((90, 90), Image.Resampling.LANCZOS)
+            canvas.paste(logo, (70, 95), mask=logo)
+        except Exception:
+            pass
+
+    f_brand = get_font(FONT_BOLD_PATH, 38)
+    draw.text((180, 98), "GÜNDEM ANALİZİ", font=f_brand, fill=(255, 255, 255))
+    f_sub = get_font(FONT_REGULAR_PATH, 18)
+    draw.text((182, 148), "DOĞRU HABER • TARAFSIZ ANALİZ", font=f_sub, fill=(148, 163, 184))
+
+    # Kategori Rozeti (Sağ üst)
+    cat_text = category.upper() if category else "GÜNDEM"
+    f_cat = get_font(FONT_BOLD_PATH, 22)
+    cat_bbox = f_cat.getbbox(cat_text)
+    cat_w = cat_bbox[2] - cat_bbox[0] + 36
+    cat_h = 44
+    cat_x = width - 70 - cat_w
+    cat_y = 118
+    draw.rounded_rectangle([cat_x, cat_y, cat_x + cat_w, cat_y + cat_h], radius=12, fill=(220, 38, 38))
+    draw.text((cat_x + 18, cat_y + 10), cat_text, font=f_cat, fill=(255, 255, 255))
+
+    # 3. Ana Haber Görseli (Ortalanmış 940x680 HD Çerçeve)
+    slot_w, slot_h = 940, 680
+    frame_x, frame_y = 70, 230
+    if photo_raw is not None:
+        try:
+            cropped_photo = ImageOps.fit(photo_raw, (slot_w, slot_h), method=Image.Resampling.LANCZOS)
+            cropped_photo = cropped_photo.filter(ImageFilter.UnsharpMask(radius=1.0, percent=110, threshold=3))
+            canvas.paste(cropped_photo, (frame_x, frame_y))
+            # Çerçeve kenarlık çizgisi
+            draw.rectangle([frame_x, frame_y, frame_x + slot_w, frame_y + slot_h], outline=(51, 65, 85), width=2)
+        except Exception as e:
+            print(f"Hikaye fotoğraf yerleştirme hatası: {e}")
+    else:
+        draw.rounded_rectangle([frame_x, frame_y, frame_x + slot_w, frame_y + slot_h], radius=16, fill=(18, 23, 34), outline=(51, 65, 85), width=2)
+
+    # 4. Haber Başlığı Kartı (940x670 Özel Okuma Alanı)
+    card_x1, card_y1 = 70, 955
+    card_x2, card_y2 = 1010, 1640
+    draw.rounded_rectangle([card_x1, card_y1, card_x2, card_y2], radius=24, fill=(15, 20, 30), outline=(31, 41, 61), width=2)
+
+    # Kırmızı vurgu etiketi
+    draw.rounded_rectangle([100, 990, 270, 1032], radius=8, fill=(220, 38, 38))
+    f_badge = get_font(FONT_BOLD_PATH, 20)
+    draw.text((112, 998), "⚡ SON GELİŞME", font=f_badge, fill=(255, 255, 255))
+
+    # Başlık Metni (Büyük, yüksek kontrastlı ve okunaklı)
+    clean_title = title.strip()
+    f_title = get_font(FONT_BOLD_PATH, 44)
+    lines = wrap_text(clean_title, f_title, 850)
+    
+    # Çok uzun başlıklarda taşmayı önlemek için fontu küçült
+    if len(lines) > 5:
+        f_title = get_font(FONT_BOLD_PATH, 38)
+        lines = wrap_text(clean_title, f_title, 850)
+
+    y_text = 1065
+    for line in lines[:5]:
+        draw.text((100, y_text), line, font=f_title, fill=(255, 255, 255))
+        y_text += 58
+
+    # 5. Alt Aksiyon / Web Yönlendirme Butonu (CTA)
+    cta_box = [100, 1705, 980, 1805]
+    draw.rounded_rectangle(cta_box, radius=50, fill=(220, 38, 38))
+    f_cta = get_font(FONT_BOLD_PATH, 30)
+    cta_text = "🌐 Haberin Detayları: www.gündemanalizi.com.tr"
+    c_bbox = f_cta.getbbox(cta_text)
+    c_w = c_bbox[2] - c_bbox[0]
+    draw.text((cta_box[0] + (880 - c_w) // 2, cta_box[1] + 32), cta_text, font=f_cta, fill=(255, 255, 255))
+
+    # Alt yönlendirme fısıltısı
+    f_hint = get_font(FONT_REGULAR_PATH, 20)
+    hint_text = "👆 Yukarı kaydırın veya profildeki linke tıklayın"
+    h_bbox = f_hint.getbbox(hint_text)
+    h_w = h_bbox[2] - h_bbox[0]
+    draw.text(((width - h_w) // 2, 1835), hint_text, font=f_hint, fill=(148, 163, 184))
+
+    canvas.save(output_path, "JPEG", quality=95)
+    return output_path
+
 def generate_news_card(title: str, source: str, image_url: str = None, tag: str = "TÜRKİYE GÜNDEMİ", output_filename: str = "post.jpg") -> str:
     """Geriye uyumluluk fonksiyonu."""
     urls = [image_url] if image_url else []
