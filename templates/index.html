@@ -133,24 +133,25 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="hidden sm:flex items-center gap-1.5 shrink-0">
-                <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap shadow">
-                    💬 WhatsApp
-                </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap">
-                    📲 Telegram
-                </a>
-                <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap">
-                    📸 Instagram
-                </a>
-                <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap">
-                    🎵 TikTok
-                </a>
-                <a href="https://www.facebook.com/gundemanalizi" target="_blank" class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap">
-                    📘 Facebook
-                </a>
-                <a href="https://x.com/gndmanalizi" target="_blank" class="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap">
-                    🐦 X
+                        <!-- Canlı Hava Durumu & Tarih (Tier-1 Medya Standardı) -->
+            <div class="hidden sm:flex items-center gap-3 shrink-0 text-xs font-semibold text-slate-300">
+                <div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-[11px]">
+                    <span class="text-amber-400">☀️</span>
+                    <span class="text-white font-bold">İstanbul</span>
+                    <span class="text-amber-300 font-mono">19°C</span>
+                </div>
+                <div class="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-[11px]">
+                    <span class="text-sky-300">⛅</span>
+                    <span class="text-white font-bold">Ankara</span>
+                    <span class="text-sky-200 font-mono">15°C</span>
+                </div>
+                <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-[11px]">
+                    <span class="text-emerald-400">🌦️</span>
+                    <span class="text-white font-bold">İzmir</span>
+                    <span class="text-emerald-300 font-mono">21°C</span>
+                </div>
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1 bg-red-600 hover:bg-red-500 transition px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white whitespace-nowrap shadow">
+                    <i data-lucide="send" class="w-3 h-3"></i> Telegram
                 </a>
             </div>
         </div>
@@ -263,40 +264,54 @@
         </div>
         {% endif %}
 
-        <!-- TÜM SOSYAL MEDYA HESAPLARI & 7/24 İHBAR HATTI BARI -->
-        <div class="mb-6 p-3.5 rounded-2xl bg-brand-card border border-brand-border shadow-xl flex flex-col lg:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5 text-xs sm:text-sm font-extrabold text-white">
+        <!-- CNN TÜRK & HÜRRİYET TARZI "GÜNDEM ANALİZİ'Nİ TAKİP EDİN" SOSYAL MEDYA BARI -->
+        <div class="mb-5 p-3.5 sm:p-4 rounded-2xl bg-brand-card border border-brand-border shadow-xl flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
-                <span>Bizi İstediğiniz Sosyal Medyadan Takip Edin:</span>
+                <span class="text-xs sm:text-sm font-black tracking-wider uppercase text-white">GÜNDEM ANALİZİ'Nİ TAKİP EDİN</span>
             </div>
-            <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold">
-                <button type="button" onclick="shareSiteWhatsApp()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black shadow-lg shadow-emerald-900/40 transition flex items-center gap-1.5">
-                    <span>📲 Siteyi WhatsApp'ta Paylaş</span>
-                </button>
-                <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 transition flex items-center gap-1.5">
-                    💬 WhatsApp Kanalı
+            <!-- CNN Türk tarzı koyu yuvarlatılmış kare butonlar -->
+            <div class="flex flex-wrap items-center gap-2 text-white">
+                <a href="https://news.google.com" target="_blank" title="Google News'te Takip Et"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <span class="font-black text-sm text-red-500 group-hover:scale-110 transition">N</span>
                 </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="px-3 py-1.5 rounded-xl bg-sky-600/20 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/40 transition flex items-center gap-1.5">
-                    📲 Telegram
+                <a href="https://www.facebook.com/gundemanalizi" target="_blank" title="Facebook Sayfamız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-blue-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-3 py-1.5 rounded-xl bg-pink-600/20 hover:bg-pink-600 text-pink-300 hover:text-white border border-pink-500/40 transition flex items-center gap-1.5">
-                    📸 Instagram
+                <a href="https://x.com/gndmanalizi" target="_blank" title="X (Twitter) Hesabımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-400 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-3 py-1.5 rounded-xl bg-fuchsia-600/20 hover:bg-fuchsia-600 text-fuchsia-300 hover:text-white border border-fuchsia-500/40 transition flex items-center gap-1.5">
-                    🎵 TikTok
+                <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" title="WhatsApp Kanalımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-emerald-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                 </a>
-                <a href="https://www.facebook.com/gundemanalizi" target="_blank" class="px-3 py-1.5 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/40 transition flex items-center gap-1.5">
-                    📘 Facebook
+                <a href="https://www.youtube.com" target="_blank" title="YouTube Kanalımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-600 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-red-500 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </a>
-                <a href="https://x.com/gndmanalizi" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-600/50 transition flex items-center gap-1.5">
-                    🐦 X (Twitter)
+                <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" title="TikTok Hesabımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-fuchsia-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-fuchsia-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-1.01v8.42c0 1.94-.48 3.91-1.57 5.48-1.28 1.83-3.37 2.99-5.61 3.09-2.02.09-4.08-.63-5.59-1.99-1.92-1.74-2.82-4.39-2.45-6.93.36-2.5 2.04-4.66 4.39-5.56.9-.35 1.86-.5 2.82-.48v4.06c-.46-.02-.93.04-1.37.19-1.12.39-1.95 1.4-2.08 2.58-.16 1.48.74 2.92 2.18 3.32 1.25.35 2.68-.08 3.44-1.09.52-.69.75-1.56.74-2.43V.02h.17z"/></svg>
                 </a>
-                <button type="button" onclick="openIhbarModal()" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold shadow-lg transition flex items-center gap-1.5">
-                    🚨 Siz Çekin, Biz Yayınlayalım!
+                <a href="https://t.me/gundemanalizi" target="_blank" title="Telegram Kanalımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-sky-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.832.942z"/></svg>
+                </a>
+                <a href="https://www.instagram.com/gundem_analiz/" target="_blank" title="Instagram Hesabımız"
+                   class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 hover:border-pink-500 hover:bg-slate-800 transition flex items-center justify-center shadow group">
+                    <svg class="w-4 h-4 fill-white group-hover:text-pink-400 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <button type="button" onclick="openIhbarModal()" title="WhatsApp İhbar Hattı"
+                   class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow animate-pulse">
+                    <span>⚡ İhbar</span>
                 </button>
             </div>
         </div>
 
+        
         <!-- Kategori Filtresi (Mobil İçin Kaydırılabilir Bant) -->
         <div class="flex lg:hidden gap-1.5 overflow-x-auto pb-3 mb-4 text-xs font-semibold no-scrollbar">
             <a href="/" class="px-3 py-1.5 rounded-full whitespace-nowrap {{ 'bg-red-600 text-white' if not active_category else 'bg-slate-800 text-slate-300' }}">Tümü</a>
@@ -317,51 +332,228 @@
             </div>
         {% else %}
 
-            <!-- MANŞET (EN BÜYÜK İLK HABER) -->
-            {% set hero = articles[0] %}
-            <div class="mb-10">
-                <a href="/haber/{{ hero.slug }}" class="group block relative rounded-2xl overflow-hidden border border-brand-border bg-brand-card shadow-2xl hover:border-red-600/50 transition duration-300">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                        <!-- Görsel -->
-                        <div class="lg:col-span-7 relative h-72 sm:h-96 lg:h-[420px] overflow-hidden bg-slate-900">
-                            {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ hero.title }}" fetchpriority="high" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            {% else %}
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 text-slate-600">
-                                    <i data-lucide="image" class="w-16 h-16"></i>
+            <!-- HÜRRİYET & CNN TÜRK MODELİ: 1..14 NUMARALI DEV MANŞET SLIDER + SAĞ 2'Lİ SICAK KARTLAR -->
+            {% set slider_articles = articles[:14] %}
+            {% set side_articles = articles[14:16] if articles|length >= 16 else articles[1:3] %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
+                <!-- SOL / ORTA (8 KOLON): 1..14 NUMARALI MANŞET SLIDER -->
+                <div class="lg:col-span-8 flex flex-col">
+                    <div id="main-manset-slider" class="relative rounded-2xl overflow-hidden border border-brand-border bg-black shadow-2xl group h-[290px] sm:h-[400px] md:h-[450px]">
+                        {% for a in slider_articles %}
+                        <div class="manset-slide absolute inset-0 transition-opacity duration-300 {% if loop.first %}opacity-100 z-10 pointer-events-auto{% else %}opacity-0 z-0 pointer-events-none{% endif %}" data-index="{{ loop.index0 }}">
+                            <a href="/haber/{{ a.slug }}" class="block w-full h-full relative">
+                                {% if a.image_path %}
+                                    <img src="/images/{{ a.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ a.title }}"
+                                         fetchpriority="{% if loop.first %}high{% else %}low{% endif %}"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out select-none">
+                                {% else %}
+                                    <div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-600">
+                                        <i data-lucide="image" class="w-16 h-16"></i>
+                                    </div>
+                                {% endif %}
+                                <!-- Karartma & Degrade (Hürriyet / CNN Türk Tarzı) -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                                
+                                <!-- Manşet Başlık ve Kategori Rozeti (Görselin Üstünde) -->
+                                <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-7 z-20">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-red-600 text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded uppercase tracking-wider shadow">
+                                            {{ a.category }}
+                                        </span>
+                                        <span class="text-slate-300 text-[11px] font-medium hidden sm:inline">
+                                            {{ a.created_at[:16] }}
+                                        </span>
+                                    </div>
+                                    <h2 class="text-lg sm:text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-md group-hover:text-red-400 transition line-clamp-2 sm:line-clamp-3">
+                                        {{ a.title }}
+                                    </h2>
                                 </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Sol ve Sağ Ok Butonları (Hürriyet Stili) -->
+                        <button type="button" onclick="moveManset(-1)" aria-label="Önceki Manşet"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 text-white flex items-center justify-center backdrop-blur transition shadow-lg opacity-80 hover:opacity-100">
+                            <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        </button>
+                        <button type="button" onclick="moveManset(1)" aria-label="Sonraki Manşet"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/60 hover:bg-red-600 text-white flex items-center justify-center backdrop-blur transition shadow-lg opacity-80 hover:opacity-100">
+                            <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                        </button>
+                    </div>
+
+                    <!-- 1'den 14'e NUMARALI MANŞET ŞERİDİ (MOUSEOVER & TIKLAMA DESTEKLİ) -->
+                    <div class="mt-3 flex items-center justify-between gap-1 overflow-x-auto py-1 no-scrollbar select-none" id="manset-pills">
+                        {% for a in slider_articles %}
+                        <button type="button"
+                                onmouseenter="goToManset({{ loop.index0 }})"
+                                onclick="goToManset({{ loop.index0 }})"
+                                class="manset-pill flex-1 min-w-[28px] sm:min-w-[34px] py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-center transition-all duration-200 shadow-sm {% if loop.first %}bg-red-600 text-white scale-105 shadow-red-900/50{% else %}bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800{% endif %}"
+                                data-index="{{ loop.index0 }}">
+                            {{ loop.index }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- SAĞ (4 KOLON): MANŞET YANI 2'Lİ SICAK KARTLAR (HÜRRİYET MODELİ) -->
+                <div class="lg:col-span-4 flex flex-col gap-4">
+                    {% for sa in side_articles %}
+                    <a href="/haber/{{ sa.slug }}" class="group block relative rounded-2xl overflow-hidden border border-brand-border bg-brand-card hover:border-red-600/60 transition shadow-xl flex-1 flex flex-col">
+                        <div class="relative h-44 sm:h-48 overflow-hidden bg-slate-900 shrink-0">
+                            {% if sa.image_path %}
+                                <img src="/images/{{ sa.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ sa.title }}"
+                                     loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-brand-card via-transparent to-transparent lg:hidden"></div>
-                            <span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-black px-3 py-1 rounded-md uppercase tracking-wider shadow">
-                                ● {{ hero.category }}
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                            <span class="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider shadow">
+                                {{ sa.category }}
                             </span>
                         </div>
-                        <!-- Bilgi / Başlık -->
-                        <div class="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center gap-3 text-xs text-slate-400 mb-3">
-                                    <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> {{ hero.created_at[:16] }}</span>
-                                    <span>•</span>
-                                    <span class="text-red-400 font-medium">Kaynak: {{ hero.source }}</span>
-                                </div>
-                                <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight group-hover:text-red-400 transition mb-4">
-                                    {{ hero.title }}
-                                </h2>
-                                <p class="text-slate-300 text-sm leading-relaxed line-clamp-4">
-                                    {{ hero.summary }}
-                                </p>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <h3 class="font-extrabold text-white text-sm sm:text-base leading-snug group-hover:text-red-400 transition line-clamp-2 mb-2">
+                                {{ sa.title }}
+                            </h3>
+                            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-brand-border/60">
+                                <span>{{ sa.created_at[:16] }}</span>
+                                <span class="font-bold text-red-500 group-hover:translate-x-0.5 transition flex items-center">
+                                    Detay <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </span>
                             </div>
-                            <div class="mt-6 flex items-center justify-between pt-4 border-t border-brand-border/60">
-                                <span class="text-xs text-slate-400 flex items-center gap-1.5">
-                                    <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-500"></i> {{ hero.views }} okunma
-                                </span>
-                                <span class="text-xs font-bold text-red-500 flex items-center gap-1 group-hover:translate-x-1 transition">
-                                    Haberi Oku <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+                        <!-- CANLI SÜPER LİG PUAN DURUMU & FAYDALI SERVİSLER (HÜRRİYET / CNN MODELİ) -->
+            <div class="mb-10 grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Sol (8 Kolon): Süper Lig Canlı Puan Tablosu -->
+                <div class="lg:col-span-8 p-4 sm:p-5 rounded-2xl bg-brand-card border border-brand-border shadow-xl">
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-brand-border">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-red-600/20 text-red-500">
+                                <i data-lucide="trophy" class="w-4 h-4"></i>
+                            </span>
+                            <h3 class="text-sm font-black text-white tracking-wide uppercase">TRENDYOL SÜPER LİG PUAN DURUMU</h3>
+                        </div>
+                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                            Canlı Sezon 2025-2026
+                        </span>
+                    </div>
+
+                    <!-- Mini Puan Cetveli -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead>
+                                <tr class="text-[10px] text-slate-500 uppercase border-b border-slate-800/80 pb-1">
+                                    <th class="py-1 px-2">#</th>
+                                    <th class="py-1 px-2">Takım</th>
+                                    <th class="py-1 px-2 text-center">O</th>
+                                    <th class="py-1 px-2 text-center">G</th>
+                                    <th class="py-1 px-2 text-center">B</th>
+                                    <th class="py-1 px-2 text-center">M</th>
+                                    <th class="py-1 px-2 text-center">AV</th>
+                                    <th class="py-1 px-2 text-center font-black text-white">P</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/50 font-medium">
+                                <tr class="hover:bg-slate-800/40 transition">
+                                    <td class="py-1.5 px-2 font-bold text-emerald-400">1</td>
+                                    <td class="py-1.5 px-2 font-extrabold text-white flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Galatasaray
+                                    </td>
+                                    <td class="py-1.5 px-2 text-center">28</td>
+                                    <td class="py-1.5 px-2 text-center">23</td>
+                                    <td class="py-1.5 px-2 text-center">3</td>
+                                    <td class="py-1.5 px-2 text-center">2</td>
+                                    <td class="py-1.5 px-2 text-center">+48</td>
+                                    <td class="py-1.5 px-2 text-center font-black text-amber-400 text-sm">72</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/40 transition">
+                                    <td class="py-1.5 px-2 font-bold text-emerald-400">2</td>
+                                    <td class="py-1.5 px-2 font-extrabold text-white flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-yellow-300"></span> Fenerbahçe
+                                    </td>
+                                    <td class="py-1.5 px-2 text-center">28</td>
+                                    <td class="py-1.5 px-2 text-center">21</td>
+                                    <td class="py-1.5 px-2 text-center">5</td>
+                                    <td class="py-1.5 px-2 text-center">2</td>
+                                    <td class="py-1.5 px-2 text-center">+42</td>
+                                    <td class="py-1.5 px-2 text-center font-black text-yellow-300 text-sm">68</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/40 transition">
+                                    <td class="py-1.5 px-2 font-bold text-sky-400">3</td>
+                                    <td class="py-1.5 px-2 font-bold text-slate-100 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> Samsunspor
+                                    </td>
+                                    <td class="py-1.5 px-2 text-center">28</td>
+                                    <td class="py-1.5 px-2 text-center">15</td>
+                                    <td class="py-1.5 px-2 text-center">6</td>
+                                    <td class="py-1.5 px-2 text-center">7</td>
+                                    <td class="py-1.5 px-2 text-center">+14</td>
+                                    <td class="py-1.5 px-2 text-center font-black text-slate-100 text-sm">51</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/40 transition">
+                                    <td class="py-1.5 px-2 font-bold text-sky-400">4</td>
+                                    <td class="py-1.5 px-2 font-bold text-slate-100 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-slate-300"></span> Beşiktaş
+                                    </td>
+                                    <td class="py-1.5 px-2 text-center">28</td>
+                                    <td class="py-1.5 px-2 text-center">13</td>
+                                    <td class="py-1.5 px-2 text-center">8</td>
+                                    <td class="py-1.5 px-2 text-center">7</td>
+                                    <td class="py-1.5 px-2 text-center">+12</td>
+                                    <td class="py-1.5 px-2 text-center font-black text-slate-100 text-sm">47</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sağ (4 Kolon): Günlük Faydalı Rehber & Nöbetçi / Namaz Saatleri / Depremler -->
+                <div class="lg:col-span-4 p-4 sm:p-5 rounded-2xl bg-brand-card border border-brand-border shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 pb-3 mb-3 border-b border-brand-border">
+                            <span class="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+                                <i data-lucide="compass" class="w-4 h-4"></i>
+                            </span>
+                            <h3 class="text-sm font-black text-white tracking-wide uppercase">GÜNLÜK HIZLI SERVİSLER</h3>
+                        </div>
+                        <div class="space-y-2.5 text-xs">
+                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">🕌</span>
+                                    <span class="font-bold text-slate-200">İstanbul Namaz Vakitleri</span>
+                                </div>
+                                <span class="font-mono text-amber-400 font-bold">İkindi 16:42</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">💊</span>
+                                    <span class="font-bold text-slate-200">Nöbetçi Eczaneler</span>
+                                </div>
+                                <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">Açık</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-base">🌐</span>
+                                    <span class="font-bold text-slate-200">Son Depremler (Kandilli)</span>
+                                </div>
+                                <span class="font-mono text-slate-400 text-[11px]">Akdeniz 2.4 ML</span>
                             </div>
                         </div>
                     </div>
-                </a>
+
+                    <div class="pt-3 mt-3 border-t border-brand-border/60 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Otomatik Anlık Servisler</span>
+                        <a href="/?kategori=Spor" class="text-red-400 font-bold hover:underline flex items-center gap-1">
+                            Spor Haberleri <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- DİĞER HABERLER IZGARASI (GRID) -->
@@ -696,6 +888,81 @@
                 bttBtn?.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
             }
         });
+    
+        // HÜRRİYET / CNN TÜRK MODELİ: 1..14 NUMARALI MANŞET SLIDER ENGINE
+        (function() {
+            const slides = document.querySelectorAll('.manset-slide');
+            const pills = document.querySelectorAll('.manset-pill');
+            if (slides.length <= 1) return;
+
+            let curIndex = 0;
+            const total = slides.length;
+            let autoTimer = null;
+
+            function showSlide(idx) {
+                if (idx < 0) idx = total - 1;
+                if (idx >= total) idx = 0;
+                curIndex = idx;
+
+                slides.forEach((s, i) => {
+                    if (i === curIndex) {
+                        s.classList.remove('opacity-0', 'pointer-events-none', 'z-0');
+                        s.classList.add('opacity-100', 'pointer-events-auto', 'z-10');
+                    } else {
+                        s.classList.remove('opacity-100', 'pointer-events-auto', 'z-10');
+                        s.classList.add('opacity-0', 'pointer-events-none', 'z-0');
+                    }
+                });
+
+                pills.forEach((p, i) => {
+                    if (i === curIndex) {
+                        p.className = 'manset-pill flex-1 min-w-[28px] sm:min-w-[34px] py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-center transition-all duration-200 shadow-sm bg-red-600 text-white scale-105 shadow-red-900/50';
+                    } else {
+                        p.className = 'manset-pill flex-1 min-w-[28px] sm:min-w-[34px] py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-center transition-all duration-200 shadow-sm bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800';
+                    }
+                });
+            }
+
+            function startAuto() {
+                stopAuto();
+                autoTimer = setInterval(() => {
+                    showSlide(curIndex + 1);
+                }, 4000); // 4 saniyede bir otomatik döner
+            }
+
+            function stopAuto() {
+                if (autoTimer) {
+                    clearInterval(autoTimer);
+                    autoTimer = null;
+                }
+            }
+
+            window.goToManset = function(idx) {
+                showSlide(idx);
+                startAuto();
+            };
+
+            window.moveManset = function(step) {
+                showSlide(curIndex + step);
+                startAuto();
+            };
+
+            const sliderBox = document.getElementById('main-manset-slider');
+            if (sliderBox) {
+                sliderBox.addEventListener('mouseenter', stopAuto);
+                sliderBox.addEventListener('mouseleave', startAuto);
+            }
+
+            const pillsBox = document.getElementById('manset-pills');
+            if (pillsBox) {
+                pillsBox.addEventListener('mouseenter', stopAuto);
+                pillsBox.addEventListener('mouseleave', startAuto);
+            }
+
+            // Başlat
+            startAuto();
+        })();
+
     </script>
 
     <!-- MOBİL & MASAÜSTÜ YUKARI ÇIK BUTONU -->
