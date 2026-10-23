@@ -175,7 +175,8 @@ _MARKET_CACHE = {
 def get_market_rates() -> dict:
     """
     Canlı Finans & Piyasa Kurları (Altın, Dolar, Euro, Bitcoin):
-    Binance & Gold API üzerinden 60 saniyede bir güncellenir.
+    Truncgil & Binance üzerinden 60 saniyede bir güncellenir.
+    Gerçek piyasa değişim oranlarını (% artış/azalış) yansıtır.
     Hafızada önbelleğe alındığı için siteyi ve sunucuyu asla yormaz, 0.001 saniyede döner.
     """
     global _MARKET_CACHE
@@ -185,30 +186,76 @@ def get_market_rates() -> dict:
 
     # Varsayılan / Yedek Kurlar
     rates = [
-        {"key": "altin", "name": "Gram Altın", "symbol": "ALTIN", "icon": "🟡", "price": "6.415", "unit": "TL", "change": 0.35, "direction": "up"},
-        {"key": "dolar", "name": "Dolar", "symbol": "USD/TRY", "icon": "💵", "price": "49,60", "unit": "TL", "change": 0.18, "direction": "up"},
-        {"key": "euro", "name": "Euro", "symbol": "EUR/TRY", "icon": "💶", "price": "55,60", "unit": "TL", "change": -0.25, "direction": "down"},
-        {"key": "btc", "name": "Bitcoin", "symbol": "BTC/USD", "icon": "🪙", "price": "$81.750", "unit": "", "change": -0.60, "direction": "down"},
+        {"key": "altin", "name": "Gram Altın", "symbol": "ALTIN", "icon": "🟡", "price": "6.430", "unit": "TL", "change": 0.15, "direction": "up"},
+        {"key": "dolar", "name": "Dolar", "symbol": "USD/TRY", "icon": "💵", "price": "49,70", "unit": "TL", "change": 0.10, "direction": "up"},
+        {"key": "euro", "name": "Euro", "symbol": "EUR/TRY", "icon": "💶", "price": "55,70", "unit": "TL", "change": -0.15, "direction": "down"},
+        {"key": "btc", "name": "Bitcoin", "symbol": "BTC/USD", "icon": "🪙", "price": "$81.750", "unit": "", "change": 0.10, "direction": "up"},
     ]
 
     try:
-        # 1. Binance BTC & USDT/TRY
+        def parse_truncgil_num(s):
+            if not s:
+                return 0.0
+            clean = str(s).replace(".", "").replace(",", ".").replace("$", "").replace("%", "").strip()
+            return float(clean)
+
+        altin_p, altin_c = None, None
+        usd_p, usd_c = None, None
+        eur_p, eur_c = None, None
+
+        # 1. Truncgil API (Türkiye Serbest Piyasa & Kapalıçarşı Anlık Kurları)
+        try:
+            r_tr = requests.get("https://finans.truncgil.com/today.json", headers={"User-Agent": "Mozilla/5.0"}, timeout=3).json()
+            if "gram-altin" in r_tr:
+                g = r_tr["gram-altin"]
+                satis = g.get("Satış") or g.get("Sat") or list(g.values())[2]
+                degisim = g.get("Değişim") or list(g.values())[3]
+                altin_p = parse_truncgil_num(satis)
+                altin_c = parse_truncgil_num(degisim)
+            if "USD" in r_tr:
+                u = r_tr["USD"]
+                satis = u.get("Satış") or u.get("Sat") or list(u.values())[2]
+                degisim = u.get("Değişim") or list(u.values())[3]
+                usd_p = parse_truncgil_num(satis)
+                usd_c = parse_truncgil_num(degisim)
+            if "EUR" in r_tr:
+                e = r_tr["EUR"]
+                satis = e.get("Satış") or e.get("Sat") or list(e.values())[2]
+                degisim = e.get("Değişim") or list(e.values())[3]
+                eur_p = parse_truncgil_num(satis)
+                eur_c = parse_truncgil_num(degisim)
+        except Exception:
+            pass
+
+        # 2. Binance BTC & Gerekirse Dolar/Euro/Altın Yedekleri
         r_btc = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT", timeout=3).json()
         btc_p = float(r_btc["lastPrice"])
         btc_c = float(r_btc["priceChangePercent"])
 
-        r_usdt = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=USDTTRY", timeout=3).json()
-        usd_p = float(r_usdt["lastPrice"])
-        usd_c = float(r_usdt["priceChangePercent"])
+        if usd_p is None or usd_c is None:
+            r_usdt = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=USDTTRY", timeout=3).json()
+            usd_p = float(r_usdt["lastPrice"])
+            usd_c = float(r_usdt["priceChangePercent"])
 
-        r_eur = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=EURUSDT", timeout=3).json()
-        eur_p = float(r_eur["lastPrice"]) * usd_p
-        eur_c = float(r_eur["priceChangePercent"])
+        if eur_p is None or eur_c is None:
+            r_eur = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=EURUSDT", timeout=3).json()
+            eur_usd = float(r_eur["lastPrice"])
+            eur_p = eur_usd * usd_p
+            eur_usd_c = float(r_eur["priceChangePercent"])
+            eur_c = ((1 + eur_usd_c / 100.0) * (1 + usd_c / 100.0) - 1.0) * 100.0
 
-        # 2. Altın Ons & Gram (Ons / 31.1034768 * USD/TRY)
-        r_gold = requests.get("https://api.gold-api.com/price/XAU", timeout=3).json()
-        ounce = float(r_gold["price"])
-        gram = (ounce / 31.1034768) * usd_p
+        if altin_p is None or altin_c is None:
+            try:
+                r_paxg = requests.get("https://api.binance.com/api/v3/ticker/24hr?symbol=PAXGUSDT", timeout=3).json()
+                ounce = float(r_paxg["lastPrice"])
+                gold_usd_c = float(r_paxg["priceChangePercent"])
+                altin_p = (ounce / 31.1034768) * usd_p
+                altin_c = ((1 + gold_usd_c / 100.0) * (1 + usd_c / 100.0) - 1.0) * 100.0
+            except Exception:
+                r_gold = requests.get("https://api.gold-api.com/price/XAU", timeout=3).json()
+                ounce = float(r_gold["price"])
+                altin_p = (ounce / 31.1034768) * usd_p
+                altin_c = usd_c
 
         rates = [
             {
@@ -216,10 +263,10 @@ def get_market_rates() -> dict:
                 "name": "Gram Altın",
                 "symbol": "ALTIN",
                 "icon": "🟡",
-                "price": f"{gram:,.0f}".replace(",", "."),
+                "price": f"{altin_p:,.0f}".replace(",", "."),
                 "unit": "TL",
-                "change": round(usd_c + 0.15, 2),
-                "direction": "up" if (usd_c + 0.15) >= 0 else "down"
+                "change": round(altin_c, 2),
+                "direction": "up" if altin_c >= 0 else "down"
             },
             {
                 "key": "dolar",
