@@ -672,98 +672,125 @@
             </div>
         </section>
 
-        <!-- 10. 🔮 12 BURÇ ASTROLOJİ DÜNYASI (HÜRRİYET & MAHMURE STANDARDI) -->
-        <section class="pt-4 border-t border-brand-border/60">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-3.5 h-3.5 bg-purple-600 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        GÜNLÜK BURÇ YORUMLARI & ASTROLOJİ <span class="text-xs font-bold text-purple-400 tracking-normal hidden sm:inline">| Aşk, Kariyer, Para & Şans Yorumları</span>
-                    </h2>
+                <!-- 10. 🔮 12 BURÇ GÜNLÜK ASTROLOJİ DÜNYASI -->
+        <section class="pt-6 border-t border-brand-border/60" id="burclar-section">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                <div class="flex items-center gap-3">
+                    <span class="w-3.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-sm shadow-md shadow-purple-500/30"></span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
+                            GÜNLÜK BURÇ YORUMLARI & ASTROLOJİ
+                        </h2>
+                        <p class="text-xs text-purple-300 font-medium">Yapay Zeka Destekli Günlük Aşk, Kariyer, Para ve Sağlık Analizleri</p>
+                    </div>
                 </div>
-                <span class="text-xs font-semibold text-slate-400">Bugünkü Burcunuzu Seçin</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-950/60 border border-purple-500/40 text-purple-300 text-xs font-semibold self-start sm:self-auto shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <span>Burcunuzu Seçin & Detaylı Yorumu Okuyun</span>
+                </div>
             </div>
 
-            <!-- 12 Burç Kartları (Responsive 6x2 / 4x3 Grid) -->
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <!-- 12 Burç Kartları (Responsive 6x2 / 4x3 Grid, Canlı ve Tıklanabilir Tasarım) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {% set signs = [
-                    ('Koç', '♈', '21 Mart - 19 Nisan'),
-                    ('Boğa', '♉', '20 Nisan - 20 Mayıs'),
-                    ('İkizler', '♊', '21 Mayıs - 20 Haziran'),
-                    ('Yengeç', '♋', '21 Haziran - 22 Temmuz'),
-                    ('Aslan', '♌', '23 Temmuz - 22 Ağustos'),
-                    ('Başak', '♍', '23 Ağustos - 22 Eylül'),
-                    ('Terazi', '♎', '23 Eylül - 22 Ekim'),
-                    ('Akrep', '♏', '23 Ekim - 21 Kasım'),
-                    ('Yay', '♐', '22 Kasım - 21 Aralık'),
-                    ('Oğlak', '♑', '22 Aralık - 19 Ocak'),
-                    ('Kova', '♒', '20 Ocak - 18 Şubat'),
-                    ('Balık', '♓', '19 Şubat - 20 Mart')
+                    ('Koç', '♈', '21 Mart - 19 Nisan', 'Ateş', 'from-amber-500/20 to-red-500/10 border-red-500/40 hover:border-red-400 text-red-400'),
+                    ('Boğa', '♉', '20 Nisan - 20 Mayıs', 'Toprak', 'from-emerald-500/20 to-teal-500/10 border-emerald-500/40 hover:border-emerald-400 text-emerald-400'),
+                    ('İkizler', '♊', '21 Mayıs - 20 Haziran', 'Hava', 'from-yellow-500/20 to-amber-500/10 border-yellow-500/40 hover:border-yellow-400 text-yellow-400'),
+                    ('Yengeç', '♋', '21 Haziran - 22 Temmuz', 'Su', 'from-cyan-500/20 to-blue-500/10 border-cyan-500/40 hover:border-cyan-400 text-cyan-400'),
+                    ('Aslan', '♌', '23 Temmuz - 22 Ağustos', 'Ateş', 'from-orange-500/20 to-amber-500/10 border-orange-500/40 hover:border-orange-400 text-orange-400'),
+                    ('Başak', '♍', '23 Ağustos - 22 Eylül', 'Toprak', 'from-teal-500/20 to-emerald-500/10 border-teal-500/40 hover:border-teal-400 text-teal-400'),
+                    ('Terazi', '♎', '23 Eylül - 22 Ekim', 'Hava', 'from-pink-500/20 to-purple-500/10 border-pink-500/40 hover:border-pink-400 text-pink-400'),
+                    ('Akrep', '♏', '23 Ekim - 21 Kasım', 'Su', 'from-rose-500/20 to-red-500/10 border-rose-500/40 hover:border-rose-400 text-rose-400'),
+                    ('Yay', '♐', '22 Kasım - 21 Aralık', 'Ateş', 'from-purple-500/20 to-indigo-500/10 border-purple-500/40 hover:border-purple-400 text-purple-400'),
+                    ('Oğlak', '♑', '22 Aralık - 19 Ocak', 'Toprak', 'from-blue-500/20 to-slate-500/10 border-blue-500/40 hover:border-blue-400 text-blue-400'),
+                    ('Kova', '♒', '20 Ocak - 18 Şubat', 'Hava', 'from-sky-500/20 to-indigo-500/10 border-sky-500/40 hover:border-sky-400 text-sky-400'),
+                    ('Balık', '♓', '19 Şubat - 20 Mart', 'Su', 'from-indigo-500/20 to-purple-500/10 border-indigo-500/40 hover:border-indigo-400 text-indigo-400')
                 ] %}
-                {% for name, symbol, dates in signs %}
-                <button type="button" onclick="openAstroModal('{{ name }}', '{{ symbol }}', '{{ dates }}')"
-                    class="p-3 sm:p-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-purple-500/70 transition flex flex-col items-center justify-center gap-1 group shadow cursor-pointer">
-                    <span class="text-2xl sm:text-3xl text-purple-400 group-hover:scale-110 transition">{{ symbol }}</span>
-                    <span class="text-xs sm:text-sm font-black text-white uppercase">{{ name }}</span>
-                    <span class="text-[9px] text-slate-500 text-center">{{ dates }}</span>
+                {% for name, symbol, dates, element, style in signs %}
+                <button type="button" 
+                        onclick="window.openAstroModal('{{ name }}', '{{ symbol }}', '{{ dates }}')"
+                        class="p-4 rounded-2xl bg-gradient-to-b {{ style }} bg-slate-900/90 border transition-all duration-200 flex flex-col items-center justify-center gap-1.5 group shadow-lg hover:shadow-purple-500/20 hover:-translate-y-0.5 cursor-pointer text-center relative overflow-hidden"
+                        aria-label="{{ name }} Burcu Günlük Yorumunu Oku">
+                    <span class="text-3xl sm:text-4xl group-hover:scale-115 transition-transform duration-200">{{ symbol }}</span>
+                    <span class="text-sm font-black text-white tracking-wide uppercase">{{ name }}</span>
+                    <span class="text-[10px] text-slate-400 font-medium">{{ dates }}</span>
+                    <span class="mt-1 px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300 uppercase tracking-wider group-hover:bg-purple-600 group-hover:text-white transition">Yorumu Oku →</span>
                 </button>
                 {% endfor %}
             </div>
         </section>
 
         <!-- 11. 🕌 FAYDALI SERVİSLER & 81 İL REHBERİ (NAMAZ, NÖBETÇİ ECZANELER, DEPREMLER) -->
-        <section class="pt-4 border-t border-brand-border/60">
-            <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950 via-brand-card to-slate-950 border border-brand-border shadow-xl">
-                <div class="flex items-center justify-between pb-3 mb-4 border-b border-brand-border">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">🕌</span>
-                        <h3 class="text-sm sm:text-base font-black text-white tracking-wide uppercase">81 İL GÜNLÜK HIZLI SERVİSLER</h3>
+        <section class="pt-6 border-t border-brand-border/60" id="servisler-section">
+            <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-slate-800 shadow-2xl">
+                <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">⚡</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black text-white tracking-wide uppercase">81 İL GÜNLÜK HIZLI SERVİSLER</h3>
+                            <p class="text-[11px] text-slate-400">Canlı ve güncel verilerle Türkiye geneli rehber</p>
+                        </div>
                     </div>
-                    <span class="text-xs text-amber-400 font-bold">Canlı Takip</span>
+                    <span class="text-xs text-amber-400 font-bold px-2.5 py-1 rounded-full bg-amber-950/60 border border-amber-500/30 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Canlı Takip
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- Canlı Dinamik Namaz Vakti Butonu -->
-                    <button type="button" onclick="openNamazModal()" aria-label="81 İl Canlı Namaz Vakitleri Sayfasını Aç"
-                        class="p-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
+                    <button type="button" 
+                            id="btn-open-namaz"
+                            onclick="window.openNamazModal()" 
+                            aria-label="81 İl Canlı Namaz Vakitleri Sayfasını Aç"
+                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">🕌</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">🕌</span>
                             <div>
-                                <div class="font-bold text-slate-200 group-hover:text-amber-400 transition text-sm">
+                                <div class="font-extrabold text-white group-hover:text-amber-400 transition text-sm">
                                     <span id="card-city-name">İstanbul</span> Namaz Vakitleri
                                 </div>
-                                <div class="text-[11px] text-slate-400">81 İl Diyanet saatleri</div>
+                                <div class="text-[11px] text-slate-400 font-medium">81 İl Diyanet Saatleri & İftar/Sahur</div>
                             </div>
                         </div>
-                        <span id="live-namaz-vakti" class="font-mono text-amber-400 font-extrabold text-xs px-2.5 py-1 rounded bg-amber-950/60 border border-amber-500/30">
+                        <span id="live-namaz-vakti" class="font-mono text-amber-400 font-black text-xs px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/40 shadow-inner">
                             Yatsı 19:44
                         </span>
                     </button>
 
                     <!-- Tıklanabilir Nöbetçi Eczaneler Butonu -->
-                    <button type="button" onclick="openNobetciModal()" aria-label="81 İl Nöbetçi Eczaneler Rehberini Aç"
-                        class="p-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
+                    <button type="button" 
+                            id="btn-open-nobetci"
+                            onclick="window.openNobetciModal()" 
+                            aria-label="81 İl Nöbetçi Eczaneler Rehberini Aç"
+                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">💊</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">💊</span>
                             <div>
-                                <div class="font-bold text-slate-200 group-hover:text-emerald-400 transition text-sm">Nöbetçi Eczaneler</div>
-                                <div class="text-[11px] text-slate-400">81 İl Canlı Eczane Listesi</div>
+                                <div class="font-extrabold text-white group-hover:text-emerald-400 transition text-sm">Nöbetçi Eczaneler</div>
+                                <div class="text-[11px] text-slate-400 font-medium">81 İl & İlçe Açık Nöbetçi Listesi</div>
                             </div>
                         </div>
-                        <span class="text-emerald-400 text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/30">Gözat →</span>
+                        <span class="text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition">
+                            Listele →
+                        </span>
                     </button>
 
                     <!-- Tıklanabilir Son Depremler Butonu -->
-                    <button type="button" onclick="openDepremModal()" aria-label="Kandilli ve AFAD Son Depremler Sayfasını Aç"
-                        class="p-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-red-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
+                    <button type="button" 
+                            id="btn-open-deprem"
+                            onclick="window.openDepremModal()" 
+                            aria-label="Kandilli ve AFAD Son Depremler Sayfasını Aç"
+                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-rose-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">📉</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">📉</span>
                             <div>
-                                <div class="font-bold text-slate-200 group-hover:text-red-400 transition text-sm">Son Depremler</div>
-                                <div class="text-[11px] text-slate-400">AFAD & Kandilli Resmi Veri</div>
+                                <div class="font-extrabold text-white group-hover:text-rose-400 transition text-sm">Son Depremler</div>
+                                <div class="text-[11px] text-slate-400 font-medium">AFAD & Kandilli Canlı Veri Akışı</div>
                             </div>
                         </div>
-                        <span class="text-red-400 text-xs font-bold px-2 py-0.5 rounded bg-red-950 border border-red-500/30">Harita →</span>
+                        <span class="text-rose-400 text-xs font-black px-3 py-1.5 rounded-lg bg-rose-950/80 border border-rose-500/40 shadow-inner group-hover:bg-rose-600 group-hover:text-white transition">
+                            İncele →
+                        </span>
                     </button>
                 </div>
             </div>
@@ -902,28 +929,30 @@
         </div>
     </div>
 
-    <!-- 🔮 ASTROLOJİ & GÜNLÜK BURÇ YORUMU MODALI (YAPAY ZEKA GÜNLÜK OTOMATİK MOTOR) -->
-    <div id="astro-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border-2 border-purple-500/80 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('astro-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
-                <i data-lucide="x" class="w-5 h-5"></i>
+        <!-- 🔮 1. ASTROLOJİ & GÜNLÜK BURÇ YORUMU MODALI (YAPAY ZEKA MOTORU) -->
+    <div id="astro-modal" 
+         onclick="if(event.target === this) window.closeModal('astro-modal')"
+         style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0f172a; border: 2px solid #8b5cf6;" class="rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="window.closeModal('astro-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+                ✕
             </button>
             <div class="flex items-center gap-3 pb-3 border-b border-purple-500/40">
-                <div class="p-3 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-3xl text-purple-400 flex items-center justify-center shadow-lg">
+                <div class="p-3 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-4xl text-purple-400 flex items-center justify-center shadow-lg">
                     <span id="astro-modal-symbol">♈</span>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h3 class="text-lg sm:text-xl font-black text-white"><span id="astro-modal-name">Koç</span> Burcu Günlük Yorumu</h3>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/30 text-purple-300 border border-purple-400/40 uppercase">AI Astroloji</span>
+                        <h3 class="text-xl sm:text-2xl font-black text-white"><span id="astro-modal-name">Koç</span> Burcu</h3>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black bg-purple-500/30 text-purple-300 border border-purple-400/40 uppercase">AI Günlük Analiz</span>
                     </div>
                     <p id="astro-modal-dates" class="text-xs text-purple-300 font-semibold mt-0.5">21 Mart - 19 Nisan</p>
                 </div>
             </div>
 
             <!-- Günün Tarihi Bildirimi -->
-            <div class="flex items-center justify-between text-xs px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200">
-                <span>🗓️ <span id="astro-today-date">Bugün</span> Günlük Analizi</span>
+            <div class="flex items-center justify-between text-xs px-3.5 py-2 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-200">
+                <span>📅 <strong id="astro-today-date">Bugün</strong> Günlük Yorumu</span>
                 <span class="text-amber-400 font-bold">✨ Yapay Zeka Güncel</span>
             </div>
 
@@ -931,184 +960,182 @@
             <div class="space-y-3 text-xs leading-relaxed text-slate-200">
                 <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span class="text-amber-400 font-black text-sm block mb-1">🌟 Günlük Genel Enerji & Tavsiye</span>
-                    <p id="astro-text-general" class="text-slate-300"></p>
+                    <p id="astro-text-general" class="text-slate-300 leading-normal"></p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-                        <span class="text-pink-400 font-black text-sm block mb-1">💖 Aşk & İlişkiler</span>
-                        <p id="astro-text-love" class="text-slate-300"></p>
+                        <span class="text-rose-400 font-black text-xs block mb-1">💖 Aşk & İlişkiler</span>
+                        <p id="astro-text-love" class="text-slate-300 leading-normal"></p>
                     </div>
                     <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-                        <span class="text-emerald-400 font-black text-sm block mb-1">💼 İş, Para & Kariyer</span>
-                        <p id="astro-text-money" class="text-slate-300"></p>
+                        <span class="text-emerald-400 font-black text-xs block mb-1">💼 Kariyer & Maddi Durum</span>
+                        <p id="astro-text-money" class="text-slate-300 leading-normal"></p>
                     </div>
                 </div>
 
                 <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
-                    <span class="text-sky-400 font-black text-sm block mb-1">🩺 Sağlık & Zindelik</span>
-                    <p id="astro-text-health" class="text-slate-300"></p>
+                    <span class="text-sky-400 font-black text-xs block mb-1">🌿 Sağlık & Zindelik</span>
+                    <p id="astro-text-health" class="text-slate-300 leading-normal"></p>
                 </div>
 
-                <!-- Şanslı Rakam & Renk -->
-                <div class="p-3 rounded-xl bg-gradient-to-r from-purple-950/60 to-slate-900 border border-purple-500/30 flex items-center justify-between font-bold text-xs">
-                    <span>Günün Şanslı Rakamı: <span id="astro-lucky-num" class="text-amber-400 text-sm font-black">7</span></span>
-                    <span>Uğurlu Rengi: <span id="astro-lucky-color" class="text-purple-300 font-bold">Gece Mavisi</span></span>
+                <!-- Şanslı Rakam & Renk Rozetleri -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 block font-bold">Şanslı Sayı</span>
+                        <span id="astro-lucky-num" class="text-base font-black text-amber-400">7</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-center">
+                        <span class="text-[10px] text-slate-400 block font-bold">Şanslı Renk</span>
+                        <span id="astro-lucky-color" class="text-xs font-black text-purple-300">Mor / Gece Mavisi</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Gündem Analizi Astroloji Masası</span>
-                <button type="button" onclick="closeModal('astro-modal')" class="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white transition text-xs">
-                    Kapat
+            <div class="pt-2 flex justify-end">
+                <button type="button" onclick="window.closeModal('astro-modal')" class="w-full sm:w-auto px-6 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white transition text-xs shadow-lg cursor-pointer">
+                    Pencereyi Kapat
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 🕌 NAMAZ VAKİTLERİ MODALI (81 İL SEÇİCİLİ) -->
-    <div id="namaz-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white">
-            <button onclick="closeNamazModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
-                <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- 🕌 2. 81 İL CANLI DİYANET NAMAZ VAKİTLERİ MODALI -->
+    <div id="namaz-modal" 
+         onclick="if(event.target === this) window.closeModal('namaz-modal')"
+         style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0f172a; border: 2px solid #f59e0b;" class="rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="window.closeModal('namaz-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+                ✕
             </button>
-            <div class="flex items-center gap-2.5 mb-4">
-                <div class="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 text-xl flex items-center justify-center">
-                    <span>🕌</span>
-                </div>
+            <div class="flex items-center gap-3 pb-3 border-b border-amber-500/40">
+                <div class="p-2.5 rounded-xl bg-amber-500/20 text-3xl">🕌</div>
                 <div>
-                    <h3 class="text-base sm:text-lg font-black text-white"><span id="namaz-modal-city-title">İstanbul</span> Namaz Vakitleri</h3>
-                    <p class="text-xs text-slate-400">81 İl Diyanet İşleri Başkanlığı Güncel Takvimi</p>
+                    <h3 class="text-lg sm:text-xl font-black text-white"><span id="namaz-modal-city-title">İstanbul</span> Namaz Vakitleri</h3>
+                    <p class="text-xs text-amber-300">T.C. Diyanet İşleri Başkanlığı Resmi Vakitleri</p>
                 </div>
             </div>
 
-            <!-- 81 İl Seçici Dropdown & Hızlı Butonlar -->
-            <div class="mb-4 space-y-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                <div class="flex items-center justify-between">
-                    <label for="namaz-city-select" class="text-xs font-bold text-slate-300">📍 Şehir Seçin (81 İl):</label>
-                    <span class="text-[10px] text-amber-400 font-semibold">Otomatik Kaydedilir</span>
-                </div>
-                <select id="namaz-city-select" onchange="changeNamazCity(this.value)" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none cursor-pointer">
+            <!-- 81 İl Seçici Dropdown -->
+            <div class="flex items-center gap-2">
+                <label for="namaz-city-select" class="text-xs text-slate-300 font-bold whitespace-nowrap">Şehir Seç:</label>
+                <select id="namaz-city-select" onchange="window.onNamazCityChange(this.value)" class="flex-1 bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
+                    <!-- Populated dynamically via JS -->
                 </select>
-                <div class="flex flex-wrap gap-1.5 pt-1">
-                    <button type="button" onclick="changeNamazCity('İstanbul')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">İstanbul</button>
-                    <button type="button" onclick="changeNamazCity('Ankara')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Ankara</button>
-                    <button type="button" onclick="changeNamazCity('İzmir')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">İzmir</button>
-                    <button type="button" onclick="changeNamazCity('Bursa')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Bursa</button>
-                    <button type="button" onclick="changeNamazCity('Antalya')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Antalya</button>
-                    <button type="button" onclick="changeNamazCity('Adana')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-amber-600/30 border border-slate-700 text-[11px] font-bold text-slate-300 hover:text-white transition">Adana</button>
+            </div>
+
+            <!-- 6 Vakit Kartları -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-center">
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-imsak">
+                    <span class="text-[11px] text-slate-400 block font-bold">İmsak</span>
+                    <span id="time-imsak" class="text-lg font-black text-amber-400">05:46</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-gunes">
+                    <span class="text-[11px] text-slate-400 block font-bold">Güneş</span>
+                    <span id="time-gunes" class="text-lg font-black text-amber-400">07:11</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-ogle">
+                    <span class="text-[11px] text-slate-400 block font-bold">Öğle</span>
+                    <span id="time-ogle" class="text-lg font-black text-amber-400">12:54</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-ikindi">
+                    <span class="text-[11px] text-slate-400 block font-bold">İkindi</span>
+                    <span id="time-ikindi" class="text-lg font-black text-amber-400">15:53</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-aksam">
+                    <span class="text-[11px] text-slate-400 block font-bold">Akşam (İftar)</span>
+                    <span id="time-aksam" class="text-lg font-black text-amber-400">18:25</span>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800" id="card-yatsi">
+                    <span class="text-[11px] text-slate-400 block font-bold">Yatsı</span>
+                    <span id="time-yatsi" class="text-lg font-black text-amber-400">19:44</span>
                 </div>
             </div>
 
-            <!-- 6 Vakit Kutusu -->
-            <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-4" id="namaz-times-grid">
-                <div id="v-imsak-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">İmsak</span>
-                    <span id="v-imsak" class="font-mono text-white font-bold">05:46</span>
-                </div>
-                <div id="v-gunes-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">Güneş</span>
-                    <span id="v-gunes" class="font-mono text-white font-bold">07:11</span>
-                </div>
-                <div id="v-ogle-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">Öğle</span>
-                    <span id="v-ogle" class="font-mono text-white font-bold">12:54</span>
-                </div>
-                <div id="v-ikindi-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">İkindi</span>
-                    <span id="v-ikindi" class="font-mono text-white font-bold">15:53</span>
-                </div>
-                <div id="v-aksam-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">Akşam</span>
-                    <span id="v-aksam" class="font-mono text-white font-bold">18:25</span>
-                </div>
-                <div id="v-yatsi-box" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition">
-                    <span class="text-slate-400">Yatsı</span>
-                    <span id="v-yatsi" class="font-mono text-white font-bold">19:44</span>
-                </div>
+            <!-- Sıradaki Vakte Kalan Süre -->
+            <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-center">
+                <span class="text-xs text-slate-300 block font-semibold"><span id="next-prayer-name">Yatsı</span> Vaktine Kalan Süre</span>
+                <span id="next-prayer-countdown" class="text-xl font-black text-amber-400 font-mono tracking-wider">--:--:--</span>
             </div>
 
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Diyanet İşleri Başkanlığı</span>
-                <span class="text-amber-400 font-medium">Canlı Otomatik Takip</span>
+            <div class="pt-2 flex justify-end">
+                <button type="button" onclick="window.closeModal('namaz-modal')" class="w-full sm:w-auto px-6 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 font-bold text-white transition text-xs shadow-lg cursor-pointer">
+                    Pencereyi Kapat
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 💊 NÖBETÇİ ECZANELER MODALI -->
-    <div id="nobetci-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white">
-            <button onclick="closeNobetciModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
-                <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- 💊 3. 81 İL NÖBETÇİ ECZANELER MODALI -->
+    <div id="nobetci-modal" 
+         onclick="if(event.target === this) window.closeModal('nobetci-modal')"
+         style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0f172a; border: 2px solid #10b981;" class="rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="window.closeModal('nobetci-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+                ✕
             </button>
-            <div class="flex items-center gap-2.5 mb-4">
-                <div class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 text-xl">
-                    <span>💊</span>
-                </div>
+            <div class="flex items-center gap-2.5 pb-3 border-b border-emerald-500/40">
+                <span class="text-3xl p-2 rounded-xl bg-emerald-500/20 text-emerald-400">💊</span>
                 <div>
-                    <h3 class="text-lg font-black text-white">81 İl Nöbetçi Eczaneler Rehberi</h3>
-                    <p class="text-xs text-slate-400">Şehrinizdeki en yakın açık nöbetçi eczaneyi anında bulun</p>
+                    <h3 class="text-lg sm:text-xl font-black text-white">81 İl Nöbetçi Eczaneler</h3>
+                    <p class="text-xs text-emerald-400 font-semibold">Sağlık Bakanlığı & Eczacı Odaları Verileri</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs font-bold">
-                <a href="https://www.istanbuleczaciodasi.org.tr/nobetci-eczane/" target="_blank" class="p-3 rounded-xl bg-slate-900 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/50 flex items-center justify-between transition">
-                    <span>📍 İstanbul Nöbetçi Eczaneler</span>
-                    <span class="text-emerald-400">→</span>
-                </a>
-                <a href="https://www.aeo.org.tr/NobetciEczaneler" target="_blank" class="p-3 rounded-xl bg-slate-900 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/50 flex items-center justify-between transition">
-                    <span>📍 Ankara Nöbetçi Eczaneler</span>
-                    <span class="text-emerald-400">→</span>
-                </a>
-                <a href="https://www.izmireczaciodasi.org.tr/nobetci-eczane" target="_blank" class="p-3 rounded-xl bg-slate-900 hover:bg-emerald-950/60 border border-slate-800 hover:border-emerald-500/50 flex items-center justify-between transition">
-                    <span>📍 İzmir Nöbetçi Eczaneler</span>
-                    <span class="text-emerald-400">→</span>
-                </a>
-                <a href="https://www.turkiye.gov.tr/saglik-nobetci-eczane-sorgulama" target="_blank" class="p-3 rounded-xl bg-emerald-900/40 hover:bg-emerald-900/70 border border-emerald-500/50 flex items-center justify-between transition text-white">
-                    <span>🇹🇷 81 İl e-Devlet Sorgulama</span>
-                    <span class="text-emerald-300 font-bold">Giriş →</span>
-                </a>
+
+            <!-- Arama Kutusu -->
+            <div class="relative">
+                <input type="text" id="nobetci-search" oninput="window.filterNobetci(this.value)" placeholder="Şehir, İlçe veya Eczane Adı ile filtrele..." 
+                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 transition">
             </div>
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400">
-                Veriler Türk Eczacıları Birliği ve Sağlık Bakanlığı resmi kaynaklarından sağlanır.
+
+            <!-- Canlı Eczane Listesi -->
+            <div id="nobetci-list" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button type="button" onclick="window.closeModal('nobetci-modal')" class="w-full sm:w-auto px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white transition text-xs shadow-lg cursor-pointer">
+                    Pencereyi Kapat
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 📉 SON DEPREMLER MODALI -->
-    <div id="deprem-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white">
-            <button onclick="closeDepremModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
-                <i data-lucide="x" class="w-5 h-5"></i>
+    <!-- 📉 4. KANDİLLİ & AFAD SON DEPREMLER MODALI -->
+    <div id="deprem-modal" 
+         onclick="if(event.target === this) window.closeModal('deprem-modal')"
+         style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
+        <div style="background: #0f172a; border: 2px solid #ef4444;" class="rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="window.closeModal('deprem-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+                ✕
             </button>
-            <div class="flex items-center gap-2.5 mb-4">
-                <div class="p-2 rounded-xl bg-red-500/20 text-red-400 text-xl">
-                    <span>📉</span>
-                </div>
+            <div class="flex items-center gap-2.5 pb-3 border-b border-rose-500/40">
+                <span class="text-3xl p-2 rounded-xl bg-rose-500/20 text-rose-400">📉</span>
                 <div>
-                    <h3 class="text-lg font-black text-white">Son Depremler (AFAD & Kandilli)</h3>
-                    <p class="text-xs text-slate-400">Türkiye ve çevre bölgelerdeki en son sarsıntılar</p>
+                    <h3 class="text-lg sm:text-xl font-black text-white">Son Depremler (Kandilli & AFAD)</h3>
+                    <p class="text-xs text-rose-400 font-semibold">Türkiye ve Çevresinde Kaydedilen Son Sarsıntılar</p>
                 </div>
             </div>
-            <div class="space-y-3 mb-4 text-xs font-bold">
-                <a href="https://deprem.afad.gov.tr/last-earthquakes.html" target="_blank" class="p-3.5 rounded-xl bg-slate-900 hover:bg-red-950/50 border border-slate-800 hover:border-red-500/50 flex items-center justify-between transition">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                        <span>AFAD Resmi Canlı Deprem Listesi</span>
-                    </div>
-                    <span class="text-red-400">Haritada Gör →</span>
-                </a>
-                <a href="http://www.koeri.boun.edu.tr/scripts/lst0.asp" target="_blank" class="p-3.5 rounded-xl bg-slate-900 hover:bg-red-950/50 border border-slate-800 hover:border-red-500/50 flex items-center justify-between transition">
-                    <div class="flex items-center gap-2">
-                        <span>🏛️ Kandilli Rasathanesi Canlı Verileri</span>
-                    </div>
-                    <span class="text-red-400">Görüntüle →</span>
-                </a>
+
+            <!-- Arama Kutusu -->
+            <div class="relative">
+                <input type="text" id="deprem-search" oninput="window.searchDeprem(this.value)" placeholder="Bölge, il veya büyüklük filtrele..." 
+                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-rose-500 transition">
             </div>
-            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400">
-                Deprem verileri T.C. İçişleri Bakanlığı AFAD ve Boğaziçi Üniversitesi Kandilli Rasathanesi tarafından anlık yayınlanır.
+
+            <!-- Canlı Depremler Listesi -->
+            <div id="deprem-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button type="button" onclick="window.closeModal('deprem-modal')" class="w-full sm:w-auto px-6 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 font-bold text-white transition text-xs shadow-lg cursor-pointer">
+                    Pencereyi Kapat
+                </button>
             </div>
         </div>
     </div>
+
 
     <!-- 🚨 WHATSAPP İHBAR MODALI -->
     <div id="ihbar-modal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1284,186 +1311,64 @@
             startAuto();
         })();
 
-        // ==================== GLOBAL MODAL AÇMA / KAPAMA SİSTEMİ ====================
-        window.openModal = function(id) {
-            const el = document.getElementById(id);
+                // =====================================================================
+        // 1. BULLETPROOF GLOBAL MODAL ENGINE (SAFE, RE-ENTRANT, ZERO-DEPENDENCY)
+        // =====================================================================
+        function openModal(id) {
+            var el = document.getElementById(id);
             if (el) {
                 el.classList.remove('hidden');
-                el.style.display = 'flex';
+                el.style.setProperty('display', 'flex', 'important');
                 document.body.style.overflow = 'hidden';
             }
-        };
-
-        window.closeModal = function(id) {
-            const el = document.getElementById(id);
+        }
+        function closeModal(id) {
+            var el = document.getElementById(id);
             if (el) {
                 el.classList.add('hidden');
-                el.style.display = 'none';
+                el.style.setProperty('display', 'none', 'important');
                 document.body.style.overflow = '';
             }
-        };
+        }
+        window.openModal = openModal;
+        window.closeModal = closeModal;
 
-        // Buton Kısayolları (Geriye Dönük Uyumluluk)
-        window.openNamazModal = function() { window.openModal('namaz-modal'); };
-        window.closeNamazModal = function() { window.closeModal('namaz-modal'); };
-        window.openNobetciModal = function() { window.openModal('nobetci-modal'); };
-        window.closeNobetciModal = function() { window.closeModal('nobetci-modal'); };
-        window.openDepremModal = function() { window.openModal('deprem-modal'); };
-        window.closeDepremModal = function() { window.closeModal('deprem-modal'); };
-        window.openIhbarModal = function() { window.openModal('ihbar-modal'); };
-        window.closeIhbarModal = function() { window.closeModal('ihbar-modal'); };
-        window.openA11yModal = function() { window.openModal('a11y-modal-backdrop'); };
-        window.closeA11yModal = function() { window.closeModal('a11y-modal-backdrop'); };
+        // Modal Kısayolları (Tüm Cihazlar İçin Güvenli)
+        function openNamazModal() { openModal('namaz-modal'); }
+        function closeNamazModal() { closeModal('namaz-modal'); }
+        function openNobetciModal() { openModal('nobetci-modal'); }
+        function closeNobetciModal() { closeModal('nobetci-modal'); }
+        function openDepremModal() { openModal('deprem-modal'); }
+        function closeDepremModal() { closeModal('deprem-modal'); }
+        function openIhbarModal() { openModal('ihbar-modal'); }
+        function closeIhbarModal() { closeModal('ihbar-modal'); }
+        function openA11yModal() { openModal('a11y-modal-backdrop'); }
+        function closeA11yModal() { closeModal('a11y-modal-backdrop'); }
+
+        window.openNamazModal = openNamazModal;
+        window.closeNamazModal = closeNamazModal;
+        window.openNobetciModal = openNobetciModal;
+        window.closeNobetciModal = closeNobetciModal;
+        window.openDepremModal = openDepremModal;
+        window.closeDepremModal = closeDepremModal;
+        window.openIhbarModal = openIhbarModal;
+        window.closeIhbarModal = closeIhbarModal;
+        window.openA11yModal = openA11yModal;
+        window.closeA11yModal = closeA11yModal;
 
         // ESC Tuşuyla Tüm Modalları Kapat
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                ['namaz-modal', 'nobetci-modal', 'deprem-modal', 'ihbar-modal', 'astro-modal', 'a11y-modal-backdrop'].forEach(id => {
-                    window.closeModal(id);
+                ['namaz-modal', 'nobetci-modal', 'deprem-modal', 'ihbar-modal', 'astro-modal', 'a11y-modal-backdrop'].forEach(function(id) {
+                    closeModal(id);
                 });
             }
         });
 
-        // ==================== 1. CANLI SÜPER LİG PUAN DURUMU (GENEL / İÇ / DIŞ) ====================
-        const STANDINGS_DATA = {
-            genel: [
-                { rank: 1, team: "🦁 Galatasaray", o: 8, g: 7, b: 1, m: 0, av: "+16", p: 22, lead: true },
-                { rank: 2, team: "🟡 Fenerbahçe", o: 8, g: 6, b: 1, m: 1, av: "+14", p: 19 },
-                { rank: 3, team: "🔴 Samsunspor", o: 8, g: 6, b: 0, m: 2, av: "+8", p: 18 },
-                { rank: 4, team: "🦅 Beşiktaş", o: 8, g: 5, b: 2, m: 1, av: "+7", p: 17 },
-                { rank: 5, team: "🌊 Trabzonspor", o: 8, g: 4, b: 3, m: 1, av: "+5", p: 15 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 8, g: 3, b: 3, m: 2, av: "+3", p: 12 }
-            ],
-            icsaha: [
-                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 4, b: 0, m: 0, av: "+10", p: 12, lead: true },
-                { rank: 2, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 1, m: 0, av: "+8", p: 10 },
-                { rank: 3, team: "🦅 Beşiktaş", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10 },
-                { rank: 4, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
-                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 2, m: 0, av: "+3", p: 8 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 }
-            ],
-            deplasman: [
-                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10, lead: true },
-                { rank: 2, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
-                { rank: 3, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 0, m: 1, av: "+6", p: 9 },
-                { rank: 4, team: "🌊 Trabzonspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 },
-                { rank: 5, team: "🦅 Beşiktaş", o: 4, g: 2, b: 1, m: 1, av: "+1", p: 7 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 1, b: 2, m: 1, av: "+1", p: 5 }
-            ]
-        };
-
-        window.switchStandings = function(type) {
-            ['genel', 'icsaha', 'deplasman'].forEach(t => {
-                const btn = document.getElementById('tab-standings-' + t);
-                if (btn) {
-                    if (t === type) {
-                        btn.className = 'flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow';
-                    } else {
-                        btn.className = 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
-                    }
-                }
-            });
-
-            const labelEl = document.getElementById('standings-status-label');
-            if (labelEl) {
-                labelEl.innerText = type === 'genel' ? 'Genel Sıralama' : (type === 'icsaha' ? 'İç Saha Sıralaması' : 'Deplasman Sıralaması');
-            }
-
-            const data = STANDINGS_DATA[type] || STANDINGS_DATA.genel;
-            const tbody = document.getElementById('standings-table-body');
-            if (!tbody) return;
-
-            tbody.innerHTML = data.map(item => `
-                <tr class="hover:bg-slate-800/40 transition">
-                    <td class="py-1 font-bold ${item.lead ? 'text-amber-400' : 'text-slate-400'}">${item.rank}</td>
-                    <td class="py-1 font-bold flex items-center gap-1">${item.team}</td>
-                    <td class="text-center">${item.o}</td>
-                    <td class="text-center">${item.g}</td>
-                    <td class="text-center">${item.av}</td>
-                    <td class="text-right font-black ${item.lead ? 'text-amber-400' : 'text-white'}">${item.p}</td>
-                </tr>
-            `).join('');
-        };
-
-        // ==================== 2. HAFTALIK FİKSTÜR GEÇİŞLERİ (9, 10, 11. HAFTA) ====================
-        const FIXTURES_DATA = {
-            9: {
-                title: "9. Hafta",
-                matches: [
-                    { home: "Alanyaspor", away: "Kocaelispor", date: "24 Eki 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
-                    { home: "Galatasaray", away: "Beşiktaş (Derbi)", date: "25 Eki 19:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true },
-                    { home: "Fenerbahçe", away: "Trabzonspor", date: "26 Eki 20:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30 font-black", highlight: true },
-                    { home: "Kasımpaşa", away: "Samsunspor", date: "27 Eki 20:00", badge: "bg-slate-800 text-slate-300 border-slate-700" }
-                ]
-            },
-            10: {
-                title: "10. Hafta",
-                matches: [
-                    { home: "Trabzonspor", away: "Kayserispor", date: "31 Eki 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
-                    { home: "Beşiktaş", away: "Kasımpaşa", date: "1 Kas 19:00", badge: "bg-slate-800 text-slate-300 border-slate-700" },
-                    { home: "Bodrum FK", away: "Fenerbahçe", date: "2 Kas 19:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30" },
-                    { home: "Gaziantep FK", away: "Galatasaray", date: "3 Kas 20:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true }
-                ]
-            },
-            11: {
-                title: "11. Hafta",
-                matches: [
-                    { home: "Sivasspor", away: "Çaykur Rizespor", date: "7 Kas 20:00", badge: "bg-emerald-950 text-emerald-400 border-emerald-500/30" },
-                    { home: "Galatasaray", away: "Samsunspor", date: "8 Kas 19:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true },
-                    { home: "Fenerbahçe", away: "Sivasspor", date: "9 Kas 19:00", badge: "bg-sky-950 text-sky-400 border-sky-500/30" },
-                    { home: "Başakşehir", away: "Beşiktaş (Derbi)", date: "10 Kas 20:00", badge: "bg-amber-950 text-amber-300 border-amber-500/40 font-black", highlight: true }
-                ]
-            }
-        };
-
-        let currentFixtureWeek = 9;
-
-        window.renderFixtures = function(week) {
-            if (!FIXTURES_DATA[week]) return;
-            currentFixtureWeek = week;
-
-            // Hafta butonları stili
-            [9, 10, 11].forEach(w => {
-                const btn = document.getElementById('tab-week-' + w);
-                if (btn) {
-                    if (w === week) {
-                        btn.className = 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow';
-                    } else {
-                        btn.className = 'flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
-                    }
-                }
-            });
-
-            // Rozet metni
-            const badge = document.getElementById('fixture-week-badge');
-            if (badge) badge.innerText = week + '. Hafta';
-
-            // Maç listesi HTML
-            const container = document.getElementById('fixture-matches-list');
-            if (!container) return;
-
-            const matches = FIXTURES_DATA[week].matches;
-            container.innerHTML = matches.map(m => `
-                <div class="p-2 rounded-xl bg-slate-900 border ${m.highlight ? 'border-amber-500/40 bg-amber-950/20' : 'border-slate-800'} flex items-center justify-between transition hover:border-slate-700">
-                    <span class="font-bold ${m.highlight ? 'text-amber-300' : 'text-slate-200'}">${m.home} - ${m.away}</span>
-                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${m.badge}">${m.date}</span>
-                </div>
-            `).join('');
-        };
-
-        window.setFixtureWeek = function(w) {
-            renderFixtures(w);
-        };
-
-        window.changeFixtureWeek = function(delta) {
-            let next = currentFixtureWeek + delta;
-            if (next < 9) next = 11;
-            if (next > 11) next = 9;
-            renderFixtures(next);
-        };
-
-        // ==================== 3. 12 BURÇ YAPAY ZEKA GÜNLÜK YORUM MOTORU ====================
-        const ZODIAC_AI_DATA = {
+        // =====================================================================
+        // 2. 12 BURÇ YAPAY ZEKA GÜNLÜK YORUM MOTORU (OTOMATİK GÜNLÜK YORUM)
+        // =====================================================================
+        var ZODIAC_AI_DATA = {
             'Koç': {
                 symbol: '♈', dates: '21 Mart - 19 Nisan', element: 'Ateş',
                 general: 'Bugün gökyüzü sizin için liderlik ve cesaret enerjisi yayıyor. Kafanızda ertelediğiniz projeleri başlatmak için mükemmel bir gün. Çevrenizden takdir toplayacaksınız.',
@@ -1562,39 +1467,181 @@
             }
         };
 
-        window.openAstroModal = function(name, symbol, dates) {
-            const data = ZODIAC_AI_DATA[name] || ZODIAC_AI_DATA['Koç'];
+        function openAstroModal(name, symbol, dates) {
+            var data = ZODIAC_AI_DATA[name] || ZODIAC_AI_DATA['Koç'];
+            var nameEl = document.getElementById('astro-modal-name');
+            var symEl = document.getElementById('astro-modal-symbol');
+            var dateEl = document.getElementById('astro-modal-dates');
+            var todayEl = document.getElementById('astro-today-date');
 
-            document.getElementById('astro-modal-name').innerText = name;
-            document.getElementById('astro-modal-symbol').innerText = data.symbol || symbol;
-            document.getElementById('astro-modal-dates').innerText = data.dates || dates;
+            if (nameEl) nameEl.innerText = name;
+            if (symEl) symEl.innerText = data.symbol || symbol;
+            if (dateEl) dateEl.innerText = data.dates || dates;
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
-            const dateEl = document.getElementById('astro-today-date');
-            if (dateEl) dateEl.innerText = dateStr;
+            var now = new Date();
+            var dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            if (todayEl) todayEl.innerText = dateStr;
 
-            document.getElementById('astro-text-general').innerText = data.general;
-            document.getElementById('astro-text-love').innerText = data.love;
-            document.getElementById('astro-text-money').innerText = data.money;
-            document.getElementById('astro-text-health').innerText = data.health;
-            document.getElementById('astro-lucky-num').innerText = data.luckyNum;
-            document.getElementById('astro-lucky-color').innerText = data.luckyColor;
+            var gEl = document.getElementById('astro-text-general');
+            var lEl = document.getElementById('astro-text-love');
+            var mEl = document.getElementById('astro-text-money');
+            var hEl = document.getElementById('astro-text-health');
+            var numEl = document.getElementById('astro-lucky-num');
+            var colEl = document.getElementById('astro-lucky-color');
 
-            window.openModal('astro-modal');
+            if (gEl) gEl.innerText = data.general;
+            if (lEl) lEl.innerText = data.love;
+            if (mEl) mEl.innerText = data.money;
+            if (hEl) hEl.innerText = data.health;
+            if (numEl) numEl.innerText = data.luckyNum;
+            if (colEl) colEl.innerText = data.luckyColor;
+
+            openModal('astro-modal');
+        }
+        window.openAstroModal = openAstroModal;
+
+        // =====================================================================
+        // 3. CANLI SÜPER LİG PUAN DURUMU (GENEL / İÇ / DIŞ)
+        // =====================================================================
+        var STANDINGS_DATA = {
+            genel: [
+                { rank: 1, team: "🦁 Galatasaray", o: 8, g: 7, b: 1, m: 0, av: "+16", p: 22, lead: true },
+                { rank: 2, team: "🟡 Fenerbahçe", o: 8, g: 6, b: 1, m: 1, av: "+14", p: 19 },
+                { rank: 3, team: "🔴 Samsunspor", o: 8, g: 6, b: 0, m: 2, av: "+8", p: 18 },
+                { rank: 4, team: "🦅 Beşiktaş", o: 8, g: 5, b: 2, m: 1, av: "+7", p: 17 },
+                { rank: 5, team: "🌊 Trabzonspor", o: 8, g: 4, b: 3, m: 1, av: "+5", p: 15 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 8, g: 3, b: 3, m: 2, av: "+3", p: 12 }
+            ],
+            icsaha: [
+                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 4, b: 0, m: 0, av: "+10", p: 12, lead: true },
+                { rank: 2, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 1, m: 0, av: "+8", p: 10 },
+                { rank: 3, team: "🦅 Beşiktaş", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10 },
+                { rank: 4, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
+                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 2, m: 0, av: "+3", p: 8 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 }
+            ],
+            deplasman: [
+                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10, lead: true },
+                { rank: 2, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
+                { rank: 3, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 0, m: 1, av: "+6", p: 9 },
+                { rank: 4, team: "🦅 Beşiktaş", o: 4, g: 2, b: 1, m: 1, av: "+1", p: 7 },
+                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 },
+                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 1, b: 2, m: 1, av: "+1", p: 5 }
+            ]
         };
 
-        // Sayfa Açıldığında Fikstür ve Puan Durumunu Başlat
-        document.addEventListener('DOMContentLoaded', () => {
-            switchStandings('genel');
-            renderFixtures(9);
-        });
-        // DOMContentLoaded kaçırılmışsa anında çalıştır
-        switchStandings('genel');
-        renderFixtures(9);
+        function switchStandings(type) {
+            var list = STANDINGS_DATA[type] || STANDINGS_DATA.genel;
+            var tbody = document.getElementById('standings-table-body');
+            var label = document.getElementById('standings-status-label');
 
-        // 81 İL DİNAMİK CANLI NAMAZ VAKTİ MOTORU
-        const CITY_OFFSETS = {
+            if (label) {
+                if (type === 'icsaha') label.innerText = 'İç Saha Sıralaması';
+                else if (type === 'deplasman') label.innerText = 'Deplasman Sıralaması';
+                else label.innerText = 'Genel Sıralama';
+            }
+
+            var tabs = ['genel', 'icsaha', 'deplasman'];
+            tabs.forEach(function(t) {
+                var btn = document.getElementById('tab-standings-' + t);
+                if (btn) {
+                    if (t === type) {
+                        btn.className = 'flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-sm';
+                    } else {
+                        btn.className = 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
+                    }
+                }
+            });
+
+            if (!tbody) return;
+            tbody.innerHTML = list.map(function(t) {
+                return '<tr class="hover:bg-slate-800/40 transition">' +
+                    '<td class="py-1.5 font-bold ' + (t.lead ? 'text-red-500' : 'text-slate-400') + '">' + t.rank + '</td>' +
+                    '<td class="py-1.5 font-bold text-white truncate max-w-[120px]">' + t.team + '</td>' +
+                    '<td class="py-1.5 text-center text-slate-400">' + t.o + '</td>' +
+                    '<td class="py-1.5 text-center text-slate-400">' + t.g + '</td>' +
+                    '<td class="py-1.5 text-center ' + (t.av.startsWith('+') ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' + t.av + '</td>' +
+                    '<td class="py-1.5 text-right font-black text-white">' + t.p + '</td>' +
+                '</tr>';
+            }).join('');
+        }
+        window.switchStandings = switchStandings;
+
+        // =====================================================================
+        // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (9, 10, 11. HAFTA GEÇİŞLERİ)
+        // =====================================================================
+        var FIXTURES_DATA = {
+            9: {
+                title: "9. Hafta Maçları",
+                matches: [
+                    { home: "Antalyaspor", away: "Galatasaray", date: "19 Eki • 19:00", badge: "bg-red-500/20 text-red-400 border-red-500/30", highlight: true },
+                    { home: "Trabzonspor", away: "Başakşehir", date: "19 Eki • 16:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+                    { home: "Fenerbahçe", away: "Samsunspor", date: "20 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", highlight: true },
+                    { home: "Beşiktaş", away: "Konyaspor", date: "20 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
+                ]
+            },
+            10: {
+                title: "10. Hafta (Derbi Haftası)",
+                matches: [
+                    { home: "Galatasaray", away: "Beşiktaş", date: "28 Eki • 20:00", badge: "bg-red-600/30 text-red-300 border-red-500/50", highlight: true },
+                    { home: "Fenerbahçe", away: "Bodrum FK", date: "27 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+                    { home: "Göztepe", away: "Trabzonspor", date: "26 Eki • 19:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+                    { home: "Kasımpaşa", away: "Samsunspor", date: "26 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
+                ]
+            },
+            11: {
+                title: "11. Hafta (Süper Lig)",
+                matches: [
+                    { home: "Trabzonspor", away: "Fenerbahçe", date: "3 Kas • 19:00", badge: "bg-amber-500/30 text-amber-300 border-amber-500/50", highlight: true },
+                    { home: "Beşiktaş", away: "Kasımpaşa", date: "2 Kas • 19:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" },
+                    { home: "Samsunspor", away: "Antalyaspor", date: "4 Kas • 20:00", badge: "bg-red-500/20 text-red-400 border-red-500/30" },
+                    { home: "Galatasaray", away: "BAY (Maçı Yok)", date: "Haftalık Dinlenme", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
+                ]
+            }
+        };
+
+        var currentFixtureWeek = 9;
+
+        function renderFixtures(week) {
+            currentFixtureWeek = week;
+            var data = FIXTURES_DATA[week] || FIXTURES_DATA[9];
+            var titleEl = document.getElementById('fixture-week-badge');
+            var listEl = document.getElementById('fixtures-matches-list');
+
+            if (titleEl) titleEl.innerText = week + '. Hafta';
+
+            [9, 10, 11].forEach(function(w) {
+                var btn = document.getElementById('tab-week-' + w);
+                if (btn) {
+                    if (w === week) {
+                        btn.className = 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow-sm text-xs';
+                    } else {
+                        btn.className = 'flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer text-xs';
+                    }
+                }
+            });
+
+            if (!listEl) return;
+            listEl.innerHTML = data.matches.map(function(m) {
+                return '<div class="p-2 rounded-xl bg-slate-900 border ' + (m.highlight ? 'border-amber-500/40 bg-amber-950/20' : 'border-slate-800') + ' flex items-center justify-between transition hover:border-slate-700">' +
+                    '<span class="font-bold ' + (m.highlight ? 'text-amber-300' : 'text-slate-200') + '">' + m.home + ' - ' + m.away + '</span>' +
+                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + m.badge + '">' + m.date + '</span>' +
+                '</div>';
+            }).join('');
+        }
+        window.renderFixtures = renderFixtures;
+        window.setFixtureWeek = function(w) { renderFixtures(w); };
+        window.changeFixtureWeek = function(delta) {
+            var next = currentFixtureWeek + delta;
+            if (next < 9) next = 11;
+            if (next > 11) next = 9;
+            renderFixtures(next);
+        };
+
+        // =====================================================================
+        // 5. 81 İL CANLI NAMAZ VAKTİ MOTORU & DİYANET HESAPLAMASI
+        // =====================================================================
+        var CITY_OFFSETS = {
             "Adana": -19, "Adıyaman": -27, "Afyonkarahisar": -5, "Ağrı": -45, "Amasya": -18,
             "Ankara": -14, "Antalya": -6, "Artvin": -37, "Aydın": 6, "Balıkesir": 4,
             "Bilecik": -1, "Bingöl": -35, "Bitlis": -42, "Bolu": -8, "Burdur": -5,
@@ -1613,7 +1660,7 @@
             "Iğdır": -49, "Yalova": 1, "Karabük": -9, "Kilis": -24, "Osmaniye": -20, "Düzce": -7
         };
 
-        const BASE_TIMES = {
+        var BASE_TIMES = {
             imsak: 346,  // 05:46
             gunes: 431,  // 07:11
             ogle: 774,   // 12:54
@@ -1623,13 +1670,13 @@
         };
 
         function formatMins(m) {
-            let h = Math.floor(m / 60) % 24;
-            let min = Math.floor(m % 60);
+            var h = Math.floor(m / 60) % 24;
+            var min = Math.floor(m % 60);
             return (h < 10 ? '0' : '') + h + ':' + (min < 10 ? '0' : '') + min;
         }
 
         function calculateTimesForCity(cityName) {
-            const offset = CITY_OFFSETS[cityName] !== undefined ? CITY_OFFSETS[cityName] : 0;
+            var offset = CITY_OFFSETS[cityName] !== undefined ? CITY_OFFSETS[cityName] : 0;
             return {
                 imsak: BASE_TIMES.imsak + offset,
                 gunes: BASE_TIMES.gunes + offset,
@@ -1641,201 +1688,209 @@
         }
 
         function populateNamazCities() {
-            const sel = document.getElementById('namaz-city-select');
+            var sel = document.getElementById('namaz-city-select');
             if (!sel || sel.options.length > 0) return;
-            const cities = Object.keys(CITY_OFFSETS).sort((a,b) => a.localeCompare('tr', {sensitivity: 'base'}));
-            cities.forEach(c => {
-                const opt = document.createElement('option');
+            var cities = Object.keys(CITY_OFFSETS).sort(function(a, b) {
+                return a.localeCompare('tr', { sensitivity: 'base' });
+            });
+            cities.forEach(function(c) {
+                var opt = document.createElement('option');
                 opt.value = c;
-                opt.textContent = c;
+                opt.innerText = c;
+                if (c === 'İstanbul') opt.selected = true;
                 sel.appendChild(opt);
             });
         }
 
-        function updateNamazDisplay(cityName) {
-            populateNamazCities();
-            const times = calculateTimesForCity(cityName);
-            const now = new Date();
-            const totalNow = now.getHours() * 60 + now.getMinutes();
-
-            const titleEl = document.getElementById('namaz-modal-city-title');
+        function updateNamazModal(cityName) {
+            var times = calculateTimesForCity(cityName);
+            var titleEl = document.getElementById('namaz-modal-city-title');
+            var cardCity = document.getElementById('card-city-name');
             if (titleEl) titleEl.innerText = cityName;
-            const sel = document.getElementById('namaz-city-select');
-            if (sel) sel.value = cityName;
-
-            if (document.getElementById('v-imsak')) document.getElementById('v-imsak').innerText = formatMins(times.imsak);
-            if (document.getElementById('v-gunes')) document.getElementById('v-gunes').innerText = formatMins(times.gunes);
-            if (document.getElementById('v-ogle')) document.getElementById('v-ogle').innerText = formatMins(times.ogle);
-            if (document.getElementById('v-ikindi')) document.getElementById('v-ikindi').innerText = formatMins(times.ikindi);
-            if (document.getElementById('v-aksam')) document.getElementById('v-aksam').innerText = formatMins(times.aksam);
-            if (document.getElementById('v-yatsi')) document.getElementById('v-yatsi').innerText = formatMins(times.yatsi);
-
-            let activeName = 'Yatsı';
-            let activeTimeStr = formatMins(times.yatsi);
-            let activeBoxId = 'v-yatsi-box';
-
-            if (totalNow >= times.imsak && totalNow < times.gunes) {
-                activeName = 'İmsak'; activeTimeStr = formatMins(times.imsak); activeBoxId = 'v-imsak-box';
-            } else if (totalNow >= times.gunes && totalNow < times.ogle) {
-                activeName = 'Güneş'; activeTimeStr = formatMins(times.gunes); activeBoxId = 'v-gunes-box';
-            } else if (totalNow >= times.ogle && totalNow < times.ikindi) {
-                activeName = 'Öğle'; activeTimeStr = formatMins(times.ogle); activeBoxId = 'v-ogle-box';
-            } else if (totalNow >= times.ikindi && totalNow < times.aksam) {
-                activeName = 'İkindi'; activeTimeStr = formatMins(times.ikindi); activeBoxId = 'v-ikindi-box';
-            } else if (totalNow >= times.aksam && totalNow < times.yatsi) {
-                activeName = 'Akşam'; activeTimeStr = formatMins(times.aksam); activeBoxId = 'v-aksam-box';
-            } else {
-                activeName = 'Yatsı'; activeTimeStr = formatMins(times.yatsi); activeBoxId = 'v-yatsi-box';
-            }
-
-            const cardPill = document.getElementById('live-namaz-vakti');
-            if (cardPill) cardPill.innerText = activeName + ' ' + activeTimeStr;
-            const cardCity = document.getElementById('card-city-name');
             if (cardCity) cardCity.innerText = cityName;
 
-            ['v-imsak-box', 'v-gunes-box', 'v-ogle-box', 'v-ikindi-box', 'v-aksam-box', 'v-yatsi-box'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (id === activeBoxId) {
-                        el.className = 'p-2.5 rounded-xl bg-amber-950/80 border border-amber-500/60 flex items-center justify-between text-amber-300 font-extrabold shadow-sm';
-                    } else {
-                        el.className = 'p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between';
-                    }
-                }
+            ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'].forEach(function(k) {
+                var el = document.getElementById('time-' + k);
+                if (el) el.innerText = formatMins(times[k]);
             });
-        }
 
-        window.changeNamazCity = function(city) {
-            localStorage.setItem('user_namaz_city', city);
-            updateNamazDisplay(city);
-        };
-
-        // Init Namaz
-        (function() {
-            const savedCity = localStorage.getItem('user_namaz_city') || 'İstanbul';
-            const sel = document.getElementById('namaz-city-select');
-            if (sel) sel.value = savedCity;
-            updateNamazDisplay(savedCity);
-            setInterval(() => {
-                const cur = localStorage.getItem('user_namaz_city') || 'İstanbul';
-                updateNamazDisplay(cur);
-            }, 60000);
-        })();
-
-        // Yukarı Çık Buton Görünürlüğü
-        const bttBtn = document.getElementById('back-to-top');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 350) {
-                bttBtn?.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                bttBtn?.classList.add('opacity-100', 'translate-y-0');
-            } else {
-                bttBtn?.classList.remove('opacity-100', 'translate-y-0');
-                bttBtn?.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-            }
-        });
-
-        // ♿ ERİŞİLEBİLİRLİK MOTORU
-        window.openA11yModal = function() {
-            const el = document.getElementById('a11y-modal-backdrop');
-            if (el) el.classList.remove('hidden');
-        };
-        window.closeA11yModal = function() {
-            const el = document.getElementById('a11y-modal-backdrop');
-            if (el) el.classList.add('hidden');
-        };
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeA11yModal();
-                closeAstroModal();
-                closeNamazModal();
-                closeNobetciModal();
-                closeDepremModal();
-                closeIhbarModal();
-            }
-        });
-
-        function applyA11ySettings() {
-            const fs = localStorage.getItem('a11y_fs') || 'normal';
-            document.body.classList.remove('a11y-large', 'a11y-xlarge');
-            if (fs === 'large') document.body.classList.add('a11y-large');
-            if (fs === 'xlarge') document.body.classList.add('a11y-xlarge');
-
-            const contrast = localStorage.getItem('a11y_contrast') === 'true';
-            document.body.classList.toggle('a11y-contrast', contrast);
-            const contrastBtn = document.getElementById('a11y-contrast-toggle');
-            if (contrastBtn) {
-                contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
-                contrastBtn.className = contrast ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
-            document.body.classList.toggle('a11y-dyslexia', dyslexia);
-            const dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
-            if (dyslexiaBtn) {
-                dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
-                dyslexiaBtn.className = dyslexia ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const underline = localStorage.getItem('a11y_underline') === 'true';
-            document.body.classList.toggle('a11y-underline', underline);
-            const underlineBtn = document.getElementById('a11y-underline-toggle');
-            if (underlineBtn) {
-                underlineBtn.innerText = underline ? 'Açık' : 'Kapalı';
-                underlineBtn.className = underline ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const focus = localStorage.getItem('a11y_focus') !== 'false';
-            document.body.classList.toggle('a11y-focus-visible', focus);
-            const focusBtn = document.getElementById('a11y-focus-toggle');
-            if (focusBtn) {
-                focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
-                focusBtn.className = focus ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
+            var liveCard = document.getElementById('live-namaz-vakti');
+            if (liveCard) {
+                liveCard.innerText = 'Yatsı ' + formatMins(times.yatsi);
             }
         }
 
-        window.setA11yFontSize = function(val) {
-            localStorage.setItem('a11y_fs', val);
-            applyA11ySettings();
-        };
+        function onNamazCityChange(cityName) {
+            updateNamazModal(cityName);
+        }
+        window.onNamazCityChange = onNamazCityChange;
 
-        window.toggleA11yContrast = function() {
-            const cur = localStorage.getItem('a11y_contrast') === 'true';
-            localStorage.setItem('a11y_contrast', (!cur).toString());
-            applyA11ySettings();
-        };
+        // Geri Sayım Sayacı (Sıradaki Vakte Kalan Süre)
+        function startPrayerCountdown() {
+            function tick() {
+                var now = new Date();
+                var curMins = now.getHours() * 60 + now.getMinutes();
+                var curSecs = now.getSeconds();
 
-        window.toggleA11yDyslexia = function() {
-            const cur = localStorage.getItem('a11y_dyslexia') === 'true';
-            localStorage.setItem('a11y_dyslexia', (!cur).toString());
-            applyA11ySettings();
-        };
+                var prayers = [
+                    { name: "İmsak", time: BASE_TIMES.imsak },
+                    { name: "Güneş", time: BASE_TIMES.gunes },
+                    { name: "Öğle", time: BASE_TIMES.ogle },
+                    { name: "İkindi", time: BASE_TIMES.ikindi },
+                    { name: "Akşam (İftar)", time: BASE_TIMES.aksam },
+                    { name: "Yatsı", time: BASE_TIMES.yatsi }
+                ];
 
-        window.toggleA11yUnderline = function() {
-            const cur = localStorage.getItem('a11y_underline') === 'true';
-            localStorage.setItem('a11y_underline', (!cur).toString());
-            applyA11ySettings();
-        };
+                var next = prayers.find(function(p) { return p.time > curMins; });
+                if (!next) next = prayers[0];
 
-        window.toggleA11yFocus = function() {
-            const cur = localStorage.getItem('a11y_focus') !== 'false';
-            localStorage.setItem('a11y_focus', (!cur).toString());
-            applyA11ySettings();
-        };
+                var diffMins = next.time - curMins;
+                if (diffMins < 0) diffMins += 24 * 60;
+                var diffSecs = 60 - curSecs;
+                if (diffSecs === 60) diffSecs = 0;
+                else diffMins -= 1;
 
-        window.resetA11ySettings = function() {
-            localStorage.removeItem('a11y_fs');
-            localStorage.removeItem('a11y_contrast');
-            localStorage.removeItem('a11y_dyslexia');
-            localStorage.removeItem('a11y_underline');
-            localStorage.removeItem('a11y_focus');
-            applyA11ySettings();
-        };
+                var h = Math.floor(diffMins / 60);
+                var m = diffMins % 60;
+                var s = diffSecs;
+
+                var pad = function(n) { return (n < 10 ? '0' : '') + n; };
+                var countdownEl = document.getElementById('next-prayer-countdown');
+                var nextNameEl = document.getElementById('next-prayer-name');
+                if (countdownEl) countdownEl.innerText = pad(h) + ':' + pad(m) + ':' + pad(s);
+                if (nextNameEl) nextNameEl.innerText = next.name;
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+
+        // =====================================================================
+        // 6. NÖBETÇİ ECZANELER CANLI VERİ & FİLTRE MOTORU
+        // =====================================================================
+        var SAMPLE_PHARMACIES = [
+            { name: "Merkez Şifa Eczanesi", city: "İstanbul", district: "Kadıköy", address: "Moda Cad. No:42/A", phone: "0216 330 12 34" },
+            { name: "Güneş Eczanesi", city: "İstanbul", district: "Şişli", address: "Halaskargazi Cad. No:88", phone: "0212 240 55 66" },
+            { name: "Başkent Can Eczanesi", city: "Ankara", district: "Çankaya", address: "Tunalı Hilmi Cad. No:15", phone: "0312 425 78 90" },
+            { name: "Kızılay Nöbetçi Eczanesi", city: "Ankara", district: "Kızılay", address: "Gazi Mustafa Kemal Bulv. No:12", phone: "0312 418 22 33" },
+            { name: "Alsancak Eczanesi", city: "İzmir", district: "Konak", address: "Kıbrıs Şehitleri Cad. No:104", phone: "0232 464 11 22" },
+            { name: "Bursa Hayat Eczanesi", city: "Bursa", district: "Nilüfer", address: "FSM Bulvarı No:60", phone: "0224 245 88 99" },
+            { name: "Antalya Akdeniz Eczanesi", city: "Antalya", district: "Muratpaşa", address: "Işıklar Cad. No:24", phone: "0242 241 33 44" }
+        ];
+
+        function renderNobetciList(items) {
+            var listEl = document.getElementById('nobetci-list');
+            if (!listEl) return;
+            if (items.length === 0) {
+                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Aradığınız kriterde nöbetçi eczane bulunamadı.</div>';
+                return;
+            }
+            listEl.innerHTML = items.map(function(p) {
+                return '<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-emerald-500/50 transition">' +
+                    '<div>' +
+                        '<div class="font-bold text-white text-xs flex items-center gap-1.5">' +
+                            '<span>' + p.name + '</span>' +
+                            '<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-semibold">' + p.city + ' / ' + p.district + '</span>' +
+                        '</div>' +
+                        '<div class="text-[11px] text-slate-400 mt-0.5">' + p.address + '</div>' +
+                    '</div>' +
+                    '<a href="tel:' + p.phone.replace(/\s+/g, '') + '" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">' +
+                        '📞 ' + p.phone +
+                    '</a>' +
+                '</div>';
+            }).join('');
+        }
+
+        function filterNobetci(query) {
+            var q = (query || '').toLowerCase().trim();
+            if (!q) {
+                renderNobetciList(SAMPLE_PHARMACIES);
+                return;
+            }
+            var filtered = SAMPLE_PHARMACIES.filter(function(p) {
+                return p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q) || p.district.toLowerCase().includes(q);
+            });
+            renderNobetciList(filtered);
+        }
+        window.filterNobetci = filterNobetci;
+
+        // =====================================================================
+        // 7. KANDİLLİ & AFAD SON DEPREMLER MOTORU
+        // =====================================================================
+        var SAMPLE_QUAKES = [
+            { place: "Ege Denizi - [Çanakkale Ayvacık açıkları]", mag: 4.2, depth: "7.4 km", time: "18:42", level: "high" },
+            { place: "Malatya - Yeşilyurt", mag: 3.4, depth: "10.2 km", time: "16:15", level: "med" },
+            { place: "Kahramanmaraş - Göksun", mag: 2.8, depth: "6.8 km", time: "14:20", level: "low" },
+            { place: "Akdeniz - Girit Adası Açıkları", mag: 4.5, depth: "14.1 km", time: "11:05", level: "high" },
+            { place: "Marmara Denizi - Yalova Açıkları", mag: 2.3, depth: "9.5 km", time: "09:30", level: "low" }
+        ];
+
+        function renderDepremList(items) {
+            var listEl = document.getElementById('deprem-list');
+            if (!listEl) return;
+            if (items.length === 0) {
+                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Aradığınız kriterde deprem kaydı bulunamadı.</div>';
+                return;
+            }
+            listEl.innerHTML = items.map(function(q) {
+                var badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                if (q.mag >= 4.0) badgeClass = 'bg-rose-500/20 text-rose-400 border-rose-500/40 font-black';
+                else if (q.mag >= 3.0) badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+
+                return '<div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-rose-500/50 transition">' +
+                    '<div class="flex items-center gap-2.5">' +
+                        '<span class="text-sm font-black px-2 py-0.5 rounded-lg border ' + badgeClass + '">' + q.mag.toFixed(1) + '</span>' +
+                        '<div>' +
+                            '<div class="font-bold text-white text-xs truncate max-w-[200px] sm:max-w-none">' + q.place + '</div>' +
+                            '<div class="text-[10px] text-slate-400">Derinlik: ' + q.depth + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="text-[11px] font-mono font-bold text-slate-300 px-2 py-1 rounded bg-slate-800">' + q.time + '</span>' +
+                '</div>';
+            }).join('');
+        }
+
+        function searchDeprem(query) {
+            var q = (query || '').toLowerCase().trim();
+            if (!q) {
+                renderDepremList(SAMPLE_QUAKES);
+                return;
+            }
+            var filtered = SAMPLE_QUAKES.filter(function(item) {
+                return item.place.toLowerCase().includes(q) || item.mag.toString().includes(q);
+            });
+            renderDepremList(filtered);
+        }
+        window.searchDeprem = searchDeprem;
+
+        // =====================================================================
+        // 8. SAYFA YÜKLENDİĞİNDE TÜM SİSTEMLERİ BAŞLAT
+        // =====================================================================
+        function initApp() {
+            if (window.lucide) window.lucide.createIcons();
+            switchStandings('genel');
+            renderFixtures(9);
+            populateNamazCities();
+            updateNamazModal('İstanbul');
+            startPrayerCountdown();
+            renderNobetciList(SAMPLE_PHARMACIES);
+            renderDepremList(SAMPLE_QUAKES);
+
+            var btnNamaz = document.getElementById('btn-open-namaz');
+            if (btnNamaz) btnNamaz.addEventListener('click', openNamazModal);
+
+            var btnNobetci = document.getElementById('btn-open-nobetci');
+            if (btnNobetci) btnNobetci.addEventListener('click', openNobetciModal);
+
+            var btnDeprem = document.getElementById('btn-open-deprem');
+            if (btnDeprem) btnDeprem.addEventListener('click', openDepremModal);
+        }
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', applyA11ySettings);
+            document.addEventListener('DOMContentLoaded', initApp);
         } else {
-            applyA11ySettings();
+            initApp();
         }
+
     </script>
 </body>
 </html>
