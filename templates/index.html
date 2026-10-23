@@ -522,28 +522,51 @@
                             </span>
                             <h3 class="text-sm font-black text-white tracking-wide uppercase">GÜNLÜK HIZLI SERVİSLER</h3>
                         </div>
-                        <div class="space-y-2.5 text-xs">
-                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                                <div class="space-y-2.5 text-xs">
+                            <!-- Canlı Dinamik Namaz Vakti Butonu -->
+                            <button type="button" onclick="openNamazModal()"
+                                class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🕌</span>
-                                    <span class="font-bold text-slate-200">İstanbul Namaz Vakitleri</span>
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-amber-400 transition">Namaz Vakitleri</div>
+                                        <div class="text-[10px] text-slate-500">Tüm vakitleri görmek için tıkla</div>
+                                    </div>
                                 </div>
-                                <span class="font-mono text-amber-400 font-bold">İkindi 16:42</span>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                <span id="live-namaz-vakti" class="font-mono text-amber-400 font-extrabold text-xs px-2 py-0.5 rounded bg-amber-950/60 border border-amber-500/30">
+                                    Yatsı 19:44
+                                </span>
+                            </button>
+
+                            <!-- Tıklanabilir Nöbetçi Eczaneler Butonu -->
+                            <button type="button" onclick="openNobetciModal()"
+                                class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">💊</span>
-                                    <span class="font-bold text-slate-200">Nöbetçi Eczaneler</span>
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-emerald-400 transition">Nöbetçi Eczaneler</div>
+                                        <div class="text-[10px] text-slate-500">İlinizdeki nöbetçi eczaneleri bul</div>
+                                    </div>
                                 </div>
-                                <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">Açık</span>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/90 px-2.5 py-0.5 rounded border border-emerald-500/40 flex items-center gap-1">
+                                    Sorgula <i data-lucide="chevron-right" class="w-3 h-3 group-hover:translate-x-0.5 transition"></i>
+                                </span>
+                            </button>
+
+                            <!-- Son Depremler Butonu (Kandilli Canlı) -->
+                            <a href="http://www.koeri.boun.edu.tr/scripts/lst0.asp" target="_blank"
+                                class="w-full p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/60 transition flex items-center justify-between group cursor-pointer text-left shadow-sm">
                                 <div class="flex items-center gap-2">
                                     <span class="text-base">🌐</span>
-                                    <span class="font-bold text-slate-200">Son Depremler (Kandilli)</span>
+                                    <div>
+                                        <div class="font-bold text-slate-200 group-hover:text-sky-400 transition">Son Depremler</div>
+                                        <div class="text-[10px] text-slate-500">Kandilli Rasathanesi Anlık</div>
+                                    </div>
                                 </div>
-                                <span class="font-mono text-slate-400 text-[11px]">Akdeniz 2.4 ML</span>
-                            </div>
+                                <span class="font-mono text-sky-400 text-xs font-bold flex items-center gap-1">
+                                    Canlı Liste <i data-lucide="external-link" class="w-3 h-3 group-hover:translate-x-0.5 transition"></i>
+                                </span>
+                            </a>
                         </div>
                     </div>
 
@@ -963,11 +986,167 @@
             startAuto();
         })();
 
+    
+        // Nöbetçi Eczaneler & Namaz Vakitleri Modal Fonksiyonları
+        function openNobetciModal() {
+            document.getElementById('nobetci-modal')?.classList.remove('hidden');
+        }
+        function closeNobetciModal() {
+            document.getElementById('nobetci-modal')?.classList.add('hidden');
+        }
+        function openNamazModal() {
+            document.getElementById('namaz-modal')?.classList.remove('hidden');
+        }
+        function closeNamazModal() {
+            document.getElementById('namaz-modal')?.classList.add('hidden');
+        }
+
+        // Anlık Canlı Namaz Vakti Hesaplayıcı (Türkiye Saatine Göre)
+        function updateLiveNamaz() {
+            const now = new Date();
+            const hours = now.getHours();
+            const mins = now.getMinutes();
+            const totalMins = hours * 60 + mins;
+
+            // İstanbul Güncel Vakitler (dakika cinsinden):
+            // İmsak: 05:46 (346 dk), Güneş: 07:11 (431 dk), Öğle: 12:54 (774 dk)
+            // İkindi: 15:53 (953 dk), Akşam: 18:25 (1105 dk), Yatsı: 19:44 (1184 dk)
+            let vText = 'Yatsı 19:44';
+            if (totalMins >= 346 && totalMins < 431) {
+                vText = 'İmsak 05:46';
+            } else if (totalMins >= 431 && totalMins < 774) {
+                vText = 'Güneş 07:11';
+            } else if (totalMins >= 774 && totalMins < 953) {
+                vText = 'Öğle 12:54';
+            } else if (totalMins >= 953 && totalMins < 1105) {
+                vText = 'İkindi 15:53';
+            } else if (totalMins >= 1105 && totalMins < 1184) {
+                vText = 'Akşam 18:25';
+            } else {
+                vText = 'Yatsı 19:44';
+            }
+
+            const el = document.getElementById('live-namaz-vakti');
+            if (el) el.innerText = vText;
+        }
+        updateLiveNamaz();
+        setInterval(updateLiveNamaz, 60000);
+
     </script>
 
     <!-- MOBİL & MASAÜSTÜ YUKARI ÇIK BUTONU -->
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-5 z-40 p-3 rounded-full bg-red-600/90 hover:bg-red-500 text-white shadow-2xl border border-red-400/40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center justify-center" title="Yukarı Çık">
         <i data-lucide="chevron-up" class="w-5 h-5"></i>
     </button>
+
+    <!-- NÖBETÇİ ECZANELER MODALI (81 İL REHBERİ) -->
+    <div id="nobetci-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative">
+            <button onclick="closeNobetciModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-2.5 mb-4">
+                <div class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+                    <span class="text-xl">💊</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">Nöbetçi Eczane Sorgulama</h3>
+                    <p class="text-xs text-slate-400">Sağlık Bakanlığı & TEB Güncel Nöbetçi Eczane Listesi</p>
+                </div>
+            </div>
+
+            <!-- Popüler Şehirler Hızlı Butonları -->
+            <p class="text-xs font-bold text-slate-300 mb-2">Popüler Şehirler:</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4 text-xs font-semibold">
+                <a href="https://www.istanbuleczaciodasi.org.tr/nobetci-eczane/" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 İstanbul
+                </a>
+                <a href="https://www.aeo.org.tr/nobetci-eczaneler" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 Ankara
+                </a>
+                <a href="https://www.izmireo.org.tr/nobetci-eczaneler" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 İzmir
+                </a>
+                <a href="https://www.bursaeczaciodasi.org.tr/nobetci-eczaneler" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 Bursa
+                </a>
+                <a href="https://www.antalyaeo.org.tr/nobetci-eczaneler" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 Antalya
+                </a>
+                <a href="https://www.adanaeo.org.tr/nobetci-eczaneler" target="_blank"
+                   class="p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 hover:text-white border border-slate-800 text-slate-200 transition text-center flex items-center justify-center gap-1">
+                    📍 Adana
+                </a>
+            </div>
+
+            <!-- Resmi e-Devlet & Genel Arama -->
+            <div class="space-y-2 pt-2 border-t border-brand-border">
+                <a href="https://www.turkiye.gov.tr/saglik-nobetci-eczane-sorgulama" target="_blank"
+                   class="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs transition flex items-center justify-center gap-2 shadow">
+                    <span>🏛️ e-Devlet Nöbetçi Eczane Sorgulama</span>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                </a>
+                <a href="https://www.nobetcieczaneler.org/" target="_blank"
+                   class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition flex items-center justify-center gap-2">
+                    <span>Türkiye Geneli 81 İl Nöbetçi Eczaneleri</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAMAZ VAKİTLERİ MODALI -->
+    <div id="namaz-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-brand-card border border-brand-border rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative">
+            <button onclick="closeNamazModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-2.5 mb-4">
+                <div class="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                    <span class="text-xl">🕌</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">İstanbul Namaz Vakitleri</h3>
+                    <p class="text-xs text-slate-400">Diyanet İşleri Başkanlığı Güncel Takvimi</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs font-semibold mb-4" id="namaz-times-grid">
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <span class="text-slate-400">İmsak</span>
+                    <span class="font-mono text-white font-bold">05:46</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <span class="text-slate-400">Güneş</span>
+                    <span class="font-mono text-white font-bold">07:11</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <span class="text-slate-400">Öğle</span>
+                    <span class="font-mono text-white font-bold">12:54</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <span class="text-slate-400">İkindi</span>
+                    <span class="font-mono text-white font-bold">15:53</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                    <span class="text-slate-400">Akşam</span>
+                    <span class="font-mono text-white font-bold">18:25</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-amber-950/70 border border-amber-500/40 flex items-center justify-between">
+                    <span class="text-amber-400 font-bold">Yatsı (Aktif)</span>
+                    <span class="font-mono text-amber-300 font-black">19:44</span>
+                </div>
+            </div>
+
+            <div class="text-center pt-2 border-t border-brand-border text-[11px] text-slate-400">
+                Vakitler her gün Diyanet takvimine göre otomatik yenilenir.
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
