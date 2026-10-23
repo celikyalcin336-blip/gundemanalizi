@@ -62,10 +62,10 @@ app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
-    # 1. Panel, yönetim sayfaları ve admin API çağrılarını sayaca ASLA dahil etme
-    is_panel_or_admin = (
+    # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
+    is_api_or_admin = (
+        path.startswith("/api/") or
         path == "/panel" or
-        path.startswith("/api/panel") or
         path.startswith(f"/{PANEL_SECRET_SLUG}") or
         "yonetim" in path
     )
@@ -76,7 +76,7 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith("/.well-known") or
         path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
     )
-    if not (is_panel_or_admin or is_static_or_system):
+    if not (is_api_or_admin or is_static_or_system):
         try:
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
             ip = ip.split(",")[0].strip()

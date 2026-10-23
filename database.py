@@ -198,6 +198,13 @@ def init_db():
             """)
     if USE_PG:
         _migrate_from_sqlite_if_empty()
+
+    # Arka plan API sorgu kayıtlarını (döviz kurları vb.) ziyaretçi geçmişinden temizle
+    try:
+        with get_connection() as conn:
+            conn.execute("DELETE FROM visitor_logs WHERE page LIKE '/api/%'")
+    except Exception:
+        pass
     cleanup_corrupted_articles()
 
 
@@ -520,6 +527,8 @@ def set_setting(key: str, val: str):
 
 def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "") -> bool:
     """Ziyaretçiyi kaydeder. Kullanıcı siteye ilk defa mı giriyor kontrol eder ve döner."""
+    if not page or page.startswith("/api/") or page.startswith("/assets") or page.startswith("/images"):
+        return False
     try:
         with get_connection() as conn:
             # Bu ziyaretçi daha önce hiç girdi mi?
@@ -633,9 +642,9 @@ def get_dashboard_summary() -> Dict:
             ).fetchall()
             device_stats = [dict(r) for r in dev_rows]
 
-            # Canlı son 15 ziyaretçi (Türkiye Saatine çevrilmiş olarak)
+            # Canlı son 15 ziyaretçi (Türkiye Saatine çevrilmiş olarak - API çağrıları hariç)
             lv_rows = conn.execute(
-                "SELECT * FROM visitor_logs ORDER BY id DESC LIMIT 15"
+                "SELECT * FROM visitor_logs WHERE page NOT LIKE '/api/%' ORDER BY id DESC LIMIT 15"
             ).fetchall()
             live_visitors = [_row_to_dict(r) for r in lv_rows]
         except Exception as e:
