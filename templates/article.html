@@ -798,6 +798,155 @@
                 bttBtn?.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
             }
         });
+    
+        // 🎧 HABERİ SESLİ DİNLEME MOTORU (WEB SPEECH API)
+        let isAudioPlaying = false;
+        let isAudioPaused = false;
+        let audioRate = 1.0;
+        let speechChunks = [];
+        let currentChunkIndex = 0;
+
+        function getArticleTextForSpeech() {
+            const title = {{ article.title | tojson }};
+            const summary = {{ (article.summary or "") | tojson }};
+            let text = title + ". " + summary + ". ";
+            const articleContent = document.querySelector('.article-body') || document.querySelector('article');
+            if (articleContent) {
+                const paragraphs = articleContent.querySelectorAll('p');
+                paragraphs.forEach(p => {
+                    const t = p.innerText.trim();
+                    if (t && !t.includes('http') && !t.includes('Gündem Analizi') && !t.includes('WhatsApp')) {
+                        text += t + " ";
+                    }
+                });
+            }
+            return text.trim();
+        }
+
+        function splitTextIntoSentences(text) {
+            return text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+        }
+
+        window.toggleAudioReading = function() {
+            if (!('speechSynthesis' in window)) {
+                alert('Tarayıcınız sesli okumayı desteklemiyor.');
+                return;
+            }
+
+            if (isAudioPlaying) {
+                if (isAudioPaused) {
+                    window.speechSynthesis.resume();
+                    isAudioPaused = false;
+                    updateAudioUI(true, 'Sesli okunuyor...');
+                } else {
+                    window.speechSynthesis.pause();
+                    isAudioPaused = true;
+                    updateAudioUI(false, 'Duraklatıldı (Devam için tıklayın)');
+                }
+                return;
+            }
+
+            startAudioReading();
+        };
+
+        function startAudioReading() {
+            window.speechSynthesis.cancel();
+            const fullText = getArticleTextForSpeech();
+            if (!fullText) return;
+
+            speechChunks = splitTextIntoSentences(fullText);
+            currentChunkIndex = 0;
+            isAudioPlaying = true;
+            isAudioPaused = false;
+            updateAudioUI(true, 'Haber seslendiriliyor...');
+
+            playNextChunk();
+        }
+
+        function playNextChunk() {
+            if (!isAudioPlaying || currentChunkIndex >= speechChunks.length) {
+                stopAudioReading();
+                updateAudioUI(false, 'Sesli okuma tamamlandı.');
+                return;
+            }
+
+            const chunk = speechChunks[currentChunkIndex].trim();
+            if (!chunk) {
+                currentChunkIndex++;
+                playNextChunk();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(chunk);
+            utterance.lang = 'tr-TR';
+            utterance.rate = audioRate;
+
+            const voices = window.speechSynthesis.getVoices();
+            const trVoice = voices.find(v => (v.lang && v.lang.toLowerCase().includes('tr')) || (v.name && v.name.toLowerCase().includes('turkish')));
+            if (trVoice) utterance.voice = trVoice;
+
+            utterance.onend = () => {
+                currentChunkIndex++;
+                if (isAudioPlaying && !isAudioPaused) {
+                    playNextChunk();
+                }
+            };
+
+            utterance.onerror = (e) => {
+                if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                    currentChunkIndex++;
+                    if (isAudioPlaying) playNextChunk();
+                }
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.stopAudioReading = function() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            isAudioPlaying = false;
+            isAudioPaused = false;
+            currentChunkIndex = 0;
+            updateAudioUI(false, 'Bu haberi sesli dinlemek için oynat\'a basın.');
+        };
+
+        window.cycleAudioRate = function() {
+            const rates = [1.0, 1.25, 1.5];
+            let idx = (rates.indexOf(audioRate) + 1) % rates.length;
+            audioRate = rates[idx];
+            const btn = document.getElementById('audio-rate-btn');
+            if (btn) btn.innerText = audioRate + 'x';
+            if (isAudioPlaying) {
+                window.speechSynthesis.cancel();
+                playNextChunk();
+            }
+        };
+
+        function updateAudioUI(playing, statusText) {
+            const icon = document.getElementById('audio-play-icon');
+            const status = document.getElementById('audio-status-text');
+            const wave = document.getElementById('audio-wave');
+            if (status) status.innerText = statusText;
+            if (wave) {
+                if (playing) {
+                    wave.classList.remove('hidden');
+                    wave.classList.add('flex');
+                } else {
+                    wave.classList.remove('flex');
+                    wave.classList.add('hidden');
+                }
+            }
+            if (icon) {
+                if (playing) {
+                    icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"></rect><rect x="14" y="4" width="4" height="16" fill="white"></rect>';
+                } else {
+                    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>';
+                }
+            }
+        }
+
     </script>
 
     <!-- MOBİL & MASAÜSTÜ YUKARI ÇIK BUTONU -->
