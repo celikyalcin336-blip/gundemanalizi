@@ -384,6 +384,54 @@ async def panel_fetch_now(request: Request):
     threading.Thread(target=main.run_bot, kwargs={"max_items": 1}, daemon=True).start()
     return {"ok": True, "message": "Yeni haber taraması başlatıldı! 15-20 saniye içinde siteye ve Telegram'a düşecek."}
 
+@app.post("/api/panel/publish-breaking")
+async def panel_publish_breaking(
+    request: Request,
+    title: str = Form(...),
+    summary: str = Form(""),
+    content: str = Form(""),
+    category: str = Form("Gündem"),
+    source: str = Form("Gündem Analizi"),
+    image_url: str = Form(None)
+):
+    pin = request.headers.get("X-Admin-Pin", "")
+    if pin != ADMIN_PIN:
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+
+    img_path = ""
+    if image_url:
+        try:
+            r = requests.get(image_url, timeout=10)
+            if r.status_code == 200:
+                import hashlib
+                fname = f"post_{hashlib.md5(title.encode()).hexdigest()[:10]}.jpg"
+                img_path = os.path.join(OUTPUT_DIR, fname)
+                with open(img_path, "wb") as f:
+                    f.write(r.content)
+        except Exception as e:
+            print(f"Görsel indirme hatası: {e}")
+
+    slug = database.save_article(
+        title=title.strip(),
+        summary=summary.strip(),
+        content=content.strip(),
+        image_path=img_path,
+        source=source.strip(),
+        category=category.strip()
+    )
+    site_url = f"{config.SITE_URL}/haber/{slug}"
+
+    try:
+        tg_text = f"🚨 <b>{title}</b>\n\n{summary}"
+        if img_path and os.path.exists(img_path):
+            telegram_notifier.send_telegram_news(img_path, tg_text, site_url)
+        else:
+            telegram_notifier.send_telegram_message(f"{tg_text}\n\n🔗 Haberin Detayı: {site_url}")
+    except Exception as e:
+        print(f"Telegram bildirim hatası: {e}")
+
+    return {"ok": True, "slug": slug, "url": site_url}
+
 @app.post("/api/panel/delete/{article_id}")
 async def panel_delete_article(article_id: int, request: Request):
     pin = request.headers.get("X-Admin-Pin", "")
