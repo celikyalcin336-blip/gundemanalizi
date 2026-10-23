@@ -572,21 +572,19 @@ def brand_raw_video(
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
     # 2. Doğrudan FFmpeg ile HD 720p Video Kurgulama (Net, Canlı ve Keskin)
-    # Profesyonel TV / Reels Stili: Arka planda hareketli bulanık video (boş siyah kutuları yok eder), ortada keskin 16:9 orijinal video
+    # Ultra-Hafif (~15MB RAM) Güvenli Ölçekleme & Şık Koyu Çerçeve (Render 512MB RAM'de asla çökmez)
     if use_ticker and ticker_path:
         filter_complex = (
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=increase,crop={VW_OUT}:{VH_OUT},boxblur=22:5,eq=brightness=-0.12[bg_blur];"
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease[fg_sharp];"
-            f"[bg_blur][fg_sharp]overlay=(W-w)/2:(H-h)/2[bg_base];"
-            f"[bg_base][2:v]overlay=x='170-mod(t*130\\,{loop_w})':y={ticker_y}[bg_tk];"
-            f"[bg_tk][1:v]overlay=0:0,format=yuv420p[v]"
+            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=bicubic,"
+            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
+            f"[bg][2:v]overlay=x='170-mod(t*130\\,{loop_w})':y={ticker_y}:eof_action=repeat[bg_tk];"
+            f"[bg_tk][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
         )
     else:
         filter_complex = (
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=increase,crop={VW_OUT}:{VH_OUT},boxblur=22:5,eq=brightness=-0.12[bg_blur];"
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease[fg_sharp];"
-            f"[bg_blur][fg_sharp]overlay=(W-w)/2:(H-h)/2[bg_base];"
-            f"[bg_base][1:v]overlay=0:0,format=yuv420p[v]"
+            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=bicubic,"
+            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
+            f"[bg][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
         )
 
     safe_start = max(0.0, float(start_sec or 0.0))
