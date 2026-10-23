@@ -91,7 +91,7 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith("/assets") or
         path.startswith("/images") or
         path.startswith("/.well-known") or
-        path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
+        path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/video-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
     )
     if not (is_api_or_admin or is_static_or_system):
         try:
@@ -1103,6 +1103,7 @@ Disallow: /yonetim*
 Disallow: /api/panel/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml
+Sitemap: {base_url}/video-sitemap.xml
 """
     return PlainTextResponse(content=content)
 
@@ -1153,6 +1154,40 @@ async def news_sitemap(request: Request):
       <news:publication_date>{raw_dt}</news:publication_date>
       <news:title>{title_esc}</news:title>
     </news:news>
+  </url>""")
+    xml.append('</urlset>')
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+
+@app.get("/video-sitemap.xml")
+async def video_sitemap(request: Request):
+    """Google Video Search i\u00e7in \u00f6zel XML Video Site Haritas\u0131."""
+    from xml.sax.saxutils import escape
+    articles = database.get_articles(limit=100)
+    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
+    base_url = f"https://{host}"
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
+    for a in articles:
+        raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
+        if len(raw_dt) == 16:
+            raw_dt += ":00+03:00"
+        elif "+" not in raw_dt and "Z" not in raw_dt:
+            raw_dt = raw_dt[:19] + "+03:00"
+        title_esc = escape(a.get("title") or "")
+        summary_esc = escape((a.get("summary") or a.get("title") or "")[:200])
+        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1]
+        img_url = f"{base_url}/images/{img_name}" if img_name else f"{base_url}/assets/logo.png"
+        xml.append(f"""  <url>
+    <loc>{base_url}/haber/{a["slug"]}</loc>
+    <video:video>
+      <video:thumbnail_loc>{img_url}</video:thumbnail_loc>
+      <video:title>{title_esc}</video:title>
+      <video:description>{summary_esc}</video:description>
+      <video:player_loc>{base_url}/haber/{a["slug"]}</video:player_loc>
+      <video:publication_date>{raw_dt}</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:live>no</video:live>
+    </video:video>
   </url>""")
     xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml")
