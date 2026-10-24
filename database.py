@@ -42,15 +42,34 @@ USE_PG = DATABASE_URL.startswith("postgres")
 if USE_PG:
     import psycopg2
     import psycopg2.extras
+    import psycopg2.pool
+
+    _PG_POOL = None
+
+    def _get_pg_pool():
+        global _PG_POOL
+        if _PG_POOL is None:
+            try:
+                _PG_POOL = psycopg2.pool.ThreadedConnectionPool(minconn=1, maxconn=15, dsn=DATABASE_URL)
+            except Exception as e:
+                print(f"PostgreSQL Pool başlatma hatası: {e}")
+        return _PG_POOL
 
 
 class _Conn:
-    """sqlite3 / psycopg2 farkını gizleyen küçük sarmalayıcı."""
+    """sqlite3 / psycopg2 farkını gizleyen ve bağlantı havuzu (connection pool) ile ultra hızlı çalışan sarmalayıcı."""
 
     def __init__(self):
         if USE_PG:
-            self.raw = psycopg2.connect(DATABASE_URL)
+            pool = _get_pg_pool()
+            if pool:
+                self.from_pool = True
+                self.raw = pool.getconn()
+            else:
+                self.from_pool = False
+                self.raw = psycopg2.connect(DATABASE_URL)
         else:
+            self.from_pool = False
             os.makedirs(DB_DIR, exist_ok=True)
             self.raw = sqlite3.connect(DB_PATH)
             self.raw.row_factory = sqlite3.Row
@@ -81,7 +100,14 @@ class _Conn:
             else:
                 self.raw.rollback()
         finally:
-            self.raw.close()
+            if USE_PG and getattr(self, "from_pool", False):
+                pool = _get_pg_pool()
+                if pool:
+                    pool.putconn(self.raw)
+                else:
+                    self.raw.close()
+            else:
+                self.raw.close()
 
 
 def get_connection():
