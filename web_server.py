@@ -1111,6 +1111,10 @@ async def about_page(request: Request):
 @app.get("/privacy", response_class=HTMLResponse)
 @app.get("/gizlilik-politikasi", response_class=HTMLResponse)
 @app.get("/gizlilik", response_class=HTMLResponse)
+@app.get("/cerez-politikasi", response_class=HTMLResponse)
+@app.get("/cookies", response_class=HTMLResponse)
+@app.get("/kullanim-sartlari", response_class=HTMLResponse)
+@app.get("/terms", response_class=HTMLResponse)
 async def privacy_page(request: Request):
     return templates.TemplateResponse(request=request, name="privacy.html", context={})
 
@@ -1197,6 +1201,8 @@ async def sitemap(request: Request):
     xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/kullanim-sartlari</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/cerez-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     for a in articles:
         xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>')
     xml.append('</urlset>')

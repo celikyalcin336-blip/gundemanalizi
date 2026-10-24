@@ -1142,6 +1142,8 @@
                 <ul class="space-y-1.5 text-xs">
                     <li><a href="/hakkimizda" class="hover:text-white transition">Hakkımızda & Künye</a></li>
                     <li><a href="/gizlilik-politikasi" class="hover:text-white transition">Gizlilik Politikası</a></li>
+                    <li><a href="/kullanim-sartlari" class="hover:text-white transition">Kullanım Şartları</a></li>
+                    <li><a href="/cerez-politikasi" class="hover:text-white transition">Çerez Politikası</a></li>
                     <li><a href="/site-haritasi" class="hover:text-white transition font-medium">Site Haritası</a></li>
                     <li><a href="/news-sitemap.xml" target="_blank" class="hover:text-white transition">Google News Haritası</a></li>
                     <li><a href="/video-sitemap.xml" target="_blank" class="hover:text-white transition">Video Haritası</a></li>
@@ -2284,5 +2286,30 @@
         }
 
     </script>
+
+    <!-- 🍪 ÇEREZ & KVKK ONAY BANDI -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 inset-x-0 z-[9999] bg-slate-900/95 backdrop-blur border-t border-red-600/40 p-4 shadow-2xl">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-slate-300">
+            <p class="leading-relaxed text-center sm:text-left">
+                🍪 Sizlere daha iyi bir haber deneyimi sunmak için çerezler (cookies) kullanıyoruz. Detaylar için <a href="/cerez-politikasi" class="text-red-400 underline hover:text-red-300 font-semibold">Gizlilik ve Çerez Politikamızı</a> inceleyebilirsiniz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="/cerez-politikasi" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold transition">Detaylar</a>
+                <button onclick="acceptCookies()" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold shadow-lg shadow-red-900/40 transition">Kabul Et</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        if (!localStorage.getItem('ga_cookie_consent')) {
+            var cb = document.getElementById('cookie-banner');
+            if (cb) cb.classList.remove('hidden');
+        }
+        function acceptCookies() {
+            localStorage.setItem('ga_cookie_consent', 'accepted');
+            var cb = document.getElementById('cookie-banner');
+            if (cb) cb.classList.add('hidden');
+        }
+    </script>
 </body>
+
 </html>
