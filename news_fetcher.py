@@ -64,6 +64,9 @@ def sanitize_news_text(text: str) -> str:
 
     # 2. Site buton, menü, SEO, borsa bandı ve telif çöplerini kaldır
     junk_patterns = [
+        # ShiftDelete / Webtekno menü, arama çubuğu ve kategori kırıntıları
+        r'ARA\s+English\s+Version.*?(?:Nasıl\s+Yapılır\?|Kategoriler|Haberler)\s*',
+        r'English\s+Version\s+Teknoloji\s+Haberleri[^\.\n]*',
         # Mynet / Haber siteleri favori butonları
         r'Favorilerime\s+ekle.*?(?:ekleyebilirsin[i\.]?|ekleyin[i\.]?|kaydet|ikonuna\s+tıklayarak[^\.\n]*)',
         r'Favorilerime\s+ekle\s*\([^\)]*\)[^\.\n]*',

@@ -306,14 +306,16 @@ def cleanup_corrupted_articles():
                     LOWER(title) LIKE '%israil%' OR LOWER(title) LIKE '%iran%'
                   )
             """)
-            # 5. Teknoloji (Güneş paneli, perovskit, yapay zeka - Eğitimden kurtar)
+            # 5. Teknoloji (Güneş paneli, yapay zeka, Kimi K3, çip vb. - Otomobil veya eğitimden kurtar)
             conn.execute("""
                 UPDATE articles SET category = 'Teknoloji' 
                 WHERE category != 'Teknoloji' 
                   AND (
-                    LOWER(title) LIKE '%güneş paneli%' OR LOWER(title) LIKE '%perovskit%' OR 
-                    LOWER(title) LIKE '%güneş hücresi%' OR LOWER(title) LIKE '%yapay zeka%' OR 
-                    LOWER(title) LIKE '%chatgpt%'
+                    LOWER(title) LIKE '%yapay zeka%' OR LOWER(title) LIKE '%yapay zekâ%' OR 
+                    LOWER(title) LIKE '%kimi k3%' OR LOWER(title) LIKE '%chatgpt%' OR 
+                    LOWER(title) LIKE '%deepseek%' OR LOWER(title) LIKE '%claude%' OR 
+                    LOWER(title) LIKE '%openai%' OR LOWER(title) LIKE '%güneş paneli%' OR 
+                    LOWER(title) LIKE '%perovskit%' OR LOWER(title) LIKE '%güneş hücresi%'
                   )
             """)
             # 6. Spor (Sadece gerçek spor kulüpleri ve maçlar - Suç ve operasyon haberleri hariç)
