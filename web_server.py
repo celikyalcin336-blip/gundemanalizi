@@ -348,12 +348,51 @@ def _fetch_fresh_market_rates():
     except Exception:
         pass
 
+_WEATHER_CACHE = {
+    "data": [
+        {"city": "İstanbul", "temp": "19°C", "icon": "⛅"},
+        {"city": "Ankara", "temp": "20°C", "icon": "☀️"},
+        {"city": "İzmir", "temp": "24°C", "icon": "☀️"}
+    ],
+    "ts": 0
+}
+
+def _fetch_fresh_weather():
+    global _WEATHER_CACHE
+    try:
+        url = "https://api.open-meteo.com/v1/forecast?latitude=41.0082,39.9334,38.4192&longitude=28.9784,32.8597,27.1287&current=temperature_2m,weather_code&timezone=Europe%2FIstanbul"
+        resp = requests.get(url, headers={"User-Agent": "GundemAnalizi/1.0"}, timeout=4)
+        if resp.status_code == 200:
+            data = resp.json()
+            updated = []
+            for item in data:
+                lat = item.get("latitude", 0)
+                city = "İstanbul" if abs(lat - 41.0) < 0.5 else ("Ankara" if abs(lat - 39.9) < 0.5 else "İzmir")
+                temp = round(item.get("current", {}).get("temperature_2m", 20))
+                code = item.get("current", {}).get("weather_code", 0)
+                icon = "☀️" if code in (0, 1) else ("⛅" if code in (2, 3) else ("🌧️" if code in (51, 53, 55, 61, 63, 65, 80, 81) else "☁️"))
+                updated.append({"city": city, "temp": f"{temp}°C", "icon": icon})
+            if len(updated) == 3:
+                _WEATHER_CACHE["data"] = updated
+                _WEATHER_CACHE["ts"] = time.time()
+    except Exception:
+        pass
+
+def get_live_weather() -> list:
+    return _WEATHER_CACHE["data"]
+
 def market_rates_background_worker():
-    """Piyasa kurlarını arka planda her 60 saniyede bir günceller."""
+    """Piyasa kurlarını ve canlı hava durumunu arka planda günceller (Sıfır bekleme, 0ms sayfa hızı)."""
     time.sleep(2)
+    _fetch_fresh_weather()
+    loop_count = 0
     while True:
         try:
             _fetch_fresh_market_rates()
+            loop_count += 1
+            # Her 15 dakikada bir hava durumunu tazele (900 sn / 60 sn = 15 döngü)
+            if loop_count % 15 == 0:
+                _fetch_fresh_weather()
         except Exception:
             pass
         time.sleep(60)
@@ -420,7 +459,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             canonical_url = f"{config.SITE_URL}/"
 
     total_pages = max(1, math.ceil(total_count / limit))
-    breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
+    breaking_news = database.get_articles(limit=10)
     slider_articles = database.get_articles(limit=14)
     auto_articles = database.get_articles(limit=5, category="Otomobil")
     tech_articles = database.get_articles(limit=5, category="Teknoloji")
@@ -444,6 +483,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "search_query": q.strip() if q else "",
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
+            "weather_data": get_live_weather(),
             "canonical_url": canonical_url,
             "current_page": page,
             "total_pages": total_pages,
@@ -1054,7 +1094,7 @@ async def article_detail(request: Request, slug: str):
         related_articles = cat_articles[:4]
 
     other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
-    breaking_news = database.get_articles(limit=8, category="Son Dakika") or database.get_articles(limit=8)
+    breaking_news = database.get_articles(limit=10)
     slider_articles = database.get_articles(limit=14)
     auto_articles = database.get_articles(limit=5, category="Otomobil")
     tech_articles = database.get_articles(limit=5, category="Teknoloji")
@@ -1098,6 +1138,7 @@ async def article_detail(request: Request, slug: str):
             "reading_time_min": reading_time_min,
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
+            "weather_data": get_live_weather(),
             "canonical_url": canonical_url
         }
     )
