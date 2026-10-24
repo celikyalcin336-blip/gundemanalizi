@@ -32,6 +32,11 @@ def process_single_news(item: dict) -> bool:
     image_url = item.get("image_url")
     news_hash = item["hash"]
 
+    # Mükerrer Paylaşım Kalkanı: Son saniye kontrolü (Aynı veya benzer haber varsa kesinlikle atla)
+    if database.is_already_posted(news_hash, title=title, link=link):
+        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış. Atlanıyor.")
+        return False
+
     print("\n" + "="*60)
     print(f"🔥 İşlenen Haber: {title}")
     print(f"📌 Kaynak: {source}")

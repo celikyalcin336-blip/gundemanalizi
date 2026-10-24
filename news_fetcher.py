@@ -389,9 +389,13 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
     """
     Tanımlı seçkin RSS kaynaklarını tarar ve 'Halkın İlgisi ve Cüzdan Puanı'na göre
     en yüksekten en düşüğe sıralanmış paylaşılmaya hazır haberleri döner.
+    Çapraz RSS mükerrerlik koruması ve 5 katmanlı dedup içerir.
     """
     database.init_db()
     unposted_news = []
+    seen_batch_slugs = set()
+    seen_batch_titles = []
+    import difflib
 
     for feed_info in config.RSS_FEEDS:
         feed_name = feed_info["name"]
@@ -415,30 +419,57 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
 
                 news_hash = get_news_hash(title, link)
 
-                # Daha önce paylaşılmış mı kontrol et
-                if not database.is_already_posted(news_hash):
-                    # Haberin viral/tüketici/cüzdan ilgi puanını hesapla
-                    score = calculate_virality_score(title, summary, feed_name)
-                    # Görseli olan haberlere +10 avantaj puanı
-                    if image_url:
-                        score += 10
+                # 1. Veritabanı ve Geçmiş Kontrolü (5 Katmanlı Akıllı Dedup: Hash, Link, Başlık, Benzerlik)
+                if database.is_already_posted(news_hash, title=title, link=link):
+                    continue
 
-                    feed_cat = feed_info.get("category", "Gündem")
-                    # Haberin gerçek kategorisini içerik analiz motoru ile doğrula
-                    import ai_writer
-                    real_cat = ai_writer.classify_article(title, summary, feed_cat)
+                # 2. Aynı Tarama Döngüsünde Başka Bir Kaynak Aynı Haberi Verdi mi? (Çapraz RSS Koruması)
+                from database import slugify
+                item_slug = slugify(title)
+                norm_slug = re.sub(r'-\d+$', '', item_slug)
+                if norm_slug in seen_batch_slugs:
+                    continue
 
-                    unposted_news.append({
-                        "hash": news_hash,
-                        "title": title,
-                        "summary": summary,
-                        "link": link,
-                        "image_url": image_url,
-                        "source": feed_name,
-                        "category": real_cat,
-                        "published": published,
-                        "score": score
-                    })
+                is_batch_dup = False
+                for prev_title in seen_batch_titles:
+                    if difflib.SequenceMatcher(None, title.lower(), prev_title.lower()).ratio() > 0.72:
+                        is_batch_dup = True
+                        break
+                    stopwords = {'ve', 'ile', 'bir', 'bu', 'da', 'de', 'icin', 'için', 'yeni', 'son', 'dakika'}
+                    w1 = {w for w in re.findall(r'\w+', title.lower()) if len(w) > 2 and w not in stopwords}
+                    w2 = {w for w in re.findall(r'\w+', prev_title.lower()) if len(w) > 2 and w not in stopwords}
+                    if len(w1) >= 4 and len(w2) >= 4 and len(w1 & w2) / min(len(w1), len(w2)) >= 0.75:
+                        is_batch_dup = True
+                        break
+
+                if is_batch_dup:
+                    continue
+
+                seen_batch_slugs.add(norm_slug)
+                seen_batch_titles.append(title)
+
+                # Haberin viral/tüketici/cüzdan ilgi puanını hesapla
+                score = calculate_virality_score(title, summary, feed_name)
+                # Görseli olan haberlere +10 avantaj puanı
+                if image_url:
+                    score += 10
+
+                feed_cat = feed_info.get("category", "Gündem")
+                # Haberin gerçek kategorisini içerik analiz motoru ile doğrula
+                import ai_writer
+                real_cat = ai_writer.classify_article(title, summary, feed_cat)
+
+                unposted_news.append({
+                    "hash": news_hash,
+                    "title": title,
+                    "summary": summary,
+                    "link": link,
+                    "image_url": image_url,
+                    "source": feed_name,
+                    "category": real_cat,
+                    "published": published,
+                    "score": score
+                })
         except Exception as e:
             print(f"[{feed_name}] RSS okunurken hata oluştu: {e}")
 

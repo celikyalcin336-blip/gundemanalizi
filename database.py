@@ -13,6 +13,7 @@ import os
 import sys
 import re
 import unicodedata
+import difflib
 from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timezone, timedelta
 
@@ -480,6 +481,49 @@ def cleanup_corrupted_articles():
                     updated_count += 1
             if updated_count > 0:
                 print(f"🧹 [Veritabanı Temizliği] {updated_count} adet makale başarıyla temizlendi ve güncellendi.")
+
+            # 7. MÜKERRER / TEKRARLANAN HABERLERİ OTOMATİK TESPİT ET VE SİL (MG vb. çift paylaşımları temizler)
+            cur_dup = conn.execute("SELECT id, title, slug, views, created_at FROM articles ORDER BY id ASC")
+            all_arts = cur_dup.fetchall()
+            seen_slugs_map = {}
+            seen_titles_list = []
+            duplicate_ids = []
+
+            dup_stopwords = {'ve', 'ile', 'bir', 'bu', 'da', 'de', 'ta', 'te', 'icin', 'için', 'yeni', 'son', 'dakika'}
+            for art in all_arts:
+                aid = art["id"]
+                atitle = (art["title"] or "").strip()
+                aslug = (art["slug"] or "").strip()
+                norm_slug = re.sub(r'-\d+$', '', aslug)
+
+                is_dup = False
+                if norm_slug in seen_slugs_map:
+                    is_dup = True
+                else:
+                    for prev_id, prev_title, prev_slug in seen_titles_list:
+                        # Benzerlik oranı kontrolü (>72%)
+                        sim = difflib.SequenceMatcher(None, atitle.lower(), prev_title.lower()).ratio()
+                        if sim > 0.72:
+                            is_dup = True
+                            break
+                        # Anlamlı kelime kümesi örtüşmesi (>75%)
+                        w1 = {w for w in re.findall(r'\w+', atitle.lower()) if len(w) > 2 and w not in dup_stopwords}
+                        w2 = {w for w in re.findall(r'\w+', prev_title.lower()) if len(w) > 2 and w not in dup_stopwords}
+                        if len(w1) >= 4 and len(w2) >= 4 and len(w1 & w2) / min(len(w1), len(w2)) >= 0.75:
+                            is_dup = True
+                            break
+
+                if is_dup:
+                    duplicate_ids.append((aid, atitle))
+                else:
+                    seen_slugs_map[norm_slug] = aid
+                    seen_titles_list.append((aid, atitle, aslug))
+
+            if duplicate_ids:
+                for did, dtitle in duplicate_ids:
+                    conn.execute("DELETE FROM articles WHERE id = ?", (did,))
+                    print(f"🗑️ [Mükerrer Haber Temizlendi] ID: {did} | Başlık: {dtitle[:60]}")
+                print(f"🧹 [Veritabanı Temizliği] Toplam {len(duplicate_ids)} adet mükerrer/tekrarlanan haber veritabanından tamamen silindi.")
     except Exception as e:
         print(f"Veritabanı Temizliği Hatası: {e}")
 
@@ -593,10 +637,72 @@ def get_image(filename: str) -> Optional[bytes]:
     return bytes(row["data"]) if row else None
 
 
-def is_already_posted(news_hash: str) -> bool:
+def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
+    """
+    Haberin daha önce paylaşılıp paylaşılmadığını 5 katmanlı akıllı korumayla kontrol eder:
+    1. news_hash kontrolü (posted_news)
+    2. Orijinal kaynak linki kontrolü (posted_news)
+    3. Birebir başlık veya slug kontrolü (articles ve posted_news)
+    4. Yüksek benzerlikli başlık kontrolü (son 200 haber içinde %72 üzeri benzerlik)
+    5. Kelime kümesi örtüşmesi (önemli kelimelerin %75+ eşleşmesi)
+    """
     with get_connection() as conn:
-        row = conn.execute("SELECT 1 FROM posted_news WHERE news_hash = ?", (news_hash,)).fetchone()
-        return row is not None
+        # 1. Doğrudan hash kontrolü
+        if news_hash:
+            row = conn.execute("SELECT 1 FROM posted_news WHERE news_hash = ?", (news_hash,)).fetchone()
+            if row:
+                return True
+
+        # 2. Orijinal link kontrolü (aynı link farklı hash ile gelirse)
+        if link and len(link.strip()) > 10:
+            row = conn.execute("SELECT 1 FROM posted_news WHERE link = ?", (link.strip(),)).fetchone()
+            if row:
+                return True
+
+        if not title or not title.strip():
+            return False
+
+        clean_t = title.strip().lower()
+        slug = slugify(title)
+
+        # 3. Birebir başlık veya slug kontrolü
+        row = conn.execute("SELECT 1 FROM articles WHERE slug = ? OR LOWER(title) = ?", (slug, clean_t)).fetchone()
+        if row:
+            return True
+        row = conn.execute("SELECT 1 FROM posted_news WHERE LOWER(title) = ?", (clean_t,)).fetchone()
+        if row:
+            return True
+
+        # 4. Son 200 makale içinde Benzerlik (Fuzzy / Jaccard) Kontrolü
+        # Farklı ajanslar aynı haberi 1-2 kelime farkla servis ettiğinde (örn: iSmart vs i Smart) anında yakalar
+        dup_stopwords = {'ve', 'ile', 'bir', 'bu', 'da', 'de', 'ta', 'te', 'icin', 'için', 'yeni', 'son', 'dakika', 'gore', 'göre', 'kadar', 'olan', 'olarak', 'eden', 'etti', 'yaptı'}
+        clean_words = {w for w in re.findall(r'\w+', clean_t) if len(w) > 2 and w not in dup_stopwords}
+
+        cur = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 200")
+        recent_articles = cur.fetchall()
+
+        for r in recent_articles:
+            exist_title = (r["title"] or "").strip().lower()
+            exist_slug = (r["slug"] or "").strip().lower()
+
+            # Slug benzerliği (>88%)
+            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.88:
+                return True
+
+            # Başlık benzerliği (>72%)
+            sim = difflib.SequenceMatcher(None, clean_t, exist_title).ratio()
+            if sim > 0.72:
+                return True
+
+            # Anahtar kelime örtüşmesi (>75%)
+            if len(clean_words) >= 4:
+                exist_words = {w for w in re.findall(r'\w+', exist_title) if len(w) > 2 and w not in dup_stopwords}
+                if len(exist_words) >= 4:
+                    overlap = len(clean_words & exist_words) / min(len(clean_words), len(exist_words))
+                    if overlap >= 0.75:
+                        return True
+
+        return False
 
 
 def mark_as_posted(news_hash: str, title: str, source: str = "", link: str = "", fb_id: str = None, ig_id: str = None):
@@ -622,6 +728,16 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
     base_slug = slugify(title)
     if not base_slug:
         base_slug = "haber"
+
+    # MÜKERRER KAYIT ENGELLEYİCİ: Bu haber zaten veritabanında varsa asla tekrar kaydetme!
+    with get_connection() as conn:
+        existing = conn.execute(
+            "SELECT slug FROM articles WHERE slug = ? OR LOWER(title) = ?",
+            (base_slug, title.strip().lower())
+        ).fetchone()
+        if existing:
+            print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' zaten veritabanında mevcut ({existing['slug']}). İkinci kez eklenmedi.")
+            return existing["slug"]
 
     # Görseli kalıcı depoya da yaz (PostgreSQL modunda)
     save_image_file(image_path)
