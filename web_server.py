@@ -448,6 +448,104 @@ async def api_market_rates():
     return JSONResponse(get_market_rates())
 
 # ========================================================
+# ⚡ AFAD & KANDİLLİ CANLI SON DEPREMLER SERVİSİ (RAM ÖNBELLEKLİ)
+# ========================================================
+_DEPREM_CACHE = {"time": 0, "data": []}
+
+def get_live_earthquakes(limit=50) -> list:
+    import urllib.request, json
+    global _DEPREM_CACHE
+    now = time.time()
+    if _DEPREM_CACHE["data"] and (now - _DEPREM_CACHE["time"]) < 90:
+        return _DEPREM_CACHE["data"]
+
+    quakes = []
+    # 1. AFAD Resmi Deprem Servisi
+    try:
+        url = f"https://deprem.afad.gov.tr/apiv2/event/filter?limit={limit}&orderby=timedesc"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            for item in data:
+                try:
+                    mag = float(item.get("magnitude") or 0)
+                    place = item.get("location") or "Türkiye"
+                    depth = f"{float(item.get('depth') or 0):.1f} km"
+                    date_raw = item.get("date") or ""
+                    try:
+                        dt = datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        tr_dt = dt.astimezone(timezone(timedelta(hours=3)))
+                        time_str = tr_dt.strftime("%H:%M")
+                        date_str = tr_dt.strftime("%d.%m.%Y")
+                    except Exception:
+                        time_str = date_raw[-8:-3]
+                        date_str = date_raw[:10]
+                    level = "high" if mag >= 4.0 else ("med" if mag >= 3.0 else "low")
+                    quakes.append({
+                        "place": place,
+                        "mag": round(mag, 1),
+                        "depth": depth,
+                        "time": time_str,
+                        "date": date_str,
+                        "provider": "AFAD",
+                        "level": level
+                    })
+                except Exception:
+                    continue
+            if len(quakes) >= 10:
+                _DEPREM_CACHE = {"time": now, "data": quakes}
+                return quakes
+    except Exception as e:
+        print(f"AFAD fetch failed: {e}")
+
+    # 2. Kandilli Rasathanesi Canlı Servisi
+    try:
+        url2 = f"https://api.orhanaydogdu.com.tr/deprem/kandilli/live?limit={limit}"
+        req2 = urllib.request.Request(url2, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req2, timeout=4) as resp:
+            data2 = json.loads(resp.read().decode("utf-8"))
+            for item in data2.get("result", []):
+                try:
+                    mag = float(item.get("mag") or 0)
+                    place = item.get("title") or "Bölge Belirtilmemiş"
+                    depth = f"{float(item.get('depth') or 0):.1f} km"
+                    dt = item.get("date_time") or item.get("date") or ""
+                    time_str = dt.split(" ")[-1][:5] if " " in dt else dt[:5]
+                    date_str = dt.split(" ")[0] if " " in dt else ""
+                    level = "high" if mag >= 4.0 else ("med" if mag >= 3.0 else "low")
+                    quakes.append({
+                        "place": place,
+                        "mag": round(mag, 1),
+                        "depth": depth,
+                        "time": time_str,
+                        "date": date_str,
+                        "provider": "Kandilli",
+                        "level": level
+                    })
+                except Exception:
+                    continue
+            if quakes:
+                _DEPREM_CACHE = {"time": now, "data": quakes}
+                return quakes
+    except Exception as e:
+        print(f"Kandilli fetch failed: {e}")
+
+    return _DEPREM_CACHE["data"] if _DEPREM_CACHE["data"] else []
+
+@app.get("/api/deprem")
+async def api_deprem(limit: int = 50):
+    """AFAD ve Kandilli son 50 canlı deprem verisini döner."""
+    quakes = get_live_earthquakes(limit=limit)
+    return JSONResponse({
+        "ok": True,
+        "count": len(quakes),
+        "updated_at": datetime.now(timezone(timedelta(hours=3))).strftime("%H:%M:%S"),
+        "quakes": quakes
+    })
+
+# ========================================================
 # 🚀 TURBO HIZ BELLEK ÖNBELLEĞİ (RAM CACHE)
 # Kategori bloklarını RAM'de 45 sn tutarak veritabanı yükünü sıfırlar
 # Sayfa açılış hızını 1.5 saniyeden 25 milisaniyeye (60 kat hız) düşürür

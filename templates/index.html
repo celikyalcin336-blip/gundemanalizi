@@ -1758,31 +1758,76 @@
         </div>
     </div>
 
-    <!-- 📉 4. KANDİLLİ & AFAD SON DEPREMLER MODALI -->
+    <!-- 📉 4. KANDİLLİ & AFAD SON DEPREMLER MODALI (CANLI AFAD & KANDİLLİ AĞI) -->
     <div id="deprem-modal" 
          onclick="if(event.target === this) window.closeModal('deprem-modal')"
          style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
-        <div style="background: #0f172a; border: 2px solid #ef4444;" class="rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[90vh] overflow-y-auto">
-            <button onclick="window.closeModal('deprem-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition" aria-label="Kapat">
+        <div style="background: #0b1120; border: 2px solid #ef4444;" class="rounded-3xl w-full max-w-xl p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[92vh] overflow-y-auto">
+            
+            <!-- Üst Kapatma Butonu -->
+            <button onclick="window.closeModal('deprem-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 transition" aria-label="Kapat">
                 ✕
             </button>
-            <div class="flex items-center gap-2.5 pb-3 border-b border-rose-500/40">
-                <span class="text-3xl p-2 rounded-xl bg-rose-500/20 text-rose-400">📉</span>
-                <div>
-                    <h3 class="text-lg sm:text-xl font-black text-white">Son Depremler (Kandilli & AFAD)</h3>
-                    <p class="text-xs text-rose-400 font-semibold">Türkiye ve Çevresinde Kaydedilen Son Sarsıntılar</p>
+
+            <!-- Başlık ve Yenileme Butonu -->
+            <div class="flex items-center justify-between pb-3 border-b border-rose-500/30 pr-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-3xl text-rose-400 flex items-center justify-center shrink-0">
+                        📉
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-lg sm:text-xl font-black text-white">Son Depremler</h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase">AFAD & Kandilli</span>
+                        </div>
+                        <p class="text-xs text-rose-400/90 font-medium mt-0.5 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            <span>Türkiye ve Çevresinde Son Sarsıntılar</span>
+                        </p>
+                    </div>
                 </div>
+
+                <button type="button" onclick="window.fetchLiveDeprem(true)" id="deprem-refresh-btn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Verileri Yenile">
+                    <span id="deprem-refresh-icon">🔄</span>
+                    <span class="hidden sm:inline">Yenile</span>
+                </button>
             </div>
 
-            <!-- Arama Kutusu -->
+            <!-- Büyüklük Filtreleme Sekmeleri -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
+                <button type="button" onclick="window.filterDepremMag('all')" id="deprem-filter-all" class="deprem-filter-btn px-3 py-1.5 rounded-xl bg-rose-600 text-white shrink-0 transition shadow-sm cursor-pointer">
+                    Tümü (50)
+                </button>
+                <button type="button" onclick="window.filterDepremMag('low')" id="deprem-filter-low" class="deprem-filter-btn px-3 py-1.5 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
+                    🟢 &lt; 3.0 (Hafif)
+                </button>
+                <button type="button" onclick="window.filterDepremMag('med')" id="deprem-filter-med" class="deprem-filter-btn px-3 py-1.5 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
+                    🟡 3.0 - 4.0 (Hissedilen)
+                </button>
+                <button type="button" onclick="window.filterDepremMag('high')" id="deprem-filter-high" class="deprem-filter-btn px-3 py-1.5 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
+                    🔴 4.0+ (Şiddetli)
+                </button>
+            </div>
+
+            <!-- Arama Kutusu & Sayaç -->
             <div class="relative">
-                <input type="text" id="deprem-search" oninput="window.searchDeprem(this.value)" placeholder="Bölge, il veya büyüklük filtrele..." 
-                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-rose-500 transition">
+                <input type="text" id="deprem-search" oninput="window.searchDeprem(this.value)" placeholder="İl, ilçe veya bölge ara (örn: Malatya, Ege, Çanakkale)..." 
+                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl pl-4 pr-10 py-2.5 text-xs focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition placeholder:text-slate-500">
+                <span class="absolute right-3.5 top-2.5 text-slate-500 text-xs">🔍</span>
+            </div>
+
+            <!-- Canlı Durum ve Adet Bilgisi -->
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                <span id="deprem-status-count">50 sarsıntı listeleniyor</span>
+                <span id="deprem-updated-at" class="text-rose-400 font-mono font-semibold">Canlı Veri</span>
             </div>
 
             <!-- Canlı Depremler Listesi -->
-            <div id="deprem-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                <!-- Rendered dynamically -->
+            <div id="deprem-list" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                <div class="p-6 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
+                    <span class="animate-spin text-2xl">⏳</span>
+                    <span>Canlı sismik veriler AFAD & Kandilli ağından alınıyor...</span>
+                </div>
             </div>
 
             <div class="pt-2 flex justify-end">
@@ -1792,7 +1837,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- 🚨 7/24 HABER & VİDEO İHBAR HATTI MODALI -->
     <div id="ihbar-modal" style="display: none;" onclick="if(event.target===this)closeIhbarModal()" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -3184,54 +3228,150 @@
         window.filterNobetci = filterNobetci;
 
         // =====================================================================
-        // 7. KANDİLLİ & AFAD SON DEPREMLER MOTORU
+        // 7. KANDİLLİ & AFAD CANLI SON DEPREMLER MOTORU (50 CANLI SARSINTI)
         // =====================================================================
+        var LIVE_DEPREM_DATA = [];
+        var currentDepremFilter = 'all';
+        var isFetchingDeprem = false;
+
         var SAMPLE_QUAKES = [
-            { place: "Ege Denizi - [Çanakkale Ayvacık açıkları]", mag: 4.2, depth: "7.4 km", time: "18:42", level: "high" },
-            { place: "Malatya - Yeşilyurt", mag: 3.4, depth: "10.2 km", time: "16:15", level: "med" },
-            { place: "Kahramanmaraş - Göksun", mag: 2.8, depth: "6.8 km", time: "14:20", level: "low" },
-            { place: "Akdeniz - Girit Adası Açıkları", mag: 4.5, depth: "14.1 km", time: "11:05", level: "high" },
-            { place: "Marmara Denizi - Yalova Açıkları", mag: 2.3, depth: "9.5 km", time: "09:30", level: "low" }
+            { place: "Ege Denizi - [Çanakkale Ayvacık açıkları]", mag: 4.2, depth: "7.4 km", time: "18:42", provider: "Kandilli", level: "high" },
+            { place: "Malatya - Yeşilyurt", mag: 3.4, depth: "10.2 km", time: "16:15", provider: "AFAD", level: "med" },
+            { place: "Kahramanmaraş - Göksun", mag: 2.8, depth: "6.8 km", time: "14:20", provider: "AFAD", level: "low" },
+            { place: "Akdeniz - Girit Adası Açıkları", mag: 4.5, depth: "14.1 km", time: "11:05", provider: "Kandilli", level: "high" },
+            { place: "Marmara Denizi - Yalova Açıkları", mag: 2.3, depth: "9.5 km", time: "09:30", provider: "AFAD", level: "low" }
         ];
+
+        function fetchLiveDeprem(force) {
+            if (isFetchingDeprem && !force) return;
+            isFetchingDeprem = true;
+            var refreshIcon = document.getElementById('deprem-refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+            fetch('/api/deprem?limit=50')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.quakes && data.quakes.length > 0) {
+                        LIVE_DEPREM_DATA = data.quakes;
+                        var upEl = document.getElementById('deprem-updated-at');
+                        if (upEl && data.updated_at) upEl.innerText = 'Son: ' + data.updated_at;
+                        applyDepremFilters();
+                    } else if (LIVE_DEPREM_DATA.length === 0) {
+                        renderDepremList(SAMPLE_QUAKES);
+                    }
+                })
+                .catch(function(err) {
+                    console.log('Deprem fetch hatası:', err);
+                    if (LIVE_DEPREM_DATA.length === 0) {
+                        renderDepremList(SAMPLE_QUAKES);
+                    }
+                })
+                .finally(function() {
+                    isFetchingDeprem = false;
+                    if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+                });
+        }
+        window.fetchLiveDeprem = fetchLiveDeprem;
 
         function renderDepremList(items) {
             var listEl = document.getElementById('deprem-list');
+            var countEl = document.getElementById('deprem-status-count');
             if (!listEl) return;
-            if (items.length === 0) {
-                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Aradığınız kriterde deprem kaydı bulunamadı.</div>';
+
+            if (countEl) {
+                countEl.innerText = items.length + ' sarsıntı listeleniyor';
+            }
+
+            if (!items || items.length === 0) {
+                listEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Aradığınız kriterde deprem kaydı bulunamadı.</div>';
                 return;
             }
-            listEl.innerHTML = items.map(function(q) {
-                var badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-                if (q.mag >= 4.0) badgeClass = 'bg-rose-500/20 text-rose-400 border-rose-500/40 font-black';
-                else if (q.mag >= 3.0) badgeClass = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
 
-                return '<div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-rose-500/50 transition">' +
-                    '<div class="flex items-center gap-2.5">' +
-                        '<span class="text-sm font-black px-2 py-0.5 rounded-lg border ' + badgeClass + '">' + q.mag.toFixed(1) + '</span>' +
+            listEl.innerHTML = items.map(function(q) {
+                var badgeClass = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+                var pingHtml = '';
+                if (q.mag >= 4.0) {
+                    badgeClass = 'bg-rose-500/25 text-rose-300 border-rose-500/60 font-black shadow-rose-900/30 shadow-md';
+                    pingHtml = '<span class="inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping mr-1"></span>';
+                } else if (q.mag >= 3.0) {
+                    badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold';
+                }
+
+                var provBadge = q.provider ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-semibold border border-slate-700">' + q.provider + '</span>' : '';
+                var dateInfo = q.date ? '<span class="text-[10px] text-slate-500 mr-1">' + q.date + '</span>' : '';
+
+                return '<div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between hover:border-rose-500/50 transition group">' +
+                    '<div class="flex items-center gap-3">' +
+                        '<div class="flex flex-col items-center justify-center w-12 h-12 rounded-xl border ' + badgeClass + ' shrink-0">' +
+                            '<span class="text-base font-black leading-none">' + q.mag.toFixed(1) + '</span>' +
+                            '<span class="text-[8px] uppercase tracking-wider opacity-80 mt-0.5">ML</span>' +
+                        '</div>' +
                         '<div>' +
-                            '<div class="font-bold text-white text-xs truncate max-w-[200px] sm:max-w-none">' + q.place + '</div>' +
-                            '<div class="text-[10px] text-slate-400">Derinlik: ' + q.depth + '</div>' +
+                            '<div class="font-bold text-white text-xs group-hover:text-rose-300 transition">' + pingHtml + q.place + '</div>' +
+                            '<div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">' +
+                                '<span>Derinlik: <strong class="text-slate-300">' + q.depth + '</strong></span>' +
+                                provBadge +
+                            '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<span class="text-[11px] font-mono font-bold text-slate-300 px-2 py-1 rounded bg-slate-800">' + q.time + '</span>' +
+                    '<div class="text-right shrink-0 pl-2">' +
+                        '<span class="text-xs font-mono font-bold text-white px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 block">' + q.time + '</span>' +
+                        dateInfo +
+                    '</div>' +
                 '</div>';
             }).join('');
         }
 
-        function searchDeprem(query) {
-            var q = (query || '').toLowerCase().trim();
-            if (!q) {
-                renderDepremList(SAMPLE_QUAKES);
-                return;
-            }
-            var filtered = SAMPLE_QUAKES.filter(function(item) {
-                return item.place.toLowerCase().includes(q) || item.mag.toString().includes(q);
+        function filterDepremMag(level) {
+            currentDepremFilter = level;
+            var buttons = document.querySelectorAll('.deprem-filter-btn');
+            buttons.forEach(function(b) {
+                b.classList.remove('bg-rose-600', 'text-white');
+                b.classList.add('bg-slate-800/90', 'text-slate-300');
             });
-            renderDepremList(filtered);
+            var activeBtn = document.getElementById('deprem-filter-' + level);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-800/90', 'text-slate-300');
+                activeBtn.classList.add('bg-rose-600', 'text-white');
+            }
+            applyDepremFilters();
+        }
+        window.filterDepremMag = filterDepremMag;
+
+        function searchDeprem(query) {
+            applyDepremFilters();
         }
         window.searchDeprem = searchDeprem;
 
+        function applyDepremFilters() {
+            var pool = LIVE_DEPREM_DATA.length > 0 ? LIVE_DEPREM_DATA : SAMPLE_QUAKES;
+            var searchInput = document.getElementById('deprem-search');
+            var q = searchInput ? (searchInput.value || '').toLowerCase().trim() : '';
+
+            var filtered = pool.filter(function(item) {
+                if (currentDepremFilter === 'low' && item.mag >= 3.0) return false;
+                if (currentDepremFilter === 'med' && (item.mag < 3.0 || item.mag >= 4.0)) return false;
+                if (currentDepremFilter === 'high' && item.mag < 4.0) return false;
+
+                if (q) {
+                    var matchPlace = item.place.toLowerCase().includes(q);
+                    var matchMag = item.mag.toString().includes(q);
+                    var matchProv = (item.provider || '').toLowerCase().includes(q);
+                    return matchPlace || matchMag || matchProv;
+                }
+                return true;
+            });
+
+            renderDepremList(filtered);
+        }
+
+        function openDepremModal() {
+            openModal('deprem-modal');
+            fetchLiveDeprem();
+        }
+        window.openDepremModal = openDepremModal;
+        function closeDepremModal() { closeModal('deprem-modal'); }
+        window.closeDepremModal = closeDepremModal;
         // =====================================================================
         // 8. SAYFA YÜKLENDİĞİNDE TÜM SİSTEMLERİ BAŞLAT
         // =====================================================================
