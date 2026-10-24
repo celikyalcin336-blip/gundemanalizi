@@ -605,25 +605,29 @@ def get_articles_total_count(category: str = None) -> int:
         with get_connection() as conn:
             if category:
                 cat_norm = normalize_category_name(category) or category
-                row = conn.execute(
+                cur = conn.execute(
                     """SELECT COUNT(*) AS c FROM articles 
                        WHERE category = ? OR LOWER(category) = LOWER(?) OR category = ?""",
                     (cat_norm, cat_norm, category.strip())
                 )
-                c = row["c"] if row else 0
+                row = cur.fetchone()
+                c = (row["c"] if row else 0) if isinstance(row, dict) else (row[0] if row else 0)
                 if c == 0:
                     kw = cat_norm.lower()
-                    row2 = conn.execute(
+                    cur2 = conn.execute(
                         """SELECT COUNT(*) AS c FROM articles 
                            WHERE title LIKE ? OR summary LIKE ? OR category LIKE ?""",
                         (f"%{kw}%", f"%{kw}%", f"%{kw}%")
                     )
-                    return row2["c"] if row2 else 0
+                    row2 = cur2.fetchone()
+                    return (row2["c"] if row2 else 0) if isinstance(row2, dict) else (row2[0] if row2 else 0)
                 return c
             else:
-                row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
-                return row["c"] if row else 0
-    except Exception:
+                cur = conn.execute("SELECT COUNT(*) AS c FROM articles")
+                row = cur.fetchone()
+                return (row["c"] if row else 0) if isinstance(row, dict) else (row[0] if row else 0)
+    except Exception as e:
+        print("get_articles_total_count error:", e)
         return 0
 
 
