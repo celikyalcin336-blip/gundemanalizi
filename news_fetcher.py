@@ -93,6 +93,16 @@ def sanitize_news_text(text: str) -> str:
     t = re.sub(r'^(?:\s*%\s*[-+]?\d+[\.,]\d+\s*)+(?:Haberler|FİNANS|Ekonomi|Gündem|Son Dakika|\s)*', '', t, flags=re.I)
     t = re.sub(r'\b(?:Haberler\s+FİNANS\s+Ekonomi)\b', '', t, flags=re.I)
 
+    # 1. Menü, Kategori, Breadcrumb ve AI kutusu kalıntıları (ShiftDelete, Webtekno, DonanımHaber vb.)
+    t = re.sub(r'(?:i\s+)?Son\s+Haberler\s+Yapay\s+Zeka.*?(?:Nasıl\s+Yapılır\?|Kategoriler|Haberler)\s*', ' ', t, flags=re.I)
+    t = re.sub(r'Donanım\s+Yazılım\s+Android.*?AI\s+ile\s+Özetle\s*', ' ', t, flags=re.I)
+    t = re.sub(r'AI\s+ile\s+Özetle\s*', ' ', t, flags=re.I)
+    t = re.sub(r'ARA\s+English\s+Version.*?(?:Nasıl\s+Yapılır\?|Kategoriler|Haberler)\s*', ' ', t, flags=re.I)
+    t = re.sub(r'English\s+Version\s+Teknoloji\s+Haberleri[^\.\n]*', ' ', t, flags=re.I)
+
+    # 2. Yazar adı ve tarih kırıntısı (Erhan Şencan 24 Ekim 2026, Hakan Hasırcıoğlu 24 Ekim 2026 vb.)
+    t = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', t, flags=re.I)
+
     # 1. Yapışık kelimeleri ve noktalama bitişikliklerini ayır
     t = re.sub(r'([a-zçğıöşü\)])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
@@ -184,12 +194,13 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
 def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
     """
     Haberin orijinal web sayfasına gidip:
-    1. Yüksek çözünürlüklü og:image, twitter:image ve içerik içi görselleri ayıklar.
-    2. Gerçek makale paragraflarını (tıklama tuzakları yerine sayılar, oranlar ve kararları) çeker.
+    1. Yüksek çözünürlüklü resmi og:image / twitter:image basın görselini ayıklar.
+    2. BeautifulSoup ile menü/navigasyon/reklam çöplerini ayıklayarak saf haber paragraflarını çeker.
     """
     if not link or not link.startswith("http"):
         return {"body": "", "images": []}
     try:
+        from bs4 import BeautifulSoup
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
@@ -198,55 +209,30 @@ def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
         if resp.status_code != 200:
             return {"body": "", "images": []}
 
-        raw_text = resp.text
+        soup = BeautifulSoup(resp.content, "html.parser")
 
-        # 1. Görselleri topla (OG Image, Twitter Image, ve Gövde İçi Haber Fotoğrafları)
+        # 1. Haberin Resmi Editoryal Görseli (OG Image / Twitter Image)
         candidate_images = []
-
-        # OG Image (Genelde 1200x630 veya 1920x1080 orijinal editoryal fotoğraftır)
-        og_match = re.search(r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)["\']', raw_text, re.I)
-        if not og_match:
-            og_match = re.search(r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']', raw_text, re.I)
-        if og_match:
-            og_url = html.unescape(og_match.group(1).strip())
+        og = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
+        if og and og.get("content"):
+            og_url = og.get("content").strip()
             if og_url.startswith("//"):
                 og_url = "https:" + og_url
             if og_url.startswith("http"):
                 candidate_images.append(og_url)
 
-        # Twitter Image
-        tw_match = re.search(r'<meta[^>]*name=["\']twitter:image["\'][^>]*content=["\']([^"\']+)["\']', raw_text, re.I)
-        if tw_match:
-            tw_url = html.unescape(tw_match.group(1).strip())
-            if tw_url.startswith("//"):
-                tw_url = "https:" + tw_url
-            if tw_url.startswith("http") and tw_url not in candidate_images:
-                candidate_images.append(tw_url)
+        # 2. Sayfa içi çöpleri (menü, script, stil, arama kutusu, yazar kutusu, sidebar) DOM'dan tamamen temizle
+        for tag in soup(["script", "style", "nav", "header", "footer", "aside", "form", "button"]):
+            tag.decompose()
 
-        # Gövde İçi Fotoğraflar
-        raw_imgs = re.findall(r'<img[^>]+(?:src|data-src)=["\']([^"\']+)["\']', raw_text, re.I)
-        bad_words = [
-            'logo', 'icon', 'avatar', 'pixel', 'advert', 'banner', 'blank', 'gif',
-            'svg', 'share', 'button', 'badge', 'spinner', 'tracker', 'stats',
-            'footer', 'header', 'gravatar', 'kurdele', 'placeholder', 'transparent', 'emoji'
-        ]
-        for raw_src in raw_imgs:
-            clean_src = html.unescape(raw_src.strip())
-            if clean_src.startswith("//"):
-                clean_src = "https:" + clean_src
-            if not clean_src.startswith("http"):
-                continue
-            if any(b in clean_src.lower() for b in bad_words):
-                continue
-            if any(ext in clean_src.lower() for ext in ['.jpg', '.jpeg', '.webp', '.png', '/resim', '/image', '/img']):
-                if clean_src not in candidate_images:
-                    candidate_images.append(clean_src)
+        # Makale gövdesini içeren ana kapsayıcıyı bul
+        article_elem = (
+            soup.find("article") or
+            soup.find("div", class_=re.compile(r"entry-content|post-content|article-content|content-body|news-detail", re.I)) or
+            soup.find("main") or
+            soup
+        )
 
-        # 2. Makale Metnini Ayıkla (Script ve stilleri temizle)
-        clean_html_text = re.sub(r'<script[^>]*>.*?</script>', '', raw_text, flags=re.DOTALL | re.IGNORECASE)
-        clean_html_text = re.sub(r'<style[^>]*>.*?</style>', '', clean_html_text, flags=re.DOTALL | re.IGNORECASE)
-
-        p_matches = re.findall(r'<p[^>]*>(.*?)</p>', clean_html_text, re.DOTALL | re.IGNORECASE)
         clean_paras = []
         bad_body_phrases = [
             "çerez", "cookie", "telif", "copyright", "kullanım koşulları",
@@ -262,14 +248,17 @@ def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
             "whatsapp kanalımıza", "bizi takip edin", "e-bülten", "ayrıntılar için tıklayın",
             "içindekiler", "editör hakkında", "teknoloji editörü", "içerik editörü", "oy ver", "takipçi",
             "scorsese", "donanım haber", "donanimhaber", "tam boyutta gör", "click()", "preventdefault",
-            "n11.com", "migros.com", "idefix.com", "trendyol.com", "hepsiburada.com"
+            "n11.com", "migros.com", "idefix.com", "trendyol.com", "hepsiburada.com",
+            "son haberler", "yapay zeka otomobil", "kategoriler nasıl yapılır", "donanım yazılım android",
+            "ai ile özetle", "yorum yap", "yorumlar", "giriş yap", "üye ol"
         ]
-        for p in p_matches:
-            c = clean_html(p)
+
+        for p in article_elem.find_all("p"):
+            txt = p.get_text()
+            c = clean_html(txt)
             c = sanitize_news_text(c)
-            # 50 karakterden uzun, çöp içermeyen ve daha önce listeye eklenmemiş özgün paragraflar
-            if len(c) > 50 and not any(b in c.lower() for b in bad_body_phrases):
-                # Tekrarlayan paragrafları engelle
+            # 40 karakterden uzun, çöp içermeyen ve daha önce listeye eklenmemiş özgün paragraflar
+            if len(c) > 40 and not any(b in c.lower() for b in bad_body_phrases):
                 if not any(c.lower() in existing.lower() or existing.lower() in c.lower() for existing in clean_paras):
                     clean_paras.append(c)
                     if len(clean_paras) >= max_paragraphs:

@@ -88,7 +88,12 @@ Kurallar:
 
         if len(s_clean) < 25:
             continue
-        if any(b in s_lower for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha"]):
+        if any(b in s_lower for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha", "son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
+            continue
+
+        # Başındaki yazar adı ve tarihi temizle (Erhan Şencan 24 Ekim 2026, Hakan Hasırcıoğlu 24 Ekim 2026 vb.)
+        s_clean = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', s_clean, flags=re.I).strip()
+        if len(s_clean) < 25:
             continue
 
         filtered_sentences.append(s_clean)
@@ -341,14 +346,19 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
     # Metni cümlelere ayır (Türkçe kısaltmaları ve noktalama işaretlerini gözeterek)
     sentences = smart_sentence_split(raw_clean)
     
-    # Başlıkla aynı olan veya çöp soru olan cümleleri filtrele
+    # Başlıkla aynı olan, çöp soru olan veya yazar/menü içeren cümleleri filtrele
     filtered = []
     for s in sentences:
-        if s.lower() == title.lower() or title.lower() in s.lower():
+        s_clean = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', s, flags=re.I).strip()
+        if not s_clean:
             continue
-        if s.endswith('?') and len(s) < 55:
+        if s_clean.lower() == title.lower() or title.lower() in s_clean.lower():
             continue
-        filtered.append(s)
+        if any(b in s_clean.lower() for b in ["son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
+            continue
+        if s_clean.endswith('?') and len(s_clean) < 55:
+            continue
+        filtered.append(s_clean)
 
     if filtered:
         lead_para = filtered[0]

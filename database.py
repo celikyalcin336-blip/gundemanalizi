@@ -383,11 +383,13 @@ def cleanup_corrupted_articles():
                     clean_content = re.sub(r'<p class="lead[^>]*>.*?favorilerime ekle.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
 
                 # Yazar biyografisi, içindekiler ve e-ticaret çöplerini ayıkla
-                if any(j in clean_content.lower() for j in ["içindekiler", "editör hakkında", "onur seven", "scorsese"]):
+                if any(j in clean_content.lower() for j in ["içindekiler", "editör hakkında", "onur seven", "scorsese", "son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
                     clean_content = re.sub(r'<p[^>]*>.*?içindekiler.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?editör hakkında.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?onur seven.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?https?://(?:n11|migros|idefix).*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
+                    clean_content = re.sub(r'<p class="lead[^>]*>.*?(?:son haberler|kategoriler nasıl yapılır|donanım yazılım|ai ile özetle).*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
+                    clean_content = re.sub(r'<p[^>]*>.*?(?:son haberler yapay zeka|kategoriler nasıl yapılır|donanım yazılım android).*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
 
                 if any(j in clean_summary.lower() for j in ["içindekiler", "editör hakkında", "onur seven"]):
                     clean_summary = re.sub(r'İçindekiler.*?(\.|\n|$)', '', clean_summary, flags=re.I).strip()

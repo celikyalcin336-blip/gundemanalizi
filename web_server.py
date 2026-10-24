@@ -45,19 +45,26 @@ def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
     - İlk açılışta hemen 1 taze haber çeker (Otomobil, Teknoloji, Ekonomi döngüsünü başlatır).
-    - Her CHECK_INTERVAL_MINUTES dakikada bir otomatik haber tarayıp siteye ve Telegram'a atar.
+    - Precision Timer sayesinde işlem süresinden bağımsız olarak TAM 8 dakikada bir çalışır (asla 9-10 dakikaya kaymaz).
     """
     time.sleep(5)
     print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi, ilk haber taranıyor...")
+    cycle_start = time.time()
     try:
         main.run_bot(max_items=1)
     except Exception as e:
         print(f"❌ Başlangıç bot hatası: {e}")
 
+    interval_sec = config.CHECK_INTERVAL_MINUTES * 60
     while True:
+        # Önceki tarama süresini (örn: 85 sn) 480 saniyeden düşerek TAM 8.0 dakikada bir tetikler
+        elapsed = time.time() - cycle_start
+        sleep_dur = max(15, interval_sec - elapsed)
+        time.sleep(sleep_dur)
+
+        cycle_start = time.time()
         try:
-            time.sleep(config.CHECK_INTERVAL_MINUTES * 60)
-            print("🔄 [Otonom Bot] Periyodik haber taraması başlatılıyor...")
+            print(f"🔄 [Otonom Bot] Periyodik haber taraması başlatılıyor (Hedef: her {config.CHECK_INTERVAL_MINUTES} dakikada bir)...")
             main.run_bot(max_items=1)
             database.cleanup_old_images(days=180)
         except Exception as e:
@@ -1238,7 +1245,9 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
         'gündem analizi değerlendirmesi', 'piyasalar ve kamuoyu', 'abone olun',
         'tıklayınız', 'fotoğraf:', 'içindekiler', 'editör hakkında', 'teknoloji editörü',
         'içerik editörü', 'oy ver', 'takipçi', 'scorsese', 'donanım haber', 'tam boyutta gör',
-        'click()', 'n11.com', 'migros', 'idefix', 'trendyol', 'hepsiburada', 'http'
+        'click()', 'n11.com', 'migros', 'idefix', 'trendyol', 'hepsiburada', 'http',
+        'son haberler', 'yapay zeka otomobil', 'kategoriler nasıl yapılır', 'donanım yazılım android',
+        'ai ile özetle'
     ]
 
     def is_similar_to_summary(sent: str) -> bool:

@@ -303,24 +303,13 @@ def create_news_visual(candidate_urls: list, output_filename: str, title: str = 
         if u and u.startswith("http") and u not in cleaned_urls:
             cleaned_urls.append(u)
             
-    # 1. Aday görseller varsa önce onları dene
+    # 1. Aday görseller varsa: Konunun tekil, orijinal ve kristal netliğindeki 16:9 HD basın görselini üret
+    # (Asla farklı konuları birbirine karıştıran yapay kolaj yapılmaz!)
     if cleaned_urls:
-        primary_url = cleaned_urls[0]
-        secondary_url = None
-        if len(cleaned_urls) >= 2:
-            for u in cleaned_urls[1:]:
-                if is_valid_secondary_editorial_image(u, primary_url):
-                    secondary_url = u
-                    break
-                    
-        if secondary_url:
-            res = create_dual_news_collage(primary_url, secondary_url, output_path)
+        for u in cleaned_urls:
+            res = create_single_news_photo(u, output_path)
             if res and os.path.exists(res):
                 return res
-                
-        res = create_single_news_photo(primary_url, output_path)
-        if res and os.path.exists(res):
-            return res
 
     # 2. Görsel yoksa veya indirilemediyse: Haberin konusuna özel gerçek basın fotoğrafı ara
     if title:
