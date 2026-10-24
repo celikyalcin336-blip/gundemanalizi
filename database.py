@@ -288,6 +288,27 @@ def cleanup_corrupted_articles():
                 # Boş başlık kalmışsa başlığı tamamla
                 clean_content = re.sub(r'<h3 class="text-xl font-bold text-white mt-6 mb-3">\s*</h3>', '<h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları</h3>', clean_content)
 
+                                # 4. Kategori Düzeltme (Örn: Otomobil haberinin Teknoloji'de veya Kanser haberinin Ekonomi'de kalmasını önle)
+                import ai_writer
+                correct_cat = ai_writer.classify_article(clean_title, clean_summary, category) if hasattr(ai_writer, 'classify_article') else category
+                
+                # 5. Kesilmiş / yarım kalmış lead paragraf tamiri (örn: '... düzenlenen 14.')
+                if re.search(r'\b\d+\.\s*$', clean_summary):
+                    # Özette sayı noktalı kalmışsa içerikten tamamla
+                    lead_m = re.search(r'<p class="lead[^>]*>(.*?)</p>', clean_content, re.DOTALL)
+                    if lead_m:
+                        full_lead = lead_m.group(1).strip()
+                        if not re.search(r'\b\d+\.\s*$', full_lead):
+                            clean_summary = full_lead
+
+                if clean_title != orig_title or clean_summary != orig_summary or clean_content != orig_content or correct_cat != category:
+                    conn.execute(
+                        "UPDATE articles SET title = ?, summary = ?, content = ?, category = ? WHERE id = ?",
+                        (clean_title, clean_summary, clean_content, correct_cat, aid)
+                    )
+                    updated_count += 1
+                    continue
+
                 if clean_title != orig_title or clean_summary != orig_summary or clean_content != orig_content:
                     conn.execute(
                         "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",

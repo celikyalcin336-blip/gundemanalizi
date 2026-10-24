@@ -853,14 +853,20 @@
             const articleBody = document.querySelector('.article-body');
             if (articleBody) {
                 const paragraphs = articleBody.querySelectorAll('p');
+                const seenSentences = new Set();
                 paragraphs.forEach(p => {
                     let t = p.innerText.trim();
                     const lower = t.toLowerCase();
                     if (t && !t.includes('http') && !t.includes('Gündem Analizi Değerlendirmesi') && !t.includes('WhatsApp') && !lower.includes('içindekiler') && !lower.includes('editör hakkında') && !lower.includes('oy ver') && !lower.includes('tam boyutta gör') && !lower.includes('scorsese')) {
-                        // Eğer metin zaten daha önce eklendiyse (özet tekrarı vb.) tekrar etme
-                        if (!text.includes(t)) {
-                            text += t + " ";
-                        }
+                        // Cümle bazında mükerrer kontrolü
+                        const sents = t.match(/[^.!?]+[.!?]+/g) || [t];
+                        sents.forEach(s => {
+                            const trimmed = s.trim();
+                            if (trimmed.length > 15 && !seenSentences.has(trimmed.toLowerCase())) {
+                                seenSentences.add(trimmed.toLowerCase());
+                                text += trimmed + " ";
+                            }
+                        });
                     }
                 });
             }

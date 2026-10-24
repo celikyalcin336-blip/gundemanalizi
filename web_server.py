@@ -1,3 +1,22 @@
+
+def smart_sentence_split(text: str) -> list:
+    """Türkçe sıra sayıları (14., 1., 2026.) ve unvan/kısaltmaları (Dr., Prof., vb.) bozmadan tam cümlelere böler."""
+    if not text:
+        return []
+    t = text
+    abbrevs = ["dr", "prof", "doç", "doc", "av", "uzm", "vb", "vs", "yy", "mad", "no", "m", "km"]
+    for ab in abbrevs:
+        t = re.sub(rf'\b({ab})\.', r'\1___DOT___', t, flags=re.I)
+    t = re.sub(r'(\b\d+)\.', r'\1___DOT___', t)
+    parts = re.split(r'(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ"“])', t)
+    clean_sents = []
+    for p in parts:
+        restored = p.replace('___DOT___', '.').strip()
+        if len(restored) > 25:
+            clean_sents.append(restored)
+    return clean_sents
+
+import re
 import os
 import time
 import threading
@@ -460,7 +479,12 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
 
     total_pages = max(1, math.ceil(total_count / limit))
     breaking_news = database.get_articles(limit=10)
-    slider_articles = database.get_articles(limit=14)
+    if norm_kategori:
+        slider_articles = database.get_articles(limit=14, category=norm_kategori)
+        if len(slider_articles) < 3:
+            slider_articles = database.get_articles(limit=14)
+    else:
+        slider_articles = database.get_articles(limit=14)
     auto_articles = database.get_articles(limit=5, category="Otomobil")
     tech_articles = database.get_articles(limit=5, category="Teknoloji")
     economy_articles = database.get_articles(limit=5, category="Ekonomi")
@@ -1071,7 +1095,7 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
             if any(b in clean_p.lower() for b in bad_bullet_words):
                 continue
             # Noktalama ile biten tam cümlelere böl
-            sents = [s.strip() for s in re.split(r'(?<=[.!?])\s+', clean_p) if len(s.strip()) > 35]
+            sents = [s for s in smart_sentence_split(clean_p) if len(s) > 35]
             for s in sents:
                 if any(b in s.lower() for b in bad_bullet_words):
                     continue
@@ -1107,7 +1131,12 @@ async def article_detail(request: Request, slug: str):
 
     other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
     breaking_news = database.get_articles(limit=10)
-    slider_articles = database.get_articles(limit=14)
+    if norm_kategori:
+        slider_articles = database.get_articles(limit=14, category=norm_kategori)
+        if len(slider_articles) < 3:
+            slider_articles = database.get_articles(limit=14)
+    else:
+        slider_articles = database.get_articles(limit=14)
     auto_articles = database.get_articles(limit=5, category="Otomobil")
     tech_articles = database.get_articles(limit=5, category="Teknoloji")
     economy_articles = database.get_articles(limit=5, category="Ekonomi")
@@ -1232,7 +1261,6 @@ async def html_sitemap(request: Request):
 @app.get("/sitemap.xsl")
 async def sitemap_xsl():
     """XML Site Haritalarını tarayıcıda görselleştiren XSLT şablonu."""
-    import os
     xsl_path = os.path.join(os.path.dirname(__file__), "templates", "sitemap.xsl")
     with open(xsl_path, "r", encoding="utf-8") as f:
         content = f.read()

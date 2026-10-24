@@ -162,6 +162,64 @@ UYULMASI ZORUNLU KURALLAR:
         "source_used": "Corporate Template"
     }
 
+
+def smart_sentence_split(text: str) -> list:
+    """Türkçe sıra sayıları (14., 1., 2026.) ve unvan/kısaltmaları (Dr., Prof., vb.) bozmadan tam cümlelere böler."""
+    import re
+    if not text:
+        return []
+    t = text
+    abbrevs = ["dr", "prof", "doç", "doc", "av", "uzm", "vb", "vs", "yy", "mad", "no", "m", "km"]
+    for ab in abbrevs:
+        t = re.sub(rf'\b({ab})\.', r'\1___DOT___', t, flags=re.I)
+    t = re.sub(r'(\b\d+)\.', r'\1___DOT___', t)
+    parts = re.split(r'(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ"“])', t)
+    clean_sents = []
+    for p in parts:
+        restored = p.replace('___DOT___', '.').strip()
+        if len(restored) > 25:
+            clean_sents.append(restored)
+    return clean_sents
+
+
+def classify_article(title: str, summary: str, force_category: str = None) -> str:
+    """Haber metnini analiz edip en doğru kategoriye yönlendirir. Çapraz kategori kaymalarını engeller."""
+    lower_all = f"{title} {summary}".lower()
+
+    # 1. SPOR (Futbol, lig, derbi, transfer)
+    if any(k in lower_all for k in ["maç", "futbol", "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor", "süper lig", "şampiyonlar ligi", "uefa", "transfer", "teknik direktör", "derbi", "a milli takım", "basketbol", "voleybol", "formula 1"]):
+        return "Spor"
+
+    # 2. SAĞLIK (Tıp, kanser, hastane, hekim, cerrahi)
+    if any(k in lower_all for k in ["kanser", "başhekim", "cerrahi", "ameliyat", "aşı", "grip", "ilaç", "tedavi", "mhrs", "sağlık bakanlığı", "kalp sağlığı", "enfeksiyon", "salgın", "doktor", "hastane"]):
+        return "Sağlık"
+
+    # 3. OTOMOBİL (Teknoloji veya ekonomideki araç haberlerini kesin olarak otomobile aktar)
+    if any(k in lower_all for k in ["otomobil", "araba", "fiat", "byd", "togg", "t10x", "egea", "clio", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "renault", "peugeot", "skoda", "bmw", "mercedes", "ötv", "taşıt kredisi", "araç"]):
+        return "Otomobil"
+
+    # 4. EĞİTİM (MEB, ÖSYM, Sınavlar, Öğrenci)
+    if any(k in lower_all for k in ["öğrenci", "okul", "meb", "öğretmen", "üniversite", "ösym", "yks", "lgs", "kpss", "burs", "tatil", "sınav", "müfredat"]):
+        return "Eğitim"
+
+    # 5. TEKNOLOJİ & YAPAY ZEKA
+    if any(k in lower_all for k in ["yapay zeka", "yapay zekâ", "chatgpt", "openai", "gemini", "claude", "midjourney", "sora", "deepseek", "nemotron", "ai model", "akıllı telefon", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "yazılım"]):
+        return "Teknoloji"
+
+    # 6. DÜNYA (Savaş, diplomasi, uluslararası krizler)
+    if any(k in lower_all for k in ["savaş", "israil", "gazze", "iran", "nato", "ukrayna", "lübnan", "pentagon", "beyaz saray", "zelenskiy", "putin", "kremlin", "dışişleri", "diplomasi", "uluslararası", "avrupa birliği", "ateşkes", "füze", "hava saldırısı"]):
+        return "Dünya"
+
+    # 7. EKONOMİ (Finans, borsa, piyasa, zam)
+    if any(k in lower_all for k in ["borsa", "faiz", "enflasyon", "dolar", "euro", "bakan şimşek", "merkez bankası", "tcmb", "asgari ücret", "emekli maaşı", "mevduat", "zam", "vergi", "bist 100", "altın"]):
+        return "Ekonomi"
+
+    # Eğer gelen beslemenin kategorisi varsa onu kullan
+    if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Eğitim", "Sağlık", "Dünya", "Spor", "Gündem"]:
+        return force_category
+
+    return "Gündem"
+
 def generate_full_article(title: str, summary: str, source: str, force_category: str = None) -> dict:
     """
     Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
@@ -170,25 +228,7 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
-    lower_all = f"{title} {summary}".lower()
-    if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Eğitim", "Sağlık", "Dünya", "Spor", "Gündem"]:
-        category = force_category
-    elif any(k in lower_all for k in ["öğrenci", "okul", "meb", "öğretmen", "üniversite", "ösym", "yks", "lgs", "kpss", "burs", "tatil", "sınav", "eğitim", "müfredat"]):
-        category = "Eğitim"
-    elif any(k in lower_all for k in ["otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg", "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd", "renault", "fiat", "peugeot", "skoda"]):
-        category = "Otomobil"
-    elif any(k in lower_all for k in ["yapay zeka", "chatgpt", "openai", "gemini", "claude", "anthropic", "midjourney", "sora", "deepseek", "nemotron", "llm", "ai model", "yapay zekâ", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "akıllı telefon", "ios", "yazılım", "donanım"]):
-        category = "Teknoloji"
-    elif any(k in lower_all for k in ["sağlık", "hastane", "grip", "aşı", "beslenme", "diyet", "kolesterol", "tansiyon", "kanser", "tedavi", "ilaç", "check-up", "kalp sağlığı", "doktor", "mhrs", "sağlık bakanlığı"]):
-        category = "Sağlık"
-    elif any(k in lower_all for k in ["faiz", "enflasyon", "borsa", "dolar", "euro", "bakan şimşek", "ekonomi", "zam", "vergi", "mevduat", "asgari ücret", "emekli", "promosyon", "altın", "akaryakıt", "benzin"]):
-        category = "Ekonomi"
-    elif any(k in lower_all for k in ["maç", "futbol", "fenerbahçe", "galatasaray", "beşiktaş", "şampiyon", "süper lig", "uefa", "transfer"]):
-        category = "Spor"
-    elif any(k in lower_all for k in ["savaş", "abd", "rusya", "israil", "avrupa", "gazze", "iran", "dünya", "nato", "ukrayna", "çin"]):
-        category = "Dünya"
-    else:
-        category = "Gündem"
+    category = classify_article(title, summary, force_category)
 
     category_guide = ""
     if category == "Otomobil":
@@ -245,7 +285,7 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
     import re
     raw_clean = summary.strip()
     # Metni cümlelere ayır (Türkçe kısaltmaları ve noktalama işaretlerini gözeterek)
-    sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', raw_clean) if len(s.strip()) > 20]
+    sentences = smart_sentence_split(raw_clean)
     
     # Başlıkla aynı olan veya çöp soru olan cümleleri filtrele
     filtered = []

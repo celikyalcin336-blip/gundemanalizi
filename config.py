@@ -172,7 +172,51 @@ RSS_FEEDS = [
         "category": "Eğitim"
     },
 
-# 🚨 SICAK GÜNDEM & SON DAKİKA
+    # 🌍 DÜNYA & DIŞ POLİTİKA (Küresel Sıcak Gelişmeler & Krizler)
+    {
+        "name": "TRT Haber Dünya",
+        "url": "https://www.trthaber.com/dunya_articles.rss",
+        "category": "Dünya"
+    },
+    {
+        "name": "NTV Dünya",
+        "url": "https://www.ntv.com.tr/dunya.rss",
+        "category": "Dünya"
+    },
+    {
+        "name": "Habertürk Dünya",
+        "url": "https://www.haberturk.com/rss/kategori/dunya.xml",
+        "category": "Dünya"
+    },
+    {
+        "name": "Ensonhaber Dünya",
+        "url": "https://www.ensonhaber.com/rss/dunya.xml",
+        "category": "Dünya"
+    },
+
+    # ⚽ SPOR, SÜPER LİG & AVRUPA (Yüksek Anlık Okuyucu Trafiği)
+    {
+        "name": "A Spor",
+        "url": "https://www.aspor.com.tr/rss/anasayfa.xml",
+        "category": "Spor"
+    },
+    {
+        "name": "TRT Haber Spor",
+        "url": "https://www.trthaber.com/spor_articles.rss",
+        "category": "Spor"
+    },
+    {
+        "name": "Fotomaç",
+        "url": "https://www.fotomac.com.tr/rss/anasayfa.xml",
+        "category": "Spor"
+    },
+    {
+        "name": "Habertürk Spor",
+        "url": "https://www.haberturk.com/rss/kategori/spor.xml",
+        "category": "Spor"
+    },
+
+    # 🚨 SICAK GÜNDEM & SON DAKİKA
     {
         "name": "TRT Haber Gündem",
         "url": "https://www.trthaber.com/gundem_articles.rss",
