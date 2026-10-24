@@ -1,6 +1,7 @@
 import os
 import sys
 import html
+import re
 
 # Windows konsolunda Türkçe ve emoji karakterlerin hatasız yazdırılması için
 if sys.stdout.encoding != 'utf-8':
