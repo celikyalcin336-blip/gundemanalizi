@@ -218,10 +218,35 @@ def init_db():
 def cleanup_corrupted_articles():
     """
     Veritabanındaki makaleleri tarayarak:
-    1. 'Favorilerime ekle', borsa canlı bantları, editör imzaları ve telif çöplerini temizler.
-    2. 'Gelişmenin Ayrıntıları' altında giriş cümlesinin birebir tekrarlandığı makaleleri düzeltir.
-    3. Başlıklardaki kaynak uzantılarını (- Hürriyet vb.) ayıklar.
+    1. Hatalı kategoriye düşmüş haberleri (Togg, futbol, sağlık vb.) doğru kategorilere taşır.
+    2. 'Favorilerime ekle', borsa canlı bantları, editör imzaları ve telif çöplerini temizler.
+    3. 'Gelişmenin Ayrıntıları' altında giriş cümlesinin birebir tekrarlandığı makaleleri düzeltir.
     """
+    # Anlık Kategori Düzeltme (Togg, Otomobil, Spor, Sağlık, Eğitim)
+    try:
+        with get_connection() as conn:
+            conn.execute("""
+                UPDATE articles SET category = 'Otomobil' 
+                WHERE category != 'Otomobil' 
+                  AND (LOWER(title) LIKE '%togg%' OR LOWER(title) LIKE '%fiat%' OR LOWER(title) LIKE '%byd%' OR LOWER(title) LIKE '%elektrikli araç%' OR LOWER(title) LIKE '%otomobil%' OR LOWER(title) LIKE '%araba%')
+            """)
+            conn.execute("""
+                UPDATE articles SET category = 'Spor' 
+                WHERE category != 'Spor' 
+                  AND (LOWER(title) LIKE '%fenerbahçe%' OR LOWER(title) LIKE '%galatasaray%' OR LOWER(title) LIKE '%beşiktaş%' OR LOWER(title) LIKE '%trabzonspor%' OR LOWER(title) LIKE '%süper lig%' OR LOWER(title) LIKE '%uefa%' OR LOWER(title) LIKE '%transfer%' OR LOWER(title) LIKE '%a milli takım%')
+            """)
+            conn.execute("""
+                UPDATE articles SET category = 'Sağlık' 
+                WHERE category != 'Sağlık' 
+                  AND (LOWER(title) LIKE '%kanser%' OR LOWER(title) LIKE '%başhekim%' OR LOWER(title) LIKE '%cerrahi%' OR LOWER(title) LIKE '%ameliyat%' OR LOWER(title) LIKE '%doktor%' OR LOWER(title) LIKE '%mhrs%' OR LOWER(title) LIKE '%hastane%')
+            """)
+            conn.execute("""
+                UPDATE articles SET category = 'Eğitim' 
+                WHERE category != 'Eğitim' 
+                  AND (LOWER(title) LIKE '%öğrenci%' OR LOWER(title) LIKE '%meb%' OR LOWER(title) LIKE '%ösym%' OR LOWER(title) LIKE '%yks%' OR LOWER(title) LIKE '%lgs%' OR LOWER(title) LIKE '%kpss%' OR LOWER(title) LIKE '%müfredat%')
+            """)
+    except Exception as e:
+        print(f"Kategori hızlı düzeltme hatası: {e}")
     import news_fetcher
     try:
         with get_connection() as conn:
