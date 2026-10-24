@@ -177,7 +177,7 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         category = "Eğitim"
     elif any(k in lower_all for k in ["otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg", "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd", "renault", "fiat", "peugeot", "skoda"]):
         category = "Otomobil"
-    elif any(k in lower_all for k in ["yapay zeka", "chatgpt", "openai", "gemini", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "akıllı telefon", "ios", "yazılım", "donanım"]):
+    elif any(k in lower_all for k in ["yapay zeka", "chatgpt", "openai", "gemini", "claude", "anthropic", "midjourney", "sora", "deepseek", "nemotron", "llm", "ai model", "yapay zekâ", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "akıllı telefon", "ios", "yazılım", "donanım"]):
         category = "Teknoloji"
     elif any(k in lower_all for k in ["sağlık", "hastane", "grip", "aşı", "beslenme", "diyet", "kolesterol", "tansiyon", "kanser", "tedavi", "ilaç", "check-up", "kalp sağlığı", "doktor", "mhrs", "sağlık bakanlığı"]):
         category = "Sağlık"

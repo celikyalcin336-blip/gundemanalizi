@@ -89,6 +89,23 @@ RSS_FEEDS = [
         "category": "Teknoloji"
     },
 
+    # 🤖 ÖZEL YAPAY ZEKA (AI) & İNOVASYON
+    {
+        "name": "ShiftDelete Yapay Zeka",
+        "url": "https://shiftdelete.net/yapay-zeka/feed",
+        "category": "Teknoloji"
+    },
+    {
+        "name": "Webrazzi Yapay Zeka",
+        "url": "https://webrazzi.com/kategori/yapay-zeka/feed/",
+        "category": "Teknoloji"
+    },
+    {
+        "name": "E-Girişim AI & İnovasyon",
+        "url": "https://egirisim.com/feed/",
+        "category": "Teknoloji"
+    },
+
     # 💰 EKONOMİ, FİNANS & TÜKETİCİ (Yüksek Tık & Gelir Değeri)
     {
         "name": "Bloomberg HT",
