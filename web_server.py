@@ -1131,11 +1131,8 @@ async def article_detail(request: Request, slug: str):
 
     other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
     breaking_news = database.get_articles(limit=10)
-    if norm_kategori:
-        slider_articles = database.get_articles(limit=14, category=norm_kategori)
-        if len(slider_articles) < 3:
-            slider_articles = database.get_articles(limit=14)
-    else:
+    slider_articles = database.get_articles(limit=14, category=category)
+    if len(slider_articles) < 3:
         slider_articles = database.get_articles(limit=14)
     auto_articles = database.get_articles(limit=5, category="Otomobil")
     tech_articles = database.get_articles(limit=5, category="Teknoloji")
