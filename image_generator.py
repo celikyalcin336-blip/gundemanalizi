@@ -1,3 +1,4 @@
+import re
 import os
 import requests
 from io import BytesIO
@@ -177,36 +178,123 @@ def create_dual_news_collage(url1: str, url2: str, output_path: str, width: int 
     sharp.save(output_path, "JPEG", quality=95)
     return output_path
 
-def create_default_brand_backdrop(output_path: str, title: str = "", category: str = "GÜNDEM", width: int = 1280, height: int = 720) -> str:
-    """Haberde hiç görsel bulunamazsa profesyonel antrasit/lacivert stüdyo arka planı oluşturur."""
-    canvas = Image.new("RGB", (width, height), (15, 23, 42))
+def search_editorial_web_image(title: str, category: str = "") -> str:
+    """Haberin konusuyla doğrudan ilgili gerçek, yüksek çözünürlüklü ve yatay basın fotoğrafı arar."""
+    try:
+        import urllib.parse
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
+        }
+        clean_q = re.sub(r'[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ\s]', ' ', title)
+        words = [w for w in clean_q.split() if len(w) > 2 and w.lower() not in ['haber', 'haberi', 'son', 'dakika', 'flas', 'flaş', 'iste', 'işte', 'acikladi', 'açıkladı']][:5]
+        search_str = " ".join(words)
+        if category and category.lower() not in search_str.lower():
+            search_str += f" {category}"
+
+        url = f'https://www.bing.com/images/search?q={urllib.parse.quote(search_str)}&qft=+filterui:aspect-wide&first=1'
+        r = requests.get(url, headers=headers, timeout=6)
+        murls = re.findall(r'murl&quot;:&quot;(https?://[^&]+?\.(?:jpg|jpeg|png|webp))&quot;', r.text)
+        if not murls:
+            murls = re.findall(r'\"murl\":\"(https?://[^\"]+?\.(?:jpg|jpeg|png|webp))\"', r.text)
+            
+        for candidate in murls[:5]:
+            if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector']):
+                continue
+            return candidate
+    except Exception as e:
+        print(f"Editoryal görsel arama hatası: {e}")
+    return None
+
+def create_thematic_editorial_card(output_path: str, title: str = "", category: str = "Gündem", width: int = 1280, height: int = 720) -> str:
+    """Haber görseli bulunamadığında boş gri kutu yerine TV bülteni tarzında şık, tipografik son dakika haber kartı üretir."""
+    import textwrap
+    cat_lower = category.lower()
+    
+    if "spor" in cat_lower:
+        c1, c2 = (180, 25, 25), (15, 23, 42)
+        badge_bg, badge_txt = (220, 38, 38), (255, 255, 255)
+    elif "eko" in cat_lower:
+        c1, c2 = (16, 120, 75), (15, 23, 42)
+        badge_bg, badge_txt = (16, 185, 129), (255, 255, 255)
+    elif "tekno" in cat_lower:
+        c1, c2 = (67, 56, 202), (15, 23, 42)
+        badge_bg, badge_txt = (99, 102, 241), (255, 255, 255)
+    elif "sağlık" in cat_lower or "saglik" in cat_lower:
+        c1, c2 = (14, 116, 144), (15, 23, 42)
+        badge_bg, badge_txt = (6, 182, 212), (255, 255, 255)
+    elif "oto" in cat_lower:
+        c1, c2 = (190, 24, 93), (15, 23, 42)
+        badge_bg, badge_txt = (244, 63, 94), (255, 255, 255)
+    else:
+        c1, c2 = (220, 38, 38), (15, 23, 42)
+        badge_bg, badge_txt = (239, 68, 68), (255, 255, 255)
+        
+    canvas = Image.new("RGB", (width, height), c2)
     draw = ImageDraw.Draw(canvas)
     
     for y in range(height):
-        r = int(15 + (35 - 15) * (y / height))
-        g = int(23 + (25 - 23) * (y / height))
-        b = int(42 + (55 - 42) * (y / height))
+        factor = (y / height) ** 1.3
+        r = int(c1[0] * (1 - factor) + c2[0] * factor)
+        g = int(c1[1] * (1 - factor) + c2[1] * factor)
+        b = int(c1[2] * (1 - factor) + c2[2] * factor)
         draw.line([(0, y), (width, y)], fill=(r, g, b))
         
-    logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
+    card_margin = 60
+    card_box = [(card_margin, card_margin), (width - card_margin, height - card_margin)]
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    ov_draw = ImageDraw.Draw(overlay)
+    ov_draw.rounded_rectangle(card_box, radius=24, fill=(15, 23, 42, 190), outline=(255, 255, 255, 30), width=2)
+    canvas.paste(overlay, (0, 0), mask=overlay)
+    
+    draw = ImageDraw.Draw(canvas)
+    badge_font = get_font(FONT_BOLD_PATH, 26)
+    badge_text = f"● {category.upper()}"
+    b_left = card_margin + 50
+    b_top = card_margin + 50
+    b_padding_x = 24
+    
+    draw.rounded_rectangle([(b_left, b_top), (b_left + 220, b_top + 46)], radius=23, fill=badge_bg)
+    draw.text((b_left + b_padding_x, b_top + 8), badge_text, font=badge_font, fill=badge_txt)
+    
+    logo_path = os.path.join(BASE_DIR, "assets", "logo.png")
     if os.path.exists(logo_path):
         try:
             wm = Image.open(logo_path).convert("RGBA")
-            wm_size = 240
+            wm_size = 90
             wm = wm.resize((wm_size, wm_size), Image.Resampling.LANCZOS)
-            canvas.paste(wm, ((width - wm_size) // 2, (height - wm_size) // 2), mask=wm)
+            canvas.paste(wm, (width - card_margin - wm_size - 40, card_margin + 35), mask=wm)
         except Exception:
             pass
-            
+
+    clean_title = (title or "").strip()
+    clean_title = re.sub(r'^(?:SON DAKİKA|FLAŞ|GALATASARAY HABERİ|BEŞİKTAŞ HABERİ|FENERBAHÇE HABERİ):\s*', '', clean_title, flags=re.I).strip()
+    
+    title_font = get_font(FONT_BOLD_PATH, 44)
+    wrapped_lines = textwrap.wrap(clean_title, width=38)
+    
+    text_y = b_top + 85
+    for line in wrapped_lines[:4]:
+        draw.text((b_left, text_y), line, font=title_font, fill=(255, 255, 255))
+        text_y += 62
+        
+    sub_font = get_font(FONT_REGULAR_PATH, 22)
+    draw.text((b_left, height - card_margin - 55), "gündemanalizi.com.tr | Doğru Haber • Tarafsız Analiz", font=sub_font, fill=(148, 163, 184))
+    
     canvas.save(output_path, "JPEG", quality=95)
     return output_path
+
+def create_default_brand_backdrop(output_path: str, title: str = "", category: str = "GÜNDEM", width: int = 1280, height: int = 720) -> str:
+    """Geriye uyumluluk için şık tipografik editoryal kart fonksiyonunu çağırır."""
+    return create_thematic_editorial_card(output_path, title, category, width, height)
 
 def create_news_visual(candidate_urls: list, output_filename: str, title: str = "", category: str = "Gündem") -> str:
     """
     Sitenin ana sayfası ve Telegram kanalı için nihai haber görselini üretir:
-    - 2 veya daha fazla gerçek editoryal haber fotoğrafı varsa -> Yan yana 2'li Split Kolaj
-    - 1 görsel varsa -> 16:9 HD kristal netliğinde tekil fotoğraf
-    - Hiç görsel yoksa -> Şık editoryal marka tuvali
+    1. 2 veya daha fazla gerçek editoryal haber fotoğrafı varsa -> Yan yana 2'li Split Kolaj
+    2. 1 görsel varsa -> 16:9 HD kristal netliğinde tekil fotoğraf
+    3. Hiç görsel yoksa -> Otomatik olarak konunun gerçek editoryal basın fotoğrafını arar ve indirir
+    4. Ağ engeli varsa -> TV bülteni kalitesinde tipografik özel haber kartı üretir (Asla boş kutu bırakmaz)
     """
     output_path = os.path.join(OUTPUT_DIR, output_filename)
     
@@ -215,30 +303,38 @@ def create_news_visual(candidate_urls: list, output_filename: str, title: str = 
         if u and u.startswith("http") and u not in cleaned_urls:
             cleaned_urls.append(u)
             
-    if not cleaned_urls:
-        return create_default_brand_backdrop(output_path, title, category)
-        
-    primary_url = cleaned_urls[0]
-    
-    # Gerçek ikincil editoryal görsel ara
-    secondary_url = None
-    if len(cleaned_urls) >= 2:
-        for u in cleaned_urls[1:]:
-            if is_valid_secondary_editorial_image(u, primary_url):
-                secondary_url = u
-                break
+    # 1. Aday görseller varsa önce onları dene
+    if cleaned_urls:
+        primary_url = cleaned_urls[0]
+        secondary_url = None
+        if len(cleaned_urls) >= 2:
+            for u in cleaned_urls[1:]:
+                if is_valid_secondary_editorial_image(u, primary_url):
+                    secondary_url = u
+                    break
+                    
+        if secondary_url:
+            res = create_dual_news_collage(primary_url, secondary_url, output_path)
+            if res and os.path.exists(res):
+                return res
                 
-    if secondary_url:
-        res = create_dual_news_collage(primary_url, secondary_url, output_path)
+        res = create_single_news_photo(primary_url, output_path)
         if res and os.path.exists(res):
             return res
-            
-    # Tekil net haber fotoğrafı
-    res = create_single_news_photo(primary_url, output_path)
-    if res and os.path.exists(res):
-        return res
-        
-    return create_default_brand_backdrop(output_path, title, category)
+
+    # 2. Görsel yoksa veya indirilemediyse: Haberin konusuna özel gerçek basın fotoğrafı ara
+    if title:
+        print(f"🔍 Habere özel görsel aranıyor: {title[:40]}...")
+        web_img = search_editorial_web_image(title, category)
+        if web_img:
+            print(f"📸 Gerçek haber görseli bulundu: {web_img[:60]}...")
+            res = create_single_news_photo(web_img, output_path)
+            if res and os.path.exists(res):
+                return res
+
+    # 3. Son çare: TV bülteni tarzında şık, tipografik son dakika haber kartı üret (Asla boş logo kutusu olmaz!)
+    return create_thematic_editorial_card(output_path, title, category)
+
 
 def wrap_text(text: str, font, max_width: int) -> list:
     """Metni verilen piksel genişliğini aşmayacak şekilde satırlara böler."""

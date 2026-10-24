@@ -13,24 +13,56 @@ def get_news_hash(title: str, link: str) -> str:
     return hashlib.md5(normalized.encode("utf-8")).hexdigest()
 
 def extract_image_url(entry) -> Optional[str]:
-    """RSS girdisinden haber görseli URL'sini çıkarmaya çalışır."""
+    """RSS girdisinden haber görseli URL'sini çıkarmaya çalışır (Enclosures, Links, MediaContent, Og:Image)."""
     # 1. media_content kontrolü
     if "media_content" in entry and len(entry.media_content) > 0:
-        return entry.media_content[0].get("url")
+        url = entry.media_content[0].get("url")
+        if url:
+            return url
 
     # 2. enclosures kontrolü
     if "enclosures" in entry and len(entry.enclosures) > 0:
         for enc in entry.enclosures:
-            if enc.get("type", "").startswith("image/"):
+            if enc.get("type", "").startswith("image/") or any(ext in enc.get("href", "").lower() for ext in [".jpg", ".jpeg", ".png", ".webp"]):
                 return enc.get("href")
 
-    # 3. description veya summary içindeki <img> etiketini arama
+    # 3. links kontrolü (Fotomaç, A Spor, Sabah, Milliyet)
+    if "links" in entry and len(entry.links) > 0:
+        for l in entry.links:
+            href = l.get("href", "")
+            ltype = l.get("type", "")
+            if ltype.startswith("image/") or any(ext in href.lower() for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+                return href
+
+    # 4. media_thumbnail
+    if "media_thumbnail" in entry and len(entry.media_thumbnail) > 0:
+        url = entry.media_thumbnail[0].get("url")
+        if url:
+            return url
+
+    # 5. description veya summary içindeki <img> etiketini arama
     content = entry.get("summary", "") or entry.get("description", "")
     img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', content)
     if img_match:
         return img_match.group(1)
 
+    # 6. Haberin orijinal sayfasından og:image / twitter:image kazıma (Hızlı 2.5 sn)
+    link = entry.get("link", "")
+    if link and link.startswith("http"):
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            r = requests.get(link, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}, timeout=2.5)
+            if r.status_code == 200:
+                soup = BeautifulSoup(r.content, "html.parser")
+                og = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
+                if og and og.get("content"):
+                    return og.get("content").strip()
+        except Exception:
+            pass
+
     return None
+
 
 def clean_html(text: str) -> str:
     """

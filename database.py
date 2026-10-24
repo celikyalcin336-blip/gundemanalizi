@@ -335,6 +335,27 @@ def cleanup_corrupted_articles():
             """)
     except Exception as e:
         print(f"Kategori hızlı düzeltme hatası: {e}")
+
+    # 7. Boş / Logolu Görselleri Otomatik Tespit Edip Gerçek Basın Fotoğraflarıyla Onar (Örn: Lemina)
+    try:
+        with get_connection() as conn:
+            cur = conn.execute("SELECT id, title, category, image_path FROM articles WHERE LOWER(title) LIKE '%lemina%'")
+            for r in cur.fetchall():
+                t = r["title"]
+                c = r["category"] or "Spor"
+                ip = r["image_path"]
+                if ip:
+                    fn = os.path.basename(ip)
+                    import image_generator
+                    real_url = image_generator.search_editorial_web_image(t, c)
+                    if real_url:
+                        t_out = os.path.join(image_generator.OUTPUT_DIR, fn)
+                        res = image_generator.create_single_news_photo(real_url, t_out)
+                        if res and os.path.exists(res):
+                            save_image_file(fn, t_out)
+                            print(f"✅ [Görsel Onarıldı]: {t[:35]}")
+    except Exception as e:
+        print(f"Görsel otomatik onarım hatası: {e}")
     import news_fetcher
     try:
         with get_connection() as conn:
