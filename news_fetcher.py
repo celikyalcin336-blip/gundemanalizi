@@ -82,6 +82,14 @@ def sanitize_news_text(text: str) -> str:
         r'Ayrıntılar Geliyor\.+',
         r'Detaylar birazdan\.+',
         r'Haberin devamı aşağıdadır\.?',
+        # DonanımHaber ve diğer sitelerin yazar biyografisi, içindekiler ve e-ticaret bağlantıları
+        r'\bİçindekiler(?:\s+İçindekiler)*\b[^\.\n]*',
+        r'Editör Hakkında Diğer Haberleri.*?(?:ilgi duyuyor|imza atmaya çalışıyor|\.|\n|$)',
+        r'[A-Za-z0-9_\'\"]+\s*\)\s*\.\s*click\s*\(\s*\)\s*;\s*event\s*\.\s*prevent\s*Default\s*\(\s*\)\s*;\s*[\"\'>]*',
+        r'Tam\s+Boyutta\s+Gör',
+        r'Oy\s+Ver\s+[A-ZÇĞİÖŞÜa-zçğıöşü\s\?]+',
+        r'https?://(?:www\.)?(?:n11|migros|idefix|trendyol|hepsiburada|amazon)\.com[^\s<]*',
+        r'\b\d+\s*sa\.\s*önce\s*eklendi\b',
         # Standart buton ve Google promosyon çöpleri
         r'\bHABERLER\b.*?(?:Haberleri|Gündem)',
         r'Font\s*Boyutu.*?Linki\s*Kopyala',
@@ -212,7 +220,10 @@ def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
             "favorilerime ekle", "ikonuna tıklayarak", "içerik editörü", "haber / içerik",
             "kanuna aykırı ve izinsiz", "kaynak gösterilmeden alıntı yapılamaz", "ayrıntılar geliyor",
             "detaylar birazdan", "hurriyet.com.tr", "mynet haber", "bist 100", "gram altın",
-            "whatsapp kanalımıza", "bizi takip edin", "e-bülten", "ayrıntılar için tıklayın"
+            "whatsapp kanalımıza", "bizi takip edin", "e-bülten", "ayrıntılar için tıklayın",
+            "içindekiler", "editör hakkında", "teknoloji editörü", "içerik editörü", "oy ver", "takipçi",
+            "scorsese", "donanım haber", "donanimhaber", "tam boyutta gör", "click()", "preventdefault",
+            "n11.com", "migros.com", "idefix.com", "trendyol.com", "hepsiburada.com"
         ]
         for p in p_matches:
             c = clean_html(p)

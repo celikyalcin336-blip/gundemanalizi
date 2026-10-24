@@ -79,8 +79,8 @@ RSS_FEEDS = [
         "category": "Teknoloji"
     },
     {
-        "name": "DonanımHaber",
-        "url": "https://www.donanimhaber.com/rss/tum/",
+        "name": "Log.com.tr Teknoloji",
+        "url": "https://www.log.com.tr/feed/",
         "category": "Teknoloji"
     },
     {

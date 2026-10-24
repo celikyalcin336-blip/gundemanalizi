@@ -849,15 +849,18 @@
 
         function getArticleTextForSpeech() {
             const title = {{ article.title | tojson }};
-            const summary = {{ (article.summary or "") | tojson }};
-            let text = title + ". " + summary + ". ";
-            const articleContent = document.querySelector('.article-body') || document.querySelector('article');
-            if (articleContent) {
-                const paragraphs = articleContent.querySelectorAll('p');
+            let text = title + ". ";
+            const articleBody = document.querySelector('.article-body');
+            if (articleBody) {
+                const paragraphs = articleBody.querySelectorAll('p');
                 paragraphs.forEach(p => {
-                    const t = p.innerText.trim();
-                    if (t && !t.includes('http') && !t.includes('Gündem Analizi') && !t.includes('WhatsApp')) {
-                        text += t + " ";
+                    let t = p.innerText.trim();
+                    const lower = t.toLowerCase();
+                    if (t && !t.includes('http') && !t.includes('Gündem Analizi Değerlendirmesi') && !t.includes('WhatsApp') && !lower.includes('içindekiler') && !lower.includes('editör hakkında') && !lower.includes('oy ver') && !lower.includes('tam boyutta gör') && !lower.includes('scorsese')) {
+                        // Eğer metin zaten daha önce eklendiyse (özet tekrarı vb.) tekrar etme
+                        if (!text.includes(t)) {
+                            text += t + " ";
+                        }
                     }
                 });
             }

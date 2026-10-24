@@ -1056,16 +1056,25 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
     paras = re.findall(r'<p[^>]*>(.*?)</p>', content or "", flags=re.DOTALL)
     bullets = []
 
+    bad_bullet_words = [
+        'gündem analizi değerlendirmesi', 'piyasalar ve kamuoyu', 'abone olun',
+        'tıklayınız', 'fotoğraf:', 'içindekiler', 'editör hakkında', 'teknoloji editörü',
+        'içerik editörü', 'oy ver', 'takipçi', 'scorsese', 'donanım haber', 'tam boyutta gör',
+        'click()', 'n11.com', 'migros', 'idefix', 'trendyol', 'hepsiburada', 'http'
+    ]
+
     # 1. İçerik paragraflarından tam cümleleri al
     if paras:
         for p in paras:
             clean_p = re.sub(r'<[^>]+>', '', p).strip()
             clean_p = html.unescape(clean_p)
-            if any(b in clean_p.lower() for b in ['gündem analizi değerlendirmesi', 'piyasalar ve kamuoyu', 'abone olun', 'tıklayınız', 'fotoğraf:']):
+            if any(b in clean_p.lower() for b in bad_bullet_words):
                 continue
             # Noktalama ile biten tam cümlelere böl
             sents = [s.strip() for s in re.split(r'(?<=[.!?])\s+', clean_p) if len(s.strip()) > 35]
             for s in sents:
+                if any(b in s.lower() for b in bad_bullet_words):
+                    continue
                 if (s.endswith(('.', '!', '?')) or s.endswith('."') or s.endswith('".')) and s not in bullets and s.lower() != title.lower():
                     bullets.append(s)
                     if len(bullets) >= 3:
@@ -1076,8 +1085,9 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
     # 2. Eğer içerikten tam cümle çıkmadıysa ve summary tam bir cümle ise onu ekle
     if not bullets and summary:
         clean_sum = html.unescape(summary.strip())
-        if clean_sum.endswith(('.', '!', '?')) and len(clean_sum) > 30 and clean_sum.lower() != title.lower():
-            bullets.append(clean_sum)
+        if not any(b in clean_sum.lower() for b in bad_bullet_words):
+            if clean_sum.endswith(('.', '!', '?')) and len(clean_sum) > 30 and clean_sum.lower() != title.lower():
+                bullets.append(clean_sum)
 
     return bullets[:3]
 
