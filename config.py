@@ -133,7 +133,29 @@ RSS_FEEDS = [
         "category": "Sağlık"
     },
 
-    # 🚨 SICAK GÜNDEM & SON DAKİKA
+        # 🎓 EĞİTİM, MEB & SINAVLAR (Yüksek Tık & Aile/Öğrenci Trafiği)
+    {
+        "name": "Anadolu Ajansı Eğitim",
+        "url": "https://www.aa.com.tr/tr/rss/default?cat=egitim",
+        "category": "Eğitim"
+    },
+    {
+        "name": "TRT Haber Eğitim",
+        "url": "https://www.trthaber.com/egitim_articles.rss",
+        "category": "Eğitim"
+    },
+    {
+        "name": "NTV Eğitim",
+        "url": "https://www.ntv.com.tr/egitim.rss",
+        "category": "Eğitim"
+    },
+    {
+        "name": "Sabah Eğitim",
+        "url": "https://www.sabah.com.tr/rss/egitim.xml",
+        "category": "Eğitim"
+    },
+
+# 🚨 SICAK GÜNDEM & SON DAKİKA
     {
         "name": "TRT Haber Gündem",
         "url": "https://www.trthaber.com/gundem_articles.rss",

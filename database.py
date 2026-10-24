@@ -452,6 +452,16 @@ def normalize_category_name(cat: Optional[str]) -> Optional[str]:
         return None
     c = cat.strip().lower()
     mapping = {
+                "egitim": "Eğitim",
+        "eğitim": "Eğitim",
+        "meb": "Eğitim",
+        "osym": "Eğitim",
+        "ösym": "Eğitim",
+        "sinav": "Eğitim",
+        "sınav": "Eğitim",
+        "yks": "Eğitim",
+        "lgs": "Eğitim",
+        "kpss": "Eğitim",
         "saglik": "Sağlık",
         "sağlık": "Sağlık",
         "ekonomi": "Ekonomi",

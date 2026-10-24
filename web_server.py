@@ -466,6 +466,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     economy_articles = database.get_articles(limit=5, category="Ekonomi")
     sports_articles = database.get_articles(limit=5, category="Spor")
     health_articles = database.get_articles(limit=5, category="Sağlık")
+    education_articles = database.get_articles(limit=5, category="Eğitim")
 
     return templates.TemplateResponse(
         request=request,
@@ -478,6 +479,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "economy_articles": economy_articles,
             "sports_articles": sports_articles,
             "health_articles": health_articles,
+            "education_articles": education_articles,
             "breaking_news": breaking_news,
             "active_category": norm_kategori,
             "search_query": q.strip() if q else "",
@@ -1101,6 +1103,7 @@ async def article_detail(request: Request, slug: str):
     economy_articles = database.get_articles(limit=5, category="Ekonomi")
     sports_articles = database.get_articles(limit=5, category="Spor")
     health_articles = database.get_articles(limit=5, category="Sağlık")
+    education_articles = database.get_articles(limit=5, category="Eğitim")
 
     # Tahmini okuma süresi (140 kelime/dk)
     text_content = f"{article.get('title', '')} {article.get('summary', '')} {article.get('content', '')}"
@@ -1235,7 +1238,7 @@ async def sitemap(request: Request):
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
     import urllib.parse
-    for cat in ("Gündem", "Ekonomi", "Dünya", "Spor", "Asayiş", "Son Dakika"):
+    for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş", "Son Dakika"):
         cat_enc = urllib.parse.quote(cat)
         xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')

@@ -171,8 +171,10 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
     lower_all = f"{title} {summary}".lower()
-    if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Sağlık", "Dünya", "Spor", "Gündem"]:
+    if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Eğitim", "Sağlık", "Dünya", "Spor", "Gündem"]:
         category = force_category
+    elif any(k in lower_all for k in ["öğrenci", "okul", "meb", "öğretmen", "üniversite", "ösym", "yks", "lgs", "kpss", "burs", "tatil", "sınav", "eğitim", "müfredat"]):
+        category = "Eğitim"
     elif any(k in lower_all for k in ["otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg", "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd", "renault", "fiat", "peugeot", "skoda"]):
         category = "Otomobil"
     elif any(k in lower_all for k in ["yapay zeka", "chatgpt", "openai", "gemini", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "akıllı telefon", "ios", "yazılım", "donanım"]):
@@ -193,6 +195,8 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         category_guide = "Bu bir OTOMOBİL & KAMPANYA haberidir. Kampanya şartları, fiyatlar, faizsiz kredi/taksit seçenekleri, model özellikleri ve tüketicinin nasıl yararlanacağını açıkça vurgula."
     elif category == "Teknoloji":
         category_guide = "Bu bir TEKNOLOJİ & YAPAY ZEKA haberidir. Cihazın veya teknolojinin öne çıkan özellikleri, tahmini/kesin Türkiye fiyatı, çıkış tarihi ve günlük hayattaki faydalarını tüketici odaklı anlat."
+    elif category == "Eğitim":
+        category_guide = "Bu bir EĞİTİM, MEB & SINAV haberidir. Tarihleri, sınav/başvuru detaylarını, öğrencileri ve velileri ilgilendiren önemli bilgileri açık, net ve güvenilir bir dille anlat."
     elif category == "Sağlık":
         category_guide = "Bu bir SAĞLIK & YAŞAM haberidir. Belirtileri, uzman tavsiyelerini ve dikkat edilmesi gereken noktaları güvenilir ve bilgilendirici bir dille anlat."
     elif category == "Ekonomi":
@@ -272,6 +276,9 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
         if category == "Ekonomi":
             body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler ve tüketici üzerindeki yansımaların önümüzdeki günlerde netleşeceğini belirtiyor.</p>')
             body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sektör temsilcileri ve ilgili finans kurumlarının alacağı yeni kararlar yakından takip edilirken, sürecin piyasa dinamiklerine etkisi ekonomi masamız tarafından izlenmektedir.</p>')
+        elif category == "Eğitim":
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Öğrencileri, öğretmenleri ve velileri yakından ilgilendiren bu gelişmeyle ilgili Milli Eğitim Bakanlığı (MEB) ve ilgili resmi kurumların açıklamaları takip ediliyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sınav takvimleri, başvuru şartları ve eğitim süreçlerine dair resmi duyurular anlık olarak eğitim servisimiz tarafından aktarılacaktır.</p>')
         elif category == "Spor":
             body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Spor camiasında geniş yankı uyandıran gelişmeyle ilgili taraflardan gelecek yeni açıklamalar merakla beklenirken, teknik heyet ve yönetimin atacağı adımlar takip ediliyor.</p>')
             body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmenin ligdeki dengelere ve takımın önümüzdeki fikstürüne olası etkileri spor masamız tarafından aktarılmaya devam edecektir.</p>')
@@ -287,6 +294,8 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
     eval_text = "Gelişmenin piyasalar ve kamuoyu üzerindeki yansımaları masamız tarafından yakından takip edilmektedir. Sürece dair resmi makamlardan gelecek yeni veriler anlık olarak aktarılacaktır."
     if category == "Ekonomi":
         eval_text = "Piyasalardaki fiyatlamalar, tüketici hakları ve makroekonomik dengeler açısından sürecin seyri ekonomi servisimiz tarafından yakından izlenmektedir."
+    elif category == "Eğitim":
+        eval_text = "Öğrenci, veli ve eğitim camiasını ilgilendiren resmi kılavuzlar ve takvim duyuruları eğitim masamız tarafından anlık olarak izlenmektedir."
     elif category == "Spor":
         eval_text = "Müsabaka takvimi ve spor kamuoyunun nabzı doğrultusunda kulüplerden gelecek resmi açıklamalar anlık olarak sayfalarımızda yer alacaktır."
 
