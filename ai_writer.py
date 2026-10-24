@@ -61,15 +61,37 @@ Kurallar:
 
     # Kural Tabanlı Akıllı Editör (Fallback)
     import re
-    raw_sentences = [s.strip() for s in re.split(r'(?<=[!?:])\s+|(?<=[0-9a-zA-ZçğıöşüÇĞİÖŞÜ]{3}\.)\s+(?=[A-ZÇĞİÖŞÜ0-9])', clean_summary) if len(s.strip()) > 25]
+    # Finans / Borsa canlı ticker yüzdelerini ve kategori kırıntılarını ayıkla
+    clean_summary = re.sub(r'^(?:\s*%\s*[-+]?\d+[\.,]\d+\s*)+(?:Haberler|FİNANS|Ekonomi|Gündem|Son Dakika|\s)*', '', clean_summary, flags=re.I)
+    clean_summary = re.sub(r'\b(?:Haberler\s+FİNANS\s+Ekonomi)\b', '', clean_summary, flags=re.I)
+
+    raw_sentences = [s.strip() for s in re.split(r'(?<=[!?:])\s+|(?<=[0-9a-zA-ZçğıöşüÇĞİÖŞÜ]{3}\.)\s+(?=[A-ZÇĞİÖŞÜ0-9])', clean_summary) if len(s.strip()) > 20]
+
+    # Başlık parçalarını topla (başlıktaki cümlelerin maddelerde tekrarlanmasını önle)
+    headline_parts = [p.strip().lower() for p in re.split(r'[:!,—\-\.]+', headline) if len(p.strip()) > 10]
 
     filtered_sentences = []
     for s in raw_sentences:
-        if s.lower() == headline.lower():
+        s_clean = s.strip()
+        s_lower = s_clean.lower()
+
+        if s_lower == headline.lower():
             continue
-        if any(b in s.lower() for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha"]):
+        if any(s_lower == part for part in headline_parts):
             continue
-        filtered_sentences.append(s)
+
+        # Eğer cümlenin başı başlığın bir parçasıyla başlıyorsa kırp
+        for part in headline_parts:
+            if s_lower.startswith(part):
+                s_clean = s_clean[len(part):].lstrip(' ,:!-—.')
+                s_lower = s_clean.lower()
+
+        if len(s_clean) < 25:
+            continue
+        if any(b in s_lower for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha"]):
+            continue
+
+        filtered_sentences.append(s_clean)
 
     data_keywords = ["tl", "lira", "dolar", "yüzde", "%", "bin", "milyon", "milyar", "hapis", "yıl", "ay", "ceza", "maliyet", "tutar", "tespit", "karar", "açıkladı", "belirlendi", "kesinleşti", "arttı", "düştü", "zam", "indirim", "metre", "icra", "iade"]
 

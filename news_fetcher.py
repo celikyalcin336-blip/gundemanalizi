@@ -89,6 +89,10 @@ def sanitize_news_text(text: str) -> str:
     if not text:
         return ""
     t = text
+    # 0. Finans / Borsa canlı ticker yüzdeleri ve kategori kırıntıları (örn: %-0,14 %-2,48 Haberler FİNANS Ekonomi)
+    t = re.sub(r'^(?:\s*%\s*[-+]?\d+[\.,]\d+\s*)+(?:Haberler|FİNANS|Ekonomi|Gündem|Son Dakika|\s)*', '', t, flags=re.I)
+    t = re.sub(r'\b(?:Haberler\s+FİNANS\s+Ekonomi)\b', '', t, flags=re.I)
+
     # 1. Yapışık kelimeleri ve noktalama bitişikliklerini ayır
     t = re.sub(r'([a-zçğıöşü\)])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
@@ -396,9 +400,9 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
         try:
             parsed = feedparser.parse(feed_url)
             for entry in parsed.entries[:limit_per_feed]:
-                title = clean_html(entry.get("title", ""))
+                title = sanitize_news_text(clean_html(entry.get("title", "")))
                 link = entry.get("link", "")
-                summary = clean_html(entry.get("summary", "") or entry.get("description", ""))
+                summary = sanitize_news_text(clean_html(entry.get("summary", "") or entry.get("description", "")))
                 image_url = extract_image_url(entry)
                 published = entry.get("published", "")
 
