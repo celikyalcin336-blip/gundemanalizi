@@ -59,9 +59,16 @@ class _Conn:
         if USE_PG:
             sql = sql.replace("?", "%s")
             cur = self.raw.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            if params:
+                cur.execute(sql, params)
+            else:
+                cur.execute(sql)
         else:
             cur = self.raw.cursor()
-        cur.execute(sql, params)
+            if params:
+                cur.execute(sql, params)
+            else:
+                cur.execute(sql)
         return cur
 
     def __enter__(self):
@@ -202,7 +209,7 @@ def init_db():
     # Arka plan API sorgu kayıtlarını (döviz kurları vb.) ziyaretçi geçmişinden temizle
     try:
         with get_connection() as conn:
-            conn.execute("DELETE FROM visitor_logs WHERE page LIKE '/api/%'")
+            conn.execute("DELETE FROM visitor_logs WHERE page LIKE ?", ('/api/%',))
     except Exception:
         pass
     cleanup_corrupted_articles()
@@ -720,9 +727,9 @@ def get_dashboard_summary() -> Dict:
             ).fetchall()
             device_stats = [dict(r) for r in dev_rows]
 
-            # Canlı son 15 ziyaretçi (Türkiye Saatine çevrilmiş olarak - API çağrıları hariç)
+            # Canlı son 20 ziyaretçi (Türkiye Saatine çevrilmiş olarak - API çağrıları hariç)
             lv_rows = conn.execute(
-                "SELECT * FROM visitor_logs WHERE page NOT LIKE '/api/%' ORDER BY id DESC LIMIT 15"
+                "SELECT * FROM visitor_logs WHERE page NOT LIKE ? ORDER BY id DESC LIMIT 20", ('/api/%',)
             ).fetchall()
             live_visitors = [_row_to_dict(r) for r in lv_rows]
         except Exception as e:

@@ -874,7 +874,7 @@ async def panel_live_stats(request: Request):
         "returning_today": stats.get("returning_today", 0),
         "total_views": stats.get("total_views", 0),
         "total_all_hits": stats.get("total_all_hits", 0),
-        "live_visitors": stats.get("live_visitors", [])[:8],
+        "live_visitors": stats.get("live_visitors", [])[:15],
         "total_revenue": stats.get("total_revenue", 0.0)
     }
 
