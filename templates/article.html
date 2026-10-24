@@ -456,6 +456,81 @@
             </div>
             {% endif %}
 
+            <!-- SIRADAKİ HABER VE KESİNTİSİZ OKUMA AKIŞI KARTI -->
+            {% if next_article %}
+            <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-red-950/70 via-brand-card to-slate-900 border-2 border-red-600/50 shadow-2xl relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-black tracking-wider uppercase">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                        SIRADAKİ HABER
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-medium hidden sm:inline">Okumaya devam et →</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 items-center">
+                    <a href="/haber/{{ next_article.slug }}" class="w-full sm:w-48 h-32 rounded-xl overflow-hidden shrink-0 bg-slate-950 border border-brand-border block relative shadow-md">
+                        {% if next_article.image_path %}
+                        <img src="/images/{{ next_article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        {% else %}
+                        <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-3">
+                        {% endif %}
+                        <span class="absolute top-2 left-2 bg-black/75 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-extrabold text-red-400 uppercase">
+                            {{ next_article.category }}
+                        </span>
+                    </a>
+
+                    <div class="flex-1 min-w-0 space-y-2 text-center sm:text-left">
+                        <h3 class="text-sm sm:text-base font-extrabold text-white group-hover:text-red-400 transition leading-snug line-clamp-2">
+                            <a href="/haber/{{ next_article.slug }}">{{ next_article.title }}</a>
+                        </h3>
+                        <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                            {{ next_article.summary }}
+                        </p>
+                        <div class="pt-1 flex items-center justify-center sm:justify-start">
+                            <a href="/haber/{{ next_article.slug }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg shadow-red-900/40 transition hover:translate-x-1">
+                                <span>Sonraki Habere Geç</span>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ÖNCEKİ / SONRAKİ HABER NAVİGASYON BUTONLARI -->
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-brand-border/60">
+                {% if prev_article %}
+                <a href="/haber/{{ prev_article.slug }}" class="flex items-center gap-3 p-3.5 rounded-xl bg-brand-card hover:bg-slate-900 border border-brand-border hover:border-slate-700 transition group text-left">
+                    <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-red-600 transition shrink-0">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Önceki Haber</span>
+                        <h4 class="text-xs font-bold text-slate-300 group-hover:text-red-400 transition line-clamp-1">{{ prev_article.title }}</h4>
+                    </div>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+
+                {% if next_article %}
+                <a href="/haber/{{ next_article.slug }}" class="flex items-center justify-end gap-3 p-3.5 rounded-xl bg-brand-card hover:bg-slate-900 border border-brand-border hover:border-slate-700 transition group text-right">
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-red-400 font-bold uppercase tracking-wider block">Sonraki Haber</span>
+                        <h4 class="text-xs font-bold text-slate-300 group-hover:text-red-400 transition line-clamp-1">{{ next_article.title }}</h4>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-red-600/20 text-red-400 group-hover:text-white group-hover:bg-red-600 flex items-center justify-center transition shrink-0">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </div>
+                </a>
+                {% endif %}
+            </div>
+
             <!-- Kaynak Bilgisi -->
             <div class="mt-8 pt-4 border-t border-brand-border flex items-center justify-between text-xs text-slate-400">
                 <span>Haber Kaynağı: <strong class="text-slate-300">{{ article.source }}</strong></span>
@@ -544,41 +619,94 @@
 
         </article>
 
-        <!-- YAN SÜTUN (SAĞ BÖLÜM - 4 KOLON) -->
-        <aside class="lg:col-span-4 space-y-6">
+        <!-- YAN SÜTUN (SAĞ BÖLÜM - STICKY MODERN HABER AKIŞI) -->
+        <aside class="lg:col-span-4 space-y-6 sticky top-24 self-start">
             
-            <div class="rounded-2xl border border-brand-border bg-brand-card p-5">
-                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2 pb-3 border-b border-brand-border">
-                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
-                    DİĞER ÖNEMLİ HABERLER
+            <!-- 1. EN ÇOK OKUNANLAR (TREND İLK 5 - NUMARALI ROZETLERLE) -->
+            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-xl">
+                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center justify-between pb-3 border-b border-brand-border">
+                    <span class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
+                        🔥 EN ÇOK OKUNANLAR
+                    </span>
+                    <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-wider">Trend</span>
                 </h3>
 
-                <div class="space-y-4">
-                    {% for other in other_articles %}
-                    <a href="/haber/{{ other.slug }}" class="group block pb-4 border-b border-brand-border/40 last:border-0 last:pb-0">
-                        <div class="flex items-center gap-2 text-[11px] text-slate-500 mb-1">
-                            <span class="text-red-400 font-semibold">{{ other.category }}</span>
-                            <span>•</span>
-                            <span>{{ other.created_at[:16] }}</span>
+                <div class="space-y-3.5">
+                    {% for trend in trending_articles %}
+                    <a href="/haber/{{ trend.slug }}" class="group flex items-center gap-3 pb-3 border-b border-brand-border/40 last:border-0 last:pb-0">
+                        <!-- Sıralama Rozeti (1..5) -->
+                        <div class="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center font-black text-xs shadow-sm
+                            {% if loop.index == 1 %}bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 ring-1 ring-amber-300
+                            {% elif loop.index == 2 %}bg-gradient-to-br from-slate-200 to-slate-400 text-slate-950
+                            {% elif loop.index == 3 %}bg-gradient-to-br from-amber-700 to-amber-900 text-amber-100
+                            {% else %}bg-slate-800 text-slate-400 border border-slate-700{% endif %}">
+                            {{ loop.index }}
                         </div>
-                        <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
-                            {{ other.title }}
-                        </h4>
+
+                        <!-- Küçük Görsel -->
+                        <div class="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80">
+                            {% if trend.image_path %}
+                            <img src="/images/{{ trend.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ trend.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            {% else %}
+                            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
+                            {% endif %}
+                        </div>
+
+                        <!-- Başlık & Kategori -->
+                        <div class="flex-1 min-w-0">
+                            <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider block mb-0.5">{{ trend.category }}</span>
+                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
+                                {{ trend.title }}
+                            </h4>
+                        </div>
                     </a>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Gündem Analizi Hakkında Kartı -->
-            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 text-center">
-                <img src="/assets/logo.png" alt="Gündem Analizi" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-red-600">
+            <!-- 2. DİĞER GÜNCEL HABERLER (GÖRSELLİ) -->
+            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-xl">
+                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2 pb-3 border-b border-brand-border">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
+                    ⚡ DİĞER GÜNCEL HABERLER
+                </h3>
+
+                <div class="space-y-3">
+                    {% for other in other_articles %}
+                    <a href="/haber/{{ other.slug }}" class="group flex items-start gap-3 pb-3 border-b border-brand-border/40 last:border-0 last:pb-0">
+                        <div class="w-14 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80 mt-0.5">
+                            {% if other.image_path %}
+                            <img src="/images/{{ other.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ other.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            {% else %}
+                            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5 text-[10px] text-slate-500 mb-0.5">
+                                <span class="text-red-400 font-bold uppercase">{{ other.category }}</span>
+                                <span>•</span>
+                                <span>{{ other.created_at[:10] }}</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
+                                {{ other.title }}
+                            </h4>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 3. Gündem Analizi Hakkında Kartı -->
+            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 text-center shadow-xl">
+                <img src="/assets/logo.png" alt="Gündem Analizi" class="w-14 h-14 rounded-full mx-auto mb-3 border-2 border-red-600 shadow-md">
                 <h4 class="font-extrabold text-white text-sm">GÜNDEM ANALİZİ</h4>
                 <p class="text-xs text-red-400 font-semibold uppercase tracking-wider mb-2">Doğru Haber • Tarafsız Analiz</p>
                 <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                    Türkiye ve dünyada öne çıkan son dakika gelişmelerini tarafsız ve hızlı şekilde okuyucularına ulaştıran bağımsız haber platformu.
+                    Türkiye ve dünyada öne çıkan son dakika gelişmelerini tarafsız ve anlık şekilde takip etmek için kanalımıza katılın.
                 </p>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-2 text-xs font-bold text-red-400 hover:text-red-300">
-                    <i data-lucide="send" class="w-3.5 h-3.5"></i> @gundemanalizi
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs shadow-lg transition">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i> @gundemanalizi Katıl
                 </a>
             </div>
 
@@ -1209,5 +1337,22 @@
             applyA11ySettings();
         }
     </script>
+    <!-- MOBİL VE DESKTOP İÇİN SABİT SIRADAKİ HABER BARI -->
+    {% if next_article %}
+    <div id="floating-next-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-red-900/60 p-2.5 sm:px-6 shadow-2xl transition-transform duration-300">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-black uppercase shrink-0">Sıradaki</span>
+                <a href="/haber/{{ next_article.slug }}" class="text-xs sm:text-sm font-bold text-white hover:text-red-400 transition truncate">
+                    {{ next_article.title }}
+                </a>
+            </div>
+            <a href="/haber/{{ next_article.slug }}" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shrink-0 flex items-center gap-1.5 shadow-lg shadow-red-900/50 transition whitespace-nowrap">
+                <span>Sonraki Haber</span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </body>
 </html>

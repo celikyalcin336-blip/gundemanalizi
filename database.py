@@ -13,7 +13,7 @@ import os
 import sys
 import re
 import unicodedata
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from datetime import datetime, timezone, timedelta
 
 if sys.stdout.encoding != 'utf-8':
@@ -435,6 +435,35 @@ def cleanup_corrupted_articles():
                         if not re.search(r'\b\d+\.\s*$', full_lead):
                             clean_summary = full_lead
 
+                # 6. Çok kısa kalmış (1-2 cümlelik) veya eksik paragraflı haberleri zenginleştir (Örn: Frank McCourt vb.)
+                paras = re.findall(r'<p class="text-slate-300[^>]*>(.*?)</p>', clean_content, re.DOTALL)
+                if len(paras) < 2 and '<p class="lead' in clean_content:
+                    cat_lower = correct_cat.lower()
+                    extra_paras = []
+                    if "eko" in cat_lower:
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde geniş yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler, fiyatlama dinamikleri ve yatırım trendleri üzerindeki etkilerin önümüzdeki süreçte belirginleşeceğini vurguluyor. Yüksek meblağlı işlemler ve piyasa hareketlilikleri, sektör temsilcileri tarafından yakından izleniyor.</p>')
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Önümüzdeki günlerde sürecin resmiyet kazanması ve ilgili finansal adımların tamamlanmasıyla birlikte, sektörel göstergeler ve emsal değerler açısından piyasaların nasıl bir yön çizeceği ekonomi servisimiz tarafından takip edilmektedir.</p>')
+                    elif "spor" in cat_lower:
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Spor kamuoyunda ve taraftarlar arasında büyük heyecan uyandıran gelişmeyle ilgili olarak kulüp yönetiminin resmi adımları bekleniyor. Teknik heyetin sezon planlaması doğrultusunda atılacak bu adımın, takım içi dengelere ve önümüzdeki kritik maç takvimine doğrudan etki etmesi öngörülüyor.</p>')
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Müsabaka takvimi ve resmi sözleşme süreçlerinde imzaların atılmasının ardından, tarafların önümüzdeki günlerde kapsamlı bir bilgilendirmeyle ayrıntıları paylaşması beklenirken, spor servisimiz gelişmeleri aktaracaktır.</p>')
+                    elif "tekno" in cat_lower:
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji dünyasında ve dijital ekosistemde dengeleri değiştirebilecek bu yenilik, geliştiriciler ve son kullanıcılar açısından önemli avantajlar barındırıyor. Yüksek işlem kapasitesi ve yeni nesil algoritmalarla donatılan sistemin sektörel rekabeti artıracağı vurgulanıyor.</p>')
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji otoriteleri, yeni modelin yaygınlaşmasıyla birlikte dijital dönüşüm süreçlerinde hız ve verimlilik artışı yaşanacağına dikkat çekerken, küresel pazardaki entegrasyon takvimi merakla takip ediliyor.</p>')
+                    elif "sağlık" in cat_lower or "saglik" in cat_lower:
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlık otoriteleri ve tıp uzmanları, doğru bilgilendirmenin ve erken farkındalığın hayati önem taşıdığına dikkat çekiyor. Benzer sağlık göstergeleri karşısında vatandaşların vakit kaybetmeden uzman hekim kontrolünden geçmesinin önemine vurgu yapılıyor.</p>')
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlıklı yaşam standartları ve koruyucu hekimlik kapsamında alınacak bireysel tedbirlerin yaşam kalitesini doğrudan artıracağı belirtilirken, klinik değerlendirmeler yakından izleniyor.</p>')
+                    else:
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor. Sürecin detayları anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
+                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Konuya ilişkin kurumlar arası koordinasyon ve sahadaki yansımalar yakından izlenirken, yeni gelişmeler netleştikçe haberimiz güncellenecektir.</p>')
+
+                    if '<div class="p-5 rounded-xl bg-red-950/40' in clean_content:
+                        clean_content = clean_content.replace(
+                            '<div class="p-5 rounded-xl bg-red-950/40',
+                            "\n".join(extra_paras) + '\n<div class="p-5 rounded-xl bg-red-950/40'
+                        )
+                    else:
+                        clean_content = clean_content + "\n" + "\n".join(extra_paras)
+
                 if clean_title != orig_title or clean_summary != orig_summary or clean_content != orig_content or correct_cat != category:
                     conn.execute(
                         "UPDATE articles SET title = ?, summary = ?, content = ?, category = ? WHERE id = ?",
@@ -768,6 +797,36 @@ def get_article_by_id(article_id: int) -> Optional[Dict]:
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM articles WHERE id = ?", (article_id,)).fetchone()
         return _row_to_dict(row) if row else None
+
+
+def get_trending_articles(limit: int = 5) -> List[Dict]:
+    """En çok okunan (views DESC) makaleleri listeler."""
+    with get_connection() as conn:
+        cur = conn.execute("SELECT * FROM articles ORDER BY views DESC, id DESC LIMIT ?", (limit,))
+        return [_row_to_dict(row) for row in cur.fetchall()]
+
+
+def get_adjacent_articles(article_id: int) -> Tuple[Optional[Dict], Optional[Dict]]:
+    """Mevcut makalenin bir önceki ve bir sonraki makalesini döner (prev, next)."""
+    with get_connection() as conn:
+        # Önceki haber (ID'si daha küçük olan)
+        cur_prev = conn.execute("SELECT * FROM articles WHERE id < ? ORDER BY id DESC LIMIT 1", (article_id,))
+        row_prev = cur_prev.fetchone()
+        prev_art = _row_to_dict(row_prev) if row_prev else None
+
+        # Sonraki haber (ID'si daha büyük olan)
+        cur_next = conn.execute("SELECT * FROM articles WHERE id > ? ORDER BY id ASC LIMIT 1", (article_id,))
+        row_next = cur_next.fetchone()
+        next_art = _row_to_dict(row_next) if row_next else None
+
+        # Eğer kullanıcı en yeni haberdeyse (next yoksa), akışı koparmamak için önceki haberi sonraki olarak ver
+        if not next_art and prev_art:
+            next_art = prev_art
+        # Eğer kullanıcı en eski haberdeyse (prev yoksa), sonraki haberi önceki olarak ver
+        if not prev_art and next_art:
+            prev_art = next_art
+
+        return prev_art, next_art
 
 
 def update_article(article_id: int, title: str, summary: str, content: str, category: str) -> bool:

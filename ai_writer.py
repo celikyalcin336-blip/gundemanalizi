@@ -359,29 +359,41 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
 
     body_paras_list = []
     if remaining:
-        # Kalan cümleleri 2'şerli paragraflara grupla
+        # Kalan gerçek haber cümlelerini ilk paragraflara koy
         chunk1 = " ".join(remaining[:2])
         body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk1}</p>')
         if len(remaining) > 2:
             chunk2 = " ".join(remaining[2:5])
             body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk2}</p>')
-    else:
-        # Tek cümlelik haberlerde ASLA girişi tekrar etme; kategoriye özel editoryal arka plan ekle
-        if category == "Ekonomi":
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler ve tüketici üzerindeki yansımaların önümüzdeki günlerde netleşeceğini belirtiyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sektör temsilcileri ve ilgili finans kurumlarının alacağı yeni kararlar yakından takip edilirken, sürecin piyasa dinamiklerine etkisi ekonomi masamız tarafından izlenmektedir.</p>')
-        elif category == "Eğitim":
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Öğrencileri, öğretmenleri ve velileri yakından ilgilendiren bu gelişmeyle ilgili Milli Eğitim Bakanlığı (MEB) ve ilgili resmi kurumların açıklamaları takip ediliyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sınav takvimleri, başvuru şartları ve eğitim süreçlerine dair resmi duyurular anlık olarak eğitim servisimiz tarafından aktarılacaktır.</p>')
-        elif category == "Spor":
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Spor camiasında geniş yankı uyandıran gelişmeyle ilgili taraflardan gelecek yeni açıklamalar merakla beklenirken, teknik heyet ve yönetimin atacağı adımlar takip ediliyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmenin ligdeki dengelere ve takımın önümüzdeki fikstürüne olası etkileri spor masamız tarafından aktarılmaya devam edecektir.</p>')
-        elif category == "Dünya":
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgesel ve uluslararası dengeleri yakından ilgilendiren olay sonrasında ilgili ülkelerin diplomatik temasları hız kazandı.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Uluslararası gözlemciler ve diplomasi çevreleri sürecin seyrine ilişkin değerlendirmelerini sürdürürken, gelişmeler anlık olarak takip edilmektedir.</p>')
+
+    # Her haberin doyurucu, zengin ve en az 3-4 paragraflık gerçek bir haber makalesi olması için
+    # eğer gövdede az cümle varsa kategoriye özel derinlikli editoryal arka plan ekle (Asla 1 cümleyle bırakma!)
+    if len(body_paras_list) < 2:
+        cat_lower = category.lower()
+        if "eko" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde geniş yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler, fiyatlama dinamikleri ve yatırım trendleri üzerindeki etkilerin önümüzdeki süreçte belirginleşeceğini vurguluyor. Yüksek meblağlı işlemler ve piyasa hareketlilikleri, sektör temsilcileri tarafından yakından izleniyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Önümüzdeki günlerde sürecin resmiyet kazanması ve ilgili finansal adımların tamamlanmasıyla birlikte, sektörel göstergeler ve emsal değerler açısından piyasaların nasıl bir yön çizeceği ekonomi servisimiz tarafından takip edilmektedir.</p>')
+        elif "spor" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Spor kamuoyunda ve taraftarlar arasında büyük heyecan uyandıran gelişmeyle ilgili olarak kulüp yönetiminin resmi adımları bekleniyor. Teknik heyetin sezon planlaması ve kadro mühendisliği doğrultusunda atılacak bu adımın, takım içi dengelere ve önümüzdeki kritik maç takvimine doğrudan etki etmesi öngörülüyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Müsabaka takvimi ve resmi sözleşme süreçlerinde imzaların atılmasının ardından, tarafların önümüzdeki günlerde kapsamlı bir bilgilendirmeyle ayrıntıları paylaşması beklenirken, spor servisimiz gelişmeleri anbean aktaracaktır.</p>')
+        elif "tekno" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji dünyasında ve dijital ekosistemde dengeleri değiştirebilecek bu yenilik, geliştiriciler ve son kullanıcılar açısından önemli avantajlar barındırıyor. Yüksek işlem kapasitesi ve yeni nesil algoritmalarla donatılan sistemin, sektördeki küresel rekabeti farklı bir boyuta taşıyacağı vurgulanıyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji otoriteleri, yeni modelin yaygınlaşmasıyla birlikte dijital dönüşüm süreçlerinde hız ve verimlilik artışı yaşanacağına dikkat çekerken, küresel pazardaki entegrasyon takvimi merakla takip ediliyor.</p>')
+        elif "sağlık" in cat_lower or "saglik" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlık otoriteleri ve tıp uzmanları, doğru bilgilendirmenin ve erken farkındalığın hayati önem taşıdığına dikkat çekiyor. Benzer semptomlar veya sağlık göstergeleri karşısında vatandaşların vakit kaybetmeden uzman hekim kontrolünden geçmesinin önemine vurgu yapılıyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlıklı yaşam standartları ve koruyucu hekimlik kapsamında alınacak bireysel tedbirlerin, yaşam kalitesini doğrudan artıracağı belirtilirken, konuya ilişkin klinik değerlendirmeler yakından izleniyor.</p>')
+        elif "oto" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Otomotiv sektöründe dikkat çeken model ve fiyat dinamikleri, tüketici tercihlerini ve pazar dengelerini doğrudan şekillendiriyor. Segmentindeki güçlü rakipleri karşısında öne çıkan donanım ve mühendislik detayları, kullanıcı deneyimi açısından önemli yenilikler sunuyor.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Türkiye pazarındaki bulunabilirlik, satış koşulları ve bayi kampanyalarına dair resmi duyurular yakından takip edilirken, otomotiv masamız süreci okuyucularımıza aktarmaya devam edecektir.</p>')
+        elif "eğitim" in cat_lower or "egitim" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Öğrencileri, öğretmenleri ve velileri yakından ilgilendiren bu gelişmeyle ilgili Milli Eğitim Bakanlığı (MEB) ve ilgili resmi kurumların açıklamaları takip ediliyor. Takvimler, başvuru şartları ve sınav süreçlerine dair resmi duyurular anlık olarak eğitim servisimiz tarafından aktarılacaktır.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Eğitim camiasındaki güncel beklentiler ve başvuru takvimine dair resmi kılavuzlar yayınlandıkça detaylar anbean paylaşılacaktır.</p>')
+        elif "dünya" in cat_lower or "dunya" in cat_lower:
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgesel ve uluslararası dengeleri yakından ilgilendiren olay sonrasında ilgili ülkelerin diplomatik temasları hız kazandı. Uluslararası gözlemciler ve diplomasi çevreleri sürecin seyrine ilişkin değerlendirmelerini sürdürürken, gelişmeler anlık olarak takip edilmektedir.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgedeki aktörlerin atacağı yeni adımlar ve resmi zirvelerden çıkacak kararlar dünya masamız tarafından dikkatle izlenmektedir.</p>')
         else:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sürecin detayları ve yaşanacak yeni gelişmeler anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor. Sürecin yasal boyutu ve detayları anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
+            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Konuya ilişkin kurumlar arası koordinasyon ve sahadaki yansımalar yakından izlenirken, yeni gelişmeler netleştikçe haberimiz güncellenecektir.</p>')
 
     body_paras = "\n".join(body_paras_list)
 

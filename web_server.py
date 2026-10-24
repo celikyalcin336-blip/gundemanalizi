@@ -1228,8 +1228,9 @@ async def submit_ihbar(
     return {"ok": True, "message": "İhbarınız ve medyanız Haber Merkezimize başarıyla iletildi! Teşekkür ederiz."}
 
 def extract_clean_highlights(content: str, summary: str, title: str) -> list:
-    """Haberin içinden tam, anlamlı ve kesilmemiş 2-3 adet madde/özet çıkarır."""
+    """Haberin içinden tam, anlamlı ve kesilmemiş 2-3 adet madde/özet çıkarır. Lead paragrafı birebir tekrarlamaz."""
     import re, html
+    clean_summary = html.unescape(summary or "").strip()
     paras = re.findall(r'<p[^>]*>(.*?)</p>', content or "", flags=re.DOTALL)
     bullets = []
 
@@ -1240,17 +1241,32 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
         'click()', 'n11.com', 'migros', 'idefix', 'trendyol', 'hepsiburada', 'http'
     ]
 
-    # 1. İçerik paragraflarından tam cümleleri al
+    def is_similar_to_summary(sent: str) -> bool:
+        if not clean_summary:
+            return False
+        s_low = sent.lower().strip()
+        sum_low = clean_summary.lower().strip()
+        if s_low in sum_low or sum_low in s_low:
+            return True
+        w1 = set(s_low.split())
+        w2 = set(sum_low.split())
+        if len(w1) > 4 and len(w1 & w2) / len(w1) > 0.70:
+            return True
+        return False
+
+    # 1. Gövde paragraflarından (tercihen lead olmayanlardan) tam cümleleri al
     if paras:
-        for p in paras:
+        candidate_paras = paras[1:] if len(paras) > 1 else paras
+        for p in candidate_paras:
             clean_p = re.sub(r'<[^>]+>', '', p).strip()
             clean_p = html.unescape(clean_p)
             if any(b in clean_p.lower() for b in bad_bullet_words):
                 continue
-            # Noktalama ile biten tam cümlelere böl
             sents = [s for s in smart_sentence_split(clean_p) if len(s) > 35]
             for s in sents:
                 if any(b in s.lower() for b in bad_bullet_words):
+                    continue
+                if is_similar_to_summary(s):
                     continue
                 if (s.endswith(('.', '!', '?')) or s.endswith('."') or s.endswith('".')) and s not in bullets and s.lower() != title.lower():
                     bullets.append(s)
@@ -1259,12 +1275,27 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
             if len(bullets) >= 3:
                 break
 
-    # 2. Eğer içerikten tam cümle çıkmadıysa ve summary tam bir cümle ise onu ekle
-    if not bullets and summary:
-        clean_sum = html.unescape(summary.strip())
-        if not any(b in clean_sum.lower() for b in bad_bullet_words):
-            if clean_sum.endswith(('.', '!', '?')) and len(clean_sum) > 30 and clean_sum.lower() != title.lower():
-                bullets.append(clean_sum)
+    # 2. Eğer gövdeden madde çıkmadıysa ve haber zenginse ilk paragrafı kontrol et
+    if len(bullets) < 2 and len(paras) > 2:
+        for p in paras:
+            clean_p = re.sub(r'<[^>]+>', '', p).strip()
+            clean_p = html.unescape(clean_p)
+            if any(b in clean_p.lower() for b in bad_bullet_words):
+                continue
+            sents = [s for s in smart_sentence_split(clean_p) if len(s) > 35]
+            for s in sents:
+                if any(b in s.lower() for b in bad_bullet_words):
+                    continue
+                if (s.endswith(('.', '!', '?')) or s.endswith('."') or s.endswith('".')) and s not in bullets and s.lower() != title.lower():
+                    bullets.append(s)
+                    if len(bullets) >= 2:
+                        break
+            if len(bullets) >= 2:
+                break
+
+    # Eğer sadece 1 madde kaldıysa ve özeti birebir yineliyorsa özet kutusunu gösterme (temiz editoryal deneyim)
+    if len(bullets) == 1 and is_similar_to_summary(bullets[0]):
+        return []
 
     return bullets[:3]
 
@@ -1274,7 +1305,20 @@ async def article_detail(request: Request, slug: str):
     if not article:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
 
+    article_id = article.get("id")
     category = article.get("category") or "Gündem"
+
+    # Önceki ve Sonraki Haber Navigasyonu (Okuma akışı hiç kopmaz)
+    prev_article, next_article = database.get_adjacent_articles(article_id)
+
+    # Trend / En Çok Okunanlar (Sağ sütun sticky trend listesi için)
+    raw_trending = database.get_trending_articles(limit=6)
+    trending_articles = [a for a in raw_trending if a.get("slug") != slug][:5]
+    if len(trending_articles) < 5:
+        more_recent = [a for a in database.get_articles(limit=10) if a.get("slug") != slug and a.get("slug") not in [x.get("slug") for x in trending_articles]]
+        trending_articles = (trending_articles + more_recent)[:5]
+
+    # Kategori İçi İlgili Haberler
     cat_articles = [a for a in database.get_articles(limit=8, category=category) if a.get("slug") != slug]
     if len(cat_articles) < 4:
         recent = [a for a in database.get_articles(limit=8) if a.get("slug") != slug and a.get("slug") not in [x.get("slug") for x in cat_articles]]
@@ -1329,6 +1373,9 @@ async def article_detail(request: Request, slug: str):
             "highlights": highlights,
             "related_articles": related_articles,
             "other_articles": other_articles,
+            "trending_articles": trending_articles,
+            "next_article": next_article,
+            "prev_article": prev_article,
             "breaking_news": breaking_news,
             "reading_time_min": reading_time_min,
             "ad_settings": get_site_ad_settings(),
