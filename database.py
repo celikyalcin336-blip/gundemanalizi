@@ -248,28 +248,38 @@ def cleanup_corrupted_articles():
     2. 'Favorilerime ekle', borsa canlı bantları, editör imzaları ve telif çöplerini temizler.
     3. 'Gelişmenin Ayrıntıları' altında giriş cümlesinin birebir tekrarlandığı makaleleri düzeltir.
     """
-    # Anlık Kategori Düzeltme (Togg, Otomobil, Spor, Sağlık, Eğitim)
+    # Anlık Kategori Düzeltme (Otomobil, Dünya, Teknoloji, Gündem, Sağlık, Eğitim, Spor)
     try:
         with get_connection() as conn:
+            # 1. Otomobil (Bentley, Torcal, Gunther Werks, Togg, Porsche vb.)
             conn.execute("""
                 UPDATE articles SET category = 'Otomobil' 
                 WHERE category != 'Otomobil' 
-                  AND (LOWER(title) LIKE '%togg%' OR LOWER(title) LIKE '%fiat%' OR LOWER(title) LIKE '%byd%' OR LOWER(title) LIKE '%elektrikli araç%' OR LOWER(title) LIKE '%otomobil%' OR LOWER(title) LIKE '%araba%')
+                  AND (LOWER(title) LIKE '%bentley%' OR LOWER(title) LIKE '%torcal%' OR LOWER(title) LIKE '%gunther%' OR LOWER(title) LIKE '%togg%' OR LOWER(title) LIKE '%fiat%' OR LOWER(title) LIKE '%byd%' OR LOWER(title) LIKE '%elektrikli araç%' OR LOWER(title) LIKE '%otomobil%' OR LOWER(title) LIKE '%araba%' OR LOWER(title) LIKE '%porsche%')
             """)
+            # 2. Dünya (Trump, Zelenskiy, Netanyahu, Gazze vb. - Sağlık veya spordan kurtar)
+            conn.execute("""
+                UPDATE articles SET category = 'Dünya' 
+                WHERE category IN ('Sağlık', 'Spor', 'Eğitim')
+                  AND (LOWER(title) LIKE '%trump%' OR LOWER(title) LIKE '%zelenskiy%' OR LOWER(title) LIKE '%netanyahu%' OR LOWER(title) LIKE '%gazze%' OR LOWER(title) LIKE '%israil%' OR LOWER(title) LIKE '%iran%')
+            """)
+            # 3. Teknoloji (Güneş paneli, perovskit, yapay zeka - Eğitimden kurtar)
+            conn.execute("""
+                UPDATE articles SET category = 'Teknoloji' 
+                WHERE category != 'Teknoloji' 
+                  AND (LOWER(title) LIKE '%güneş paneli%' OR LOWER(title) LIKE '%perovskit%' OR LOWER(title) LIKE '%güneş hücresi%' OR LOWER(title) LIKE '%yapay zeka%' OR LOWER(title) LIKE '%chatgpt%')
+            """)
+            # 4. Gündem (Mersin KOM, polis, kaçakçılık, kasap kedisi - Eğitim veya sağlıktan kurtar)
+            conn.execute("""
+                UPDATE articles SET category = 'Gündem' 
+                WHERE category IN ('Eğitim', 'Sağlık')
+                  AND (LOWER(title) LIKE '%mersin%' OR LOWER(title) LIKE '%kaçakçılık%' OR LOWER(title) LIKE '%kom ekipleri%' OR LOWER(title) LIKE '%kedi%' OR LOWER(title) LIKE '%kasap%')
+            """)
+            # 5. Spor (Sadece gerçek spor kulüpleri ve maçlar)
             conn.execute("""
                 UPDATE articles SET category = 'Spor' 
                 WHERE category != 'Spor' 
-                  AND (LOWER(title) LIKE '%fenerbahçe%' OR LOWER(title) LIKE '%galatasaray%' OR LOWER(title) LIKE '%beşiktaş%' OR LOWER(title) LIKE '%trabzonspor%' OR LOWER(title) LIKE '%süper lig%' OR LOWER(title) LIKE '%uefa%' OR LOWER(title) LIKE '%transfer%' OR LOWER(title) LIKE '%a milli takım%')
-            """)
-            conn.execute("""
-                UPDATE articles SET category = 'Sağlık' 
-                WHERE category != 'Sağlık' 
-                  AND (LOWER(title) LIKE '%kanser%' OR LOWER(title) LIKE '%başhekim%' OR LOWER(title) LIKE '%cerrahi%' OR LOWER(title) LIKE '%ameliyat%' OR LOWER(title) LIKE '%doktor%' OR LOWER(title) LIKE '%mhrs%' OR LOWER(title) LIKE '%hastane%')
-            """)
-            conn.execute("""
-                UPDATE articles SET category = 'Eğitim' 
-                WHERE category != 'Eğitim' 
-                  AND (LOWER(title) LIKE '%öğrenci%' OR LOWER(title) LIKE '%meb%' OR LOWER(title) LIKE '%ösym%' OR LOWER(title) LIKE '%yks%' OR LOWER(title) LIKE '%lgs%' OR LOWER(title) LIKE '%kpss%' OR LOWER(title) LIKE '%müfredat%')
+                  AND (LOWER(title) LIKE '%fenerbahçe%' OR LOWER(title) LIKE '%galatasaray%' OR LOWER(title) LIKE '%beşiktaş%' OR LOWER(title) LIKE '%trabzonspor%' OR LOWER(title) LIKE '%süper lig%' OR LOWER(title) LIKE '%uefa%' OR LOWER(title) LIKE '%a milli takım%')
             """)
     except Exception as e:
         print(f"Kategori hızlı düzeltme hatası: {e}")

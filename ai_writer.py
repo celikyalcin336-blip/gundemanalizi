@@ -183,38 +183,45 @@ def smart_sentence_split(text: str) -> list:
 
 
 def classify_article(title: str, summary: str, force_category: str = None) -> str:
-    """Haber metnini analiz edip en doğru kategoriye yönlendirir. Çapraz kategori kaymalarını engeller."""
+    """Haber metnini regex kelime sınırları (word boundaries) ile analiz edip en doğru kategoriye yönlendirir. Çapraz kategori kaymalarını engeller."""
     lower_all = f"{title} {summary}".lower()
 
-    # 1. SPOR (Futbol, lig, derbi, transfer)
-    if any(k in lower_all for k in ["maç", "futbol", "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor", "süper lig", "şampiyonlar ligi", "uefa", "transfer", "teknik direktör", "derbi", "a milli takım", "basketbol", "voleybol", "formula 1"]):
-        return "Spor"
-
-    # 2. SAĞLIK (Tıp, kanser, hastane, hekim, cerrahi)
-    if any(k in lower_all for k in ["kanser", "başhekim", "cerrahi", "ameliyat", "aşı", "grip", "ilaç", "tedavi", "mhrs", "sağlık bakanlığı", "kalp sağlığı", "enfeksiyon", "salgın", "doktor", "hastane"]):
-        return "Sağlık"
-
-    # 3. OTOMOBİL (Teknoloji veya ekonomideki araç haberlerini kesin olarak otomobile aktar)
-    if any(k in lower_all for k in ["otomobil", "araba", "fiat", "byd", "togg", "t10x", "egea", "clio", "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "renault", "peugeot", "skoda", "bmw", "mercedes", "ötv", "taşıt kredisi", "araç"]):
+    # 1. OTOMOBİL (Öncelikli: Lüks araçlar, yerli oto, marka ve modeller başka kategoriye kayamaz)
+    auto_regex = r'\b(otomobil|araba|araç|araçlar|araçta|araçtan|araca|taşıt|suv|sedan|hatchback|şanzıman|motor hacmi|ötv|taşıt kredisi|sıfır km|ikinci el|togg|t10x|egea|clio|fiat|renault|peugeot|volkswagen|toyota|hyundai|honda|skoda|opel|ford|bmw|mercedes|audi|porsche|bentley|torcal|ferrari|lamborghini|aston martin|maserati|chery|byd|tesla|mg|gunther werks)\b'
+    if re.search(auto_regex, lower_all, re.IGNORECASE):
         return "Otomobil"
 
-    # 4. EĞİTİM (MEB, ÖSYM, Sınavlar, Öğrenci)
-    if any(k in lower_all for k in ["öğrenci", "okul", "meb", "öğretmen", "üniversite", "ösym", "yks", "lgs", "kpss", "burs", "tatil", "sınav", "müfredat"]):
-        return "Eğitim"
-
-    # 5. TEKNOLOJİ & YAPAY ZEKA
-    if any(k in lower_all for k in ["yapay zeka", "yapay zekâ", "chatgpt", "openai", "gemini", "claude", "midjourney", "sora", "deepseek", "nemotron", "ai model", "akıllı telefon", "iphone", "apple", "samsung", "galaxy", "android", "telefon", "nvidia", "işlemci", "yazılım"]):
+    # 2. TEKNOLOJİ & BİLİM (Güneş paneli, yapay zeka, telefon, çip, uzay araştırmaları)
+    tech_regex = r'\b(yapay zeka|yapay zekâ|chatgpt|openai|gemini|claude|deepseek|midjourney|sora|akıllı telefon|iphone|apple|samsung|galaxy|android|nvidia|işlemci|yazılım|güneş paneli|güneş hücresi|perovskit|uzay aracı|nasa|uydu|robotik|siber güvenlik)\b'
+    if re.search(tech_regex, lower_all, re.IGNORECASE):
         return "Teknoloji"
 
-    # 6. DÜNYA (Savaş, diplomasi, uluslararası krizler)
-    if any(k in lower_all for k in ["savaş", "israil", "gazze", "iran", "nato", "ukrayna", "lübnan", "pentagon", "beyaz saray", "zelenskiy", "putin", "kremlin", "dışişleri", "diplomasi", "uluslararası", "avrupa birliği", "ateşkes", "füze", "hava saldırısı"]):
-        return "Dünya"
+    # 3. SPOR (Maç, futbol, derbi - amaç veya yamaç gibi kelimelerle karışamaz)
+    spor_regex = r'\b(maç|maçı|maçlar|karşılaşma|müsabaka|futbol|fenerbahçe|galatasaray|beşiktaş|trabzonspor|süper lig|şampiyonlar ligi|uefa|bonservis|futbolcu|teknik direktör|derbi|a milli takım|basketbol|voleybol|formula 1)\b'
+    if re.search(spor_regex, lower_all, re.IGNORECASE):
+        return "Spor"
 
-    # 7. EKONOMİ (Finans, borsa, piyasa, zam)
-    if any(k in lower_all for k in ["borsa", "faiz", "enflasyon", "dolar", "euro", "bakan şimşek", "merkez bankası", "tcmb", "asgari ücret", "emekli maaşı", "mevduat", "zam", "vergi", "bist 100", "altın"]):
+    # 4. SAĞLIK (Sadece gerçek tıp & sağlık terimleri - yaklaşık veya ulaştı gibi kelimeler karışamaz)
+    health_regex = r'\b(kanser|başhekim|cerrahi|ameliyat|aşı|aşılar|aşılama|grip aşısı|ilaç|ilaçlar|tedavi|mhrs|sağlık bakanlığı|kalp sağlığı|enfeksiyon|salgın|doktor|hekim|hastane|tabip)\b'
+    if re.search(health_regex, lower_all, re.IGNORECASE):
+        return "Sağlık"
+
+    # 5. EKONOMİ (Borsa, faiz, altın, zam - zaman kelimesi karışamaz)
+    eco_regex = r'\b(borsa|faiz|enflasyon|dolar|euro|bakan şimşek|merkez bankası|tcmb|asgari ücret|emekli maaşı|mevduat|mevduat faizi|zam|zammı|zamlar|zam oranı|vergi|bist 100|altın|gram altın)\b'
+    if re.search(eco_regex, lower_all, re.IGNORECASE):
         return "Ekonomi"
 
-    # Eğer gelen beslemenin kategorisi varsa onu kullan
+    # 6. EĞİTİM (MEB, ÖSYM, KPSS, Sınavlar - bilimsel araştırmalar buraya kayamaz)
+    edu_regex = r'\b(meb|ösym|yks|lgs|kpss|öğretmen ataması|müfredat|karneler|bursluluk sınavı|okul|öğrenci|öğretmen|eğitim bakanlığı)\b'
+    if re.search(edu_regex, lower_all, re.IGNORECASE):
+        return "Eğitim"
+
+    # 7. DÜNYA (Savaş, diplomasi, uluslararası krizler, Trump, liderler)
+    world_regex = r'\b(trump|savaş|israil|gazze|iran|nato|ukrayna|lübnan|pentagon|beyaz saray|zelenskiy|putin|kremlin|dışişleri|diplomasi|uluslararası|avrupa birliği|ateşkes|füze|hava saldırısı)\b'
+    if re.search(world_regex, lower_all, re.IGNORECASE):
+        return "Dünya"
+
+    # Eğer gelen beslemenin kategorisi varsa ve yukarıdaki çakışmalara girmemişse onu koru
     if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Eğitim", "Sağlık", "Dünya", "Spor", "Gündem"]:
         return force_category
 

@@ -464,6 +464,7 @@ def get_cached_category_widgets() -> dict:
     try:
         data = {
             "breaking_news": database.get_articles(limit=10),
+            "gundem_articles": database.get_articles(limit=5, category="Gündem"),
             "auto_articles": database.get_articles(limit=5, category="Otomobil"),
             "tech_articles": database.get_articles(limit=5, category="Teknoloji"),
             "economy_articles": database.get_articles(limit=5, category="Ekonomi"),
@@ -522,6 +523,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     else:
         slider_articles = widgets["breaking_news"][:14] if len(widgets["breaking_news"]) >= 14 else database.get_articles(limit=14)
 
+    gundem_articles = widgets.get("gundem_articles") or database.get_articles(limit=5, category="Gündem")
     auto_articles = widgets["auto_articles"]
     tech_articles = widgets["tech_articles"]
     economy_articles = widgets["economy_articles"]
@@ -535,6 +537,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         context={
             "articles": articles,
             "slider_articles": slider_articles,
+            "gundem_articles": gundem_articles,
             "auto_articles": auto_articles,
             "tech_articles": tech_articles,
             "economy_articles": economy_articles,
@@ -1173,6 +1176,7 @@ async def article_detail(request: Request, slug: str):
     if len(slider_articles) < 3:
         slider_articles = widgets["breaking_news"]
 
+    gundem_articles = widgets.get("gundem_articles") or database.get_articles(limit=5, category="Gündem")
     auto_articles = widgets["auto_articles"]
     tech_articles = widgets["tech_articles"]
     economy_articles = widgets["economy_articles"]
