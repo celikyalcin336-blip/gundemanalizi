@@ -545,6 +545,26 @@ async def api_deprem(limit: int = 50):
         "quakes": quakes
     })
 
+@app.get("/api/search")
+async def api_search(q: str = "", limit: int = 8):
+    """Canlı anlık haber arama API'si (Autocompletion & Live Search)."""
+    if not q or len(q.strip()) < 2:
+        return JSONResponse({"ok": True, "count": 0, "results": []})
+    results = database.search_articles(q.strip(), limit=limit, offset=0)
+    simplified = []
+    for a in results:
+        img = a.get("image_path") or ""
+        img_name = img.replace('\\', '/').split('/')[-1] if img else ""
+        simplified.append({
+            "title": a.get("title"),
+            "slug": a.get("slug"),
+            "category": a.get("category") or "Gündem",
+            "image": f"/images/{img_name}" if img_name else "/assets/logo.png",
+            "date": (a.get("created_at") or "")[:10]
+        })
+    return JSONResponse({"ok": True, "count": len(simplified), "results": simplified})
+
+
 # ========================================================
 # 🚀 TURBO HIZ BELLEK ÖNBELLEĞİ (RAM CACHE)
 # Kategori bloklarını RAM'de 45 sn tutarak veritabanı yükünü sıfırlar
@@ -594,15 +614,10 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     norm_kategori = database.normalize_category_name(kategori) if kategori else None
 
     if q and q.strip():
-        q_low = q.strip().lower()
-        all_arts = database.get_articles(limit=150)
-        matched = [
-            a for a in all_arts
-            if q_low in (a.get("title") or "").lower() or q_low in (a.get("summary") or "").lower()
-        ]
-        total_count = len(matched)
-        articles = matched[offset:offset + limit]
-        canonical_url = f"{config.SITE_URL}/"
+        search_kw = q.strip()
+        articles = database.search_articles(search_kw, limit=limit, offset=offset)
+        total_count = database.get_search_count(search_kw)
+        canonical_url = f"{config.SITE_URL}/?q={urllib.parse.quote(search_kw)}"
     else:
         articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
         total_count = database.get_articles_total_count(category=norm_kategori)

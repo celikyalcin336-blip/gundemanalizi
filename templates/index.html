@@ -154,8 +154,22 @@
                 <a href="/?kategori=Dünya" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Dünya' else '' }}">Dünya</a>
             </nav>
 
-            <!-- Sağ Taraf: Erişilebilirlik Butonu -->
+            <!-- Sağ Taraf: Arama & Erişilebilirlik Butonları -->
             <div class="flex items-center gap-2 shrink-0">
+                <!-- Masaüstü Hızlı Arama Formu -->
+                <form action="/" method="GET" class="relative hidden xl:flex items-center">
+                    <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Haber veya konu ara..." 
+                           class="bg-slate-900/90 border border-slate-700/80 hover:border-slate-600 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 w-44 transition shadow-inner">
+                    <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
+                </form>
+
+                <!-- Hızlı Arama Butonu (Tüm Cihazlar & Mobil) -->
+                <button type="button" onclick="openSearchModal()" class="inline-flex items-center gap-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-white border border-red-500/40 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Gelişmiş Arama (Ctrl+K)" aria-label="Haber Ara">
+                    <span>🔍</span>
+                    <span class="hidden sm:inline">Ara</span>
+                </button>
+
+                <!-- Erişilebilirlik Butonu -->
                 <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü, Görme Engelli ve Kolay Okuma Seçenekleri">
                     <span class="text-sm">♿</span>
                     <span class="hidden sm:inline">Erişilebilirlik</span>
@@ -1336,7 +1350,74 @@
         </div>
     </div>
 
-        <!-- 🔮 1. 99 LVL ASTROLOJİ & BURÇLAR MERKEZİ (HÜRRİYET & CNN TÜRK STANDARDI) -->
+            <!-- 🔍 99 LVL CANLI HABER ARAMA MASASI MODALI -->
+    <div id="search-modal" 
+         onclick="if(event.target === this) window.closeModal('search-modal')"
+         style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: flex-start; justify-content: center; padding: 2rem 1rem;">
+        <div style="background: #0b1120; border: 2px solid #ef4444;" class="rounded-3xl w-full max-w-2xl p-5 sm:p-6 shadow-2xl relative text-white space-y-4 max-h-[85vh] overflow-y-auto mt-8 sm:mt-16">
+            
+            <!-- Üst Kapatma Butonu -->
+            <button onclick="window.closeModal('search-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 transition" aria-label="Kapat">
+                ✕
+            </button>
+
+            <!-- Modal Başlığı -->
+            <div class="flex items-center gap-2.5 pb-2 border-b border-red-500/30 pr-10">
+                <span class="text-2xl p-2 rounded-xl bg-red-600/20 text-red-400">🔍</span>
+                <div>
+                    <h3 class="text-lg font-black text-white">Gündem Analizi Haber Arama</h3>
+                    <p class="text-xs text-red-400 font-medium">Başlık, içerik, kategori veya etiketlerde anında ara</p>
+                </div>
+            </div>
+
+            <!-- Arama Formu & Büyük Input -->
+            <form action="/" method="GET" onsubmit="return handleSearchSubmit(event)" class="relative">
+                <input type="text" id="live-search-input" name="q" autocomplete="off"
+                       oninput="window.handleLiveSearch(this.value)"
+                       placeholder="Haber başlığı, kelime veya kişi yazın (örn: Togg, altın, asgari ücret)..." 
+                       class="w-full bg-slate-900 border-2 border-red-500/50 rounded-2xl pl-12 pr-12 py-3.5 text-sm font-semibold text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition shadow-inner">
+                <span class="absolute left-4 top-3.5 text-lg text-red-400">🔍</span>
+                <button type="button" onclick="clearLiveSearch()" id="live-search-clear-btn" style="display: none;" class="absolute right-4 top-3 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 text-xs">
+                    ✕
+                </button>
+            </form>
+
+            <!-- Hızlı Trend Arama Etiketleri -->
+            <div class="space-y-1.5">
+                <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                    <span>🔥 Popüler Aramalar:</span>
+                </span>
+                <div class="flex flex-wrap gap-1.5 text-xs font-semibold">
+                    <button type="button" onclick="quickSearchTag('Togg')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-red-600/30 hover:text-red-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Togg</button>
+                    <button type="button" onclick="quickSearchTag('Altın')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-amber-600/30 hover:text-amber-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Altın</button>
+                    <button type="button" onclick="quickSearchTag('Asgari Ücret')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-emerald-600/30 hover:text-emerald-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#AsgariÜcret</button>
+                    <button type="button" onclick="quickSearchTag('Faiz')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-cyan-600/30 hover:text-cyan-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Faiz</button>
+                    <button type="button" onclick="quickSearchTag('Yapay Zeka')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-purple-600/30 hover:text-purple-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#YapayZeka</button>
+                    <button type="button" onclick="quickSearchTag('MEB')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-indigo-600/30 hover:text-indigo-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#MEB</button>
+                    <button type="button" onclick="quickSearchTag('Deprem')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-rose-600/30 hover:text-rose-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Deprem</button>
+                    <button type="button" onclick="quickSearchTag('Süper Lig')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-yellow-600/30 hover:text-yellow-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#SüperLig</button>
+                </div>
+            </div>
+
+            <!-- Canlı Sonuç Kutusu -->
+            <div id="live-search-results" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                <div class="p-6 text-center text-slate-400 text-xs">
+                    Aramak istediğiniz konuyu yukarıya yazın veya popüler etiketlere tıklayın.
+                </div>
+            </div>
+
+            <!-- Alt Bilgi & Tüm Sonuçları Göster Butonu -->
+            <div id="live-search-footer" style="display: none;" class="pt-2 border-t border-slate-800 flex items-center justify-between">
+                <span id="live-search-count-text" class="text-xs text-slate-400 font-medium"></span>
+                <button type="button" onclick="submitFullSearch()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-white text-xs transition shadow-md flex items-center gap-1 cursor-pointer">
+                    <span>Tüm Sonuçları Gör (Enter)</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔮 1. 99 LVL ASTROLOJİ & BURÇLAR MERKEZİ (HÜRRİYET & CNN TÜRK STANDARDI) -->
     <div id="astro-modal" 
          onclick="if(event.target === this) window.closeModal('astro-modal')"
          style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1rem;">
@@ -2134,7 +2215,7 @@
         // ESC Tuşuyla Tüm Modalları Kapat
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                ['namaz-modal', 'nobetci-modal', 'deprem-modal', 'ihbar-modal', 'astro-modal', 'a11y-modal-backdrop'].forEach(function(id) {
+                ['search-modal', 'namaz-modal', 'nobetci-modal', 'deprem-modal', 'ihbar-modal', 'astro-modal', 'a11y-modal-backdrop'].forEach(function(id) {
                     closeModal(id);
                 });
             }
@@ -3375,6 +3456,128 @@
         // =====================================================================
         // 8. SAYFA YÜKLENDİĞİNDE TÜM SİSTEMLERİ BAŞLAT
         // =====================================================================
+        // =====================================================================
+        // 🔍 CANLI HABER ARAMA MOTORU (LIVE SEARCH ENGINE)
+        // =====================================================================
+        var searchDebounceTimer = null;
+
+        function openSearchModal() {
+            openModal('search-modal');
+            setTimeout(function() {
+                var inp = document.getElementById('live-search-input');
+                if (inp) inp.focus();
+            }, 100);
+        }
+        window.openSearchModal = openSearchModal;
+
+        function closeSearchModal() {
+            closeModal('search-modal');
+        }
+        window.closeSearchModal = closeSearchModal;
+
+        function clearLiveSearch() {
+            var inp = document.getElementById('live-search-input');
+            if (inp) {
+                inp.value = '';
+                inp.focus();
+                handleLiveSearch('');
+            }
+        }
+        window.clearLiveSearch = clearLiveSearch;
+
+        function quickSearchTag(tag) {
+            var inp = document.getElementById('live-search-input');
+            if (inp) {
+                inp.value = tag;
+                handleLiveSearch(tag);
+            }
+        }
+        window.quickSearchTag = quickSearchTag;
+
+        function handleLiveSearch(query) {
+            clearTimeout(searchDebounceTimer);
+            var q = (query || '').trim();
+            var clearBtn = document.getElementById('live-search-clear-btn');
+            var resultsEl = document.getElementById('live-search-results');
+            var footerEl = document.getElementById('live-search-footer');
+            var countEl = document.getElementById('live-search-count-text');
+
+            if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+
+            if (!q || q.length < 2) {
+                if (resultsEl) {
+                    resultsEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Aramak istediğiniz konuyu yukarıya yazın veya popüler etiketlere tıklayın.</div>';
+                }
+                if (footerEl) footerEl.style.display = 'none';
+                return;
+            }
+
+            if (resultsEl) {
+                resultsEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs flex items-center justify-center gap-2"><span class="animate-spin text-lg">⏳</span> Aranıyor: "' + q + '"...</div>';
+            }
+
+            searchDebounceTimer = setTimeout(function() {
+                fetch('/api/search?q=' + encodeURIComponent(q) + '&limit=6')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!resultsEl) return;
+                        if (!data || !data.results || data.results.length === 0) {
+                            resultsEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">"' + q + '" ile eşleşen haber bulunamadı.<br><span class="text-slate-500 text-[11px] mt-1 block">Farklı bir arama terimi deneyebilirsiniz.</span></div>';
+                            if (footerEl) footerEl.style.display = 'none';
+                            return;
+                        }
+
+                        resultsEl.innerHTML = data.results.map(function(item) {
+                            return '<a href="/haber/' + item.slug + '" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-red-500/50 transition flex items-center gap-3 group block">' +
+                                '<img src="' + item.image + '" alt="' + item.title + '" class="w-14 h-12 rounded-xl object-cover shrink-0 border border-slate-700 group-hover:scale-105 transition">' +
+                                '<div class="flex-1 min-w-0">' +
+                                    '<div class="flex items-center gap-2 mb-0.5">' +
+                                        '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/30">' + item.category + '</span>' +
+                                        '<span class="text-[10px] text-slate-500">' + item.date + '</span>' +
+                                    '</div>' +
+                                    '<h4 class="text-xs font-bold text-white group-hover:text-red-400 transition truncate">' + item.title + '</h4>' +
+                                '</div>' +
+                            '</a>';
+                        }).join('');
+
+                        if (footerEl && countEl) {
+                            footerEl.style.display = 'flex';
+                            countEl.innerText = '"' + q + '" ile ilgili sonuçlar';
+                        }
+                    })
+                    .catch(function(err) {
+                        if (resultsEl) resultsEl.innerHTML = '<div class="p-4 text-center text-rose-400 text-xs">Arama sırasında bir hata oluştu.</div>';
+                    });
+            }, 250);
+        }
+        window.handleLiveSearch = handleLiveSearch;
+
+        function handleSearchSubmit(e) {
+            var inp = document.getElementById('live-search-input');
+            if (!inp || !inp.value.trim()) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        window.handleSearchSubmit = handleSearchSubmit;
+
+        function submitFullSearch() {
+            var inp = document.getElementById('live-search-input');
+            if (inp && inp.value.trim()) {
+                window.location.href = '/?q=' + encodeURIComponent(inp.value.trim());
+            }
+        }
+        window.submitFullSearch = submitFullSearch;
+
+        // Klavye Kısayolu: Ctrl + K veya Cmd + K
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                openSearchModal();
+            }
+        });
+
         function initApp() {
             if (window.lucide) window.lucide.createIcons();
             switchStandings('genel');

@@ -609,6 +609,38 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
             return [_row_to_dict(row) for row in cur.fetchall()]
 
 
+def search_articles(query: str, limit: int = 24, offset: int = 0) -> List[Dict]:
+    """Tüm makaleler içinde başlık, özet ve içerikte gerçek SQL araması yapar."""
+    if not query or not query.strip():
+        return get_articles(limit=limit, offset=offset)
+
+    kw = f"%{query.strip().lower()}%"
+    with get_connection() as conn:
+        like_op = "ILIKE" if USE_PG else "LIKE"
+        sql = f"""
+            SELECT * FROM articles 
+            WHERE (title {like_op} ? OR summary {like_op} ? OR content {like_op} ?)
+            ORDER BY id DESC LIMIT ? OFFSET ?
+        """
+        cur = conn.execute(sql, (kw, kw, kw, limit, offset))
+        return [_row_to_dict(row) for row in cur.fetchall()]
+
+
+def get_search_count(query: str) -> int:
+    """Arama sorgusuna uyan toplam makale adedini döner."""
+    if not query or not query.strip():
+        return get_articles_total_count()
+    kw = f"%{query.strip().lower()}%"
+    with get_connection() as conn:
+        like_op = "ILIKE" if USE_PG else "LIKE"
+        sql = f"SELECT COUNT(*) as c FROM articles WHERE (title {like_op} ? OR summary {like_op} ? OR content {like_op} ?)"
+        row = conn.execute(sql, (kw, kw, kw)).fetchone()
+        if not row:
+            return 0
+        if isinstance(row, dict):
+            return row.get("c", 0)
+        return row[0] if len(row) > 0 else 0
+
 def get_articles_total_count(category: str = None) -> int:
     """Toplam yayınlanmış haber sayısını döner."""
     try:

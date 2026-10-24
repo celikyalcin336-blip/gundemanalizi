@@ -241,8 +241,14 @@
                 <a href="/?kategori=Spor" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Spor</a>
             </nav>
 
-            <!-- Sağ Taraf: Ana Sayfa & Erişilebilirlik Butonları -->
+            <!-- Sağ Taraf: Arama, Ana Sayfa & Erişilebilirlik Butonları -->
             <div class="flex items-center gap-2 shrink-0">
+                <!-- Arama Formu -->
+                <form action="/" method="GET" class="relative hidden sm:flex items-center">
+                    <input type="text" name="q" placeholder="Haber ara..." 
+                           class="bg-slate-900/90 border border-slate-700/80 hover:border-slate-600 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 w-36 md:w-48 transition shadow-inner">
+                    <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
+                </form>
                 <a href="/" class="text-xs font-bold text-slate-300 hover:text-white px-3 py-1.5 rounded-xl border border-brand-border bg-slate-900/60 hover:bg-slate-800 transition">
                     ← Ana Sayfa
                 </a>
