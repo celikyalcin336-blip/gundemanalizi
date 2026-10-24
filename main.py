@@ -129,8 +129,8 @@ def run_bot(max_items: int = 1):
 
     print(f"📡 Paylaşılmaya hazır {len(news_items)} yeni haber tespit edildi.")
 
-    # 4 Yüksek Gelirli Kategori Döngüsü (Otomobil -> Teknoloji -> Ekonomi -> Sağlık)
-    ROTATION = ["Otomobil", "Teknoloji", "Ekonomi", "Sağlık"]
+    # 8 Ana Kategori Döngüsü (Gündem -> Ekonomi -> Teknoloji -> Dünya -> Otomobil -> Spor -> Sağlık -> Eğitim)
+    ROTATION = ["Gündem", "Ekonomi", "Teknoloji", "Dünya", "Otomobil", "Spor", "Sağlık", "Eğitim"]
     last_cat = database.get_setting("last_bot_category", "")
     try:
         next_idx = (ROTATION.index(last_cat) + 1) % len(ROTATION) if last_cat in ROTATION else 0
@@ -149,7 +149,10 @@ def run_bot(max_items: int = 1):
         selected_pool = news_items
 
     processed_count = 0
-    for item in selected_pool[:max_items]:
+    # Sıradaki haber hata verirse döngüyü kesme, havuzdaki diğer taze haberleri dene!
+    for item in selected_pool:
+        if processed_count >= max_items:
+            break
         try:
             success = process_single_news(item)
             if success:
@@ -158,6 +161,7 @@ def run_bot(max_items: int = 1):
                 database.set_setting("last_bot_category", cat_saved)
                 time.sleep(2)
         except Exception as e:
-            print(f"❌ Haber işlenirken hata oluştu: {e}")
+            print(f"❌ Haber ({item.get('title', '')[:30]}...) işlenirken hata oluştu: {e}, sıradaki deneniyor...")
+            continue
 
     return processed_count

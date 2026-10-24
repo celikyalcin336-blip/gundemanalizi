@@ -1397,7 +1397,6 @@ Disallow: /yonetim*
 Disallow: /api/panel/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml
-Sitemap: {base_url}/video-sitemap.xml
 """
     return PlainTextResponse(content=content)
 
@@ -1476,7 +1475,7 @@ async def news_sitemap(request: Request):
 
 @app.get("/video-sitemap.xml")
 async def video_sitemap(request: Request):
-    """Google Video Search i\u00e7in \u00f6zel XML Video Site Haritas\u0131."""
+    """Google Video Search için özel XML Video Site Haritası (Sadece gerçek videosu olan makaleler)."""
     from xml.sax.saxutils import escape
     articles = database.get_articles(limit=100)
     host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
@@ -1485,6 +1484,10 @@ async def video_sitemap(request: Request):
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
     for a in articles:
+        content_lower = (a.get("content") or "").lower()
+        # Sadece sayfasında gerçekten video veya mp4 barındıran haberleri video haritasına ekle (Google hatasını önler)
+        if "<video" not in content_lower and ".mp4" not in content_lower and "iframe" not in content_lower:
+            continue
         raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
         if len(raw_dt) == 16:
             raw_dt += ":00+03:00"
