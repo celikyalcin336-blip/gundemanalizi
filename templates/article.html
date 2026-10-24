@@ -6,6 +6,7 @@
     <title>{{ article.title }} | Gündem Analizi</title>
     <meta name="description" content="{{ article.summary }}">
     <link rel="canonical" href="{{ canonical_url or ('https://xn--gndemanalizi-dlb.com.tr/haber/' ~ article.slug) }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
