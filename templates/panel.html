@@ -297,10 +297,29 @@
             </div>
 
             <!-- CANLI SON ZİYARETÇİLER AKIŞ TABLOSU -->
-            <div class="space-y-2 pt-2">
-                <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
-                    <span>🕒 Canlı Son Ziyaretçiler Akışı (Siteye Giren Son Kişiler)</span>
-                    <span class="text-[10px] text-slate-400">Anlık otomatik güncellenir</span>
+            <div class="space-y-3 pt-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold text-slate-200">🕒 Canlı Son Ziyaretçiler Akışı</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 text-[10px] font-bold border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Anlık Canlı
+                        </span>
+                        <span class="inline-flex px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] border border-slate-700/60" title="Sizin bu tarayıcıdan sitede gezinmeniz sayaca ve tablolara dahil edilmez">
+                            🛡️ Kendi Tıklamalarınız Gizli
+                        </span>
+                    </div>
+                    <!-- Ziyaretçi Filtresi: Gerçek İnsanlar / Tümü / Botlar -->
+                    <div class="inline-flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-brand-border text-[11px] font-bold shadow-inner">
+                        <button type="button" onclick="setVisitorFilter('human')" id="vbtn-human" class="px-3 py-1 rounded-lg bg-brand-primary text-white shadow transition flex items-center gap-1.5">
+                            <span>👤 Gerçek İnsanlar</span>
+                        </button>
+                        <button type="button" onclick="setVisitorFilter('all')" id="vbtn-all" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                            <span>👥 Tümü</span>
+                        </button>
+                        <button type="button" onclick="setVisitorFilter('bot')" id="vbtn-bot" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                            <span>🤖 Arama Botları</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-brand-border bg-slate-950/80">
                     <table class="w-full text-left text-xs text-slate-300">
@@ -1250,6 +1269,106 @@
             }
         }
 
+                // Admin tarayıcısını sitenin ön yüzünde tanıyıp sayaca eklememek için cookie yaz
+        document.cookie = "ga_admin=1; path=/; max-age=31536000; SameSite=Lax";
+
+        let currentVisitorFilter = 'human'; // 'human' | 'all' | 'bot'
+        let cachedLiveVisitors = {{ stats.live_visitors | tojson if stats.live_visitors else '[]' }};
+        // İlk açılışta hemen insan filtresini uygula
+        setTimeout(() => renderLiveVisitorsTable(cachedLiveVisitors), 100);
+
+        function setVisitorFilter(filter) {
+            currentVisitorFilter = filter;
+            ['human', 'all', 'bot'].forEach(f => {
+                const btn = document.getElementById('vbtn-' + f);
+                if (btn) {
+                    if (f === filter) {
+                        btn.className = 'px-3 py-1 rounded-lg bg-brand-primary text-white shadow transition flex items-center gap-1.5';
+                    } else {
+                        btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white transition flex items-center gap-1.5';
+                    }
+                }
+            });
+            renderLiveVisitorsTable(cachedLiveVisitors);
+        }
+
+        function renderLiveVisitorsTable(visitors) {
+            const tbody = document.getElementById('live-visitors-tbody');
+            if (!tbody) return;
+            if (!visitors || visitors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 italic font-sans">Henüz loglanan canlı ziyaretçi yok. Kullanıcılar siteye girdikçe burada saniyelik akacaktır.</td></tr>';
+                return;
+            }
+
+            const filtered = visitors.filter(lv => {
+                const dev = lv.device || '';
+                const isBot = dev.includes('🤖') || (lv.referrer && lv.referrer.includes('🤖'));
+                if (currentVisitorFilter === 'human') return !isBot;
+                if (currentVisitorFilter === 'bot') return isBot;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                const emptyMsg = currentVisitorFilter === 'human'
+                    ? 'Şu anda sadece arama botları loglanmış, gerçek insan ziyareti geldikçe burada görünecek.'
+                    : 'Bu filtre kategorisinde henüz kayıt bulunmuyor.';
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 italic font-sans">${emptyMsg}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(lv => {
+                const timeStr = lv.created_at ? lv.created_at.substring(11, 19) : '-';
+                const ref = lv.referrer || 'Doğrudan';
+                const isBot = (lv.device || '').includes('🤖') || ref.includes('🤖');
+
+                let refClass = 'bg-slate-800 text-slate-300';
+                if (isBot) refClass = 'bg-purple-950/80 text-purple-300 border border-purple-500/40';
+                else if (ref.includes('Telegram')) refClass = 'bg-sky-950 text-sky-300 border border-sky-500/40';
+                else if (ref.includes('WhatsApp')) refClass = 'bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+                else if (ref.includes('Instagram')) refClass = 'bg-pink-950 text-pink-300 border border-pink-500/40';
+                else if (ref.includes('Google')) refClass = 'bg-blue-950 text-blue-300 border border-blue-500/40';
+
+                let userBadge = '';
+                if (isBot) {
+                    userBadge = '<span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 text-[10px] font-bold border border-indigo-500/40">🤖 Arama Motoru</span>';
+                } else if (lv.is_first_visit) {
+                    userBadge = '<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>';
+                } else {
+                    userBadge = '<span class="text-slate-400 text-[10px]">🔄 Tekrar Gelen</span>';
+                }
+
+                let deviceHtml = lv.device || 'Mobil';
+                if (isBot) {
+                    deviceHtml = `<span class="px-2 py-0.5 rounded bg-purple-950/70 text-purple-300 text-[10px] font-bold border border-purple-500/30">${deviceHtml}</span>`;
+                }
+
+                const c = (lv.country || 'TR').toUpperCase().trim();
+                const countryMap = {
+                    'TR': '🇹🇷 Türkiye',
+                    'US': '🇺🇸 ABD',
+                    'DE': '🇩🇪 Almanya',
+                    'NL': '🇳🇱 Hollanda',
+                    'BE': '🇧🇪 Belçika',
+                    'FI': '🇫🇮 Finlandiya',
+                    'GB': '🇬🇧 İngiltere',
+                    'UK': '🇬🇧 İngiltere',
+                    'AZ': '🇦🇿 Azerbaycan',
+                    'FR': '🇫🇷 Fransa',
+                    'RU': '🇷🇺 Rusya'
+                };
+                const countryBadge = (countryMap[c] || ('🌐 ' + c)) + (lv.city ? ' (' + lv.city + ')' : '');
+
+                return `<tr class="hover:bg-slate-900/50 transition">
+                    <td class="p-2.5 text-slate-400 whitespace-nowrap">${timeStr}</td>
+                    <td class="p-2.5 font-sans font-bold text-white truncate max-w-[200px]" title="${lv.page}">${lv.page}</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${refClass}">${ref}</span></td>
+                    <td class="p-2.5 whitespace-nowrap font-sans">${deviceHtml}</td>
+                    <td class="p-2.5 whitespace-nowrap">${countryBadge}</td>
+                    <td class="p-2.5 whitespace-nowrap">${userBadge}</td>
+                </tr>`;
+            }).join('');
+        }
+
         // CANLI ZİYARETÇİ 5 SANİYELİK OTOMATİK GÜNCELLEME (POLLING)
         async function fetchLiveAnalytics() {
             const pin = localStorage.getItem('ga_admin_pin');
@@ -1269,45 +1388,9 @@
                     if (elRet) elRet.innerText = d.returning_today;
 
                     // Canlı Ziyaretçi Tablosunu da Gerçek Zamanlı Güncelle
-                    if (d.live_visitors && d.live_visitors.length > 0) {
-                        const tbody = document.getElementById('live-visitors-tbody');
-                        if (tbody) {
-                            tbody.innerHTML = d.live_visitors.map(lv => {
-                                const timeStr = lv.created_at ? lv.created_at.substring(11, 19) : '-';
-                                let refClass = 'bg-slate-800 text-slate-300';
-                                const ref = lv.referrer || 'Doğrudan';
-                                if (ref.includes('Telegram')) refClass = 'bg-sky-950 text-sky-300 border border-sky-500/40';
-                                else if (ref.includes('WhatsApp')) refClass = 'bg-emerald-950 text-emerald-300 border border-emerald-500/40';
-                                else if (ref.includes('Instagram')) refClass = 'bg-pink-950 text-pink-300 border border-pink-500/40';
-                                else if (ref.includes('Google')) refClass = 'bg-blue-950 text-blue-300 border border-blue-500/40';
-                                const firstBadge = lv.is_first_visit 
-                                    ? '<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 text-[10px] font-bold border border-amber-500/30">🌟 İlk Defa Girdi!</span>'
-                                    : '<span class="text-slate-400 text-[10px]">🔄 Tekrar Gelen</span>';
-                                const c = (lv.country || 'TR').toUpperCase().trim();
-                                const countryMap = {
-                                    'TR': '🇹🇷 Türkiye',
-                                    'US': '🇺🇸 ABD',
-                                    'DE': '🇩🇪 Almanya',
-                                    'NL': '🇳🇱 Hollanda',
-                                    'BE': '🇧🇪 Belçika',
-                                    'FI': '🇫🇮 Finlandiya',
-                                    'GB': '🇬🇧 İngiltere',
-                                    'UK': '🇬🇧 İngiltere',
-                                    'AZ': '🇦🇿 Azerbaycan',
-                                    'FR': '🇫🇷 Fransa',
-                                    'RU': '🇷🇺 Rusya'
-                                };
-                                const countryBadge = (countryMap[c] || ('🌐 ' + c)) + (lv.city ? ' (' + lv.city + ')' : '');
-                                return `<tr class="hover:bg-slate-900/50 transition">
-                                    <td class="p-2.5 text-slate-400 whitespace-nowrap">${timeStr}</td>
-                                    <td class="p-2.5 font-sans font-bold text-white truncate max-w-[200px]" title="${lv.page}">${lv.page}</td>
-                                    <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${refClass}">${ref}</span></td>
-                                    <td class="p-2.5 whitespace-nowrap font-sans">${lv.device || 'Mobil'}</td>
-                                    <td class="p-2.5 whitespace-nowrap">${countryBadge}</td>
-                                    <td class="p-2.5 whitespace-nowrap">${firstBadge}</td>
-                                </tr>`;
-                            }).join('');
-                        }
+                    if (d.live_visitors) {
+                        cachedLiveVisitors = d.live_visitors;
+                        renderLiveVisitorsTable(cachedLiveVisitors);
                     }
                 }
             } catch (e) {}

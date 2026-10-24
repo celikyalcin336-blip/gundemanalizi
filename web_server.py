@@ -79,6 +79,10 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
+    # 0. Yönetici (Admin) kendi tarayıcısından gezerken ziyaretçi listesine ASLA ekleme
+    if request.cookies.get("ga_admin") == "1":
+        return await call_next(request)
+
     # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
     is_api_or_admin = (
         path.startswith("/api/") or
@@ -98,11 +102,31 @@ async def track_visitors_middleware(request: Request, call_next):
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
             ip = ip.split(",")[0].strip()
             ua = request.headers.get("user-agent", "")
+            ua_low = ua.lower()
+
+            # 🤖 Arama motoru örümcekleri ve botları tespit et
+            bot_type = None
+            if "googlebot" in ua_low or "google-read-aloud" in ua_low:
+                bot_type = "Googlebot"
+            elif "bingbot" in ua_low or "msnbot" in ua_low:
+                bot_type = "Bingbot"
+            elif "yandexbot" in ua_low or "yandex" in ua_low:
+                bot_type = "YandexBot"
+            elif "telegrambot" in ua_low:
+                bot_type = "TelegramBot"
+            elif "facebookexternalhit" in ua_low or "meta-externalagent" in ua_low:
+                bot_type = "MetaBot"
+            elif "twitterbot" in ua_low:
+                bot_type = "TwitterBot"
+            elif any(b in ua_low for b in ("bot", "spider", "crawl", "slurp", "headless", "ahrefs", "semrush", "python-requests")):
+                bot_type = "Arama Botu"
+
             import hashlib
             vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
 
-            ua_low = ua.lower()
-            if any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
+            if bot_type:
+                device = f"🤖 {bot_type}"
+            elif any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
                 device = "Mobil"
             elif "ipad" in ua_low or "tablet" in ua_low:
                 device = "Tablet"
@@ -110,7 +134,9 @@ async def track_visitors_middleware(request: Request, call_next):
                 device = "Masaüstü"
 
             ref = request.headers.get("referer", "").lower()
-            if "google." in ref:
+            if bot_type:
+                source = f"🤖 {bot_type}"
+            elif "google." in ref:
                 source = "Google"
             elif "t.me" in ref or "telegram" in ref:
                 source = "Telegram"
@@ -135,6 +161,7 @@ async def track_visitors_middleware(request: Request, call_next):
         except Exception:
             pass
     return await call_next(request)
+
 
 # Statik Dosya Dizinleri
 app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
@@ -364,7 +391,8 @@ async def api_market_rates():
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
-    database.record_visit("home_visits")
+    if request.cookies.get("ga_admin") != "1":
+        database.record_visit("home_visits")
     import math
     import urllib.parse
     page = max(1, sayfa)
