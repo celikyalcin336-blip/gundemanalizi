@@ -183,46 +183,100 @@ def smart_sentence_split(text: str) -> list:
     return clean_sents
 
 
-def classify_article(title: str, summary: str, force_category: str = None) -> str:
-    """Haber metnini regex kelime sınırları (word boundaries) ile analiz edip en doğru kategoriye yönlendirir. Çapraz kategori kaymalarını engeller."""
+import re
+
+def classify_article(title: str, summary: str = "", force_category: str = None) -> str:
+    """
+    Haber metnini çok katmanlı ve öncelik sıralı regex motoru ile analiz edip
+    kesin ve en doğru kategoriye yönlendirir. Çapraz kategori kaymalarını 
+    (ör. suç haberinin spora, sağlık haberinin ekonomiye düşmesini) tamamen engeller.
+    """
     lower_all = f"{title} {summary}".lower()
 
-    # 1. OTOMOBİL (Öncelikli: Lüks araçlar, yerli oto, marka ve modeller başka kategoriye kayamaz)
-    auto_regex = r'\b(otomobil|araba|araç|araçlar|araçta|araçtan|araca|taşıt|suv|sedan|hatchback|şanzıman|motor hacmi|ötv|taşıt kredisi|sıfır km|ikinci el|togg|t10x|egea|clio|fiat|renault|peugeot|volkswagen|toyota|hyundai|honda|skoda|opel|ford|bmw|mercedes|audi|porsche|bentley|torcal|ferrari|lamborghini|aston martin|maserati|chery|byd|tesla|mg|gunther werks)\b'
-    if re.search(auto_regex, lower_all, re.IGNORECASE):
-        return "Otomobil"
+    # 1. ASAYİŞ, POLİS, YARGI & SUÇ KORUMASI (Öncelik: KESİNLİKLE GÜNDEM)
+    # Suç, çete, operasyon veya tutuklama haberleri ASLA Spor, Ekonomi veya Eğitim olamaz!
+    crime_regex = r'\b(suç örgütü|çete|çetesi|tutuklama|tutuklandı|tutuklanan|gözaltı|gözaltına|adliye|adliyeye|başsavcılık|savcılık|emniyet|kaçakçılık|narkotik|cinayet|cinayeti|dolandırıcılık|dolandırıcı|cezaevi|cezaevine|operasyon|operasyonu|operasyonunda|operasyonları|asayiş|polis ekipleri|polis|jandarma|hırsızlık|hırsız|yağma|suç duyurusu|hapis cezası|mahkeme|mahkemesi|dava açıldı|şüpheli|şüpheliler|zanlı|zanlılar|silahlı saldırı|örgüt lideri|kuriş|fetö|pkk|deaş)\b'
+    if re.search(crime_regex, lower_all, re.IGNORECASE):
+        return "Gündem"
 
-    # 2. TEKNOLOJİ & BİLİM (Güneş paneli, yapay zeka, telefon, çip, uzay araştırmaları)
-    tech_regex = r'\b(yapay zeka|yapay zekâ|chatgpt|openai|gemini|claude|deepseek|midjourney|sora|akıllı telefon|iphone|apple|samsung|galaxy|android|nvidia|işlemci|yazılım|güneş paneli|güneş hücresi|perovskit|uzay aracı|nasa|uydu|robotik|siber güvenlik)\b'
-    if re.search(tech_regex, lower_all, re.IGNORECASE):
-        return "Teknoloji"
+    # 2. DEPREM & DOĞAL AFET KORUMASI (Öncelik: KESİNLİKLE GÜNDEM)
+    disaster_regex = r'\b(kandilli|afad|deprem|depremi|sarsıntı|artçı sarsıntı|fay hattı|tsunami|heyelan|sel felaketi|yangın söndürme)\b'
+    if re.search(disaster_regex, lower_all, re.IGNORECASE):
+        return "Gündem"
 
-    # 3. SPOR (Maç, futbol, derbi - amaç veya yamaç gibi kelimelerle karışamaz)
-    spor_regex = r'\b(maç|maçı|maçlar|karşılaşma|müsabaka|futbol|fenerbahçe|galatasaray|beşiktaş|trabzonspor|süper lig|şampiyonlar ligi|uefa|bonservis|futbolcu|teknik direktör|derbi|a milli takım|basketbol|voleybol|formula 1)\b'
-    if re.search(spor_regex, lower_all, re.IGNORECASE):
-        return "Spor"
-
-    # 4. SAĞLIK (Sadece gerçek tıp & sağlık terimleri - yaklaşık veya ulaştı gibi kelimeler karışamaz)
-    health_regex = r'\b(kanser|başhekim|cerrahi|ameliyat|aşı|aşılar|aşılama|grip aşısı|ilaç|ilaçlar|tedavi|mhrs|sağlık bakanlığı|kalp sağlığı|enfeksiyon|salgın|doktor|hekim|hastane|tabip)\b'
+    # 3. SAĞLIK, TIP & YAŞAM (Organlar, tıp terimleri, yorgunluk, diyet, hastalıklar)
+    # Sağlık haberleri ASLA Ekonomi veya Teknoloji olamaz!
+    health_regex = (
+        r'\b(karaciğer|karaciğer yağlanması|böbrek|böbrekler|kalp|kalp krizi|kalp sağlığı|damar|beyin kanaması|felç|inme|'
+        r'tansiyon|yüksek tansiyon|kolesterol|diyabet|şeker hastalığı|obezite|kanser|kanser tedavisi|tümör|organ nakli|'
+        r'göz sağlığı|diş sağlığı|cilt sağlığı|omurga|eklem|romatizma|bağırsak|mide|akciğer|solunum|astım|alerji|'
+        r'alzheimer|demans|epilepsi|bağışıklık|bağışıklık sistemi|enfeksiyon|salgın|virüs|bakteri|grip|grip aşısı|nezle|'
+        r'koronavirüs|covid|yorgun uyan|yorgun uyanıyorsanız|kronik yorgunluk|uyku apnesi|uyku düzeni|beslenme|diyet|'
+        r'diyetisyen|vitamin|vitaminler|mineral|metabolizma|kalori|protein|detoks|sağlıklı yaşam|zayıflama|kilo verme|'
+        r'kilo alma|yağ yakımı|doktor|doktorlar|hekim|uzman hekim|başhekim|tabip|tabipler odası|hastane|hastaneler|'
+        r'klinik|poliklinik|sağlık bakanlığı|sağlık bakanı|mhrs|ameliyat|cerrahi|tedavi|ilaç|ilaçlar|reçete|aşı|aşılar|aşılama)\b'
+    )
     if re.search(health_regex, lower_all, re.IGNORECASE):
         return "Sağlık"
 
-    # 5. EKONOMİ (Borsa, faiz, altın, zam - zaman kelimesi karışamaz)
-    eco_regex = r'\b(borsa|faiz|enflasyon|dolar|euro|bakan şimşek|merkez bankası|tcmb|asgari ücret|emekli maaşı|mevduat|mevduat faizi|zam|zammı|zamlar|zam oranı|vergi|bist 100|altın|gram altın)\b'
-    if re.search(eco_regex, lower_all, re.IGNORECASE):
-        return "Ekonomi"
+    # 4. OTOMOBİL & TAŞIT DÜNYASI (Markalar, modeller, motor, araç testleri)
+    auto_regex = (
+        r'\b(otomobil|araba|araç|araçlar|araçta|araçtan|araca|taşıt|suv|sedan|hatchback|şanzıman|motor hacmi|'
+        r'ötv|ötv indirimi|taşıt kredisi|sıfır km|ikinci el|elektrikli araç|hibrit araç|otomotiv|otopark|yakıt tüketimi|beygir gücü|'
+        r'togg|t10x|egea|clio|fiat|renault|peugeot|volkswagen|toyota|hyundai|honda|skoda|opel|ford|bmw|mercedes|audi|'
+        r'porsche|bentley|torcal|ferrari|lamborghini|aston martin|maserati|chery|byd|tesla|mg|gunther werks|citroen|'
+        r'dacia|nissan|kia|seat|cupra|volvo|suzuki|jeep|alfa romeo|land rover|range rover)\b'
+    )
+    if re.search(auto_regex, lower_all, re.IGNORECASE):
+        return "Otomobil"
 
-    # 6. EĞİTİM (MEB, ÖSYM, KPSS, Sınavlar - bilimsel araştırmalar buraya kayamaz)
-    edu_regex = r'\b(meb|ösym|yks|lgs|kpss|öğretmen ataması|müfredat|karneler|bursluluk sınavı|okul|öğrenci|öğretmen|eğitim bakanlığı)\b'
+    # 5. SPOR (Futbol, ligler, maçlar, kulüpler, derbiler)
+    spor_regex = (
+        r'\b(maç|maçı|maçlar|karşılaşma|müsabaka|futbol|basketbol|voleybol|fenerbahçe|galatasaray|beşiktaş|'
+        r'trabzonspor|başakşehir|süper lig|şampiyonlar ligi|uefa|avrupa ligi|konferans ligi|a milli takım|milli takım|'
+        r'bonservis|futbolcu|teknik direktör|derbi|formula 1|motogp|nba|euroleague|wimbledon|grand slam|olimpiyat|'
+        r'sarı kart|kırmızı kart|penaltı|ofsayt|gol krallığı|transfer teklifi)\b'
+    )
+    if re.search(spor_regex, lower_all, re.IGNORECASE):
+        return "Spor"
+
+    # 6. EĞİTİM, MEB & SINAVLAR
+    edu_regex = (
+        r'\b(meb|milli eğitim bakanlığı|ösym|yks|lgs|kpss|öğretmen ataması|müfredat|karneler|bursluluk sınavı|'
+        r'ara tatil|yarıyıl tatili|okul tatili|üniversite taban puanları|öğretmenlik|okul|okullar|öğrenci|öğrenciler|'
+        r'öğretmen|öğretmenler|ders yılı|sınav sonuçları)\b'
+    )
     if re.search(edu_regex, lower_all, re.IGNORECASE):
         return "Eğitim"
 
-    # 7. DÜNYA (Savaş, diplomasi, uluslararası krizler, Trump, liderler)
-    world_regex = r'\b(trump|savaş|israil|gazze|iran|nato|ukrayna|lübnan|pentagon|beyaz saray|zelenskiy|putin|kremlin|dışişleri|diplomasi|uluslararası|avrupa birliği|ateşkes|füze|hava saldırısı)\b'
+    # 7. EKONOMİ & FİNANS (Piyasalar, faiz, borsa, altın, döviz, zamlar)
+    eco_regex = (
+        r'\b(borsa|bist|bist 100|faiz|faiz kararı|faiz oranı|enflasyon|tüfe|üfe|dolar|euro|döviz|bakan şimşek|'
+        r'mehmet şimşek|merkez bankası|tcmb|asgari ücret|emekli maaşı|emekli zammı|memur zammı|mevduat|mevduat faizi|'
+        r'zam|zammı|zamlar|zam oranı|vergi|vergi dilimi|kdv|altın|gram altın|çeyrek altın|ons altın|kredi kartı aidatı|'
+        r'konut kredisi faizi|ihracat|ithalat|cari açık|para politikası)\b'
+    )
+    if re.search(eco_regex, lower_all, re.IGNORECASE):
+        return "Ekonomi"
+
+    # 8. TEKNOLOJİ & YAPAY ZEKA (Yazılım, donanım, çipler, uzay, inovasyon)
+    tech_regex = (
+        r'\b(yapay zeka|yapay zekâ|chatgpt|openai|gemini|claude|deepseek|midjourney|sora|akıllı telefon|'
+        r'iphone|apple|samsung|galaxy|android|nvidia|işlemci|yazılım|güneş paneli|güneş hücresi|perovskit|'
+        r'uzay aracı|nasa|spacex|uydu|robotik|siber güvenlik|çip krizi|mikroçip|ekran kartı|bilgisayar|tablet)\b'
+    )
+    if re.search(tech_regex, lower_all, re.IGNORECASE):
+        return "Teknoloji"
+
+    # 9. DÜNYA & ULUSLARARASI DİPLOMASİ
+    world_regex = (
+        r'\b(trump|savaş|israil|gazze|iran|nato|ukrayna|lübnan|pentagon|beyaz saray|zelenskiy|putin|kremlin|'
+        r'dışişleri|diplomasi|uluslararası|avrupa birliği|ateşkes|füze|hava saldırısı|biden|pekin|tahran|tel aviv)\b'
+    )
     if re.search(world_regex, lower_all, re.IGNORECASE):
         return "Dünya"
 
-    # Eğer gelen beslemenin kategorisi varsa ve yukarıdaki çakışmalara girmemişse onu koru
+    # 10. FALLBACK (Eğer metin yukarıdaki özel kurallara girmediyse besleme kategorisini doğrula)
     if force_category and force_category in ["Otomobil", "Teknoloji", "Ekonomi", "Eğitim", "Sağlık", "Dünya", "Spor", "Gündem"]:
         return force_category
 

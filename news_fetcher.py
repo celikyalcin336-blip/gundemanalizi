@@ -385,6 +385,10 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
                         score += 10
 
                     feed_cat = feed_info.get("category", "Gündem")
+                    # Haberin gerçek kategorisini içerik analiz motoru ile doğrula
+                    import ai_writer
+                    real_cat = ai_writer.classify_article(title, summary, feed_cat)
+
                     unposted_news.append({
                         "hash": news_hash,
                         "title": title,
@@ -392,7 +396,7 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
                         "link": link,
                         "image_url": image_url,
                         "source": feed_name,
-                        "category": feed_cat,
+                        "category": real_cat,
                         "published": published,
                         "score": score
                     })
