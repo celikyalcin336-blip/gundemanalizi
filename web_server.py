@@ -48,30 +48,39 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - Web sunucusunu (Uvicorn) ASLA kilitlememesi için bağımsız bir alt süreç (subprocess) olarak çalışır.
-    - Python GIL kilidini web sunucusundan tamamen ayırır, site hızı bot çalışırken bile 0.3 saniyede kalır.
+    - Web sunucusunu kilitlememesi için bağımsız subprocess olarak çalışır; sorun çıkarsa doğrudan çağrıya döner.
+    - İlk açılışta hemen 1 taze haber çeker, ardından periyodik olarak devam eder.
     """
-    time.sleep(15)
-    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi (İzole Alt Süreç Modu)...")
-    interval_sec = max(600, config.CHECK_INTERVAL_MINUTES * 60)  # En az 10-15 dakika
+    time.sleep(10)
+    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi...")
+    main_script = os.path.join(BASE_DIR, "main.py")
+    interval_sec = max(600, config.CHECK_INTERVAL_MINUTES * 60)
 
     while True:
         cycle_start = time.time()
         try:
-            print(f"🔄 [Otonom Bot] İzole haber taraması başlatılıyor (Her {interval_sec // 60} dakikada bir)...")
-            main_script = os.path.join(BASE_DIR, "main.py")
-            # Web sunucusundan tamamen bağımsız ayrı bir Python süreci başlat
-            res = subprocess.run([sys.executable, main_script], capture_output=True, text=True, timeout=120)
+            print(f"🔄 [Otonom Bot] Haber taraması başlatılıyor (Hedef: {interval_sec // 60} dakikada bir)...")
+            res = subprocess.run(
+                [sys.executable, main_script, "--max-items", "1"],
+                capture_output=True,
+                text=True,
+                timeout=180
+            )
             if res.stdout:
-                for line in res.stdout.strip().splitlines()[-5:]:
+                for line in res.stdout.strip().splitlines()[-4:]:
                     print(f"   [Bot]: {line}")
-            if res.stderr and "error" in res.stderr.lower():
-                print(f"   [Bot Uyarı]: {res.stderr[:100]}")
+            if res.returncode != 0:
+                print(f"⚠️ [Otonom Bot] Subprocess çıkış kodu {res.returncode}, doğrudan mod deneniyor...")
+                main.run_bot(max_items=1)
         except Exception as e:
-            print(f"⚠️ [Otonom Bot] Döngü hatası: {e}")
+            print(f"⚠️ [Otonom Bot] Hata: {e}, doğrudan çağrılıyor...")
+            try:
+                main.run_bot(max_items=1)
+            except Exception as inner_e:
+                print(f"❌ [Otonom Bot] Kritik hata: {inner_e}")
 
         elapsed = time.time() - cycle_start
-        sleep_dur = max(60, interval_sec - elapsed)
+        sleep_dur = max(30, interval_sec - elapsed)
         time.sleep(sleep_dur)
 
 @asynccontextmanager

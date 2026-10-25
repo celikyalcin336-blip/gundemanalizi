@@ -170,3 +170,10 @@ def run_bot(max_items: int = 1):
             continue
 
     return processed_count
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Gündem Analizi Otonom Haber Botu")
+    parser.add_argument("--max-items", type=int, default=1, help="Paylaşılacak maksimum haber sayısı")
+    args = parser.parse_args()
+    count = run_bot(max_items=args.max_items)
+    print(f"🏁 Bot çalışması tamamlandı. İşlenen haber: {count}")
