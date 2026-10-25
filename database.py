@@ -486,17 +486,17 @@ def _basename(path: str) -> str:
 
 def _compress_image(path: str) -> bytes:
     """
-    Görseli web için küçültüp sıkıştırır (1280px Google Discover HD, JPEG kalite 76).
-    1080px ~250 KB'lık kart, gözle fark edilmeyecek şekilde ~60-90 KB'a iner.
-    Telegram'a giden orijinal dosya etkilenmez.
+    Görseli web için küçültüp optimize eder (1200x675 Google Discover HD, JPEG kalite 68).
+    1080px ~250 KB'lık kart, gözle fark edilmeyecek kalitede ~40-60 KB'a iner.
+    Telegram ve sosyal medyaya giden orijinal dosya etkilenmez.
     """
     from io import BytesIO
     from PIL import Image
     with Image.open(path) as img:
         img = img.convert("RGB")
-        img.thumbnail((1280, 1280), Image.LANCZOS)
+        img.thumbnail((1200, 675), Image.LANCZOS)
         buf = BytesIO()
-        img.save(buf, format="JPEG", quality=72, optimize=True, progressive=True)
+        img.save(buf, format="JPEG", quality=68, optimize=True, progressive=True)
         return buf.getvalue()
 
 

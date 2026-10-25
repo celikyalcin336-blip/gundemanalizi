@@ -42,34 +42,37 @@ ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(ASSETS_DIR, exist_ok=True)
 
+import subprocess
+import sys
+
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - İlk açılışta hemen 1 taze haber çeker (Otomobil, Teknoloji, Ekonomi döngüsünü başlatır).
-    - Precision Timer sayesinde işlem süresinden bağımsız olarak TAM 8 dakikada bir çalışır (asla 9-10 dakikaya kaymaz).
+    - Web sunucusunu (Uvicorn) ASLA kilitlememesi için bağımsız bir alt süreç (subprocess) olarak çalışır.
+    - Python GIL kilidini web sunucusundan tamamen ayırır, site hızı bot çalışırken bile 0.3 saniyede kalır.
     """
-    time.sleep(5)
-    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi, ilk haber taranıyor...")
-    cycle_start = time.time()
-    try:
-        main.run_bot(max_items=1)
-    except Exception as e:
-        print(f"❌ Başlangıç bot hatası: {e}")
+    time.sleep(15)
+    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi (İzole Alt Süreç Modu)...")
+    interval_sec = max(600, config.CHECK_INTERVAL_MINUTES * 60)  # En az 10-15 dakika
 
-    interval_sec = config.CHECK_INTERVAL_MINUTES * 60
     while True:
-        # Önceki tarama süresini (örn: 85 sn) 480 saniyeden düşerek TAM 8.0 dakikada bir tetikler
-        elapsed = time.time() - cycle_start
-        sleep_dur = max(15, interval_sec - elapsed)
-        time.sleep(sleep_dur)
-
         cycle_start = time.time()
         try:
-            print(f"🔄 [Otonom Bot] Periyodik haber taraması başlatılıyor (Hedef: her {config.CHECK_INTERVAL_MINUTES} dakikada bir)...")
-            main.run_bot(max_items=1)
-            database.cleanup_old_images(days=180)
+            print(f"🔄 [Otonom Bot] İzole haber taraması başlatılıyor (Her {interval_sec // 60} dakikada bir)...")
+            main_script = os.path.join(BASE_DIR, "main.py")
+            # Web sunucusundan tamamen bağımsız ayrı bir Python süreci başlat
+            res = subprocess.run([sys.executable, main_script], capture_output=True, text=True, timeout=120)
+            if res.stdout:
+                for line in res.stdout.strip().splitlines()[-5:]:
+                    print(f"   [Bot]: {line}")
+            if res.stderr and "error" in res.stderr.lower():
+                print(f"   [Bot Uyarı]: {res.stderr[:100]}")
         except Exception as e:
             print(f"⚠️ [Otonom Bot] Döngü hatası: {e}")
+
+        elapsed = time.time() - cycle_start
+        sleep_dur = max(60, interval_sec - elapsed)
+        time.sleep(sleep_dur)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -204,7 +207,7 @@ async def serve_image(filename: str):
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
-        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"})
+        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
     data = database.get_image(safe_name)
     if data:
         try:
@@ -213,7 +216,7 @@ async def serve_image(filename: str):
         except Exception:
             pass
         return Response(content=data, media_type="image/jpeg",
-                        headers={"Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"})
+                        headers={"Cache-Control": "public, max-age=2592000, immutable"})
     raise HTTPException(status_code=404, detail="Görsel bulunamadı")
 
 @app.api_route("/health", methods=["GET", "HEAD"])

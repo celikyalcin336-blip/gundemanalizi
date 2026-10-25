@@ -46,20 +46,8 @@ def extract_image_url(entry) -> Optional[str]:
     if img_match:
         return img_match.group(1)
 
-    # 6. Haberin orijinal sayfasından og:image / twitter:image kazıma (Hızlı 2.5 sn)
-    link = entry.get("link", "")
-    if link and link.startswith("http"):
-        try:
-            import requests
-            from bs4 import BeautifulSoup
-            r = requests.get(link, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}, timeout=2.5)
-            if r.status_code == 200:
-                soup = BeautifulSoup(r.content, "html.parser")
-                og = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
-                if og and og.get("content"):
-                    return og.get("content").strip()
-        except Exception:
-            pass
+    # Harici site kazıma kaldırıldı (Performans koruması)
+    pass
 
     return None
 
