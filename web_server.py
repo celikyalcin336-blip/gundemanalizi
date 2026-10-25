@@ -29,6 +29,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, FileResponse, Response, PlainTextResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.gzip import GZipMiddleware
 import database
 import config
 import main
@@ -85,6 +86,7 @@ ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
 PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
 
 app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 @app.exception_handler(404)
 @app.exception_handler(StarletteHTTPException)
@@ -183,7 +185,11 @@ async def track_visitors_middleware(request: Request, call_next):
 
             country = request.headers.get("cf-ipcountry", "TR")
             city = request.headers.get("cf-ipcity", "")
-            database.log_visitor(vis_hash, path, source, device, country, city)
+            threading.Thread(
+                target=database.log_visitor,
+                args=(vis_hash, path, source, device, country, city),
+                daemon=True
+            ).start()
         except Exception:
             pass
     return await call_next(request)
@@ -194,15 +200,20 @@ app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str):
-    """Haber görselini önce diskte, yoksa kalıcı veritabanında arar."""
+    """Haber görselini önce diskte, yoksa kalıcı veritabanında arar ve yerel diske önbelleğe kaydeder."""
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
         return FileResponse(local_path, headers={"Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"})
     data = database.get_image(safe_name)
     if data:
+        try:
+            with open(local_path, "wb") as f:
+                f.write(data)
+        except Exception:
+            pass
         return Response(content=data, media_type="image/jpeg",
-                        headers={"Cache-Control": "public, max-age=604800"})
+                        headers={"Cache-Control": "public, max-age=604800, stale-while-revalidate=86400"})
     raise HTTPException(status_code=404, detail="Görsel bulunamadı")
 
 @app.api_route("/health", methods=["GET", "HEAD"])
@@ -583,7 +594,7 @@ _CATEGORY_WIDGETS_CACHE_TIME = 0
 def get_cached_category_widgets() -> dict:
     global _CATEGORY_WIDGETS_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
     now = time.time()
-    if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 45:
+    if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 180:
         return _CATEGORY_WIDGETS_CACHE
 
     try:
@@ -611,7 +622,7 @@ def get_cached_category_widgets() -> dict:
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
     if request.cookies.get("ga_admin") != "1":
-        database.record_visit("home_visits")
+        threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
     import math
     import urllib.parse
     page = max(1, sayfa)
@@ -1338,9 +1349,7 @@ async def article_detail(request: Request, slug: str):
     other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
     widgets = get_cached_category_widgets()
     breaking_news = widgets["breaking_news"]
-    slider_articles = database.get_articles(limit=14, category=category)
-    if len(slider_articles) < 3:
-        slider_articles = widgets["breaking_news"]
+    slider_articles = cat_articles[:14] if len(cat_articles) >= 3 else widgets["breaking_news"]
 
     gundem_articles = widgets.get("gundem_articles") or database.get_articles(limit=5, category="Gündem")
     auto_articles = widgets["auto_articles"]

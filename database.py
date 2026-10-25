@@ -51,7 +51,7 @@ if USE_PG:
         global _PG_POOL
         if _PG_POOL is None:
             try:
-                _PG_POOL = psycopg2.pool.ThreadedConnectionPool(minconn=1, maxconn=15, dsn=DATABASE_URL)
+                _PG_POOL = psycopg2.pool.ThreadedConnectionPool(minconn=2, maxconn=30, dsn=DATABASE_URL)
             except Exception as e:
                 print(f"PostgreSQL Pool başlatma hatası: {e}")
         return _PG_POOL

@@ -229,6 +229,13 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
 
     lower_title = clean_title.lower()
     lower_summary = clean_summary.lower()
+    full_text = f"{lower_title} {lower_summary}"
+
+    # 0. VEFAT, CENAZE, TAZİYE, YAS & ÖLÜM KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
+    # Ünlü birinin babasının/yakınının cenazesi, vefatı ekonomi veya otomobil beslemesinden gelse bile ASLA o kategoriye gidemez!
+    death_regex = r'\b(vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|taziye\w*|başsağlığı\w*|yas tutuyor\w*)\b'
+    if re.search(death_regex, lower_title, re.IGNORECASE):
+        return "Gündem"
 
     # 1. KAZA, ÇARPIŞMA, ÖLÜM & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
     # Otomobil/TIR kelimesi geçse bile kaza/ölüm varsa ASLA Otomobil yapılamaz!
