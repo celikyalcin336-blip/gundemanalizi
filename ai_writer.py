@@ -214,64 +214,74 @@ import re
 
 def classify_article(title: str, summary: str = "", force_category: str = None) -> str:
     """
-    Haber metnini 'Başlık Ağırlıklı' (Title-Weighted) ve çok katmanlı puanlama
-    motoru ile analiz eder. RSS beslemelerinden gelen menü/navigasyon çöplerinin
-    (ör. 'Teknoloji Otomobil Mobil 5G Kategoriler') başlığı yanıltmasını kesin olarak engeller.
+    Haber metnini 'Başlık Ağırlıklı' (Title-Weighted) ve Türkçe çekim eklerine tam uyumlu
+    kapsamlı sınıflandırma motoru ile analiz eder.
+    Hatalı kategori eşleşmelerini (Örn: Ölümlü trafik kazalarının Otomobil'e gitmesi,
+    KKTC bakan istifasının Sağlık'a gitmesi, Dünya/Spor haberlerinin Gündem'e sıkışması)
+    kesin kurallarla engeller.
     """
     clean_title = (title or "").strip()
     clean_summary = (summary or "").strip()
 
     # RSS Menü ve Ekmek Kırıntısı (Breadcrumbs) Çöplerini Temizle
-    nav_junk = r'(?:ARA English Version|Haberler Yapay Zeka Otomobil Mobil|Kategoriler Nasıl Yapılır\?|Paylaş tweetle paylaştır)'
+    nav_junk = r'(?:ARA English Version|Haberler Yapay Zeka Otomobil Mobil|Kategoriler Nasıl Yapılır\?|Paylaş tweetle paylaştır|Donanım Yazılım Android)'
     clean_summary = re.sub(nav_junk, '', clean_summary, flags=re.IGNORECASE)
 
     lower_title = clean_title.lower()
     lower_summary = clean_summary.lower()
 
-    # 1. ASAYİŞ, POLİS, YARGI & SUÇ KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
-    crime_regex = r'\b(suç örgütü|çete|çetesi|tutuklama|tutuklandı|tutuklanan|gözaltı|gözaltına|adliye|adliyeye|başsavcılık|savcılık|emniyet|kaçakçılık|narkotik|cinayet|cinayeti|dolandırıcılık|dolandırıcı|cezaevi|cezaevine|operasyon|operasyonu|operasyonunda|operasyonları|asayiş|polis ekipleri|polis|jandarma|hırsızlık|hırsız|yağma|suç duyurusu|hapis cezası|mahkeme|mahkemesi|dava açıldı|şüpheli|şüpheliler|zanlı|zanlılar|silahlı saldırı|örgüt lideri|kuriş|fetö|pkk|deaş)\b'
-    if re.search(crime_regex, lower_title, re.IGNORECASE) or re.search(crime_regex, lower_summary, re.IGNORECASE):
+    # 1. KAZA, ÇARPIŞMA, ÖLÜM & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
+    # Otomobil/TIR kelimesi geçse bile kaza/ölüm varsa ASLA Otomobil yapılamaz!
+    accident_regex = r'\b(kaza\w*|feci kaza\w*|zincirleme kaza\w*|can pazarı|çarpıştı\w*|şarampole\w*|devrildi\w*|can verdi\w*|hayatını kaybetti\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*)\b'
+    if re.search(accident_regex, lower_title, re.IGNORECASE):
         return "Gündem"
 
-    # 2. DEPREM & DOĞAL AFET KORUMASI (Öncelik: KESİNLİKLE GÜNDEM)
-    disaster_regex = r'\b(kandilli|afad|deprem|depremi|sarsıntı|artçı sarsıntı|fay hattı|tsunami|heyelan|sel felaketi|yangın söndürme)\b'
+    # 2. ASAYİŞ, POLİS, YARGI & SUÇ KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
+    crime_regex = r'\b(suç örgütü\w*|çete\w*|tutukla\w*|gözaltı\w*|adliye\w*|başsavcılık\w*|savcılık\w*|emniyet\w*|kaçakçılık\w*|narkotik\w*|cinayet\w*|dolandırıcılık\w*|dolandırıcı\w*|cezaevi\w*|operasyon\w*|asayiş\w*|polis ekipleri\w*|polis\w*|jandarma\w*|hırsızlık\w*|hırsız\w*|yağma\w*|suç duyurusu\w*|hapis cezası\w*|mahkeme\w*|dava açıldı\w*|şüpheli\w*|zanlı\w*|silahlı saldırı\w*|örgüt lideri\w*|kuriş\w*|fetö\w*|pkk\w*|deaş\w*|yakalama kararı\w*)\b'
+    if re.search(crime_regex, lower_title, re.IGNORECASE):
+        return "Gündem"
+
+    # 3. DOĞAL AFET / DEPREM / YANGIN (KESİNLİKLE GÜNDEM)
+    disaster_regex = r'\b(kandilli\w*|afad\w*|deprem\w*|sarsıntı\w*|artçı sarsıntı\w*|fay hattı\w*|tsunami\w*|heyelan\w*|yangın söndürme\w*)\b'
     if re.search(disaster_regex, lower_title, re.IGNORECASE):
         return "Gündem"
 
-    # KATEGORİ TANIMLARI
+    # 4. BAKAN İSTİFASI / DIŞ SİYASET / KKTC KORUMASI (KKTC Sağlık Bakanı istifa etti -> KESİNLİKLE DÜNYA)
+    if "kktc" in lower_title or "kıbrıs" in lower_title:
+        return "Dünya"
+    if any(country in lower_title for country in ["fransa", "bulgaristan", "almanya", "abd", "çin", "rusya", "ukrayna", "israil", "gazze", "iran", "lübnan", "yunanistan", "ingiltere", "hürmüz"]):
+        if any(w in lower_title for w in ["seçim", "sandık", "istifa", "fırtına", "elektrik", "boğazı", "işçi çıkar", "savaş", "füze", "hava saldırısı", "ateşkes", "cumhurbaşkanı", "başbakan"]):
+            return "Dünya"
+
+    # KATEGORİ TANIMLARI (Türkçe çekim eklerini \w* ile destekleyen zengin kök yapısı)
     regex_map = {
-        "Teknoloji": r'\b(yapay zeka|yapay zekâ|chatgpt|openai|gemini|claude|deepseek|midjourney|sora|kimi|akıllı telefon|iphone|apple|samsung|galaxy|android|nvidia|işlemci|yazılım|güneş paneli|güneş hücresi|perovskit|uzay aracı|nasa|spacex|uydu|robotik|siber güvenlik|çip krizi|mikroçip|ekran kartı|bilgisayar|tablet|moonshot ai)\b',
-        "Sağlık": r'\b(karaciğer|karaciğer yağlanması|böbrek|böbrekler|kalp|kalp krizi|kalp sağlığı|damar|beyin kanaması|felç|inme|tansiyon|yüksek tansiyon|kolesterol|diyabet|şeker hastalığı|obezite|kanser|kanser tedavisi|tümör|organ nakli|göz sağlığı|diş sağlığı|cilt sağlığı|omurga|eklem|romatizma|bağırsak|mide|akciğer|solunum|astım|alerji|alzheimer|demans|epilepsi|bağışıklık|bağışıklık sistemi|enfeksiyon|salgın|virüs|bakteri|grip|grip aşısı|nezle|koronavirüs|covid|yorgun uyan|yorgun uyanıyorsanız|kronik yorgunluk|uyku apnesi|uyku düzeni|beslenme|diyet|diyetisyen|vitamin|vitaminler|mineral|metabolizma|kalori|protein|detoks|sağlıklı yaşam|zayıflama|kilo verme|kilo alma|yağ yakımı|doktor|doktorlar|hekim|uzman hekim|başhekim|tabip|tabipler odası|hastane|hastaneler|klinik|poliklinik|sağlık bakanlığı|sağlık bakanı|mhrs|ameliyat|cerrahi|tedavi|ilaç|ilaçlar|reçete|aşı|aşılar|aşılama)\b',
-        "Otomobil": r'\b(otomobil|araba|araç|araçlar|araçta|araçtan|araca|taşıt|suv|sedan|hatchback|şanzıman|motor hacmi|ötv|ötv indirimi|taşıt kredisi|sıfır km|ikinci el|elektrikli araç|hibrit araç|otomotiv|otopark|yakıt tüketimi|beygir gücü|togg|t10x|egea|clio|fiat|renault|peugeot|volkswagen|toyota|hyundai|honda|skoda|opel|ford|bmw|mercedes|audi|porsche|bentley|torcal|ferrari|lamborghini|aston martin|maserati|chery|byd|tesla|mg|gunther werks|citroen|dacia|nissan|kia|seat|cupra|volvo|suzuki|jeep|alfa romeo|land rover|range rover)\b',
-        "Spor": r'\b(maç|maçı|maçlar|karşılaşma|müsabaka|futbol|basketbol|voleybol|fenerbahçe|galatasaray|beşiktaş|trabzonspor|başakşehir|süper lig|şampiyonlar ligi|uefa|avrupa ligi|konferans ligi|a milli takım|milli takım|bonservis|futbolcu|teknik direktör|derbi|formula 1|motogp|nba|euroleague|wimbledon|grand slam|olimpiyat|sarı kart|kırmızı kart|penaltı|ofsayt|gol krallığı|transfer teklifi)\b',
-        "Eğitim": r'\b(meb|milli eğitim bakanlığı|ösym|yks|lgs|kpss|öğretmen ataması|müfredat|karneler|bursluluk sınavı|ara tatil|yarıyıl tatili|okul tatili|üniversite taban puanları|öğretmenlik|okul|okullar|öğrenci|öğrenciler|öğretmen|öğretmenler|ders yılı|sınav sonuçları)\b',
-        "Ekonomi": r'\b(borsa|bist|bist 100|faiz|faiz kararı|faiz oranı|enflasyon|tüfe|üfe|dolar|euro|döviz|bakan şimşek|mehmet şimşek|merkez bankası|tcmb|asgari ücret|emekli maaşı|emekli zammı|memur zammı|mevduat|mevduat faizi|zam|zammı|zamlar|zam oranı|vergi|vergi dilimi|kdv|altın|gram altın|çeyrek altın|ons altın|kredi kartı aidatı|konut kredisi faizi|ihracat|ithalat|cari açık|para politikası)\b',
-        "Dünya": r'\b(trump|savaş|israil|gazze|iran|nato|ukrayna|lübnan|pentagon|beyaz saray|zelenskiy|putin|kremlin|dışişleri|diplomasi|uluslararası|avrupa birliği|ateşkes|füze|hava saldırısı|biden|pekin|tahran|tel aviv)\b',
+        "Spor": r'\b(fenerbahçe\w*|galatasaray\w*|beşiktaş\w*|trabzonspor\w*|başakşehir\w*|pendikspor\w*|kayserispor\w*|konyaspor\w*|antalyaspor\w*|sivasspor\w*|kasımpaşa\w*|alanyaspor\w*|rizespor\w*|göztepe\w*|bodrum fk|eyüpspor\w*|süper lig\w*|şampiyonlar ligi\w*|uefa\w*|avrupa ligi\w*|konferans ligi\w*|el clasico\w*|derbi\w*|futbol\w*|basketbol\w*|voleybol\w*|tenis\w*|formula 1|f1|motogp|nba|euroleague\w*|wimbledon\w*|olimpiyat\w*|milli takım\w*|a milli|arda güler\w*|kenan yıldız\w*|hakan çalhanoğlu\w*|osimhen\w*|icardi\w*|dzeko\w*|tadic\w*|muslera\w*|fred\w*|mourinho\w*|okan buruk\w*|courtois\w*|skriniar\w*|bonservis\w*|transfer\w*|karşılaşma\w*|maç\w*|galibiyet\w*|mağlubiyet\w*|beraberlik\w*|puan durumu\w*|nesibe aydın\w*)\b',
+        "Otomobil": r'\b(otomobil\w*|araba\w*|araç lansmanı\w*|yeni model\w*|fiyat listesi\w*|başlangıç fiyatı\w*|ötv indirimi\w*|taşıt kredisi\w*|sıfır araç\w*|sıfır km|ikinci el oto\w*|elektrikli araç\w*|elektrikli otomobil\w*|hibrit\w*|şarj istasyonu\w*|menzil\w*|batarya kapasitesi\w*|beygir gücü\w*|şanzıman\w*|suv\w*|sedan\w*|hatchback\w*|togg\w*|t10x|t10f|fiat\w*|egea\w*|doblo\w*|renault\w*|clio\w*|megane\w*|chery\w*|tiggo\w*|omoda\w*|jaecoo\w*|byd\w*|tesla\w*|model y|model 3|volkswagen\w*|golf\w*|passat\w*|toyota\w*|corolla\w*|hyundai\w*|i20\w*|tucson\w*|honda\w*|civic\w*|skoda\w*|octavia\w*|ford\w*|focus\w*|bmw\w*|mercedes\w*|audi\w*|porsche\w*|volvo\w*|nissan\w*|qashqai\w*|peugeot\w*|citroen\w*|dacia\w*|sandero\w*|kia\w*|sportage\w*|cupra\w*|mg\w*|suzuki\w*)\b',
+        "Eğitim": r'\b(meb\w*|milli eğitim\w*|yusuf tekin\w*|ösym\w*|yks\w*|tyt\w*|ayt\w*|lgs\w*|kpss\w*|dgs\w*|ales\w*|tus\w*|sınav\w*|soru kitapçığı\w*|cevap anahtarı\w*|taban puan\w*|tercih sonuç\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil\w*|yarıyıl tatili\w*|kar tatili\w*|karne\w*|müfredat\w*|öğretmen atama\w*)\b',
+        "Teknoloji": r'\b(yapay zeka\w*|yapay zekâ\w*|ai|chatgpt\w*|openai\w*|gemini\w*|claude\w*|deepseek\w*|midjourney\w*|sora\w*|kimi k3|robot\w*|robotik\w*|akıllı telefon\w*|cep telefonu\w*|iphone\w*|apple\w*|samsung\w*|galaxy\w*|xiaomi\w*|redmi\w*|huawei\w*|honor\w*|android\w*|ios\w*|işlemci\w*|snapdragon\w*|intel\w*|amd\w*|ryzen\w*|nvidia\w*|rtx\w*|ekran kartı\w*|çip\w*|mikroçip\w*|yarı iletken\w*|bilgisayar\w*|laptop\w*|dizüstü\w*|tablet\w*|ipad\w*|akıllı saat\w*|kulaklık\w*|airpods\w*|playstation\w*|play station\w*|ps5\w*|ps4\w*|xbox\w*|nintendo\w*|steam\w*|konsol\w*|video oyunu\w*|pc oyunu\w*|oyun dünyası\w*|jailbreak\w*|yazılım\w*|siber güvenlik\w*|hacker\w*|whatsapp\w*|instagram\w*|meta\w*|tiktok\w*|youtube\w*|twitter\w*|telegram\w*|discord\w*|uzay aracı\w*|nasa\w*|spacex\w*|uydu\w*|astronot\w*|teleskop\w*|4k|blu-ray\w*|akıllı televizyon\w*|akıllı tv\w*|güneş paneli\w*|perovskit\w*)\b',
+        "Sağlık": r'\b(hastalık\w*|virüs\w*|bakteri\w*|enfeksiyon\w*|salgın\w*|grip\w*|nezle\w*|koronavirüs\w*|covid\w*|kanser\w*|tümör\w*|kalp krizi\w*|tansiyon\w*|kolesterol\w*|diyabet\w*|şeker hastalığı\w*|obezite\w*|karaciğer\w*|böbrek\w*|organ nakli\w*|ameliyat\w*|cerrahi\w*|tedavi\w*|ilaç\w*|reçete\w*|aşı\w*|aşılama\w*|doktor\w*|hekim\w*|uzman hekim\w*|hastane\w*|acil servis\w*|poliklinik\w*|mhrs\w*|randevu\w*|beslenme\w*|diyet\w*|diyetisyen\w*|kalori\w*|vitamin\w*|bağışıklık\w*|uyku apnesi\w*|kronik yorgunluk\w*|göz sağlığı\w*|diş sağlığı\w*|cilt sağlığı\w*|reçel\w*|meyve oranı\w*)\b',
+        "Ekonomi": r'\b(ekonomi\w*|finans\w*|borsa\w*|bist\w*|hisse\w*|faiz\w*|tcmb\w*|merkez bankası\w*|enflasyon\w*|tüfe\w*|üfe\w*|dolar\w*|euro\w*|döviz\w*|altın\w*|ons altın\w*|gümüş\w*|emtia\w*|petrol\w*|brent\w*|doğalgaz\w*|mevduat\w*|kredi\w*|kredi kartı\w*|asgari ücret\w*|emekli maaşı\w*|emekli zammı\w*|memur zammı\w*|zam\w*|indirim\w*|vergi\w*|kdv\w*|ötv\w*|hazine\w*|bakan şimşek\w*|mehmet şimşek\w*|fed\w*|ecb\w*|ihracat\w*|ithalat\w*|cari açık\w*|resesyon\w*|gss\w*|genel sağlık sigortası\w*|borç\w*|borcu silinecek\w*|warren buffett\w*|yatırım\w*|fon\w*|işçi çıkar\w*)\b',
+        "Dünya": r'\b(dünya\w*|bm|birleşmiş milletler\w*|iklim planı\w*|küresel ısınma\w*|körfez ülkeleri\w*|abd\w*|amerika\w*|rusya\w*|ukrayna\w*|çin\w*|almanya\w*|fransa\w*|ingiltere\w*|israil\w*|gazze\w*|filistin\w*|iran\w*|ırak\w*|suriye\w*|lübnan\w*|kktc\w*|kıbrıs\w*|yunanistan\w*|bulgaristan\w*|nato\w*|pentagon\w*|beyaz saray\w*|kremlin\w*|tahran\w*|tel aviv\w*|kudüs\w*|hürmüz\w*|zelenskiy\w*|putin\w*|trump\w*|biden\w*|netanyahu\w*|diplomasi\w*|uluslararası\w*|ateşkes\w*|füze saldırısı\w*|hava saldırısı\w*)\b',
     }
 
-    # ADIM 1: ÖNCELİK BAŞLIKTADIR!
-    # Eğer haberin BAŞLIĞI doğrudan bir kategoriyle eşleşiyorsa (ör. 'Yapay Zeka Modeli'),
-    # özetteki menü/çöp kelimeler (ör. menüdeki 'Otomobil') BAŞLIĞI ASLA EZEMEZ!
-    title_matches = {}
+    # Puanlama (Başlık 4 Kat Daha Ağırlıklıdır)
+    scores = {}
     for cat, reg in regex_map.items():
-        found = re.findall(reg, lower_title, re.IGNORECASE)
-        if found:
-            title_matches[cat] = len(found)
+        title_hits = len(re.findall(reg, lower_title, re.IGNORECASE))
+        summary_hits = len(re.findall(reg, lower_summary, re.IGNORECASE))
+        total = (title_hits * 4) + summary_hits
+        if total > 0:
+            scores[cat] = total
 
-    if title_matches:
-        best_cat = max(title_matches.items(), key=lambda x: x[1])[0]
+    if scores:
+        best_cat = max(scores.items(), key=lambda x: x[1])[0]
         return best_cat
 
-    # ADIM 2: Başlıkta özel kategori kelimesi yoksa, Özet (Summary) puanlaması yap
-    summary_matches = {}
-    for cat, reg in regex_map.items():
-        found = re.findall(reg, lower_summary, re.IGNORECASE)
-        if found:
-            summary_matches[cat] = len(found)
+    # ADIM 3: Besleme kategorisi varsa doğrula
+    if force_category and force_category in regex_map:
+        return force_category
 
-    if summary_matches:
-        best_cat = max(summary_matches.items(), key=lambda x: x[1])[0]
-        return best_cat
+    return "Gündem"
 
     # ADIM 3: Besleme kategorisi varsa doğrula
     if force_category and force_category in regex_map:
