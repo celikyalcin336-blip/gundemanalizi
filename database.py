@@ -11,6 +11,7 @@ Render ücretsiz planında sunucu yeniden başlasa bile haberler ve görseller k
 import sqlite3
 import os
 import sys
+import time
 import re
 import unicodedata
 import difflib
@@ -40,20 +41,31 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 USE_PG = DATABASE_URL.startswith("postgres")
 
+_PG_POOL = None
+_PG_LAST_ERROR = None
+_PG_POOL_LAST_TRY = 0
+
 if USE_PG:
     import psycopg2
     import psycopg2.extras
     import psycopg2.pool
 
-    _PG_POOL = None
-
     def _get_pg_pool():
-        global _PG_POOL
+        global _PG_POOL, _PG_LAST_ERROR, _PG_POOL_LAST_TRY
+        now = time.time()
         if _PG_POOL is None:
+            if now - _PG_POOL_LAST_TRY < 5:
+                return None
+            _PG_POOL_LAST_TRY = now
             try:
-                _PG_POOL = psycopg2.pool.ThreadedConnectionPool(minconn=2, maxconn=30, dsn=DATABASE_URL)
+                _PG_POOL = psycopg2.pool.ThreadedConnectionPool(
+                    minconn=2, maxconn=30, dsn=DATABASE_URL, connect_timeout=15
+                )
+                _PG_LAST_ERROR = None
+                print("✅ [PostgreSQL] Connection Pool başarıyla kuruldu.")
             except Exception as e:
-                print(f"PostgreSQL Pool başlatma hatası: {e}")
+                _PG_LAST_ERROR = f"{type(e).__name__}: {str(e)}"
+                print(f"⚠️ [PostgreSQL] Pool başlatma hatası: {e}")
         return _PG_POOL
 
 
@@ -61,6 +73,7 @@ class _Conn:
     """sqlite3 / psycopg2 farkını gizleyen ve bağlantı havuzu (connection pool) ile ultra hızlı çalışan sarmalayıcı."""
 
     def __init__(self):
+        global _PG_LAST_ERROR
         self.is_pg = False
         self.from_pool = False
         if USE_PG:
@@ -71,9 +84,11 @@ class _Conn:
                     self.from_pool = True
                     self.is_pg = True
                 else:
-                    self.raw = psycopg2.connect(DATABASE_URL)
+                    self.raw = psycopg2.connect(DATABASE_URL, connect_timeout=15)
                     self.is_pg = True
+                _PG_LAST_ERROR = None
             except Exception as e:
+                _PG_LAST_ERROR = f"{type(e).__name__}: {str(e)}"
                 print(f"⚠️ PostgreSQL bağlantı hatası, yerel SQLite'a geçiliyor: {e}")
                 self.is_pg = False
 
@@ -546,9 +561,9 @@ def cleanup_old_images(days: int = 180) -> int:
     Belirtilen günden eski haber görsellerini siler (haber metinleri kalır).
     Böylece ücretsiz 1 GB'lık veritabanı hiçbir zaman dolmaz.
     """
-    if not USE_PG:
-        return 0
     with get_connection() as conn:
+        if not conn.is_pg:
+            return 0
         cur = conn.execute(
             "DELETE FROM images WHERE created_at < NOW() - (? * INTERVAL '1 day')", (days,)
         )
@@ -557,13 +572,17 @@ def cleanup_old_images(days: int = 180) -> int:
 
 def get_storage_stats() -> Dict:
     """Veritabanı doluluk bilgisini döner (izleme için)."""
-    stats = {"articles": 0, "images": 0, "db_size_mb": None}
+    stats = {"articles": 0, "images": 0, "db_size_mb": None, "is_pg": False, "pg_error": _PG_LAST_ERROR}
     with get_connection() as conn:
+        stats["is_pg"] = conn.is_pg
         stats["articles"] = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
-        if USE_PG:
-            stats["images"] = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
-            size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
-            stats["db_size_mb"] = round(size / 1024 / 1024, 1)
+        if conn.is_pg:
+            try:
+                stats["images"] = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
+                size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
+                stats["db_size_mb"] = round(size / 1024 / 1024, 1)
+            except Exception as e:
+                stats["pg_calc_error"] = str(e)
     return stats
 
 
@@ -667,7 +686,7 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
 
 def mark_as_posted(news_hash: str, title: str, source: str = "", link: str = "", fb_id: str = None, ig_id: str = None):
     with get_connection() as conn:
-        if USE_PG:
+        if conn.is_pg:
             conn.execute("""
                 INSERT INTO posted_news (news_hash, title, source, link, facebook_post_id, instagram_post_id)
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -797,7 +816,7 @@ def search_articles(query: str, limit: int = 24, offset: int = 0) -> List[Dict]:
 
     kw = f"%{query.strip().lower()}%"
     with get_connection() as conn:
-        like_op = "ILIKE" if USE_PG else "LIKE"
+        like_op = "ILIKE" if conn.is_pg else "LIKE"
         sql = f"""
             SELECT * FROM articles 
             WHERE (title {like_op} ? OR summary {like_op} ? OR content {like_op} ?)
@@ -813,7 +832,7 @@ def get_search_count(query: str) -> int:
         return get_articles_total_count()
     kw = f"%{query.strip().lower()}%"
     with get_connection() as conn:
-        like_op = "ILIKE" if USE_PG else "LIKE"
+        like_op = "ILIKE" if conn.is_pg else "LIKE"
         sql = f"SELECT COUNT(*) as c FROM articles WHERE (title {like_op} ? OR summary {like_op} ? OR content {like_op} ?)"
         row = conn.execute(sql, (kw, kw, kw)).fetchone()
         if not row:
@@ -922,7 +941,7 @@ def record_visit(key: str = "home_visits"):
     """Genel sayfa ziyaret sayacını 1 artırır."""
     try:
         with get_connection() as conn:
-            if USE_PG:
+            if conn.is_pg:
                 conn.execute("""
                     INSERT INTO site_metrics (key, val) VALUES (?, 1)
                     ON CONFLICT (key) DO UPDATE SET val = site_metrics.val + 1
@@ -949,7 +968,7 @@ def set_setting(key: str, val: str):
     """Kalıcı sistem ayarını kaydeder/günceller."""
     try:
         with get_connection() as conn:
-            if USE_PG:
+            if conn.is_pg:
                 conn.execute("""
                     INSERT INTO system_settings (key, val) VALUES (?, ?)
                     ON CONFLICT (key) DO UPDATE SET val = EXCLUDED.val
@@ -1101,10 +1120,13 @@ def get_dashboard_summary() -> Dict:
 
         images_count = 0
         db_size_mb = 0.0
-        if USE_PG:
-            images_count = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
-            size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
-            db_size_mb = round(size / 1024 / 1024, 1)
+        if conn.is_pg:
+            try:
+                images_count = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
+                size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
+                db_size_mb = round(size / 1024 / 1024, 1)
+            except Exception:
+                pass
 
     recent_list = [_row_to_dict(r) for r in recent_rows]
     top_list = [_row_to_dict(r) for r in top_rows]

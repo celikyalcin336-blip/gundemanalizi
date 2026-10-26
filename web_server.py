@@ -666,8 +666,9 @@ def get_cached_category_widgets() -> dict:
             "health_articles": database.get_articles(limit=5, category="Sağlık"),
             "education_articles": database.get_articles(limit=5, category="Eğitim"),
         }
-        _CATEGORY_WIDGETS_CACHE = data
-        _CATEGORY_WIDGETS_CACHE_TIME = now
+        if data["breaking_news"]:
+            _CATEGORY_WIDGETS_CACHE = data
+            _CATEGORY_WIDGETS_CACHE_TIME = now
         return data
     except Exception as e:
         print(f"Kategori önbellek yenileme hatası: {e}")
@@ -1509,6 +1510,22 @@ async def api_articles(limit: int = 10):
 @app.get("/api/stats")
 async def api_stats():
     return database.get_storage_stats()
+
+@app.get("/api/db-status")
+async def api_db_status():
+    status = {
+        "use_pg": database.USE_PG,
+        "has_db_url": bool(database.DATABASE_URL),
+        "last_pg_error": getattr(database, "_PG_LAST_ERROR", None),
+    }
+    with database.get_connection() as conn:
+        status["conn_is_pg"] = getattr(conn, "is_pg", False)
+        try:
+            row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
+            status["articles_count"] = row["c"] if row else 0
+        except Exception as e:
+            status["articles_query_error"] = str(e)
+    return status
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
