@@ -231,16 +231,11 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     lower_summary = clean_summary.lower()
     full_text = f"{lower_title} {lower_summary}"
 
-    # 0. VEFAT, CENAZE, TAZİYE, YAS & ÖLÜM KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
-    # Ünlü birinin babasının/yakınının cenazesi, vefatı ekonomi veya otomobil beslemesinden gelse bile ASLA o kategoriye gidemez!
-    death_regex = r'\b(vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|taziye\w*|başsağlığı\w*|yas tutuyor\w*)\b'
-    if re.search(death_regex, lower_title, re.IGNORECASE):
-        return "Gündem"
-
-    # 1. KAZA, ÇARPIŞMA, ÖLÜM & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
-    # Otomobil/TIR kelimesi geçse bile kaza/ölüm varsa ASLA Otomobil yapılamaz!
-    accident_regex = r'\b(kaza\w*|feci kaza\w*|zincirleme kaza\w*|can pazarı|çarpıştı\w*|şarampole\w*|devrildi\w*|can verdi\w*|hayatını kaybetti\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*)\b'
-    if re.search(accident_regex, lower_title, re.IGNORECASE):
+    # 0. VEFAT, CENAZE, TAZİYE, YAS, ÖLÜM, KAZA & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
+    # Kurban veya vefat eden kişi üniversiteli, liseli, öğretmen, doktor, polis veya sporcu olsa bile:
+    # Ölüm, kaza, çarpışma, cinayet, facia haberleri ASLA Eğitim, Sağlık veya Spor yapılamaz!
+    death_accident_regex = r'\b(ölüm\w*|öldü\w*|ölen\w*|ölü\b|vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|can verdi\w*|can pazarı\w*|facia\w*|katliam\w*|kaza\w*|feci kaza\w*|zincirleme kaza\w*|çarpıştı\w*|şarampole\w*|devrildi\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*|cansız beden\w*|ceset\w*|dehşet\w*|intihar\w*|boğul\w*|yangında can\w*)\b'
+    if re.search(death_accident_regex, lower_title, re.IGNORECASE):
         return "Gündem"
 
     # 2. ASAYİŞ, POLİS, YARGI & SUÇ KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
