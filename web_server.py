@@ -119,6 +119,14 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
+
+    # Güvenlik Kalkanı: Kötü niyetli otomatik bot taramalarını (.git, .env, wp-login, phpmyadmin vb.) anında engelle
+    is_malicious_probe = any(path.startswith(p) or p in path for p in [
+        "/.git", "/.env", "/wp-", "/wordpress", "/xmlrpc", "/phpmyadmin", "/.aws", "/config.", "/backup", "/.vscode", "/actuator"
+    ])
+    if is_malicious_probe:
+        return PlainTextResponse("Not Found", status_code=404)
+
     # 0. Yönetici (Admin) kendi tarayıcısından gezerken ziyaretçi listesine ASLA ekleme
     if request.cookies.get("ga_admin") == "1":
         return await call_next(request)
