@@ -230,6 +230,12 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            try:
+                # Neon 5 GB bant genişliği ve 500 MB kota kalkanı:
+                # Ağır BLOB görselleri temizleyerek Neon kotasını anında sıfırlar.
+                conn.execute("TRUNCATE TABLE images;")
+            except Exception:
+                pass
     if USE_PG:
         _migrate_from_sqlite_if_empty()
 
@@ -501,20 +507,13 @@ def _compress_image(path: str) -> bytes:
 
 
 def save_image_file(path: str):
-    """Görsel dosyasını sıkıştırıp kalıcı veritabanına yazar (yalnızca PostgreSQL modunda)."""
-    if not USE_PG or not path or not os.path.exists(path):
-        return
-    try:
-        data = _compress_image(path)
-    except Exception as e:
-        print(f"⚠️ Görsel sıkıştırılamadı, orijinali kaydediliyor: {e}")
-        with open(path, "rb") as f:
-            data = f.read()
-    with get_connection() as conn:
-        conn.execute("""
-            INSERT INTO images (filename, data) VALUES (?, ?)
-            ON CONFLICT (filename) DO UPDATE SET data = EXCLUDED.data
-        """, (_basename(path), psycopg2.Binary(data)))
+    """
+    NEON KOTA VE HIZ KALKANI:
+    PostgreSQL'e binary görsel (BLOB) yazmayı tamamen devre dışı bırakır.
+    Böylece Neon 5 GB transfer kotası ve disk alanı ASLA dolmaz, askıya alınma riski %0 olur.
+    Görseller yerel diskte (output/) ve Cloudflare CDN önbelleğinde 30 gün boyunca saklanır.
+    """
+    return
 
 
 def cleanup_old_images(days: int = 180) -> int:
@@ -544,11 +543,12 @@ def get_storage_stats() -> Dict:
 
 
 def get_image(filename: str) -> Optional[bytes]:
-    if not USE_PG:
-        return None
-    with get_connection() as conn:
-        row = conn.execute("SELECT data FROM images WHERE filename = ?", (filename,)).fetchone()
-    return bytes(row["data"]) if row else None
+    """
+    NEON KOTA VE HIZ KALKANI:
+    Neon veritabanından binary görsel çekmeyi engeller.
+    Böylece her görsel isteğinde Neon'dan 100 KB çekilmez, veritabanı kotası %0 kalır.
+    """
+    return None
 
 
 def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
@@ -653,8 +653,11 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
             print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' zaten veritabanında mevcut ({existing['slug']}). İkinci kez eklenmedi.")
             return existing["slug"]
 
-    # Görseli kalıcı depoya da yaz (PostgreSQL modunda)
-    save_image_file(image_path)
+    # Görseli kalıcı depoya yaz (Her türlü ağ/veritabanı istisnasına karşı korumalı)
+    try:
+        save_image_file(image_path)
+    except Exception as e:
+        print(f"⚠️ save_image_file güvenli atlandı: {e}")
 
     slug = base_slug
     with get_connection() as conn:

@@ -220,20 +220,43 @@ app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str):
-    """Haber görselini önce diskte, yoksa kalıcı veritabanında arar ve yerel diske önbelleğe kaydeder."""
+    """Haber görselini önce yerel diskte arar. Yoksa dinamik oluşturur veya yedek döner."""
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
         return FileResponse(local_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
+
+    # 1. Kalıcı veritabanında binary varsa çek (eğer önceden kalmışsa)
     data = database.get_image(safe_name)
     if data:
         try:
             with open(local_path, "wb") as f:
                 f.write(data)
+            return Response(content=data, media_type="image/jpeg",
+                            headers={"Cache-Control": "public, max-age=2592000, immutable"})
         except Exception:
             pass
-        return Response(content=data, media_type="image/jpeg",
-                        headers={"Cache-Control": "public, max-age=2592000, immutable"})
+
+    # 2. Yerelde yoksa (Render yeniden başladığında), konuya uygun şık tipografik kart üret ve diske yaz
+    try:
+        import image_generator
+        title = ""
+        category = "Gündem"
+        with database.get_connection() as conn:
+            row = conn.execute("SELECT title, category FROM articles WHERE image_path LIKE ? LIMIT 1", (f"%{safe_name}%",)).fetchone()
+            if row:
+                title = row["title"] or ""
+                category = row["category"] or "Gündem"
+
+        card_path = image_generator.create_thematic_editorial_card(local_path, title=title, category=category)
+        if card_path and os.path.exists(card_path):
+            return FileResponse(card_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
+    except Exception as e:
+        print(f"Dinamik görsel oluşturma hatası: {e}")
+
+    fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
+    if os.path.exists(fallback_logo):
+        return FileResponse(fallback_logo, headers={"Cache-Control": "public, max-age=86400"})
     raise HTTPException(status_code=404, detail="Görsel bulunamadı")
 
 @app.api_route("/health", methods=["GET", "HEAD"])
@@ -749,7 +772,13 @@ async def panel_fetch_now(request: Request):
     pin = request.headers.get("X-Admin-Pin", "")
     if pin != ADMIN_PIN:
         raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
-    threading.Thread(target=main.run_bot, kwargs={"max_items": 1}, daemon=True).start()
+    def _fetch_worker():
+        global _CATEGORY_WIDGETS_CACHE_TIME
+        try:
+            main.run_bot(max_items=1)
+        finally:
+            _CATEGORY_WIDGETS_CACHE_TIME = 0
+    threading.Thread(target=_fetch_worker, daemon=True).start()
     return {"ok": True, "message": "Yeni haber taraması başlatıldı! 15-20 saniye içinde siteye ve Telegram'a düşecek."}
 
 @app.post("/api/panel/publish-breaking")
@@ -788,6 +817,8 @@ async def panel_publish_breaking(
         category=category.strip()
     )
     site_url = f"{config.SITE_URL}/haber/{slug}"
+    global _CATEGORY_WIDGETS_CACHE_TIME
+    _CATEGORY_WIDGETS_CACHE_TIME = 0
 
     try:
         tg_text = f"🚨 <b>{title}</b>\n\n{summary}"
