@@ -61,26 +61,30 @@ class _Conn:
     """sqlite3 / psycopg2 farkını gizleyen ve bağlantı havuzu (connection pool) ile ultra hızlı çalışan sarmalayıcı."""
 
     def __init__(self):
-        self.is_write = False
+        self.is_pg = False
+        self.from_pool = False
         if USE_PG:
-            pool = _get_pg_pool()
-            if pool:
-                self.from_pool = True
-                self.raw = pool.getconn()
-            else:
-                self.from_pool = False
-                self.raw = psycopg2.connect(DATABASE_URL)
-        else:
+            try:
+                pool = _get_pg_pool()
+                if pool:
+                    self.raw = pool.getconn()
+                    self.from_pool = True
+                    self.is_pg = True
+                else:
+                    self.raw = psycopg2.connect(DATABASE_URL)
+                    self.is_pg = True
+            except Exception as e:
+                print(f"⚠️ PostgreSQL bağlantı hatası, yerel SQLite'a geçiliyor: {e}")
+                self.is_pg = False
+
+        if not self.is_pg:
             self.from_pool = False
             os.makedirs(DB_DIR, exist_ok=True)
             self.raw = sqlite3.connect(DB_PATH)
             self.raw.row_factory = sqlite3.Row
 
     def execute(self, sql: str, params: tuple = ()):
-        norm_sql = sql.strip().upper()
-        if norm_sql.startswith(("INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "TRUNCATE")):
-            self.is_write = True
-        if USE_PG:
+        if self.is_pg:
             sql = sql.replace("?", "%s")
             cur = self.raw.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             if params:
@@ -101,19 +105,32 @@ class _Conn:
     def __exit__(self, exc_type, exc, tb):
         try:
             if exc_type is None:
-                if self.is_write:
-                    self.raw.commit()
+                self.raw.commit()
             else:
                 self.raw.rollback()
+        except Exception:
+            try:
+                self.raw.rollback()
+            except Exception:
+                pass
         finally:
-            if USE_PG and getattr(self, "from_pool", False):
+            if self.is_pg and getattr(self, "from_pool", False):
                 pool = _get_pg_pool()
                 if pool:
-                    pool.putconn(self.raw)
+                    try:
+                        pool.putconn(self.raw)
+                    except Exception:
+                        pass
                 else:
-                    self.raw.close()
+                    try:
+                        self.raw.close()
+                    except Exception:
+                        pass
             else:
-                self.raw.close()
+                try:
+                    self.raw.close()
+                except Exception:
+                    pass
 
 
 def get_connection():

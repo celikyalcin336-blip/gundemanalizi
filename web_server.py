@@ -116,6 +116,21 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
         )
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    print(f"🔥 [KRİTİK HATA] {request.url.path}: {exc}")
+    traceback.print_exc()
+    if request.url.path.startswith("/api/"):
+        return JSONResponse(status_code=500, content={"ok": False, "error": str(exc)})
+    return HTMLResponse(
+        status_code=500,
+        content="""<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Sistem Güncelleniyor | Gündem Analizi</title>
+        <meta http-equiv="refresh" content="3">
+        <style>body{background:#0a0e17;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;text-align:center;}h1{color:#ef4444;font-size:2rem;margin:0;}p{margin:10px 0 20px;}a{color:#38bdf8;text-decoration:none;font-weight:bold;}</style>
+        </head><body><h1>⚡ Sistem Optimize Ediliyor</h1><p>Sunucu önbelleği yenileniyor, sayfa birkaç saniye içinde otomatik açılacak...</p><a href="/">Yenile</a></body></html>"""
+    )
+
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
