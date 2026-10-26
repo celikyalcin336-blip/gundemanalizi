@@ -47,7 +47,8 @@ Kurallar:
 2. ASLA 'Siz ne düşünüyorsunuz' gibi yapay sorular SORMA.
 3. ASLA link/URL ekleme.
 4. Varsa kesin sayıları, TL tutarlarını, oranları, ceza/hapis sürelerini maddelere koy.
-5. Yalnızca doğrudan paylaşılacak nihai metni yaz.
+5. ASLA borsa/SPK yasal uyarı metinlerini, 'yatırım danışmanlığı kapsamında değildir' şablonlarını veya ajans telif notlarını maddelere KOYMA.
+6. Yalnızca doğrudan paylaşılacak nihai metni yaz.
 """
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
                 try:
@@ -76,6 +77,9 @@ Kurallar:
         s_lower = s_clean.lower()
 
         if s_lower == headline.lower():
+            continue
+        # SPK, borsa yasal uyarısı ve ajans telif şablonlarını kesinlikle ele
+        if any(w in s_lower for w in ["spk", "yatırım danışmanlığı", "resmi gazete", "tavsiyesi değildir", "mevduat kabul etmeyen", "aracı kurumlar", "portföy yönetim", "yasal uyarı", "burada yer alan", "kişisel görüşlerine"]):
             continue
         if any(s_lower == part for part in headline_parts):
             continue
@@ -111,12 +115,15 @@ Kurallar:
 
     selected_bullets = (priority_sentences + normal_sentences)[:3]
 
+    clean_src = source
+    if any(x in clean_src.lower() for x in ["mynet", "ensonhaber", "haberler"]):
+        clean_src = "Gündem Analizi"
+
     if selected_bullets:
         bullet_text = "\n".join([f"— {s}" for s in selected_bullets])
-        return f"{headline}\n\n{bullet_text}\n({source})"
+        return f"{headline}\n\n{bullet_text}\n({clean_src})"
     else:
-        return f"{headline}\n({source})"
-
+        return f"{headline}\n({clean_src})"
 def generate_social_caption(title: str, summary: str, source: str) -> dict:
     """
     Saygın ve kurumsal bir haber medya kuruluşu (Gündem Analizi) tarzında:

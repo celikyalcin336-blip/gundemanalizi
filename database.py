@@ -307,7 +307,9 @@ def cleanup_corrupted_articles():
                     clean_content = re.sub(r'<p class="lead[^>]*>.*?favorilerime ekle.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
 
                 # Yazar biyografisi, içindekiler ve e-ticaret çöplerini ayıkla
-                if any(j in clean_content.lower() for j in ["içindekiler", "editör hakkında", "onur seven", "scorsese", "son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
+                if any(j in clean_content.lower() for j in ["spk'nın", "yatırım danışmanlığı", "resmi gazete'de yayımlanan tebliği uyarınca", "içindekiler", "editör hakkında", "onur seven", "scorsese", "son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
+                    clean_content = re.sub(r'<p[^>]*>.*?SPK(?:\'n[ıi]n)?.*?uyar[ıi].*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
+                    clean_content = re.sub(r'<p[^>]*>.*?yat[ıi]r[ıi]m\\s+dan[ıi][sş]manl[ıi][gğ][ıi]\\s+kapsam[ıi]nda\\s+de[gğ]ildir.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?içindekiler.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?editör hakkında.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)
                     clean_content = re.sub(r'<p[^>]*>.*?onur seven.*?</p>', '', clean_content, flags=re.DOTALL | re.IGNORECASE)

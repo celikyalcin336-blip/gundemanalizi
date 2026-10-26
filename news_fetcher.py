@@ -115,7 +115,14 @@ def sanitize_news_text(text: str) -> str:
         r'başka yerde yayınlanamaz\.?',
         r'Hürriyet\'in internet haber sitesi hurriyet\.com\.tr;[^\.\n]*',
         r'Tüm hakları saklıdır\.?',
-        # Tıklama ve bekleme tuzakları
+        # SPK, Borsa ve Yatırım Danışmanlığı Yasal Uyarıları (Mynet Finans, Bigpara, Borsa Gündem vb.)
+        r"SPK(?:'n[ıi]n)?.*?Resmi\s+Gazete.*?uyar[ıi].*?(?:dayanmaktad[ıi]r|sunulmaktad[ıi]r|de[gğ]ildir|al[ıi]nmal[ıi]d[ıi]r|\.|\n|$)",
+        r"Burada\s+yer\s+alan\s+yat[ıi]r[ıi]m\s+bilgi.*?(?:de[gğ]ildir|dayanmaktad[ıi]r|sunulmaktad[ıi]r|al[ıi]nmal[ıi]d[ıi]r|\.|\n|$)",
+        r"Yat[ıi]r[ıi]m\s+dan[ıi][sş]manl[ıi][gğ][ıi]\s+hizmeti,?\s*arac[ıi]\s+kurumlar.*?(?:sunulmaktad[ıi]r|dayanmaktad[ıi]r|de[gğ]ildir|\.|\n|$)",
+        r"Burada\s+yer\s+alan\s+yorum\s+ve\s+tavsiyeler.*?(?:dayanmaktad[ıi]r|al[ıi]nmal[ıi]d[ıi]r|de[gğ]ildir|\.|\n|$)",
+        r"Yasal\s+Uyar[ıi]:\s*Burada\s+yer\s+alan.*?(?:dayanmaktad[ıi]r|de[gğ]ildir|\.|\n|$)",
+        r"\bSPK(?:'n[ıi]n)?\s*uyar[ıi]s[ıi]\b[^\.\n]*",
+        r"\((?:Mynet Finans|Mynet|AA|İHA|DHA|Haber Global|Ensonhaber|Hürriyet|Milliyet|Sabah)\)",
         r'Ayrıntılar Geliyor\.+',
         r'Detaylar birazdan\.+',
         r'Haberin devamı aşağıdadır\.?',
