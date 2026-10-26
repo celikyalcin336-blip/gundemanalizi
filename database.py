@@ -595,10 +595,23 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
         if row:
             return True
 
-        # 4. Son 200 makale içinde Benzerlik (Fuzzy / Jaccard) Kontrolü
-        # Farklı ajanslar aynı haberi 1-2 kelime farkla servis ettiğinde (örn: iSmart vs i Smart) anında yakalar
-        dup_stopwords = {'ve', 'ile', 'bir', 'bu', 'da', 'de', 'ta', 'te', 'icin', 'için', 'yeni', 'son', 'dakika', 'gore', 'göre', 'kadar', 'olan', 'olarak', 'eden', 'etti', 'yaptı'}
-        clean_words = {w for w in re.findall(r'\w+', clean_t) if len(w) > 2 and w not in dup_stopwords}
+        # 4. Son 200 makale içinde Çok Katmanlı Akıllı Benzerlik Kontrolü
+        # Farklı ajanslar aynı haberi 1-2 kelime farkla veya soru formatında servis ettiğinde anında yakalar
+        dup_stopwords = {
+            've', 'ile', 'bir', 'bu', 'da', 'de', 'ta', 'te', 'icin', 'için', 'yeni', 'son', 'dakika',
+            'gore', 'göre', 'kadar', 'olan', 'olarak', 'eden', 'etti', 'yaptı', 'yaptığı', 'oldu',
+            'belli', 'iste', 'işte', 'isteği', 'hakkında', 'neden', 'hangi', 'kimdir', 'nereli', 'kaç'
+        }
+
+        def get_word_stems(text):
+            words = [re.sub(r'[\'\"\.,!\?:;\-_]', '', w) for w in re.findall(r'\w+', text.lower())]
+            stems = set()
+            for w in words:
+                if len(w) >= 3 and w not in dup_stopwords:
+                    stems.add(w[:5] if len(w) > 5 else w)
+            return stems
+
+        stems_incoming = get_word_stems(clean_t)
 
         cur = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 200")
         recent_articles = cur.fetchall()
@@ -607,22 +620,30 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
             exist_title = (r["title"] or "").strip().lower()
             exist_slug = (r["slug"] or "").strip().lower()
 
-            # Slug benzerliği (>88%)
-            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.88:
+            # A. Slug benzerliği (>80%)
+            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.80:
                 return True
 
-            # Başlık benzerliği (>72%)
-            sim = difflib.SequenceMatcher(None, clean_t, exist_title).ratio()
-            if sim > 0.72:
+            # B. Doğrudan Başlık Benzerliği (>65%)
+            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.65:
                 return True
 
-            # Anahtar kelime örtüşmesi (>75%)
-            if len(clean_words) >= 4:
-                exist_words = {w for w in re.findall(r'\w+', exist_title) if len(w) > 2 and w not in dup_stopwords}
-                if len(exist_words) >= 4:
-                    overlap = len(clean_words & exist_words) / min(len(clean_words), len(exist_words))
-                    if overlap >= 0.75:
+            # C. Kelime Kökü Örtüşmesi (Ortak Kök Oranı >= %50)
+            if len(stems_incoming) >= 3:
+                stems_exist = get_word_stems(exist_title)
+                if len(stems_exist) >= 3:
+                    overlap = len(stems_incoming & stems_exist)
+                    min_len = min(len(stems_incoming), len(stems_exist))
+                    if min_len > 0 and (overlap / min_len) >= 0.50:
                         return True
+
+            # D. Özel İsim / Anahtar İkili (Kişi veya Şirket Adı + Eylem Örtüşmesi)
+            # Örn: 'nusret altınbaş' VEYA 'spacex 40'
+            key_entities = [w for w in re.findall(r'\w+', clean_t) if len(w) >= 4 and w not in dup_stopwords]
+            for i in range(len(key_entities) - 1):
+                pair = f"{key_entities[i]} {key_entities[i+1]}"
+                if pair in exist_title:
+                    return True
 
         return False
 

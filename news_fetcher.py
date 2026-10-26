@@ -158,6 +158,12 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
     kullanıcıyı kandıran arama motoru (SEO) tuzaklarını tespit eder.
     (Örn: 'Benzin ne kadar oldu? Motorin kaç TL?' sorup hiç fiyat vermeyen çöp haberler)
     """
+    t_low = (title or "").lower()
+    # 1. Biyografi & Magazin Arama Motoru Çöpleri (Örn: 'X kimdir, nereli, kaç yaşında, serveti ne kadar')
+    bio_spam_words = ["kimdir", "kaç yaşında", "nereli", "nerelidir", "ne iş yapar", "serveti ne kadar", "serveti kaç", "evli mi", "eşi kim", "sevgilisi kim", "biyografisi", "hangi şirketlerin sahibi"]
+    if sum(1 for w in bio_spam_words if w in t_low) >= 2 or ("kimdir" in t_low and any(w in t_low for w in ["nereli", "yaşında", "tutuklandı", "servet", "sahibi"])):
+        return True
+
     combined = f"{title} {text}".lower()
     price_keywords = [
         "akaryakıt", "benzin", "motorin", "lpg", "altın fiyat", "çeyrek altın",

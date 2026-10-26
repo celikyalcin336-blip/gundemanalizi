@@ -837,6 +837,8 @@ async def panel_delete_article(article_id: int, request: Request):
     if pin != ADMIN_PIN:
         raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
     deleted = database.delete_article(article_id)
+    global _CATEGORY_WIDGETS_CACHE_TIME
+    _CATEGORY_WIDGETS_CACHE_TIME = 0
     return {"ok": deleted}
 
 @app.get("/api/panel/article/{article_id}")
