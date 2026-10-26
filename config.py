@@ -38,7 +38,7 @@ TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "1934709259")  # Yalçın Çe
 
 # Marka ve Web Sitesi Bilgisi
 BRAND_NAME = "GÜNDEM ANALİZİ"
-SITE_URL = os.getenv("SITE_URL", "https://gündemanalizi.com.tr")
+SITE_URL = os.getenv("SITE_URL", "https://xn--gndemanalizi-dlb.com.tr")
 # Instagram gibi servislerin videoyu indirebilmesi için ASCII (punycode) adres
 PUBLIC_MEDIA_BASE = os.getenv("PUBLIC_MEDIA_BASE", "https://xn--gndemanalizi-dlb.com.tr")
 

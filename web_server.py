@@ -1503,14 +1503,13 @@ async def ads_txt():
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots(request: Request):
-    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
-    base_url = f"https://{host}"
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
     content = f"""User-agent: *
 Allow: /
 Disallow: /panel
 Disallow: /{PANEL_SECRET_SLUG}
 Disallow: /yonetim*
-Disallow: /api/panel/
+Disallow: /api/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml
 """
@@ -1537,8 +1536,7 @@ async def sitemap_xsl():
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
     articles = database.get_articles(limit=300)
-    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
-    base_url = f"https://{host}"
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
@@ -1563,8 +1561,7 @@ async def news_sitemap(request: Request):
     """Google Haberler (Google News & Top Stories) özel XML site haritası."""
     from xml.sax.saxutils import escape
     articles = database.get_articles(limit=100)
-    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
-    base_url = f"https://{host}"
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">')
@@ -1594,8 +1591,7 @@ async def video_sitemap(request: Request):
     """Google Video Search için özel XML Video Site Haritası (Sadece gerçek videosu olan makaleler)."""
     from xml.sax.saxutils import escape
     articles = database.get_articles(limit=100)
-    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
-    base_url = f"https://{host}"
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
