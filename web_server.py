@@ -480,16 +480,16 @@ def market_rates_background_worker():
 def keep_alive_background_worker():
     """
     Render Free Tier 15 dakika hareketsizlikte uykuya (cold-sleep) geçer.
-    Bu arka plan işçisi her 9 dakikada bir dış genel domain'e (/health) hafif bir istek atarak
+    Bu arka plan işçisi her 3 dakikada bir dış genel domain'e (/health) hafif bir istek atarak
     sunucunun 7/24 uyanık ve sıfır gecikmeli (cold-start olmadan) kalmasını sağlar.
     """
-    time.sleep(60)
+    time.sleep(30)
     while True:
         try:
             requests.get("https://xn--gndemanalizi-dlb.com.tr/health", timeout=10)
         except Exception:
             pass
-        time.sleep(540)
+        time.sleep(180)
 
 def get_market_rates() -> dict:
     """
@@ -1382,33 +1382,43 @@ async def article_detail(request: Request, slug: str):
     # Önceki ve Sonraki Haber Navigasyonu (Okuma akışı hiç kopmaz)
     prev_article, next_article = database.get_adjacent_articles(article_id)
 
-    # Trend / En Çok Okunanlar (Sağ sütun sticky trend listesi için)
-    raw_trending = database.get_trending_articles(limit=6)
-    trending_articles = [a for a in raw_trending if a.get("slug") != slug][:5]
-    if len(trending_articles) < 5:
-        more_recent = [a for a in database.get_articles(limit=10) if a.get("slug") != slug and a.get("slug") not in [x.get("slug") for x in trending_articles]]
-        trending_articles = (trending_articles + more_recent)[:5]
-
-    # Kategori İçi İlgili Haberler
-    cat_articles = [a for a in database.get_articles(limit=8, category=category) if a.get("slug") != slug]
-    if len(cat_articles) < 4:
-        recent = [a for a in database.get_articles(limit=8) if a.get("slug") != slug and a.get("slug") not in [x.get("slug") for x in cat_articles]]
-        related_articles = (cat_articles + recent)[:4]
-    else:
-        related_articles = cat_articles[:4]
-
-    other_articles = [a for a in database.get_articles(limit=6) if a.get("slug") != slug][:5]
     widgets = get_cached_category_widgets()
-    breaking_news = widgets["breaking_news"]
-    slider_articles = cat_articles[:14] if len(cat_articles) >= 3 else widgets["breaking_news"]
+    breaking_news = widgets.get("breaking_news") or []
 
-    gundem_articles = widgets.get("gundem_articles") or database.get_articles(limit=5, category="Gündem")
-    auto_articles = widgets["auto_articles"]
-    tech_articles = widgets["tech_articles"]
-    economy_articles = widgets["economy_articles"]
-    sports_articles = widgets["sports_articles"]
-    health_articles = widgets["health_articles"]
-    education_articles = widgets["education_articles"]
+    # Trend / En Çok Okunanlar (RAM önbellekten anında döner, DB yükü sıfır)
+    trending_articles = [a for a in breaking_news if a.get("slug") != slug][:5]
+    other_articles = [a for a in breaking_news if a.get("slug") != slug][2:7]
+
+    # Kategori İçi İlgili Haberler (RAM önbellekten anında döner)
+    cat_lower = category.lower()
+    if "eko" in cat_lower:
+        cat_pool = widgets.get("economy_articles") or []
+    elif "tekno" in cat_lower:
+        cat_pool = widgets.get("tech_articles") or []
+    elif "oto" in cat_lower:
+        cat_pool = widgets.get("auto_articles") or []
+    elif "spor" in cat_lower:
+        cat_pool = widgets.get("sports_articles") or []
+    elif "sağlık" in cat_lower or "saglik" in cat_lower:
+        cat_pool = widgets.get("health_articles") or []
+    elif "eğitim" in cat_lower or "egitim" in cat_lower:
+        cat_pool = widgets.get("education_articles") or []
+    else:
+        cat_pool = widgets.get("gundem_articles") or []
+
+    related_articles = [a for a in cat_pool if a.get("slug") != slug][:4]
+    if len(related_articles) < 3:
+        related_articles = [a for a in breaking_news if a.get("slug") != slug][:4]
+
+    slider_articles = related_articles if len(related_articles) >= 3 else breaking_news
+
+    gundem_articles = widgets.get("gundem_articles") or []
+    auto_articles = widgets.get("auto_articles") or []
+    tech_articles = widgets.get("tech_articles") or []
+    economy_articles = widgets.get("economy_articles") or []
+    sports_articles = widgets.get("sports_articles") or []
+    health_articles = widgets.get("health_articles") or []
+    education_articles = widgets.get("education_articles") or []
 
     # Tahmini okuma süresi (140 kelime/dk)
     text_content = f"{article.get('title', '')} {article.get('summary', '')} {article.get('content', '')}"

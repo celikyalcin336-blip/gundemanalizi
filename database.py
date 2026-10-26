@@ -61,6 +61,7 @@ class _Conn:
     """sqlite3 / psycopg2 farkını gizleyen ve bağlantı havuzu (connection pool) ile ultra hızlı çalışan sarmalayıcı."""
 
     def __init__(self):
+        self.is_write = False
         if USE_PG:
             pool = _get_pg_pool()
             if pool:
@@ -76,6 +77,9 @@ class _Conn:
             self.raw.row_factory = sqlite3.Row
 
     def execute(self, sql: str, params: tuple = ()):
+        norm_sql = sql.strip().upper()
+        if norm_sql.startswith(("INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "TRUNCATE")):
+            self.is_write = True
         if USE_PG:
             sql = sql.replace("?", "%s")
             cur = self.raw.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -97,7 +101,8 @@ class _Conn:
     def __exit__(self, exc_type, exc, tb):
         try:
             if exc_type is None:
-                self.raw.commit()
+                if self.is_write:
+                    self.raw.commit()
             else:
                 self.raw.rollback()
         finally:
@@ -230,10 +235,12 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            # Yüksek Performans Veritabanı İndeksleri
             try:
-                # Neon 5 GB bant genişliği ve 500 MB kota kalkanı:
-                # Ağır BLOB görselleri temizleyerek Neon kotasını anında sıfırlar.
-                conn.execute("TRUNCATE TABLE images;")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_articles_cat_id ON articles (category, id DESC);")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_articles_created ON articles (created_at DESC);")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_visitor_logs_created ON visitor_logs (created_at DESC);")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_posted_news_hash ON posted_news (news_hash);")
             except Exception:
                 pass
     if USE_PG:
@@ -245,7 +252,6 @@ def init_db():
             conn.execute("DELETE FROM visitor_logs WHERE page LIKE ?", ('/api/%',))
     except Exception:
         pass
-    cleanup_corrupted_articles()
 
 
 def cleanup_corrupted_articles():
