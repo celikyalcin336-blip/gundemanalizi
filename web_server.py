@@ -315,7 +315,7 @@ async def serve_image(filename: str):
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
-        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
+        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable", "CDN-Cache-Control": "max-age=31536000", "Cloudflare-CDN-Cache-Control": "max-age=31536000"})
 
     # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 1.5 sn bekle)
     try:
@@ -325,7 +325,7 @@ async def serve_image(filename: str):
                 with open(local_path, "wb") as f:
                     f.write(data)
                 return Response(content=data, media_type="image/jpeg",
-                                headers={"Cache-Control": "public, max-age=2592000, immutable"})
+                                headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable", "CDN-Cache-Control": "max-age=31536000", "Cloudflare-CDN-Cache-Control": "max-age=31536000"})
             except Exception:
                 pass
     except Exception:
@@ -808,7 +808,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         cached_html = get_turbo_page(cache_key)
         if cached_html:
             threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
-            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60"})
+            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60, s-maxage=60", "CDN-Cache-Control": "max-age=60", "Cloudflare-CDN-Cache-Control": "max-age=60"})
 
     if request.cookies.get("ga_admin") != "1":
         threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
@@ -1539,7 +1539,7 @@ async def article_detail(request: Request, slug: str):
     if request.cookies.get("ga_admin") != "1":
         cached_html = get_turbo_page(cache_key)
         if cached_html:
-            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=120"})
+            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=120, s-maxage=120", "CDN-Cache-Control": "max-age=120", "Cloudflare-CDN-Cache-Control": "max-age=120"})
 
     article = database.get_article_by_slug(slug)
     if not article:
