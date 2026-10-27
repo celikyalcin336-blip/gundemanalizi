@@ -51,10 +51,10 @@
           "headline": {{ article.title | tojson }},
           "description": {{ article.summary | tojson }},
           "image": [
-            {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
+            {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
           ],
-          "datePublished": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
-          "dateModified": "{{ article.created_at[:10] }}T{{ article.created_at[11:19] if article.created_at|length >= 19 else '00:00:00' }}+03:00",
+          "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
+          "dateModified": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "author": {
             "@type": "Organization",
             "name": "Gündem Analizi Haber Masası",
@@ -101,7 +101,7 @@
     <meta property="og:description" content="{{ article.summary }}">
     <meta property="og:url" content="https://xn--gndemanalizi-dlb.com.tr/haber/{{ article.slug }}">
     {% if article.image_path %}
-    <meta property="og:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
+    <meta property="og:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('/')[-1] }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     {% endif %}
@@ -109,7 +109,7 @@
     <meta name="twitter:title" content="{{ article.title }}">
     <meta name="twitter:description" content="{{ article.summary }}">
     {% if article.image_path %}
-    <meta name="twitter:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}">
+    <meta name="twitter:image" content="https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.split('/')[-1] }}">
     {% endif %}
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="alternate" type="application/rss+xml" title="Gündem Analizi RSS" href="/rss.xml">
@@ -464,7 +464,7 @@
                     {{ article.category }}
                 </span>
                 <span class="text-slate-400 flex items-center gap-1">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> {{ article.created_at[:16] }}
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> {{ (article.created_at or '')[:16] }}
                 </span>
                 <span class="text-slate-500">•</span>
                 <span class="text-slate-400 flex items-center gap-1">
@@ -524,7 +524,7 @@
             <!-- Ana Görsel (Haber Kartı) -->
             <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
+                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
                 {% endif %}
             </div>
 
@@ -618,7 +618,7 @@
                 <div class="flex flex-col sm:flex-row gap-4 items-center">
                     <a href="/haber/{{ next_article.slug }}" class="w-full sm:w-48 h-32 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200 block relative shadow-sm">
                         {% if next_article.image_path %}
-                        <img src="/images/{{ next_article.image_path.split('\')[-1].split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img src="/images/{{ next_article.image_path.split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         {% else %}
                         <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-3">
                         {% endif %}
@@ -762,7 +762,7 @@
                     <a href="/haber/{{ rel.slug }}" class="group flex gap-3.5 p-3 rounded-2xl bg-brand-card hover:bg-slate-900/90 border border-brand-border/80 hover:border-red-600/40 transition shadow-md">
                         <div class="w-24 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80">
                             {% if rel.image_path %}
-                            <img src="/images/{{ rel.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ rel.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="/images/{{ rel.image_path.split('/')[-1] }}" alt="{{ rel.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
                             <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-2">
                             {% endif %}
@@ -810,7 +810,7 @@
                         <!-- Küçük Görsel -->
                         <div class="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80">
                             {% if trend.image_path %}
-                            <img src="/images/{{ trend.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ trend.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="/images/{{ trend.image_path.split('/')[-1] }}" alt="{{ trend.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
                             <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
                             {% endif %}
@@ -840,7 +840,7 @@
                     <a href="/haber/{{ other.slug }}" class="group flex items-start gap-3 pb-3 border-b border-brand-border/40 last:border-0 last:pb-0">
                         <div class="w-14 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80 mt-0.5">
                             {% if other.image_path %}
-                            <img src="/images/{{ other.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ other.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="/images/{{ other.image_path.split('/')[-1] }}" alt="{{ other.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
                             <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
                             {% endif %}
