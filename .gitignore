@@ -1,7 +1,15 @@
 # Gizli bilgiler ve geçici dosyalar
 .env
-data/
-output/
 __pycache__/
 *.pyc
+
+# Yerel veritabanları
 *.db
+data/*.db
+
+# Medya test çıktıları
+*.mp3
+*.mp4
+output/test_*
+output/out_*
+scratch/
