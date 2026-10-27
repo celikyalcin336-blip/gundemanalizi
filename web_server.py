@@ -315,28 +315,58 @@ class CacheStaticFiles(StaticFiles):
 app.mount("/assets", CacheStaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
-async def serve_image(filename: str):
+async def serve_image(filename: str, request: Request):
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
+
+    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 4 sn bekle)
+    if not os.path.exists(local_path):
+        try:
+            data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=4.0)
+            if data:
+                try:
+                    with open(local_path, "wb") as f:
+                        f.write(data)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    # 2. Resim diskte mevcutsa: Tarayıcı WebP destekliyorsa ultra hafif WebP formatında sun
     if os.path.exists(local_path):
-        return FileResponse(local_path, headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable", "CDN-Cache-Control": "max-age=31536000", "Cloudflare-CDN-Cache-Control": "max-age=31536000"})
+        accept = request.headers.get("accept", "").lower()
+        if "image/webp" in accept and not safe_name.lower().endswith(".webp"):
+            name_no_ext = os.path.splitext(safe_name)[0]
+            webp_name = f"{name_no_ext}.webp"
+            webp_path = os.path.join(OUTPUT_DIR, webp_name)
+            if not os.path.exists(webp_path):
+                try:
+                    from PIL import Image
+                    with Image.open(local_path) as img:
+                        img = img.convert("RGB")
+                        img.thumbnail((800, 450), Image.LANCZOS)
+                        img.save(webp_path, format="WEBP", quality=76, method=4)
+                except Exception:
+                    pass
+            if os.path.exists(webp_path):
+                return FileResponse(webp_path, media_type="image/webp", headers={
+                    "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+                    "CDN-Cache-Control": "max-age=31536000",
+                    "Cloudflare-CDN-Cache-Control": "max-age=31536000",
+                    "Vary": "Accept"
+                })
 
-    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 1.5 sn bekle)
-    try:
-        data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=4.0)
-        if data:
-            try:
-                with open(local_path, "wb") as f:
-                    f.write(data)
-                return Response(content=data, media_type="image/jpeg",
-                                headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable", "CDN-Cache-Control": "max-age=31536000", "Cloudflare-CDN-Cache-Control": "max-age=31536000"})
-            except Exception:
-                pass
-    except Exception:
-        pass
+        return FileResponse(local_path, headers={
+            "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+            "CDN-Cache-Control": "max-age=31536000",
+            "Cloudflare-CDN-Cache-Control": "max-age=31536000",
+            "Vary": "Accept"
+        })
 
-    # 2. Resim bulunamadıysa asla sayfayı bekletme, anında resmi logoyu dön (0 ms)
-    fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
+    # 3. Resim bulunamadıysa asla sayfayı bekletme, anında resmi logoyu dön (0 ms)
+    fallback_logo = os.path.join(ASSETS_DIR, "logo-128.webp")
+    if not os.path.exists(fallback_logo):
+        fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(fallback_logo):
         return FileResponse(fallback_logo, headers={"Cache-Control": "public, max-age=86400"})
     return Response(content=b"", status_code=404)
