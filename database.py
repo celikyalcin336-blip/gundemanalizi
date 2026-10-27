@@ -59,7 +59,7 @@ if USE_PG:
             _PG_POOL_LAST_TRY = now
             try:
                 _PG_POOL = psycopg2.pool.ThreadedConnectionPool(
-                    minconn=1, maxconn=8, dsn=DATABASE_URL, connect_timeout=5
+                    minconn=1, maxconn=18, dsn=DATABASE_URL, connect_timeout=5
                 )
                 _PG_LAST_ERROR = None
                 print("✅ [PostgreSQL] Connection Pool başarıyla kuruldu.")
@@ -991,26 +991,77 @@ def update_article(article_id: int, title: str, summary: str, content: str, cate
 
 
 _LAST_VISIT_FLUSH = 0
-def record_visit(key: str = "home_visits"):
-    """Genel sayfa ziyaret sayacını artırır (15 sn throttling ile DB kilitlenmesini engeller)."""
-    global _LAST_VISIT_FLUSH
-    now = time.time()
-    if now - _LAST_VISIT_FLUSH < 15:
+
+# ========================================================
+# 🚀 ULTRA PERFORMANS: RAM BUFFER & BATCH FLUSH (0 ms Ziyaretçi Kaydı)
+# ========================================================
+_VISITOR_LOG_QUEUE = []
+_VISITOR_QUEUE_LOCK = threading.Lock()
+_RAM_METRICS = {}
+_RAM_METRICS_LOCK = threading.Lock()
+_DASHBOARD_CACHE = {"data": None, "ts": 0}
+_BUFFER_WORKER_STARTED = False
+
+def _start_db_buffer_worker():
+    global _BUFFER_WORKER_STARTED
+    if _BUFFER_WORKER_STARTED:
         return
-    _LAST_VISIT_FLUSH = now
-    try:
-        with get_connection() as conn:
-            if conn.is_pg:
-                conn.execute("""
-                    INSERT INTO site_metrics (key, val) VALUES (?, 1)
-                    ON CONFLICT (key) DO UPDATE SET val = site_metrics.val + 1
-                """, (key,))
-            else:
-                row = conn.execute("SELECT val FROM site_metrics WHERE key = ?", (key,)).fetchone()
-                new_val = (row["val"] + 1) if row else 1
-                conn.execute("INSERT OR REPLACE INTO site_metrics (key, val) VALUES (?, ?)", (key, new_val))
-    except Exception:
-        pass
+    _BUFFER_WORKER_STARTED = True
+
+    def _worker():
+        while True:
+            time.sleep(15)
+            # A. Sayaçları Toplu Yaz
+            metrics_copy = {}
+            with _RAM_METRICS_LOCK:
+                if _RAM_METRICS:
+                    metrics_copy = dict(_RAM_METRICS)
+                    _RAM_METRICS.clear()
+
+            if metrics_copy:
+                try:
+                    with get_connection() as conn:
+                        for k, v in metrics_copy.items():
+                            if v > 0:
+                                if conn.is_pg:
+                                    conn.execute("""
+                                        INSERT INTO site_metrics (key, val) VALUES (?, ?)
+                                        ON CONFLICT (key) DO UPDATE SET val = site_metrics.val + ?
+                                    """, (k, v, v))
+                                else:
+                                    row = conn.execute("SELECT val FROM site_metrics WHERE key = ?", (k,)).fetchone()
+                                    new_val = (row["val"] + v) if row else v
+                                    conn.execute("INSERT OR REPLACE INTO site_metrics (key, val) VALUES (?, ?)", (k, new_val))
+                except Exception as e:
+                    pass
+
+            # B. Ziyaretçi Loglarını Toplu Yaz
+            logs_copy = []
+            with _VISITOR_QUEUE_LOCK:
+                if _VISITOR_LOG_QUEUE:
+                    logs_copy = list(_VISITOR_LOG_QUEUE)
+                    _VISITOR_LOG_QUEUE.clear()
+
+            if logs_copy:
+                try:
+                    with get_connection() as conn:
+                        for item in logs_copy:
+                            v_hash, page, ref, dev, ctry, city = item
+                            conn.execute("""
+                                INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
+                                VALUES (?, 0, ?, ?, ?, ?, ?)
+                            """, (v_hash, page, ref, dev, ctry, city))
+                except Exception as e:
+                    pass
+
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
+
+def record_visit(key: str = "home_visits"):
+    """Genel sayfa ziyaret sayacını RAM'de toplar (0 ms bekleme, 0 DB kilidi)."""
+    _start_db_buffer_worker()
+    with _RAM_METRICS_LOCK:
+        _RAM_METRICS[key] = _RAM_METRICS.get(key, 0) + 1
 
 
 def get_setting(key: str, default: str = "") -> str:
@@ -1039,23 +1090,14 @@ def set_setting(key: str, val: str):
 
 
 def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "") -> bool:
-    """Ziyaretçiyi kaydeder. Kullanıcı siteye ilk defa mı giriyor kontrol eder ve döner."""
+    """Ziyaretçiyi RAM kuyruğuna ekler (0 ms bekleme, 0 DB kilidi)."""
     if not page or page.startswith("/api/") or page.startswith("/assets") or page.startswith("/images"):
         return False
-    try:
-        with get_connection() as conn:
-            # Bu ziyaretçi daha önce hiç girdi mi?
-            prev = conn.execute("SELECT 1 FROM visitor_logs WHERE visitor_hash = ? LIMIT 1", (visitor_hash,)).fetchone()
-            is_first = 1 if not prev else 0
-
-            conn.execute("""
-                INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (visitor_hash, is_first, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
-            return bool(is_first)
-    except Exception as e:
-        print(f"⚠️ Ziyaretçi loglanamadı: {e}")
-        return False
+    _start_db_buffer_worker()
+    with _VISITOR_QUEUE_LOCK:
+        if len(_VISITOR_LOG_QUEUE) < 4000:
+            _VISITOR_LOG_QUEUE.append((visitor_hash, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
+    return True
 
 
 def add_revenue_record(source: str, amount: float, date_str: str, notes: str = "") -> int:
@@ -1082,7 +1124,11 @@ def delete_revenue_record(rec_id: int):
 
 
 def get_dashboard_summary() -> Dict:
-    """Yönetim paneli (/panel) için tüm ayrıntılı canlı analitik ve istatistikleri döner."""
+    """Yönetim paneli (/panel) için tüm ayrıntılı canlı analitik ve istatistikleri döner (8 sn RAM önbellekli)."""
+    global _DASHBOARD_CACHE
+    now = time.time()
+    if _DASHBOARD_CACHE.get("data") and (now - _DASHBOARD_CACHE.get("ts", 0)) < 8:
+        return _DASHBOARD_CACHE["data"]
     with get_connection() as conn:
         totals = conn.execute(
             "SELECT COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS total_views FROM articles"
@@ -1191,7 +1237,7 @@ def get_dashboard_summary() -> Dict:
     top_list = [_row_to_dict(r) for r in top_rows]
     returning_today = max(0, today_uniques - first_time_today)
 
-    return {
+    res = {
         "total_articles": total_articles,
         "total_views": total_views,
         "home_visits": home_visits,

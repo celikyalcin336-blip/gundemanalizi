@@ -312,66 +312,30 @@ app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str):
-    """Haber görselini önce yerel diskte, yoksa Neon veritabanında arar ve döner. Event loop'u asla kilitlemez."""
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
         return FileResponse(local_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
 
-    # 1. Kalıcı Neon veritabanında binary varsa çek (0 ms bekleme)
-    data = await asyncio.to_thread(database.get_image, safe_name)
-    if data:
-        try:
-            with open(local_path, "wb") as f:
-                f.write(data)
-            return Response(content=data, media_type="image/jpeg",
-                            headers={"Cache-Control": "public, max-age=2592000, immutable"})
-        except Exception:
-            pass
-
-    # 2. Disk ve DB'de yoksa, event loop'u dondurmadan ayrı iş parçacığında gerçek basın görselini ara ve indir
-    def _fetch_or_create_photo():
-        import image_generator
-        title = ""
-        category = "Gündem"
-        try:
-            with database.get_connection() as conn:
-                row = conn.execute("SELECT title, category FROM articles WHERE image_path LIKE ? LIMIT 1", (f"%{safe_name}%",)).fetchone()
-                if row:
-                    title = row.get("title") or ""
-                    category = row.get("category") or "Gündem"
-        except Exception:
-            pass
-
-        # Habere özel gerçek basın fotoğrafı ara
-        if title:
+    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 1.5 sn bekle)
+    try:
+        data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=1.5)
+        if data:
             try:
-                web_img = image_generator.search_editorial_web_image(title, category)
-                if web_img:
-                    photo_path = image_generator.create_single_news_photo(web_img, local_path)
-                    if photo_path and os.path.exists(photo_path):
-                        database.save_image_file(photo_path)
-                        return photo_path
-            except Exception as e:
-                print(f"Basın görseli otomatik tamamlama hatası: {e}")
+                with open(local_path, "wb") as f:
+                    f.write(data)
+                return Response(content=data, media_type="image/jpeg",
+                                headers={"Cache-Control": "public, max-age=2592000, immutable"})
+            except Exception:
+                pass
+    except Exception:
+        pass
 
-        try:
-            card_path = image_generator.create_thematic_editorial_card(local_path, title=title, category=category)
-            if card_path and os.path.exists(card_path):
-                database.save_image_file(card_path)
-                return card_path
-        except Exception:
-            pass
-        return None
-
-    res_path = await asyncio.to_thread(_fetch_or_create_photo)
-    if res_path and os.path.exists(res_path):
-        return FileResponse(res_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
-
+    # 2. Resim bulunamadıysa asla sayfayı bekletme, anında resmi logoyu dön (0 ms)
     fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(fallback_logo):
         return FileResponse(fallback_logo, headers={"Cache-Control": "public, max-age=86400"})
-    raise HTTPException(status_code=404, detail="Görsel bulunamadı")
+    return Response(content=b"", status_code=404)
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
