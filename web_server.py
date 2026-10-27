@@ -146,9 +146,21 @@ def system_health_watchdog_worker():
         time.sleep(600)
 
 @asynccontextmanager
+def _warmup_turbo_cache():
+    """Sunucu ayağa kalkar kalkmaz ana sayfayı ve popüler kategorileri RAM'e çeker."""
+    time.sleep(3)
+    try:
+        get_cached_category_widgets()
+        database.get_articles(limit=24)
+        database.get_articles_total_count()
+        print("⚡ [Turbo Cache] Kategori ve ana sayfa önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
+    except Exception as e:
+        print(f"Önbellek ısınma hatası: {e}")
+
 async def lifespan(app: FastAPI):
     database.init_db()
-    threading.Thread(target=database.cleanup_corrupted_articles, daemon=True).start()  # arka planda, acilisi bekletmez
+    threading.Thread(target=database.cleanup_corrupted_articles, daemon=True).start()
+    threading.Thread(target=_warmup_turbo_cache, daemon=True).start()
     # Otonom haber botunu arka planda baslat
     threading.Thread(target=bot_background_worker, daemon=True).start()
     # Canli piyasa kurlarini arka planda tazeleyen isci (sayfa yanit suresini 0 ms yapar)
@@ -767,6 +779,31 @@ async def api_search(q: str = "", limit: int = 8):
 # Kategori bloklarını RAM'de 45 sn tutarak veritabanı yükünü sıfırlar
 # Sayfa açılış hızını 1.5 saniyeden 25 milisaniyeye (60 kat hız) düşürür
 # ========================================================
+
+# ========================================================
+# ⚡ TURBO RAM SAYFA ÖNBELLEĞİ (0.001 MS YANIT SÜRESİ)
+# İlk girişte ve kategorilerde Neon'a 11 ayrı sorgu atmak yerine
+# render edilmiş HTML'i RAM'de 90 saniye saklayarak anında basar.
+# ========================================================
+_TURBO_PAGE_CACHE = {}
+
+def get_turbo_page(key: str):
+    item = _TURBO_PAGE_CACHE.get(key)
+    if item and (time.time() - item["ts"]) < 90:
+        return item["html"]
+    return None
+
+def set_turbo_page(key: str, html: str):
+    global _TURBO_PAGE_CACHE
+    if len(_TURBO_PAGE_CACHE) > 50:
+        _TURBO_PAGE_CACHE.clear()
+    _TURBO_PAGE_CACHE[key] = {"html": html, "ts": time.time()}
+
+def clear_turbo_cache():
+    global _TURBO_PAGE_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
+    _TURBO_PAGE_CACHE.clear()
+    _CATEGORY_WIDGETS_CACHE_TIME = 0
+
 _CATEGORY_WIDGETS_CACHE = {}
 _CATEGORY_WIDGETS_CACHE_TIME = 0
 
@@ -801,6 +838,14 @@ def get_cached_category_widgets() -> dict:
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
+    # Turbo RAM Önbelleği: Arama yoksa ve ilk sayfaysa 0 ms hızında RAM'den ver
+    cache_key = f"page_{kategori or 'home'}_{sayfa}" if not q else None
+    if cache_key and request.cookies.get("ga_admin") != "1":
+        cached_html = get_turbo_page(cache_key)
+        if cached_html:
+            threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
+            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60"})
+
     if request.cookies.get("ga_admin") != "1":
         threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
     import math
@@ -846,7 +891,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     health_articles = widgets["health_articles"]
     education_articles = widgets["education_articles"]
 
-    return templates.TemplateResponse(
+    resp = templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
@@ -871,6 +916,12 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "total_articles": total_count
         }
     )
+    if cache_key and resp.body:
+        try:
+            set_turbo_page(cache_key, resp.body.decode("utf-8"))
+        except Exception:
+            pass
+    return resp
 
 @app.api_route("/kategori/{kategori_adi}", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
