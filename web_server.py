@@ -20,6 +20,10 @@ def smart_sentence_split(text: str) -> list:
 import re
 import os
 import time
+import mimetypes
+mimetypes.add_type('image/webp', '.webp')
+mimetypes.add_type('text/css', '.css')
+mimetypes.add_type('application/javascript', '.js')
 import threading
 import requests
 from datetime import datetime, timezone, timedelta
