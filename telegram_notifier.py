@@ -152,6 +152,33 @@ def send_admin_ihbar(message_text: str, media_path: str = "", media_type: str = 
         print(f"İhbar gönderim hatası: {e}")
         return False
 
+def send_admin_alert(subject: str, message: str, is_resolved: bool = False) -> bool:
+    """
+    Sitede kritik bir kesinti, veritabanı kopması veya aksaklık olduğunda
+    Yalçın Bey'in şahsi Telegram'ına anında acil durum uyarısı atar.
+    """
+    if not config.TELEGRAM_BOT_TOKEN:
+        return False
+    admin_chat = getattr(config, "TELEGRAM_ADMIN_ID", "") or config.TELEGRAM_CHAT_ID
+    icon = "✅ [SİSTEM NORMALE DÖNDÜ]" if is_resolved else "🚨 [ACİL DURUM UYARISI]"
+    from datetime import datetime
+    full_text = (
+        f"<b>{icon}</b>\n"
+        f"<b>Konu:</b> {subject}\n\n"
+        f"{message}\n\n"
+        f"⏰ <i>{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (TSİ)</i>"
+    )
+    try:
+        r = requests.post(
+            f"{BASE_URL}/sendMessage",
+            json={"chat_id": admin_chat, "text": full_text, "parse_mode": "HTML"},
+            timeout=15
+        )
+        return r.json().get("ok", False)
+    except Exception as e:
+        print(f"Admin uyarı mesajı gönderme hatası: {e}")
+        return False
+
 if __name__ == "__main__":
     send_telegram_message("👋 Merhaba Yalçın Bey! Gündem Analizi botu başarıyla bağlandı. Test haberiniz birazdan geliyor...")
     test_img = os.path.join(os.path.dirname(__file__), "output", "test_card.jpg")

@@ -698,9 +698,9 @@
 
                         <!-- Hızlı Hafta Butonları -->
                         <div class="flex items-center gap-1 mb-2.5 bg-slate-900 p-1 rounded-xl text-[11px] font-bold">
-                            <button type="button" id="tab-week-9" onclick="setFixtureWeek(9)" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer">9. Hafta</button>
-                            <button type="button" id="tab-week-10" onclick="setFixtureWeek(10)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">10. Hafta</button>
+                            <button type="button" id="tab-week-10" onclick="setFixtureWeek(10)" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow-sm">10. Hafta (Güncel)</button>
                             <button type="button" id="tab-week-11" onclick="setFixtureWeek(11)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">11. Hafta</button>
+                            <button type="button" id="tab-week-12" onclick="setFixtureWeek(12)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">12. Hafta</button>
                         </div>
 
                         <!-- Maç Listesi Kutusu (Varsayılan 9. Hafta Dolu Gelir) -->
@@ -1820,10 +1820,26 @@
                 </div>
             </div>
 
-            <!-- Arama Kutusu -->
-            <div class="relative">
-                <input type="text" id="nobetci-search" oninput="window.filterNobetci(this.value)" placeholder="Şehir, İlçe veya Eczane Adı ile filtrele..." 
-                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-emerald-500 transition">
+            <!-- 81 İl Seçimi ve Filtreleme -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-emerald-400 mb-1">📍 Şehir (81 İl):</label>
+                    <select id="nobetci-city-select" onchange="window.loadNobetciCity(this.value)" 
+                            class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 transition">
+                        <!-- Populated with 81 cities -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1">🔍 İlçe / Eczane Ara:</label>
+                    <input type="text" id="nobetci-search" oninput="window.filterNobetci(this.value)" placeholder="Eczane veya ilçe yaz..." 
+                           class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 transition">
+                </div>
+            </div>
+
+            <!-- Bilgi ve Güncelleme Şeridi -->
+            <div id="nobetci-status-bar" class="flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span id="nobetci-city-title" class="font-bold text-emerald-400">İstanbul Nöbetçi Eczaneleri</span>
+                <span id="nobetci-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 Canlı Veri</span>
             </div>
 
             <!-- Canlı Eczane Listesi -->
@@ -3124,6 +3140,43 @@
                 '</div>';
             }).join('');
         }
+                // Canlı TFF Süper Lig Verisi Çekici
+        function fetchLiveSuperlig() {
+            fetch('/api/superlig')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.success) {
+                        if (data.standings && data.standings.length > 0) {
+                            STANDINGS_DATA.genel = data.standings;
+                            switchStandings('genel');
+                        }
+                        if (data.matches && data.matches.length > 0) {
+                            var w = data.week || 10;
+                            currentFixtureWeek = w;
+                            FIXTURES_DATA[w] = {
+                                title: w + '. Hafta Maçları (Canlı TFF)',
+                                matches: data.matches.map(function(m) {
+                                    var dtStr = (m.date || '') + (m.time ? ' • ' + m.time : '');
+                                    return {
+                                        home: m.home,
+                                        away: m.away,
+                                        date: dtStr || 'Gelecek Maç',
+                                        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                                        highlight: (m.home.includes('Galatasaray') || m.home.includes('Fenerbahçe') || m.home.includes('Beşiktaş') || m.home.includes('Trabzon') ||
+                                                    m.away.includes('Galatasaray') || m.away.includes('Fenerbahçe') || m.away.includes('Beşiktaş') || m.away.includes('Trabzon'))
+                                    };
+                                })
+                            };
+                            renderFixtures(w);
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Superlig fetch err:', err);
+                });
+        }
+        window.fetchLiveSuperlig = fetchLiveSuperlig;
+
         window.renderFixtures = renderFixtures;
         window.setFixtureWeek = function(w) { renderFixtures(w); };
         window.changeFixtureWeek = function(delta) {
@@ -3264,32 +3317,88 @@
         // =====================================================================
         var SAMPLE_PHARMACIES = [
             { name: "Merkez Şifa Eczanesi", city: "İstanbul", district: "Kadıköy", address: "Moda Cad. No:42/A", phone: "0216 330 12 34" },
-            { name: "Güneş Eczanesi", city: "İstanbul", district: "Şişli", address: "Halaskargazi Cad. No:88", phone: "0212 240 55 66" },
-            { name: "Başkent Can Eczanesi", city: "Ankara", district: "Çankaya", address: "Tunalı Hilmi Cad. No:15", phone: "0312 425 78 90" },
-            { name: "Kızılay Nöbetçi Eczanesi", city: "Ankara", district: "Kızılay", address: "Gazi Mustafa Kemal Bulv. No:12", phone: "0312 418 22 33" },
-            { name: "Alsancak Eczanesi", city: "İzmir", district: "Konak", address: "Kıbrıs Şehitleri Cad. No:104", phone: "0232 464 11 22" },
-            { name: "Bursa Hayat Eczanesi", city: "Bursa", district: "Nilüfer", address: "FSM Bulvarı No:60", phone: "0224 245 88 99" },
-            { name: "Antalya Akdeniz Eczanesi", city: "Antalya", district: "Muratpaşa", address: "Işıklar Cad. No:24", phone: "0242 241 33 44" }
+            { name: "Güneş Eczanesi", city: "İstanbul", district: "Şişli", address: "Halaskargazi Cad. No:88", phone: "0212 240 55 66" }
         ];
+        var CURRENT_NOBETCI_DATA = [];
+
+        function populateNobetciCities() {
+            var sel = document.getElementById('nobetci-city-select');
+            if (!sel || sel.options.length > 0) return;
+            var cities = Object.keys(CITY_OFFSETS || {}).sort(function(a, b) {
+                return a.localeCompare('tr', { sensitivity: 'base' });
+            });
+            cities.forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                if (c === 'İstanbul') opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+        window.populateNobetciCities = populateNobetciCities;
+
+        function loadNobetciCity(cityName) {
+            var listEl = document.getElementById('nobetci-list');
+            var titleEl = document.getElementById('nobetci-city-title');
+            var badgeEl = document.getElementById('nobetci-badge');
+            if (titleEl) titleEl.innerText = cityName + ' Nöbetçi Eczaneleri';
+            if (badgeEl) badgeEl.innerText = '⏳ Yükleniyor...';
+
+            if (listEl) {
+                listEl.innerHTML = '<div class="p-6 text-center text-emerald-400 text-xs flex items-center justify-center gap-2">' +
+                    '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>' +
+                    '<span>Canlı nöbetçi eczaneler alınıyor...</span></div>';
+            }
+
+            fetch('/api/nobetci-eczaneler?city=' + encodeURIComponent(cityName))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.pharmacies && data.pharmacies.length > 0) {
+                        CURRENT_NOBETCI_DATA = data.pharmacies.map(function(p) {
+                            return {
+                                name: p.name || 'Eczane',
+                                city: cityName,
+                                district: p.district || cityName,
+                                address: p.address || 'Adres bilgisi mevcut',
+                                phone: p.phone || '-'
+                            };
+                        });
+                        if (badgeEl) badgeEl.innerText = '🟢 Canlı (' + CURRENT_NOBETCI_DATA.length + ' Eczane)';
+                        renderNobetciList(CURRENT_NOBETCI_DATA);
+                    } else {
+                        if (badgeEl) badgeEl.innerText = 'Nöbetçi Bilgisi';
+                        CURRENT_NOBETCI_DATA = SAMPLE_PHARMACIES;
+                        renderNobetciList(CURRENT_NOBETCI_DATA);
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Nobetci fetch err:', err);
+                    if (badgeEl) badgeEl.innerText = 'Çevrimdışı';
+                    CURRENT_NOBETCI_DATA = SAMPLE_PHARMACIES;
+                    renderNobetciList(CURRENT_NOBETCI_DATA);
+                });
+        }
+        window.loadNobetciCity = loadNobetciCity;
 
         function renderNobetciList(items) {
             var listEl = document.getElementById('nobetci-list');
             if (!listEl) return;
-            if (items.length === 0) {
+            if (!items || items.length === 0) {
                 listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Aradığınız kriterde nöbetçi eczane bulunamadı.</div>';
                 return;
             }
             listEl.innerHTML = items.map(function(p) {
-                return '<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-emerald-500/50 transition">' +
-                    '<div>' +
-                        '<div class="font-bold text-white text-xs flex items-center gap-1.5">' +
+                var phoneClean = (p.phone || '').replace(/[^0-9+]/g, '');
+                return '<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-emerald-500/50 transition gap-2">' +
+                    '<div class="min-w-0 flex-1">' +
+                        '<div class="font-bold text-white text-xs flex items-center gap-1.5 flex-wrap">' +
                             '<span>' + p.name + '</span>' +
-                            '<span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-semibold">' + p.city + ' / ' + p.district + '</span>' +
+                            '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">' + (p.district || p.city) + '</span>' +
                         '</div>' +
-                        '<div class="text-[11px] text-slate-400 mt-0.5">' + p.address + '</div>' +
+                        '<div class="text-[11px] text-slate-400 mt-0.5 truncate">' + (p.address || '') + '</div>' +
                     '</div>' +
-                    '<a href="tel:' + p.phone.replace(/\s+/g, '') + '" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">' +
-                        '📞 ' + p.phone +
+                    '<a href="tel:' + phoneClean + '" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">' +
+                        '📞 <span class="hidden sm:inline">' + (p.phone || 'Ara') + '</span>' +
                     '</a>' +
                 '</div>';
             }).join('');
@@ -3297,12 +3406,16 @@
 
         function filterNobetci(query) {
             var q = (query || '').toLowerCase().trim();
+            var source = (CURRENT_NOBETCI_DATA && CURRENT_NOBETCI_DATA.length > 0) ? CURRENT_NOBETCI_DATA : SAMPLE_PHARMACIES;
             if (!q) {
-                renderNobetciList(SAMPLE_PHARMACIES);
+                renderNobetciList(source);
                 return;
             }
-            var filtered = SAMPLE_PHARMACIES.filter(function(p) {
-                return p.name.toLowerCase().includes(q) || p.city.toLowerCase().includes(q) || p.district.toLowerCase().includes(q);
+            var filtered = source.filter(function(p) {
+                return (p.name || '').toLowerCase().includes(q) || 
+                       (p.city || '').toLowerCase().includes(q) || 
+                       (p.district || '').toLowerCase().includes(q) ||
+                       (p.address || '').toLowerCase().includes(q);
             });
             renderNobetciList(filtered);
         }
@@ -3581,12 +3694,14 @@
         function initApp() {
             if (window.lucide) window.lucide.createIcons();
             switchStandings('genel');
-            renderFixtures(9);
+            renderFixtures(10);
             populateNamazCities();
             updateNamazModal('İstanbul');
             startPrayerCountdown();
-            renderNobetciList(SAMPLE_PHARMACIES);
+            populateNobetciCities();
+            loadNobetciCity('İstanbul');
             renderDepremList(SAMPLE_QUAKES);
+            fetchLiveSuperlig();
 
             var btnNamaz = document.getElementById('btn-open-namaz');
             if (btnNamaz) btnNamaz.addEventListener('click', openNamazModal);

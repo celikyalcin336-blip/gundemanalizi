@@ -29,26 +29,27 @@ def generate_telegram_post(title: str, summary: str, source: str) -> str:
             from google import genai
             client = genai.Client(api_key=config.GEMINI_API_KEY)
             prompt = f"""
-Sen Türkiye'nin en popüler haber Telegram kanallarının (BPT, Asayiş Berkemal, Ana Haber) uzman editörüsün.
-Aşağıdaki haber için Telegram takipçilerinin tek bakışta okuyabileceği, net, vurucu ve maddeli bir haber metni hazırla.
+Sen Türkiye'nin en popüler haber Telegram kanallarının (BPT, Asayiş Berkemal, Ana Haber) uzman baş editörüsün.
+Aşağıdaki haber için Telegram takipçilerine olayın arka planını, nedenlerini ve ayrıntılarını net şekilde aktaran, doyurucu ve maddeli bir haber metni hazırla.
 
 Haber Başlığı: {title}
 Haber Detayı: {summary}
 Kaynak: {source}
 
 Format:
-İlk satır: Haberin ana konusu / vurucu özeti (1 kısa cümle).
+İlk satır: Haberin ana konusunu ve önemini anlatan net, açıklayıcı ve vurucu bir giriş cümlesi.
 Boş satır.
-Maddeler: Haberdeki en kritik sayıları, gelişmeleri ve ayrıntıları içeren 2-3 adet madde işareti (— ile başlayan).
+Maddeler: Haberdeki en kritik sayıları, kararları, yetkili açıklamalarını ve gelişmeleri açıklayan 3-4 adet doyurucu madde işareti (— ile başlayan). Her madde sadece 2-3 kelime olmamalı; olayın o boyutunu akıcı, net ve dil bilgisi düzgün bir dille izah etmelidir.
 Son satır: Parantez içinde kaynak, örn: ({source})
 
 Kurallar:
-1. ASLA hashtag (#haber, #sondakika vb.) KULLANMA.
-2. ASLA 'Siz ne düşünüyorsunuz' gibi yapay sorular SORMA.
-3. ASLA link/URL ekleme.
-4. Varsa kesin sayıları, TL tutarlarını, oranları, ceza/hapis sürelerini maddelere koy.
-5. ASLA borsa/SPK yasal uyarı metinlerini, 'yatırım danışmanlığı kapsamında değildir' şablonlarını veya ajans telif notlarını maddelere KOYMA.
-6. Yalnızca doğrudan paylaşılacak nihai metni yaz.
+1. CÜMLE KALİTESİ: Cümleleri uzatacağım diye yapay, devrik veya bozuk cümleler kurma. Açık, duru ve kusursuz Türkçe kullan.
+2. ASLA hashtag (#haber, #sondakika vb.) KULLANMA.
+3. ASLA 'Siz ne düşünüyorsunuz?' gibi yapay sorular SORMA.
+4. ASLA link/URL ekleme.
+5. Varsa kesin sayıları, TL tutarlarını, oranları, ceza/hapis sürelerini, kurum açıklamalarını maddelere koy.
+6. ASLA borsa/SPK yasal uyarı metinlerini veya ajans telif şablonlarını maddelere KOYMA.
+7. Yalnızca doğrudan paylaşılacak nihai metni yaz.
 """
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
                 try:
@@ -144,18 +145,20 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
             
             prompt = f"""
 Sen saygın ve profesyonel bir ulusal haber ajansının (Gündem Analizi) kıdemli baş editörüsün.
-Aşağıdaki haber için kurumsal haber medya kuruluşlarının (BBC Türkçe, TRT Haber, NTV) standartlarına uygun, sade, tarafsız ve net bir Türkçe haber paylaşım metni hazırla.
+Aşağıdaki haber için kurumsal haber medya kuruluşlarının (BBC Türkçe, TRT Haber, NTV) standartlarına uygun, doyurucu, açıklayıcı, tarafsız ve profesyonel bir Türkçe haber metni hazırla.
 
 Haber Başlığı: {title}
 Haber Detayı: {summary}
 
 UYULMASI ZORUNLU KURALLAR:
-1. Basın ve ajans ciddiyetine uygun, tarafsız, bilgilendirici ve profesyonel bir dil kullan (1 veya en fazla 2 akıcı paragraf).
-2. ASLA takipçilere yapay sorular sorma (Örn: 'Siz ne düşünüyorsunuz?', 'Yorumlarda buluşalım', 'Sizce ne yapılmalı?' gibi amatör etkileşim tuzaklarını KESİNLİKLE KULLANMA).
-3. ASLA hashtag (#haber, #sondakika, #gündem vb.) KULLANMA. Metin tamamen temiz, kurumsal ve sade olmalıdır.
-4. Başlığı veya aynı cümleyi metin içinde ASLA iki kez tekrar etme.
-5. Metnin içine link/URL veya 'Kaynak: ...' yazma (kaynak ve link sistem tarafından otomatik ve tek seferlik eklenecektir).
-6. Yalnızca doğrudan yayınlanacak nihai basın metnini yaz; selamlama, kapanış veya fazladan açıklama ekleme.
+1. Basın ve ajans ciddiyetine uygun, tarafsız, bilgilendirici ve profesyonel bir dil kullan (2-3 akıcı, doyurucu ve açıklayıcı paragraf).
+2. Olayın kim, nerede, nasıl ve neden gerçekleştiğini, yetkililerin veya tarafların açıklamalarını detaylıca aktar.
+3. CÜMLE YAPISI: Cümleleri uzatacağım diye yapay, devrik, anlamsız veya bozuk cümleler kurma. Her cümlenin öznesi ve yüklemi tam, Türkçesi berrak ve akıcı olsun.
+4. ASLA takipçilere yapay sorular sorma (Örn: 'Sizce ne olmalı?', 'Yorumlarda buluşalım' gibi amatör tuzakları KESİNLİKLE KULLANMA).
+5. ASLA hashtag (#haber, #sondakika vb.) KULLANMA. Metin tamamen temiz ve kurumsal olmalıdır.
+6. Başlığı veya aynı cümleyi metin içinde iki kez tekrar etme.
+7. Metnin içine link/URL veya 'Kaynak: ...' yazma.
+8. Yalnızca doğrudan yayınlanacak nihai basın metnini yaz.
 """
             # Model denemesi (önce 2.5-flash, sonra 2.0-flash, sonra 1.5-flash)
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
@@ -325,21 +328,60 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
             from google import genai
             client = genai.Client(api_key=config.GEMINI_API_KEY)
             prompt = f"""
-Sen 'Gündem Analizi' haber sitesinin baş editörüsün.
-Aşağıdaki haber için tarafsız, profesyonel, okuyucu dostu bir Türkçe haber makalesi yaz.
+Sen 'Gündem Analizi' bağımsız haber portalının baş editörüsün.
+Aşağıdaki haber için Anadolu Ajansı, Reuters ve BBC Türkçe standartlarında; kapsamlı, doyurucu, derinlemesine açıklayıcı ve akıcı bir Türkçe haber makalesi yaz.
 
-Başlık: {title}
-Özet Bilgi: {summary}
+Haber Başlığı: {title}
+Haber Detayı ve Gelişmeler: {summary}
 Kaynak: {source}
 Kategori: {category}
-Özel Talimat: {category_guide}
+Özel Kategori Odak Noktası: {category_guide}
 
-İstenen Format:
-- Giriş: Haberin ana gelişmesini anlatan çarpıcı bir paragraf.
-- Gelişme: Konunun arka planı, detayları ve önemli noktaları (2 paragraf).
-- Gündem Analizi Yorumu: Olayın olası etkileri veya dikkat çeken yönleri üzerine kısa bir değerlendirme.
+EDİTORYAL KURALLAR VE YAZIM İLKELERİ:
+1. UZUNLUK VE AÇIKLAYICILIK: Haber yüzeysel veya tekdüze kalmamalıdır. Olayın 'Kim, Ne, Nerede, Ne Zaman, Nasıl ve Neden' (5N1K) unsurlarını, sürecin arka planını, tarafların açıklamalarını, somut rakamları ve geleceğe dönük yansımalarını detaylandır.
+2. CÜMLE YAPISI VE DİL BİLGİSİ (ÇOK ÖNEMLİ):
+   - Metni uzatacağım diye cümleleri yapay şekilde uzatma, devrik veya karmaşık hale getirme!
+   - Her cümlenin öznesi, yüklemi ve mantıksal akışı tam, duru ve anlaşılır Türkçe dil bilgisi kurallarına uygun olmalıdır.
+   - Uzunluk gereksiz laf kalabalığıyla değil; konunun teknik, hukuki, ekonomik ve insani ayrıntılarını adım adım açıklayarak sağlanmalıdır.
+   - Tekrarlardan ve içi boş klişelerden kesinlikle kaçın.
+3. KESİNLİKLE YAPILMAYACAKLAR:
+   - ASLA 'Siz ne düşünüyorsunuz?', 'Yorumlarda buluşalım' gibi yapay sorular sorma.
+   - ASLA hashtag (#haber, #sondakika vb.) kullanma.
+   - ASLA SPK / borsa yasal uyarı kalıplarını metne dahil etme.
 
-Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara başlıklar (<h3>...</h3>) olarak ver.
+İSTENEN ÇIKTI FORMATI:
+Lütfen yanıtını AYNEN şu iki bölüm halinde ver:
+
+[ÖZET]
+Haberin en can alıcı ayrıntılarını, sayılar ve somut bilgilerle özetleyen, 2-3 akıcı ve doyurucu cümleden oluşan editoryal özet.
+
+[İÇERİK]
+HTML formatında yazılmış, en az 4-5 doyurucu paragraftan ve ara başlıklardan oluşan tam makale:
+<p class="lead font-medium text-lg text-slate-200 mb-6">
+[Giriş: Olayın başlangıcını ve ana gelişmeyi tüm boyutlarıyla anlatan güçlü paragraf]
+</p>
+
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları ve Sürecin İşleyişi</h3>
+<p class="text-slate-300 leading-relaxed mb-4">
+[Detaylar, yetkililerin/kurumların açıklamaları ve olay anına ilişkin bilgiler]
+</p>
+<p class="text-slate-300 leading-relaxed mb-4">
+[Rakamlar, teknik detaylar, yasal/mali boyut veya olayın geçmişe uzanan arka planı]
+</p>
+
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Sektörel ve Toplumsal Yansımaları</h3>
+<p class="text-slate-300 leading-relaxed mb-4">
+[Gelişmenin vatandaşa, piyasalara veya sektöre etkileri, uzman değerlendirmeleri]
+</p>
+
+<div class="p-5 rounded-xl bg-red-950/40 border border-red-800/40 my-6">
+    <h4 class="font-bold text-red-400 flex items-center gap-2 mb-2">
+        <span>🔴</span> GÜNDEM ANALİZİ DEĞERLENDİRMESİ
+    </h4>
+    <p class="text-slate-300 text-sm leading-relaxed">
+        [Sürecin geleceğine ve olası sonuçlarına dair editoryal tarafsız değerlendirme]
+    </p>
+</div>
 """
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
                 try:
@@ -348,10 +390,27 @@ Lütfen çıktıyı düzgün HTML paragrafları (<p>...</p>) ve gerekiyorsa ara 
                         contents=prompt
                     )
                     if res and res.text:
+                        raw_text = res.text.strip()
+                        gen_summary = summary if summary else title
+                        gen_content = raw_text
+                        if "[İÇERİK]" in raw_text:
+                            parts = raw_text.split("[İÇERİK]")
+                            extracted_sum = parts[0].replace("[ÖZET]", "").strip()
+                            if len(extracted_sum) > 30:
+                                gen_summary = extracted_sum
+                            gen_content = parts[1].strip()
+                        elif "[ÖZET]" in raw_text:
+                            gen_content = raw_text.replace("[ÖZET]", "").strip()
+                        
+                        # Markdown ```html temizliği
+                        gen_content = re.sub(r'^```html\s*', '', gen_content, flags=re.I)
+                        gen_content = re.sub(r'^```\s*', '', gen_content)
+                        gen_content = re.sub(r'\s*```$', '', gen_content)
+
                         return {
                             "title": title,
-                            "summary": summary if summary else title,
-                            "content": res.text.strip(),
+                            "summary": gen_summary,
+                            "content": gen_content.strip(),
                             "category": category
                         }
                 except Exception:

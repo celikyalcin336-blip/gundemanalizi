@@ -83,6 +83,60 @@ def bot_background_worker():
         sleep_dur = max(30, interval_sec - elapsed)
         time.sleep(sleep_dur)
 
+def system_health_watchdog_worker():
+    """
+    7/24 Kesintisiz Nöbetçi Sistem Bekçisi:
+    Her 3 dakikada bir veritabanı, haber sayısı ve sunucu sağlığını kontrol eder.
+    Bir aksaklık olduğunda Yalçın Bey'in şahsi Telegram'ına SOS atar,
+    düzeldiğinde de 'normale döndü' raporu gönderir.
+    """
+    import telegram_notifier
+    time.sleep(45)
+    last_status_ok = True
+    consecutive_fails = 0
+
+    while True:
+        try:
+            status_ok = True
+            fail_reason = ""
+            with database.get_connection() as conn:
+                if not getattr(conn, "is_pg", False) and database.USE_PG:
+                    status_ok = False
+                    fail_reason = f"PostgreSQL bağlantısı koptu! Sistem geçici SQLite modunda. Hata: {getattr(database, '_PG_LAST_ERROR', 'Bilinmiyor')}"
+                else:
+                    try:
+                        row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
+                        cnt = row["c"] if row else 0
+                        if cnt == 0:
+                            status_ok = False
+                            fail_reason = "Veritabanında 0 haber tespit edildi! Makale listesi boş görünüyor."
+                    except Exception as q_err:
+                        status_ok = False
+                        fail_reason = f"Makale sayısı sorgulanamadı: {q_err}"
+
+            if not status_ok:
+                consecutive_fails += 1
+                if consecutive_fails == 1:
+                    telegram_notifier.send_admin_alert(
+                        subject="Sitede Veritabanı / Haber Kesintisi!",
+                        message=f"Patron dikkat!\n\n{fail_reason}\n\nSistem otomatik onarım ve yeniden bağlanmayı deniyor."
+                    )
+                last_status_ok = False
+            else:
+                if not last_status_ok:
+                    telegram_notifier.send_admin_alert(
+                        subject="Sistem Başarıyla Normale Döndü",
+                        message="Veritabanı bağlantısı sağlandı ve haberler yeniden sorunsuz yayında.",
+                        is_resolved=True
+                    )
+                last_status_ok = True
+                consecutive_fails = 0
+
+        except Exception as e:
+            pass
+
+        time.sleep(180)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
@@ -92,6 +146,8 @@ async def lifespan(app: FastAPI):
     threading.Thread(target=market_rates_background_worker, daemon=True).start()
     # Render Free Tier uyumasini (cold-start) engelleyen periyodik koruma iscisi
     threading.Thread(target=keep_alive_background_worker, daemon=True).start()
+    # 7/24 Nobetci Sistem Bekcisi
+    threading.Thread(target=system_health_watchdog_worker, daemon=True).start()
     yield
 
 ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
@@ -621,6 +677,30 @@ async def api_deprem(limit: int = 50):
         "quakes": quakes
     })
 
+@app.get("/api/nobetci-eczaneler")
+async def api_nobetci_eczaneler(city: str = "istanbul"):
+    """81 İl Canlı Nöbetçi Eczaneler API'si (Bugünün Gerçek Nöbetçileri)."""
+    import live_services
+    data = live_services.get_live_pharmacies(city)
+    return JSONResponse({
+        "ok": True,
+        "city": city,
+        "count": len(data),
+        "pharmacies": data
+    })
+
+@app.get("/api/superlig")
+async def api_superlig():
+    """TFF Resmi Trendyol Süper Lig Canlı Puan Durumu ve Gelecek Maçlar API'si."""
+    import live_services
+    data = live_services.get_live_superlig()
+    return JSONResponse(data)
+
+@app.get("/son-dakika", response_class=HTMLResponse)
+async def page_son_dakika(request: Request, sayfa: int = 1):
+    """Google Sitelinks ve doğrudan Son Dakika kategorisi açılış sayfası."""
+    return await home(request, kategori="Son Dakika", sayfa=sayfa)
+
 @app.get("/api/search")
 async def api_search(q: str = "", limit: int = 8):
     """Canlı anlık haber arama API'si (Autocompletion & Live Search)."""
@@ -696,8 +776,12 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         total_count = database.get_search_count(search_kw)
         canonical_url = f"{config.SITE_URL}/?q={urllib.parse.quote(search_kw)}"
     else:
-        articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
-        total_count = database.get_articles_total_count(category=norm_kategori)
+        if norm_kategori == "Son Dakika":
+            articles = database.get_articles(limit=limit, offset=offset)
+            total_count = database.get_articles_total_count()
+        else:
+            articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
+            total_count = database.get_articles_total_count(category=norm_kategori)
         if norm_kategori:
             canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(norm_kategori)}"
         else:
