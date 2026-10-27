@@ -53,18 +53,15 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - Web sunucusunu kilitlememesi için bağımsız subprocess olarak çalışır; sorun çıkarsa doğrudan çağrıya döner.
-    - İlk açılışta hemen 1 taze haber çeker, ardından periyodik olarak devam eder.
+    - 60 saniyede bir yoklar; main.py içindeki 14.5 dakikalık hassas veritabanı kilidi sayesinde
+      hazırlık süresiyle birlikte tam 15:00. dakikada haber yayına girer.
     """
     time.sleep(30)
-    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi (15 dk Veritabanı Kilitli)...")
+    print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
     main_script = os.path.join(BASE_DIR, "main.py")
-    interval_sec = max(900, config.CHECK_INTERVAL_MINUTES * 60)
 
     while True:
-        cycle_start = time.time()
         try:
-            print(f"🔄 [Otonom Bot] Haber taraması başlatılıyor (Hedef: {interval_sec // 60} dakikada bir)...")
             res = subprocess.run(
                 [sys.executable, main_script, "--max-items", "1"],
                 capture_output=True,
@@ -84,9 +81,8 @@ def bot_background_worker():
             except Exception as inner_e:
                 print(f"❌ [Otonom Bot] Kritik hata: {inner_e}")
 
-        elapsed = time.time() - cycle_start
-        sleep_dur = max(30, interval_sec - elapsed)
-        time.sleep(sleep_dur)
+        # Her 60 saniyede bir kontrol et (main.py veritabanındaki son haber saatine göre 14.5 dk dolunca anında tetiklenir)
+        time.sleep(60)
 
 def system_health_watchdog_worker():
     """

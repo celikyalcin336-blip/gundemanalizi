@@ -144,11 +144,11 @@ def get_minutes_since_last_article() -> float:
 def run_bot(max_items: int = 1, force: bool = False):
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     if not force:
-        target_cooldown = max(15, config.CHECK_INTERVAL_MINUTES)
+        target_cooldown = max(14.5, float(config.CHECK_INTERVAL_MINUTES) - 0.5)
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < target_cooldown:
             remaining = round(target_cooldown - minutes_passed, 1)
-            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: {target_cooldown} dk. Yeni haber için {remaining} dk bekleniyor.")
+            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: 15 dk. Yeni haber için {remaining} dk bekleniyor.")
             return 0
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
@@ -158,7 +158,13 @@ def run_bot(max_items: int = 1, force: bool = False):
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
         return 0
 
-    print(f"📡 Paylaşılmaya hazır {len(news_items)} yeni haber tespit edildi.")
+    # Mükerrer Olmayan Yepyeni Haberleri Filtrele (Aynı haber asla tekrar paylaşılmaz)
+    fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
+    if not fresh_news:
+        print("ℹ️  Tüm haberler daha önce paylaşılmış. Yeni taze haber bekleniyor.")
+        return 0
+
+    print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
     # 8 Ana Kategori Döngüsü (Gündem -> Ekonomi -> Teknoloji -> Dünya -> Otomobil -> Spor -> Sağlık -> Eğitim)
     ROTATION = ["Gündem", "Ekonomi", "Teknoloji", "Dünya", "Otomobil", "Spor", "Sağlık", "Eğitim"]
@@ -170,14 +176,14 @@ def run_bot(max_items: int = 1, force: bool = False):
     target_cat = ROTATION[next_idx]
     print(f"🎯 Hedef Kategori Sırası: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
 
-    # Hedef kategoriden bekleyen haberleri filtrele
-    target_items = [item for item in news_items if item.get("category") == target_cat]
-    if target_items:
-        selected_pool = target_items
-        print(f"✅ [{target_cat}] kategorisinden {len(target_items)} adet güncel haber bulundu.")
+    # Hedef kategoriden taze haber varsa önceliklendir
+    target_fresh = [item for item in fresh_news if item.get("category") == target_cat]
+    if target_fresh:
+        selected_pool = target_fresh
+        print(f"✅ [{target_cat}] kategorisinden {len(target_fresh)} adet taze haber seçildi.")
     else:
-        print(f"⚠️ [{target_cat}] kategorisinde henüz yeni haber yok, en yüksek puanlı alternatif seçiliyor...")
-        selected_pool = news_items
+        print(f"⚠️ [{target_cat}] kategorisinde henüz taze haber yok, diğer kategorilerden en güncel taze haber seçiliyor...")
+        selected_pool = fresh_news
 
     processed_count = 0
     # Sıradaki haber hata verirse döngüyü kesme, havuzdaki diğer taze haberleri dene!
