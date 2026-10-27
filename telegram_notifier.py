@@ -13,6 +13,17 @@ import config
 
 BASE_URL = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"
 
+def to_ascii_url(url: str) -> str:
+    if not url:
+        return "https://xn--gndemanalizi-dlb.com.tr"
+    u = url.replace("https://www.gündemanalizi.com.tr", "https://xn--gndemanalizi-dlb.com.tr")
+    u = u.replace("http://www.gündemanalizi.com.tr", "https://xn--gndemanalizi-dlb.com.tr")
+    u = u.replace("https://gündemanalizi.com.tr", "https://xn--gndemanalizi-dlb.com.tr")
+    u = u.replace("http://gündemanalizi.com.tr", "https://xn--gndemanalizi-dlb.com.tr")
+    u = u.replace("www.gündemanalizi.com.tr", "xn--gndemanalizi-dlb.com.tr")
+    u = u.replace("gündemanalizi.com.tr", "xn--gndemanalizi-dlb.com.tr")
+    return u
+
 def clean_news_link(url: str) -> str:
     """
     Punycode (xn--gndemanalizi-dlb.com.tr) adreslerini kullanıcı dostu
@@ -83,12 +94,13 @@ def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bo
         "caption": full_caption
     }
     if display_link:
+        btn_target_url = to_ascii_url(news_link or display_link)
         payload["reply_markup"] = json.dumps({
             "inline_keyboard": [
                 [
                     {
                         "text": "📖 Haberi Oku: www.gündemanalizi.com.tr",
-                        "url": display_link
+                        "url": btn_target_url
                     }
                 ]
             ]
@@ -99,6 +111,12 @@ def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bo
             files = {"photo": img}
             resp = requests.post(url, data=payload, files=files, timeout=30)
             data = resp.json()
+            if not data.get("ok") and "reply_markup" in payload:
+                print(f"⚠️ Telegram reply_markup reddedildi ({data.get('description')}), butonsuz gonderiliyor...")
+                del payload["reply_markup"]
+                with open(image_path, "rb") as retry_img:
+                    resp = requests.post(url, data=payload, files={"photo": retry_img}, timeout=30)
+                    data = resp.json()
             if data.get("ok"):
                 print("📲 Haber başarıyla Telegram'a gönderildi!")
                 return True
@@ -133,12 +151,13 @@ def send_telegram_video(video_path: str, caption: str, news_link: str = "") -> b
         "supports_streaming": "true"
     }
     if display_link:
+        btn_target_url = to_ascii_url(news_link or display_link)
         payload["reply_markup"] = json.dumps({
             "inline_keyboard": [
                 [
                     {
                         "text": "📖 Haberi Oku: www.gündemanalizi.com.tr",
-                        "url": display_link
+                        "url": btn_target_url
                     }
                 ]
             ]

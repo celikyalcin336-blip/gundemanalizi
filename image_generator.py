@@ -188,21 +188,28 @@ def search_editorial_web_image(title: str, category: str = "") -> str:
             'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7'
         }
         clean_q = re.sub(r'[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ\s]', ' ', title)
-        words = [w for w in clean_q.split() if len(w) > 2 and w.lower() not in ['haber', 'haberi', 'son', 'dakika', 'flas', 'flaş', 'iste', 'işte', 'acikladi', 'açıkladı']][:5]
-        search_str = " ".join(words)
-        if category and category.lower() not in search_str.lower():
-            search_str += f" {category}"
-
-        url = f'https://www.bing.com/images/search?q={urllib.parse.quote(search_str)}&qft=+filterui:aspect-wide&first=1'
-        r = requests.get(url, headers=headers, timeout=6)
-        murls = re.findall(r'murl&quot;:&quot;(https?://[^&]+?\.(?:jpg|jpeg|png|webp))&quot;', r.text)
-        if not murls:
-            murls = re.findall(r'\"murl\":\"(https?://[^\"]+?\.(?:jpg|jpeg|png|webp))\"', r.text)
+        stop_words = {'haber', 'haberi', 'haberleri', 'son', 'dakika', 'flas', 'flaş', 'iste', 'işte', 'acikladi', 'açıkladı', 'mesaji', 'mesajı', 'dedi', 've', 'ile', 'icin', 'için', 'bir', 'bu'}
+        words = [w for w in clean_q.split() if len(w) > 2 and w.lower() not in stop_words]
+        
+        queries = []
+        if len(words) >= 3:
+            queries.append(" ".join(words[:4]))
+        if len(words) >= 2:
+            queries.append(" ".join(words[:2]))
+        if words:
+            queries.append(words[0])
             
-        for candidate in murls[:5]:
-            if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector']):
-                continue
-            return candidate
+        for q in queries:
+            url = f'https://www.bing.com/images/search?q={urllib.parse.quote(q)}&first=1'
+            r = requests.get(url, headers=headers, timeout=5)
+            murls = re.findall(r'murl&quot;:&quot;(https?://[^&]+?\.(?:jpg|jpeg|png|webp))&quot;', r.text)
+            if not murls:
+                murls = re.findall(r'"murl":"(https?://[^"]+?\.(?:jpg|jpeg|png|webp))"', r.text)
+                
+            for candidate in murls:
+                if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector', 'icon']):
+                    continue
+                return candidate
     except Exception as e:
         print(f"Editoryal görsel arama hatası: {e}")
     return None

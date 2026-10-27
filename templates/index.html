@@ -80,12 +80,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         
-        /* ========================================================
+                /* ========================================================
            📰 GÜNDEM ANALİZİ RESMİ BEYAZ GAZETE TEMASI (LIGHT THEME)
            Hürriyet / BBC / Ensonhaber Standardında Kusursuz Kontrast
            ======================================================== */
         :root {
-            --bg-page: #f1f5f9;
+            --bg-page: #f8fafc;
             --card-bg: #ffffff;
             --border-col: #e2e8f0;
             --text-dark: #0f172a;
@@ -94,17 +94,22 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-page) !important;
-            color: var(--text-dark) !important;
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
         }
 
-        /* 1. Üst Menü & Header (Beyaz ve Ferah) */
+        /* 1. En Üst Kırmızı Son Dakika Bandı (Kırmızı Zemin Üzerinde BEYAZ Yazı) */
+        .bg-red-700, .bg-red-700 *,
+        .bg-red-800, .bg-red-800 * {
+            color: #ffffff !important;
+        }
+
+        /* 2. Üst Menü & Header (Beyaz ve Ferah) */
         header.sticky {
-            background-color: rgba(255, 255, 255, 0.97) !important;
+            background-color: rgba(255, 255, 255, 0.98) !important;
             border-color: #e2e8f0 !important;
             box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05) !important;
         }
-
         header nav a {
             color: #334155 !important;
         }
@@ -116,72 +121,19 @@
             color: #0f172a !important;
         }
 
-        /* 2. Tüm Haber Kartları ve Bölüm Zeminleri (Bembeyaz) */
-        .bg-brand-card,
-        article.bg-brand-card,
-        .bg-slate-950,
-        .bg-slate-900,
-        [class*="bg-slate-900"],
-        .rounded-2xl.bg-brand-card {
+        /* 3. Canlı Piyasa & Finans Bandı (Beyaz Zemin, Net Kurlar) */
+        section[class*="bg-brand-card"],
+        section.bg-brand-card\/90 {
             background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+            border-bottom: 1px solid #e2e8f0 !important;
         }
-
-        /* 3. BÖLÜM BAŞLIKLARI VE KART İÇİNDEKİ TÜM YAZILAR - JİLET GİBİ SİYAH */
-        h1, h2, h3, h4,
-        section h2,
-        section h2.text-white,
-        article h2, article h3, article h4,
-        .p-5 h3, .p-4 h3, .p-3 h4, .p-2 h4,
-        .p-5 a, .p-4 a, .p-3 a,
-        .p-5 .text-white, .p-4 .text-white, .p-3 .text-white,
-        .p-3 .text-slate-200, .p-4 .text-slate-200 {
+        section[class*="bg-brand-card"] span {
             color: #0f172a !important;
         }
-
-        /* Kart İçi Özet Yazıları ve Açıklamalar */
-        .p-5 p, .p-4 p, .p-3 p, article p,
-        .p-5 .text-slate-300, .p-4 .text-slate-300 {
-            color: #475569 !important;
-        }
-
-        /* 4. ⭐ EN KRİTİK KURAL: FOTOĞRAF ÜZERİNDEKİ YAZILAR (MANŞET SLIDER VE GÖRSEL OVERLAYLERİ)
-           Fotoğraf altındaki siyah gölgenin üzerinde KESİNLİKLE BEYAZ kalır! */
-        .manset-slide .text-white,
-        .manset-slide h2,
-        .manset-slide span.text-slate-300,
-        .absolute.bottom-0 .text-white,
-        .absolute.bottom-0 h2,
-        .absolute.bottom-0 h3,
-        [class*="from-slate-950"] ~ div h2,
-        [class*="from-black"] ~ div h2,
-        [class*="from-black"] .text-white,
-        [class*="from-slate-950"] .text-white,
-        /* Rozetler daima beyaz */
-        .bg-red-600, .bg-red-600 *,
-        .bg-blue-600, .bg-blue-600 *,
-        .bg-emerald-600, .bg-emerald-600 *,
-        .bg-green-600, .bg-green-600 * {
-            color: #ffffff !important;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
-        }
-
-        /* 5. Kart İçi Açıklama & Özet Yazıları */
-        article p,
-        .bg-brand-card p {
-            color: #475569 !important;
-        }
-        article .text-slate-400,
-        .bg-brand-card .text-slate-400 {
-            color: #64748b !important;
-        }
-
-        /* 6. Canlı Piyasa & Takip Çubuğu */
         #market-rates-bar > div,
         .w-full.grid.grid-cols-2 > div {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
             box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
         }
         #market-rates-bar .text-slate-400,
@@ -193,17 +145,121 @@
             color: #0f172a !important;
         }
 
-        /* 7. Sosyal Medya İhbar & Takip Bandı */
-        .bg-slate-900.border.rounded-2xl {
+        /* 4. Tüm Haber Kartları ve Bölüm Zeminleri (Bembeyaz) */
+        .bg-brand-card,
+        article.bg-brand-card,
+        .bg-slate-950,
+        .bg-slate-900,
+        [class*="bg-slate-900"],
+        .rounded-2xl.bg-brand-card {
             background-color: #ffffff !important;
             border-color: #e2e8f0 !important;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
-        }
-        .bg-slate-900.border.rounded-2xl span {
-            color: #334155 !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
         }
 
-        /* 8. Kenarlıklar */
+        /* 5. BÖLÜM VE KATEGORİ BAŞLIKLARI (GÜNDEM, TEKNOLOJİ, EKONOMİ vb.) - JİLET GİBİ SİYAH */
+        h1, h2, h3, h4,
+        section h2,
+        section h2.text-white,
+        section h2 span.text-white,
+        .flex.items-center h2,
+        h2.uppercase,
+        article h2, article h3, article h4,
+        .p-5 h3, .p-4 h3, .p-3 h4, .p-2 h4,
+        .p-5 a, .p-4 a, .p-3 a,
+        .p-5 .text-white, .p-4 .text-white, .p-3 .text-white,
+        .p-3 .text-slate-200, .p-4 .text-slate-200 {
+            color: #0f172a !important;
+        }
+
+        /* Kart İçi Özet Metinleri ve Açıklamalar (Koyu Gri, Gözü Yormayan) */
+        .p-5 p, .p-4 p, .p-3 p, article p,
+        .p-5 .text-slate-300, .p-4 .text-slate-300,
+        .text-slate-400 {
+            color: #475569 !important;
+        }
+
+        /* 6. ⭐ EN KRİTİK KURAL: FOTOĞRAF ÜZERİNDEKİ YAZILAR (MANŞET SLIDER VE GÖRSEL OVERLAYLERİ)
+           Fotoğraf altındaki siyah gölgenin üzerinde KESİNLİKLE BEYAZ kalır! */
+        .manset-slide .text-white,
+        .manset-slide h2,
+        .manset-slide span.text-slate-300,
+        .absolute.bottom-0 .text-white,
+        .absolute.bottom-0 h2,
+        .absolute.bottom-0 h3,
+        [class*="from-slate-950"] ~ div h2,
+        [class*="from-black"] ~ div h2,
+        [class*="from-black"] .text-white,
+        [class*="from-slate-950"] .text-white {
+            color: #ffffff !important;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+        }
+
+        /* 7. Kategori Rozetleri ve Renkli Etiketler (Her Zaman BEYAZ) */
+        .bg-red-600, .bg-red-600 *,
+        .bg-blue-600, .bg-blue-600 *,
+        .bg-emerald-600, .bg-emerald-600 *,
+        .bg-green-600, .bg-green-600 *,
+        .bg-purple-600, .bg-purple-600 *,
+        span[class*="bg-red-"], span[class*="bg-red-"] *,
+        span[class*="bg-blue-"], span[class*="bg-blue-"] *,
+        span[class*="bg-emerald-"], span[class*="bg-emerald-"] * {
+            color: #ffffff !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        /* 8. Sosyal Medya İhbar & Takip Bandı (Beyaz Zemin, Görünür İkonlar) */
+        div[class*="bg-slate-900"].rounded-2xl.p-4 {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+        }
+        div[class*="bg-slate-900"].rounded-2xl.p-4 span {
+            color: #0f172a !important;
+        }
+        div[class*="bg-slate-900"].rounded-2xl.p-4 a {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        div[class*="bg-slate-900"].rounded-2xl.p-4 a svg {
+            fill: #0f172a !important;
+        }
+        div[class*="bg-slate-900"].rounded-2xl.p-4 a:hover svg {
+            fill: #dc2626 !important;
+        }
+
+        /* 9. 81 İl Servisler Kutusu (Açık ve Yüksek Kontrastlı) */
+        div.bg-slate-950.border.border-slate-800.rounded-2xl,
+        div[class*="bg-slate-950"].rounded-2xl {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04) !important;
+        }
+        div[class*="bg-slate-950"].rounded-2xl h3 {
+            color: #0f172a !important;
+        }
+        div[class*="bg-slate-950"].rounded-2xl p {
+            color: #64748b !important;
+        }
+        #btn-open-namaz,
+        #btn-open-nobetci,
+        #btn-open-deprem,
+        button[id^="btn-open-"] {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+        button[id^="btn-open-"]:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+        }
+        button[id^="btn-open-"] .font-extrabold {
+            color: #0f172a !important;
+        }
+        button[id^="btn-open-"] .text-slate-400 {
+            color: #475569 !important;
+        }
+
+        /* 10. Kenarlıklar & Çizgiler */
         .border-brand-border,
         .border-slate-800,
         .border-slate-800\/80,
@@ -211,14 +267,14 @@
             border-color: #e2e8f0 !important;
         }
 
-        /* 9. Manşet Numaraları (1..14 Şeridi) */
+        /* 11. Manşet Numaraları (1..14 Şeridi) */
         .manset-pill:not(.bg-red-600) {
             background-color: #ffffff !important;
             border-color: #cbd5e1 !important;
             color: #334155 !important;
         }
 
-        /* 10. Footer (Uluslararası Medya Standardı Olarak Kurumsal Koyu Kalır) */
+        /* 12. Footer */
         footer {
             background-color: #0f172a !important;
             color: #94a3b8 !important;
@@ -232,6 +288,7 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
     </style>
 
     <style id="a11y-custom-style">
