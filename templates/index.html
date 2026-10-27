@@ -827,7 +827,7 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                 {% for a in articles %}
                 <article class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-slate-700 transition shadow-lg flex flex-col group">
                     <a href="/haber/{{ a.slug }}" class="relative block aspect-[16/10] overflow-hidden bg-black">
@@ -841,9 +841,14 @@
                                 <i data-lucide="image" class="w-10 h-10"></i>
                             </div>
                         {% endif %}
-                        <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-[11px] font-black uppercase text-red-400">
+                        <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-[10px] font-black uppercase text-red-400">
                             {{ a.category or 'Gündem' }}
                         </span>
+                        {% if a.created_at and a.created_at|length >= 16 %}
+                        <span class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-red-600 font-bold text-[10px] text-white shadow tracking-wide">
+                            {{ a.created_at[11:16] }}
+                        </span>
+                        {% endif %}
                     </a>
                     <div class="p-5 flex-1 flex flex-col justify-between">
                         <div>
@@ -1017,7 +1022,7 @@
 
                 <!-- 2. DİĞER KATEGORİ HABERLERİ GRID (articles[1:]) -->
                 {% if articles|length > 1 %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
                     {% for a in articles[1:] %}
                     <article class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden hover:border-slate-700 transition shadow-lg flex flex-col group">
                         <a href="/haber/{{ a.slug }}" class="relative block aspect-[16/10] overflow-hidden bg-black">
@@ -1034,6 +1039,11 @@
                             <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-md bg-slate-900/90 border border-slate-700 text-[11px] font-black uppercase text-red-400">
                                 {{ a.category or active_category }}
                             </span>
+                        {% if a.created_at and a.created_at|length >= 16 %}
+                        <span class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-red-600 font-bold text-[10px] text-white shadow tracking-wide">
+                            {{ a.created_at[11:16] }}
+                        </span>
+                        {% endif %}
                         </a>
                         <div class="p-5 flex-1 flex flex-col justify-between">
                             <div>
