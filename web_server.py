@@ -56,10 +56,10 @@ def bot_background_worker():
     - Web sunucusunu kilitlememesi için bağımsız subprocess olarak çalışır; sorun çıkarsa doğrudan çağrıya döner.
     - İlk açılışta hemen 1 taze haber çeker, ardından periyodik olarak devam eder.
     """
-    time.sleep(10)
-    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi...")
+    time.sleep(30)
+    print("🚀 [Otonom Bot] Arka plan haber tarayıcısı aktif edildi (15 dk Veritabanı Kilitli)...")
     main_script = os.path.join(BASE_DIR, "main.py")
-    interval_sec = max(600, config.CHECK_INTERVAL_MINUTES * 60)
+    interval_sec = max(900, config.CHECK_INTERVAL_MINUTES * 60)
 
     while True:
         cycle_start = time.time()
@@ -76,11 +76,11 @@ def bot_background_worker():
                     print(f"   [Bot]: {line}")
             if res.returncode != 0:
                 print(f"⚠️ [Otonom Bot] Subprocess çıkış kodu {res.returncode}, doğrudan mod deneniyor...")
-                main.run_bot(max_items=1)
+                main.run_bot(max_items=1, force=False)
         except Exception as e:
             print(f"⚠️ [Otonom Bot] Hata: {e}, doğrudan çağrılıyor...")
             try:
-                main.run_bot(max_items=1)
+                main.run_bot(max_items=1, force=False)
             except Exception as inner_e:
                 print(f"❌ [Otonom Bot] Kritik hata: {inner_e}")
 
@@ -1015,7 +1015,7 @@ async def panel_fetch_now(request: Request):
     def _fetch_worker():
         global _CATEGORY_WIDGETS_CACHE_TIME
         try:
-            main.run_bot(max_items=1)
+            main.run_bot(max_items=1, force=True)
         finally:
             _CATEGORY_WIDGETS_CACHE_TIME = 0
     threading.Thread(target=_fetch_worker, daemon=True).start()

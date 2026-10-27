@@ -123,7 +123,41 @@ def process_single_news(item: dict) -> bool:
     print("💾 Haber veritabanına kaydedildi (tekrar paylaşılmayacak).")
     return True
 
-def run_bot(max_items: int = 1):
+def get_minutes_since_last_article() -> float:
+    """Veritabanındaki en son yayınlanan haberin üzerinden kaç dakika geçtiğini kesin olarak hesaplar."""
+    try:
+        with database.get_connection() as conn:
+            row = conn.execute("SELECT created_at FROM articles ORDER BY id DESC LIMIT 1").fetchone()
+            if not row:
+                return 999.0
+            val = row["created_at"]
+            if not val:
+                return 999.0
+            if isinstance(val, str):
+                clean_str = val.split(".")[0].replace("T", " ")[:19]
+                dt = datetime.strptime(clean_str, "%Y-%m-%d %H:%M:%S")
+                now_tr = datetime.now(database.TR_TZ).replace(tzinfo=None)
+                diff_sec = (now_tr - dt).total_seconds()
+                return max(0.0, diff_sec / 60.0)
+            elif isinstance(val, datetime):
+                now_tr = datetime.now(database.TR_TZ)
+                if val.tzinfo is None:
+                    val = val.replace(tzinfo=database.TR_TZ)
+                diff_sec = (now_tr - val).total_seconds()
+                return max(0.0, diff_sec / 60.0)
+    except Exception as e:
+        print(f"Son haber zamanı kontrolü hatası: {e}")
+    return 999.0
+
+def run_bot(max_items: int = 1, force: bool = False):
+    """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
+    if not force:
+        target_cooldown = max(15, config.CHECK_INTERVAL_MINUTES)
+        minutes_passed = get_minutes_since_last_article()
+        if minutes_passed < target_cooldown:
+            remaining = round(target_cooldown - minutes_passed, 1)
+            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: {target_cooldown} dk. Yeni haber için {remaining} dk bekleniyor.")
+            return 0
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
     news_items = news_fetcher.fetch_latest_news(limit_per_feed=3)
