@@ -16,9 +16,26 @@
         {% endif %}
     {% endif %}
 
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu -->
+    <!-- Google AdSense: Sayfa Hızını Kilitlemeyen Akıllı Yükleyici -->
     <meta name="google-adsense-account" content="ca-pub-1415664741128989">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1415664741128989" crossorigin="anonymous"></script>
+    <script>
+    (function() {
+        var adsLoaded = false;
+        function loadAdSense() {
+            if (adsLoaded) return;
+            adsLoaded = true;
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1415664741128989";
+            s.crossOrigin = "anonymous";
+            document.head.appendChild(s);
+        }
+        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(e) {
+            window.addEventListener(e, loadAdSense, { passive: true, once: true });
+        });
+        setTimeout(loadAdSense, 3500);
+    })();
+    </script>
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
@@ -113,29 +130,16 @@
     {% endif %}
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="alternate" type="application/rss+xml" title="Gündem Analizi RSS" href="/rss.xml">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            red: '#dc2626',
-                            darkred: '#991b1b',
-                            dark: '#0a0d14',
-                            card: '#121722',
-                            border: '#1f293d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Non-blocking Font Display Swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
+
+    <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <script src="/assets/lucide.min.js" defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
         
                 /* ========================================================
@@ -552,7 +556,7 @@
             <!-- Ana Görsel (Haber Kartı) -->
             <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
+                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" loading="eager" decoding="async" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save aspect-[16/9]">
                 {% endif %}
             </div>
 

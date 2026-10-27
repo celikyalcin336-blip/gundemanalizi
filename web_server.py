@@ -304,7 +304,15 @@ async def track_visitors_middleware(request: Request, call_next):
 
 
 # Statik Dosya Dizinleri
-app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
+class CacheStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+            response.headers["CDN-Cache-Control"] = "max-age=31536000"
+        return response
+
+app.mount("/assets", CacheStaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str):
