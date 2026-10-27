@@ -150,13 +150,13 @@
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
+    
 
-    <style id="a11y-custom-style">
+    
         body.a11y-contrast { filter: contrast(135%) brightness(105%); }
         body.a11y-large { font-size: 115% !important; }
         body.a11y-xlarge { font-size: 130% !important; }
         body.a11y-dyslexia { letter-spacing: 0.06em !important; word-spacing: 0.12em !important; line-height: 1.85 !important; }
         body.a11y-underline a { text-decoration: underline !important; text-underline-offset: 3px !important; }
         body.a11y-focus-visible *:focus-visible { outline: 3px solid #facc15 !important; outline-offset: 3px !important; }
-    </style>
+    

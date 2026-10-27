@@ -19,7 +19,11 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
 
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
+    {% if site_css %}
+    <style>{{ site_css | safe }}</style>
+    {% else %}
     <link rel="stylesheet" href="/assets/style.min.css">
+    {% endif %}
     <script src="/assets/lucide.min.js" defer></script>
     <script src="/assets/app.js" defer></script>
 
