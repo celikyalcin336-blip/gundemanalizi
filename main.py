@@ -152,7 +152,7 @@ def run_bot(max_items: int = 1, force: bool = False):
             return 0
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
-    news_items = news_fetcher.fetch_latest_news(limit_per_feed=3)
+    news_items = news_fetcher.fetch_latest_news(limit_per_feed=12)
 
     if not news_items:
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
@@ -195,7 +195,7 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"🎯 [{slot_name}] Hedef Kategori: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
 
-    # 🛡️ ÇELİK KALKAN 1: Kuşağın öncelikli hedef kategorisindeki taze haberi ara
+    # 🛡️ ÇELİK KALKAN 1: Kuşağın öncelikli hedef kategorisindeki taze haberi ara (Sabah/gün içinden bekleyen yayınlanmamış haberler dahil)
     selected_pool = [item for item in fresh_news if item.get("category") == target_cat]
 
     # 🛡️ ÇELİK KALKAN 2: Eğer o kategoride taze haber yoksa, aynı kuşağın diğer kategorilerine bak
@@ -205,7 +205,7 @@ def run_bot(max_items: int = 1, force: bool = False):
                 alt_items = [item for item in fresh_news if item.get("category") == alt_cat]
                 if alt_items:
                     selected_pool = alt_items
-                    print(f"ℹ️ [{target_cat}] kategorisinde taze haber yoktu, aynı kuşağın [{alt_cat}] kategorisine geçildi.")
+                    print(f"ℹ️ [{target_cat}] kategorisinde bekleyen yayınlanmamış haber kalmadı; inat edilmedi, kuşağın [{alt_cat}] kategorisindeki bekleyen haberlere geçildi.")
                     target_cat = alt_cat
                     break
 

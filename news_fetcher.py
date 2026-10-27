@@ -375,7 +375,7 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
 
     return score
 
-def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
+def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
     """
     Tanımlı seçkin RSS kaynaklarını tarar ve 'Halkın İlgisi ve Cüzdan Puanı'na göre
     en yüksekten en düşüğe sıralanmış paylaşılmaya hazır haberleri döner.
@@ -402,6 +402,16 @@ def fetch_latest_news(limit_per_feed: int = 4) -> List[Dict]:
 
                 if not title or not link:
                     continue
+
+                # 36 Saat Tazelik Kalkanı (Sabah 09:00 haberi öğlen/gece yayınlanabilir; günler öncesinin bayat haberi elenir)
+                if entry.get('published_parsed'):
+                    try:
+                        import time
+                        pub_ts = time.mktime(entry.published_parsed)
+                        if time.time() - pub_ts > (36 * 3600):
+                            continue
+                    except Exception:
+                        pass
 
                 # Somut veri/fiyat içermeyen, yalnızca soru sorup duran arama motoru tuzaklarını baştan ele
                 if is_valueless_clickbait(title, summary):
