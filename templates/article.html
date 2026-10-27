@@ -155,17 +155,40 @@
             color: #0f172a !important;
         }
 
-        /* 1. Üst Kayan Son Dakika Bandı (Kusursuz Beyaz Gazete Bandı) */
+        /* 1. Üst Kayan Son Dakika Bandı (Kusursuz Beyaz Gazete Bandı & Harf Kesilme Önleme) */
         #floating-reader-bar {
+            height: 44px !important;
             background-color: rgba(255, 255, 255, 0.98) !important;
             border-bottom: 1px solid #e2e8f0 !important;
             box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05) !important;
+            display: flex !important;
+            align-items: center !important;
         }
-        #floating-reader-bar .breaking-item {
+        #breaking-ticker-container {
+            height: 32px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            min-width: 0 !important;
+            flex: 1 1 0% !important;
+        }
+        .breaking-item {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            line-height: normal !important;
             color: #0f172a !important;
-            font-weight: 600 !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            text-decoration: none !important;
+            transition: opacity 0.4s ease, transform 0.4s ease !important;
         }
-        #floating-reader-bar .breaking-item:hover {
+        .breaking-item:hover {
             color: #dc2626 !important;
         }
         #floating-next-bar {
@@ -174,7 +197,7 @@
             box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.06) !important;
         }
 
-                #market-rates-bar > div,
+        #market-rates-bar > div,
         .w-full.grid.grid-cols-2 > div {
             background-color: #ffffff !important;
             border: 1px solid #e2e8f0 !important;
@@ -201,17 +224,11 @@
         header nav a {
             color: #334155 !important;
         }
-        header .text-white {
-            color: #0f172a !important;
-        }
 
         /* 3. Ana Makale Kartı ve Kutuları */
         article,
         .bg-brand-card,
-        aside .bg-brand-card,
-        .bg-slate-900,
-        .bg-slate-950,
-        [class*="bg-slate-900"] {
+        aside .bg-brand-card {
             background-color: #ffffff !important;
             border-color: #e2e8f0 !important;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
@@ -230,28 +247,7 @@
             line-height: 1.85 !important;
         }
 
-        .text-slate-200,
-        .text-slate-300,
-        .text-slate-400 {
-            color: #475569 !important;
-        }
-
-        /* 5. WhatsApp ve Sosyal Paylaşım Kutusu (Beyaz Gazete Uyumu) */
-        div[class*="from-emerald-950"],
-        .bg-gradient-to-r.from-emerald-950\/80 {
-            background: #ecfdf5 !important;
-            border: 1px solid #a7f3d0 !important;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08) !important;
-        }
-        div[class*="from-emerald-950"] .font-extrabold {
-            color: #064e3b !important;
-        }
-        div[class*="from-emerald-950"] .text-slate-300,
-        div[class*="from-emerald-950"] div[class*="text-slate-"] {
-            color: #047857 !important;
-        }
-
-        /* 6. Renkli Butonlar ve Rozetler (Yazıları Beyaz Kalır) */
+        /* 5. ⭐ YALÇIN ÇELİK KURALI: Beyaz yazı YALNIZCA renkli kutucuk/rozet/pill içinde olur! */
         .bg-red-600, .bg-red-600 *,
         .bg-emerald-600, .bg-emerald-600 *,
         .bg-blue-600, .bg-blue-600 *,
@@ -259,7 +255,10 @@
         .bg-sky-600, .bg-sky-600 *,
         .bg-pink-600, .bg-pink-600 *,
         .bg-fuchsia-600, .bg-fuchsia-600 *,
-        button[class*="bg-emerald-"], button[class*="bg-emerald-"] * {
+        .bg-black, .bg-black *,
+        button[class*="bg-emerald-"], button[class*="bg-emerald-"] *,
+        a[class*="bg-emerald-"], a[class*="bg-emerald-"] *,
+        a[class*="bg-sky-"], a[class*="bg-sky-"] * {
             color: #ffffff !important;
         }
 
@@ -268,22 +267,14 @@
             color: #dc2626 !important;
         }
 
-        /* 7. Kenarlıklar */
+        /* 6. Kenarlıklar */
         .border-brand-border,
         .border-slate-800,
         .border-slate-700 {
             border-color: #e2e8f0 !important;
         }
 
-        /* 8. Sesli Dinle ve Özet Kutuları */
-        .bg-slate-900\/90,
-        .bg-slate-900\/80,
-        .bg-slate-800\/80 {
-            background-color: #f8fafc !important;
-            border-color: #e2e8f0 !important;
-        }
-
-        /* 9. Mobil Alt Sabit Bar */
+        /* 7. Mobil Alt Sabit Bar */
         #mobile-sticky-bar,
         .fixed.bottom-0 {
             background-color: #ffffff !important;
@@ -294,6 +285,15 @@
         #mobile-sticky-bar button,
         #mobile-sticky-bar span {
             color: #0f172a !important;
+        }
+
+        /* 8. Modal & İhbar Alanları (Arka plan koyu, yazı bembeyaz ve okunaklı) */
+        #ihbar-modal input,
+        #ihbar-modal textarea,
+        #ihbar-modal select {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #334155 !important;
         }
 
         footer {
@@ -336,46 +336,46 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-10">
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-11">
 
-    <!-- 100% FIXED ÜST BİLGİ & SON DAKİKA CANLI BANDI (MOBİLDE VE PC'DE ASLA KAYBOLMAZ) -->
-    <div id="floating-reader-bar" class="fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md text-slate-800 text-xs border-b border-slate-200 shadow-sm h-10 flex items-center" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 9999 !important; -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform;">
-        <div class="max-w-6xl mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-2.5">
+    <!-- 100% FIXED ÜST BİLGİ & SON DAKİKA CANLI BANDI (MOBİLDE VE PC'DE ASLA KAYBOLMAZ - KESİLMEZ) -->
+    <div id="floating-reader-bar" class="fixed top-0 left-0 right-0 w-full bg-white text-slate-800 text-xs border-b border-slate-200 shadow-sm h-11 flex items-center" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 44px !important; z-index: 9999 !important; -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform;">
+        <div class="max-w-6xl mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-3">
             <!-- Sol: Son Dakika Kayan Bant -->
-            <div class="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
-                <span class="inline-flex items-center gap-1.5 bg-red-600 px-2.5 py-0.5 rounded-full text-white font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px] shrink-0 shadow-sm">
+            <div class="flex items-center gap-2.5 overflow-hidden flex-1 min-w-0">
+                <span class="inline-flex items-center gap-1.5 bg-red-600 px-3 py-1 rounded-full text-white font-black uppercase tracking-wider text-[10px] shrink-0 shadow-sm">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                     </span>
                     SON DAKİKA
                 </span>
-                <div id="breaking-ticker-container" class="overflow-hidden flex-1 relative h-5 flex items-center">
+                <div id="breaking-ticker-container" class="overflow-hidden flex-1 relative h-8 flex items-center min-w-0" style="position: relative !important; height: 32px !important; overflow: hidden !important;">
                     {% if breaking_news and breaking_news|length > 0 %}
                         {% for b in breaking_news %}
-                        <a href="/haber/{{ b.slug }}" class="breaking-item absolute inset-0 flex items-center text-slate-800 hover:text-red-600 transition-all duration-500 truncate text-xs font-semibold {% if loop.first %}opacity-100 translate-y-0{% else %}opacity-0 translate-y-3 pointer-events-none{% endif %}" title="{{ b.title }}">
-                            <span class="text-red-600 text-[10px] mr-1.5 font-bold hidden sm:inline">[{{ b.category }}]</span>
-                            <span class="truncate hover:underline">{{ b.title }}</span>
+                        <a href="/haber/{{ b.slug }}" class="breaking-item" style="position: absolute; left: 0; top: 0; width: 100%; height: 32px; display: flex; align-items: center; font-size: 13px; font-weight: 700; color: #0f172a; line-height: normal; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all 0.4s ease-in-out; {% if loop.first %}opacity: 1; transform: translateY(0); pointer-events: auto;{% else %}opacity: 0; transform: translateY(24px); pointer-events: none;{% endif %}" title="{{ b.title }}">
+                            <span style="background-color: #fee2e2; color: #b91c1c; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 9999px; margin-right: 8px; flex-shrink: 0; text-transform: uppercase;">[{{ b.category }}]</span>
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a;" class="hover:text-red-600">{{ b.title }}</span>
                         </a>
                         {% endfor %}
                     {% else %}
-                        <span class="text-slate-600 text-xs truncate">Gündem Analizi teyitli son dakika haber akışı.</span>
+                        <span class="text-slate-700 text-xs font-semibold truncate">Gündem Analizi teyitli son dakika haber akışı.</span>
                     {% endif %}
                 </div>
             </div>
 
             <!-- Sağ: Okuma Süresi, Yazı Boyutu & Hızlı Paylaşım (Mobilde Sürekli Ekranda Sabit) -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                <span class="inline-flex items-center gap-1 text-slate-300 bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold">
-                    <i data-lucide="clock" class="w-3 h-3 text-red-400"></i>
+                <span class="inline-flex items-center gap-1 text-slate-700 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs">
+                    <i data-lucide="clock" class="w-3 h-3 text-red-600"></i>
                     <span>{{ reading_time_min or 2 }} dk</span>
                 </span>
-                <div class="hidden sm:inline-flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 px-2 py-0.5 rounded-full text-[11px] text-slate-300">
-                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
-                    <span class="text-slate-600">|</span>
-                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
+                <div class="hidden sm:inline-flex items-center gap-1 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full text-xs font-bold text-slate-700 shadow-xs">
+                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-red-600 px-1 font-extrabold" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
+                    <span class="text-slate-300">|</span>
+                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-red-600 px-1 font-extrabold" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
                 </div>
-                <button type="button" onclick="shareArticleWhatsApp()" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-full transition shadow">
+                <button type="button" onclick="shareArticleWhatsApp()" class="inline-flex items-center gap-1 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs px-3 py-1 rounded-full transition shadow-sm hover:scale-105 active:scale-95">
                     💬 <span class="hidden sm:inline">Paylaş</span>
                 </button>
             </div>
@@ -386,7 +386,7 @@
     </div>
 
     <!-- ÜST HEADER -->
-        <header class="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur border-b border-brand-border shadow-md transition-all">
+        <header class="sticky top-11 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm transition-all">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             <!-- Logo & Marka -->
             <a href="/" class="flex items-center gap-3 group shrink-0">
@@ -418,10 +418,10 @@
                 <!-- Arama Formu -->
                 <form action="/" method="GET" class="relative hidden sm:flex items-center">
                     <input type="text" name="q" placeholder="Haber ara..." 
-                           class="bg-slate-900/90 border border-slate-700/80 hover:border-slate-600 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 w-36 md:w-48 transition shadow-inner">
-                    <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
+                           class="bg-slate-100 border border-slate-300 hover:border-slate-400 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:bg-white w-36 md:w-48 transition shadow-xs">
+                    <span class="absolute left-2.5 text-slate-500 text-xs">🔍</span>
                 </form>
-                <a href="/" class="text-xs font-bold text-slate-300 hover:text-white px-3 py-1.5 rounded-xl border border-brand-border bg-slate-900/60 hover:bg-slate-800 transition">
+                <a href="/" class="text-xs font-bold text-slate-800 hover:text-red-600 px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 transition">
                     ← Ana Sayfa
                 </a>
                 <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü, Görme Engelli ve Kolay Okuma Seçenekleri">
@@ -484,28 +484,27 @@
         <!-- HABER DETAYI (SOL BÖLÜM - 8 KOLON) -->
         <article class="lg:col-span-8">
             
-            <!-- Kategori, Tarih, Okunma, Okuma Süresi ve Yazı Boyutu -->
+            <!-- Kategori, Tarih, Okunma, Okuma Süresi ve Yazı Boyutu (Kristal Netlikte Kutucuklar) -->
             <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs mb-4">
-                <span class="bg-red-600/90 text-white font-bold px-2.5 py-1 rounded-md uppercase tracking-wider text-[11px]">
+                <span class="bg-red-600 text-white font-extrabold px-3 py-1 rounded-full uppercase tracking-wider text-[11px] shadow-sm">
                     {{ article.category }}
                 </span>
-                <span class="text-slate-400 flex items-center gap-1">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> {{ (article.created_at or '')[:16] }}
+                <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-500"></i> {{ (article.created_at or '')[:16] }}
                 </span>
-                <span class="text-slate-500">•</span>
-                <span class="text-slate-400 flex items-center gap-1">
-                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> {{ article.views }} Okunma
+                <span class="text-slate-400">•</span>
+                <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-500"></i> {{ article.views }} Okunma
                 </span>
-                <span class="text-slate-500 hidden sm:inline">•</span>
-                <span class="inline-flex items-center gap-1 text-slate-300 bg-slate-800/80 px-2.5 py-0.5 rounded-md text-[11px] font-medium border border-slate-700/60">
-
-                    <i data-lucide="clock" class="w-3 h-3 text-red-400"></i> {{ reading_time_min or 2 }} dk okuma
+                <span class="text-slate-400 hidden sm:inline">•</span>
+                <span class="inline-flex items-center gap-1 text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full text-[11px] font-bold border border-slate-300 shadow-xs">
+                    <i data-lucide="clock" class="w-3 h-3 text-red-600"></i> {{ reading_time_min or 2 }} dk okuma
                 </span>
-                <div class="inline-flex items-center gap-1.5 bg-slate-800/80 px-2 py-0.5 rounded-md text-[11px] text-slate-300 ml-auto border border-slate-700/60">
-                    <span class="text-[10px] text-slate-400">Yazı:</span>
-                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
-                    <span class="text-slate-600">|</span>
-                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-white px-1 font-bold text-xs" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
+                <div class="inline-flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-full text-xs font-bold text-slate-700 ml-auto border border-slate-300 shadow-xs">
+                    <span class="text-[10px] text-slate-500">Yazı:</span>
+                    <button type="button" onclick="adjustFontSize(-1)" class="hover:text-red-600 px-1 font-extrabold text-xs" title="Yazı Boyutunu Küçült" aria-label="Yazı boyutunu küçült">A-</button>
+                    <span class="text-slate-300">|</span>
+                    <button type="button" onclick="adjustFontSize(1)" class="hover:text-red-600 px-1 font-extrabold text-xs" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
                 </div>
             </div>
 
@@ -551,45 +550,35 @@
             <!-- Ana Görsel (Haber Kartı) -->
             <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h
--auto object-cover max-h-[500px] pointer-events-none no-save">
+                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
                 {% endif %}
             </div>
 
-            <!-- WhatsApp ve Sosyal Medya Hızlı Paylaşım Barı (Doğrudan Site Trafiği Çeker) -->
-            <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <span class="p-2.5 rounded-xl bg-emerald-600 text-white text-xl shadow-sm">📲</span>
-                    <div>
-                        <div class="font-extrabold text-emerald-950 text-sm sm:text-base">Bu Haberi & Videoyu Arkadaşlarınla Paylaş</div>
-                        <div class="text-[11px] text-emerald-800">Haberi WhatsApp gruplarında tek tıkla paylaş, herkes görsün!</div>
-                    </div>
+            <!-- Haberi Paylaş Barı (Tek, Sade, Kristal Netlikte Kutucuklar) -->
+            <div class="mb-6 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold">
+                <div class="flex items-center gap-2 text-slate-900 font-black text-sm">
+                    <i data-lucide="share-2" class="w-4 h-4 text-red-600"></i>
+                    <span>Paylaş:</span>
                 </div>
-                <button type="button" onclick="shareArticleWhatsApp()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 hover:scale-105">
-                    <span>💬 WhatsApp'ta Paylaş</span>
-                </button>
-            </div>
-
-            <!-- Paylaşım Butonları Barı -->
-            <div class="flex flex-wrap items-center gap-2 py-3 px-4 rounded-2xl bg-white border border-slate-200 shadow-sm mb-8 text-xs font-bold">
-                <span class="text-slate-700 mr-2 flex items-center gap-1.5"><i data-lucide="share-2" class="w-4 h-4 text-red-600"></i> Paylaş:</span>
-                <button type="button" onclick="shareArticleWhatsApp()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm">
-                    💬 WhatsApp
-                </button>
-                <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white transition flex items-center gap-1.5 shadow-sm">
-                    📲 Telegram
-                </a>
-                <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white transition flex items-center gap-1.5 shadow-sm">
-                    🐦 X (Twitter)
-                </a>
-                <button onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition flex items-center gap-1.5 shadow-sm">
-                    🔗 Linki Kopyala
-                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="shareArticleWhatsApp()" class="px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                        💬 WhatsApp
+                    </button>
+                    <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-4 py-2 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                        📲 Telegram
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-4 py-2 rounded-full bg-[#0f1419] hover:bg-black text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                        𝕏 Paylaş
+                    </a>
+                    <button type="button" onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border border-slate-300 transition flex items-center gap-1.5 shadow-xs">
+                        🔗 Linki Kopyala
+                    </button>
+                </div>
             </div>
 
             {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_article_top %}
             <!-- REKLAM ALANI: HABER İÇİ ÜST BANNER -->
-            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-50 border border-slate-200 p-2 shadow-xs">
                 <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
                 <div class="w-full flex justify-center items-center overflow-hidden">
                     {{ ad_settings.ad_slot_article_top | safe }}
@@ -621,7 +610,7 @@
 
             {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_article_bottom %}
             <!-- REKLAM ALANI: HABER İÇİ ALT BANNER -->
-            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-50 border border-slate-200 p-2 shadow-xs">
                 <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
                 <div class="w-full flex justify-center items-center overflow-hidden">
                     {{ ad_settings.ad_slot_article_bottom | safe }}
@@ -709,16 +698,16 @@
             </div>
 
             <!-- E-E-A-T DOĞRULUK VE İLKELER KUTUSU (Google & AdSense Güven Standardı) -->
-            <div class="mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-start gap-3.5 text-xs text-slate-300 shadow-sm">
-                <div class="p-2 rounded-lg bg-red-600/10 border border-red-600/20 text-red-400 shrink-0">
+            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 text-xs shadow-sm">
+                <div class="p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 shrink-0">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
                 <div class="space-y-1">
-                    <div class="font-bold text-white text-xs flex items-center gap-2">
+                    <div class="font-extrabold text-slate-900 text-xs flex items-center gap-2">
                         Gündem Analizi Doğruluk ve Yayın İlkeleri
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Teyitli İçerik</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Teyitli İçerik</span>
                     </div>
-                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                    <p class="text-slate-600 text-[11px] leading-relaxed">
                         Bu haber; teyitli ajans bültenleri (AA, İHA vb.), resmi kamu kurum açıklamaları ve açık kaynaklar taranarak Gündem Analizi Haber Masası editörlerince bağımsızlık ve tarafsızlık ilkeleri doğrultusunda hazırlanmıştır.
                     </p>
                 </div>
@@ -869,14 +858,14 @@
             </div>
 
             <!-- 3. Gündem Analizi Hakkında Kartı -->
-            <div class="rounded-2xl border border-brand-border bg-brand-card p-5 text-center shadow-xl">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm">
                 <img src="/assets/logo.png" alt="Gündem Analizi" class="w-14 h-14 rounded-full mx-auto mb-3 border-2 border-red-600 shadow-md">
-                <h4 class="font-extrabold text-white text-sm">GÜNDEM ANALİZİ</h4>
-                <p class="text-xs text-red-400 font-semibold uppercase tracking-wider mb-2">Doğru Haber • Tarafsız Analiz</p>
-                <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                    Türkiye ve dünyada öne çıkan son dakika gelişmelerini tarafsız ve anlık şekilde takip etmek için kanalımıza katılın.
+                <h4 class="font-extrabold text-slate-900 text-sm">GÜNDEM ANALİZİ</h4>
+                <p class="text-xs text-red-600 font-bold uppercase tracking-wider mb-2">Doğru Haber • Tarafsız Analiz</p>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                    Türkiye ve dünyada öne çıkan son dakika gelişmelerini tarafsız ve anlık şekilde takip etmek için resmi kanalımıza katılın.
                 </p>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs shadow-lg transition">
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#0088cc] hover:bg-[#0077b5] text-white font-extrabold text-xs shadow-md transition">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> @gundemanalizi Katıl
                 </a>
             </div>
@@ -955,8 +944,7 @@
                 <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
 
                 <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" oncl
-ick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
+                    <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
                     <button id="ih-submit" type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-red-900/50 transition">
                         🚀 İhbarı Haber Merkezine Gönder
                     </button>
@@ -1115,23 +1103,31 @@ ick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slat
             body.style.lineHeight = (next * 1.65) + 'px';
         }
 
-        // Son Dakika Kayan Bant (Ticker)
+        // Son Dakika Kayan Bant (Ticker) - Kesilme Garantili & Kusursuz Dikey Ortalama
         (function() {
             const items = document.querySelectorAll('.breaking-item');
             if (items.length <= 1) return;
             let idx = 0;
-            let timer = setInterval(nextBreaking, 4500);
+            let timer = setInterval(nextBreaking, 5000);
             const container = document.getElementById('breaking-ticker-container');
             if (container) {
                 container.addEventListener('mouseenter', () => clearInterval(timer));
-                container.addEventListener('mouseleave', () => timer = setInterval(nextBreaking, 4500));
+                container.addEventListener('mouseleave', () => timer = setInterval(nextBreaking, 5000));
             }
             function nextBreaking() {
-                items[idx].classList.remove('opacity-100', 'translate-y-0');
-                items[idx].classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+                const prev = items[idx];
+                prev.style.opacity = '0';
+                prev.style.transform = 'translateY(-24px)';
+                prev.style.pointerEvents = 'none';
+
                 idx = (idx + 1) % items.length;
-                items[idx].classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
-                items[idx].classList.add('opacity-100', 'translate-y-0');
+                const next = items[idx];
+                next.style.transform = 'translateY(24px)';
+                next.style.opacity = '0';
+                void next.offsetHeight; // Reflow tetikle
+                next.style.opacity = '1';
+                next.style.transform = 'translateY(0)';
+                next.style.pointerEvents = 'auto';
             }
         })();
 
@@ -1335,7 +1331,7 @@ ick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slat
             <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex items-center gap-3 pb-3 border-slate-800">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
                 <div class="p-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-2xl flex items-center justify-center">
                     <span>♿</span>
                 </div>

@@ -1130,109 +1130,158 @@ def get_dashboard_summary() -> Dict:
     now = time.time()
     if _DASHBOARD_CACHE.get("data") and (now - _DASHBOARD_CACHE.get("ts", 0)) < 8:
         return _DASHBOARD_CACHE["data"]
-    with get_connection() as conn:
-        totals = conn.execute(
-            "SELECT COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS total_views FROM articles"
-        ).fetchone()
-        total_articles = totals["cnt"] if totals else 0
-        total_views = totals["total_views"] if totals else 0
 
-        home_row = conn.execute(
-            "SELECT val FROM site_metrics WHERE key = ?", ("home_visits",)
-        ).fetchone()
-        home_visits = home_row["val"] if home_row else 0
+    total_articles = 0
+    total_views = 0
+    home_visits = 0
+    top_rows = []
+    recent_rows = []
+    cat_rows = []
+    src_rows = []
+    active_now = 1
+    today_uniques = 0
+    first_time_today = 0
+    live_visitors = []
+    traffic_sources = []
+    device_stats = []
+    total_revenue = 0.0
+    month_revenue = 0.0
+    revenue_records = []
+    images_count = 0
+    db_size_mb = 0.0
 
-        top_rows = conn.execute(
-            "SELECT * FROM articles ORDER BY views DESC, id DESC LIMIT 10"
-        ).fetchall()
-        recent_rows = conn.execute(
-            "SELECT * FROM articles ORDER BY id DESC LIMIT 30"
-        ).fetchall()
-
-        cat_rows = conn.execute(
-            "SELECT category, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY category ORDER BY cnt DESC"
-        ).fetchall()
-        src_rows = conn.execute(
-            "SELECT source, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY source ORDER BY cnt DESC"
-        ).fetchall()
-
-        # CANLI TRAFİK & TEKİL KULLANICI ANALİTİĞİ
-        active_now = 0
-        today_uniques = 0
-        first_time_today = 0
-        live_visitors = []
-        traffic_sources = []
-        device_stats = []
-
-        try:
-            # Türkiye saatine göre zaman eşikleri (TSİ) -> UTC veritabanı eşdeğerleri
-            now_tr = datetime.now(TR_TZ)
-            today_start_tr = now_tr.replace(hour=0, minute=0, second=0, microsecond=0)
-            today_start_utc = today_start_tr.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-            five_min_ago_utc = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
-            seven_days_ago_utc = (today_start_tr - timedelta(days=7)).astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-
-            # Son 5 dakikada aktif olan tekil kişi sayısı
-            act_row = conn.execute(
-                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (five_min_ago_utc,)
-            ).fetchone()
-            active_now = act_row["c"] if act_row else 0
-
-            # Bugünün tekil kullanıcı sayısı (TSİ gece 00:00'dan itibaren)
-            uniq_row = conn.execute(
-                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (today_start_utc,)
-            ).fetchone()
-            today_uniques = uniq_row["c"] if uniq_row else 0
-
-            # Bugün ilk defa gelen yeni ziyaretçi sayısı
-            first_row = conn.execute(
-                "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ? AND is_first_visit = 1", (today_start_utc,)
-            ).fetchone()
-            first_time_today = first_row["c"] if first_row else 0
-
-            # Son 7 günün trafik kaynakları
-            traffic_rows = conn.execute(
-                "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
-            ).fetchall()
-            traffic_sources = [dict(r) for r in traffic_rows]
-
-            # Son 7 günün cihaz dağılımı
-            dev_rows = conn.execute(
-                "SELECT device, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY device ORDER BY cnt DESC", (seven_days_ago_utc,)
-            ).fetchall()
-            device_stats = [dict(r) for r in dev_rows]
-
-            # Canlı son 20 ziyaretçi (Türkiye Saatine çevrilmiş olarak - API çağrıları hariç)
-            lv_rows = conn.execute(
-                "SELECT * FROM visitor_logs WHERE page NOT LIKE ? ORDER BY id DESC LIMIT 20", ('/api/%',)
-            ).fetchall()
-            live_visitors = [_row_to_dict(r) for r in lv_rows]
-        except Exception as e:
-            print(f"⚠️ Analitik sorgulama hatası: {e}")
-
-        # PARA KAZANMA & GELİR VERİLERİ
-        total_revenue = 0.0
-        month_revenue = 0.0
-        revenue_records = []
-        try:
-            rev_all = conn.execute("SELECT COALESCE(SUM(amount), 0) AS s FROM revenue_records").fetchone()
-            total_revenue = round(rev_all["s"] if rev_all else 0.0, 2)
-
-            rev_rows = conn.execute("SELECT * FROM revenue_records ORDER BY id DESC LIMIT 20").fetchall()
-            revenue_records = [_row_to_dict(r) for r in rev_rows]
-            month_revenue = total_revenue  # Başlangıçta toplamı göster
-        except Exception as e:
-            print(f"⚠️ Gelir sorgulama hatası: {e}")
-
-        images_count = 0
-        db_size_mb = 0.0
-        if conn.is_pg:
+    try:
+        with get_connection() as conn:
+            # 1. Makale Genel Toplamları (En Kritik - Asla 0 Olmamalı)
             try:
-                images_count = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
-                size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
-                db_size_mb = round(size / 1024 / 1024, 1)
+                totals = conn.execute(
+                    "SELECT COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS total_views FROM articles"
+                ).fetchone()
+                if totals:
+                    total_articles = totals["cnt"] or 0
+                    total_views = int(totals["total_views"] or 0)
+            except Exception as e:
+                print(f"Makale toplamları hatası: {e}")
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 2. Site Ziyaret Metrikleri
+            try:
+                home_row = conn.execute(
+                    "SELECT val FROM site_metrics WHERE key = ?", ("home_visits",)
+                ).fetchone()
+                home_visits = int(home_row["val"]) if (home_row and home_row.get("val")) else 0
+            except Exception as e:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 3. En Çok Okunanlar & Son Haberler
+            try:
+                top_rows = conn.execute(
+                    "SELECT * FROM articles ORDER BY views DESC, id DESC LIMIT 10"
+                ).fetchall()
             except Exception:
-                pass
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            try:
+                recent_rows = conn.execute(
+                    "SELECT * FROM articles ORDER BY id DESC LIMIT 30"
+                ).fetchall()
+            except Exception:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 4. Kategori & Kaynak Dağılımları
+            try:
+                cat_rows = conn.execute(
+                    "SELECT category, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY category ORDER BY cnt DESC"
+                ).fetchall()
+            except Exception:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            try:
+                src_rows = conn.execute(
+                    "SELECT source, COUNT(*) AS cnt, COALESCE(SUM(views), 0) AS views FROM articles GROUP BY source ORDER BY cnt DESC"
+                ).fetchall()
+            except Exception:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 5. CANLI TRAFİK & TEKİL KULLANICI ANALİTİĞİ
+            try:
+                now_tr = datetime.now(TR_TZ)
+                today_start_tr = now_tr.replace(hour=0, minute=0, second=0, microsecond=0)
+                today_start_utc = today_start_tr.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                five_min_ago_utc = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+                seven_days_ago_utc = (today_start_tr - timedelta(days=7)).astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+                act_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (five_min_ago_utc,)
+                ).fetchone()
+                active_now = act_row["c"] if act_row else 1
+
+                uniq_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (today_start_utc,)
+                ).fetchone()
+                today_uniques = uniq_row["c"] if uniq_row else 0
+
+                first_row = conn.execute(
+                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ? AND is_first_visit = 1", (today_start_utc,)
+                ).fetchone()
+                first_time_today = first_row["c"] if first_row else 0
+
+                traffic_rows = conn.execute(
+                    "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
+                ).fetchall()
+                traffic_sources = [dict(r) for r in traffic_rows]
+
+                dev_rows = conn.execute(
+                    "SELECT device, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY device ORDER BY cnt DESC", (seven_days_ago_utc,)
+                ).fetchall()
+                device_stats = [dict(r) for r in dev_rows]
+
+                lv_rows = conn.execute(
+                    "SELECT * FROM visitor_logs WHERE page NOT LIKE ? ORDER BY id DESC LIMIT 20", ('/api/%',)
+                ).fetchall()
+                live_visitors = [_row_to_dict(r) for r in lv_rows]
+            except Exception as e:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 6. PARA KAZANMA & GELİR VERİLERİ
+            try:
+                rev_all = conn.execute("SELECT COALESCE(SUM(amount), 0) AS s FROM revenue_records").fetchone()
+                total_revenue = round(float(rev_all["s"]) if rev_all else 0.0, 2)
+
+                rev_rows = conn.execute("SELECT * FROM revenue_records ORDER BY id DESC LIMIT 20").fetchall()
+                revenue_records = [_row_to_dict(r) for r in rev_rows]
+                month_revenue = total_revenue
+            except Exception as e:
+                if hasattr(conn.raw, "rollback"):
+                    try: conn.raw.rollback()
+                    except Exception: pass
+
+            # 7. Görsel Deposu & Boyut
+            if conn.is_pg:
+                try:
+                    images_count = conn.execute("SELECT COUNT(*) AS c FROM images").fetchone()["c"]
+                    size = conn.execute("SELECT pg_database_size(current_database()) AS s").fetchone()["s"]
+                    db_size_mb = round(size / 1024 / 1024, 1)
+                except Exception:
+                    if hasattr(conn.raw, "rollback"):
+                        try: conn.raw.rollback()
+                        except Exception: pass
+    except Exception as outer_e:
+        print(f"⚠️ get_dashboard_summary genel hatası: {outer_e}")
 
     recent_list = [_row_to_dict(r) for r in recent_rows]
     top_list = [_row_to_dict(r) for r in top_rows]
@@ -1263,3 +1312,6 @@ def get_dashboard_summary() -> Dict:
         "categories": [dict(r) for r in cat_rows],
         "sources": [dict(r) for r in src_rows],
     }
+    _DASHBOARD_CACHE["data"] = res
+    _DASHBOARD_CACHE["ts"] = time.time()
+    return res

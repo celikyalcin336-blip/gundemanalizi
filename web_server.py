@@ -159,7 +159,7 @@ def _warmup_turbo_cache():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
-    threading.Thread(target=database.cleanup_corrupted_articles, daemon=True).start()
+    # cleanup_corrupted_articles açılışta çalıştırılmaz (CPU ve veritabanı kilitlenmesini önlemek için)
     threading.Thread(target=_warmup_turbo_cache, daemon=True).start()
     # Otonom haber botunu arka planda baslat
     threading.Thread(target=bot_background_worker, daemon=True).start()
@@ -319,7 +319,7 @@ async def serve_image(filename: str):
 
     # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 1.5 sn bekle)
     try:
-        data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=1.5)
+        data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=4.0)
         if data:
             try:
                 with open(local_path, "wb") as f:
