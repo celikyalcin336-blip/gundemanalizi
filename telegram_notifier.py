@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import json
 
 if sys.stdout.encoding != 'utf-8':
     try:
@@ -12,16 +13,36 @@ import config
 
 BASE_URL = f"https://api.telegram.org/bot{config.TELEGRAM_BOT_TOKEN}"
 
+def clean_news_link(url: str) -> str:
+    """
+    Punycode (xn--gndemanalizi-dlb.com.tr) adreslerini kullanıcı dostu
+    ve güven veren 'https://www.gündemanalizi.com.tr' adresine dönüştürür.
+    """
+    if not url:
+        return ""
+    clean = url.replace("https://xn--gndemanalizi-dlb.com.tr", "https://www.gündemanalizi.com.tr")
+    clean = clean.replace("http://xn--gndemanalizi-dlb.com.tr", "https://www.gündemanalizi.com.tr")
+    clean = clean.replace("https://xn--gndemanali-dlb.com.tr", "https://www.gündemanalizi.com.tr")
+    clean = clean.replace("http://xn--gndemanali-dlb.com.tr", "https://www.gündemanalizi.com.tr")
+    clean = clean.replace("xn--gndemanalizi-dlb.com.tr", "www.gündemanalizi.com.tr")
+    clean = clean.replace("xn--gndemanali-dlb.com.tr", "www.gündemanalizi.com.tr")
+    # Eğer doğrudan www olmadan gündemanalizi varsa www ekle
+    clean = clean.replace("https://gündemanalizi.com.tr", "https://www.gündemanalizi.com.tr")
+    clean = clean.replace("http://gündemanalizi.com.tr", "https://www.gündemanalizi.com.tr")
+    return clean
+
+
 def send_telegram_message(text: str) -> bool:
     """Telegram'a salt metin mesajı gönderir."""
     if not config.TELEGRAM_BOT_TOKEN or not config.TELEGRAM_CHAT_ID:
         print("Telegram bot token veya chat ID tanımlı değil.")
         return False
 
+    clean_text = clean_news_link(text)
     url = f"{BASE_URL}/sendMessage"
     payload = {
         "chat_id": config.TELEGRAM_CHAT_ID,
-        "text": text,
+        "text": clean_text,
         "parse_mode": "HTML"
     }
 
@@ -35,8 +56,8 @@ def send_telegram_message(text: str) -> bool:
 
 def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bool:
     """
-    Telegram'a haber kartı görselini ve açıklamayı tek bir post halinde gönderir.
-    Ayrıca altına haberin kaynağını açan bir buton/link ekler.
+    Telegram'a haber kartı görselini ve açıklamasını tek bir post halinde gönderir.
+    Altına tertemiz ve güvenilir 'www.gündemanalizi.com.tr' linkini ve tek tıkla açılan butonu ekler.
     """
     if not config.TELEGRAM_BOT_TOKEN or not config.TELEGRAM_CHAT_ID:
         print("Telegram bot token veya chat ID tanımlı değil.")
@@ -46,10 +67,12 @@ def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bo
         print(f"Görsel bulunamadı: {image_path}")
         return False
 
-    # Telegram caption limiti 1024 karakterdir
-    full_caption = caption
-    if news_link:
-        full_caption += f"\n\n🔗 Haberin Detayı: {news_link}"
+    display_link = clean_news_link(news_link)
+    # Kaynak parantezlerini (örn: (Motor1 Otomobil), (Habertürk Spor) vb.) kesinlikle kaldır
+    clean_caption = re.sub(r'\s*\([A-Za-z0-9\sğüşıöçĞÜŞİÖÇ\.\'\-]{3,40}\)\s*$', '', caption)
+    full_caption = clean_caption
+    if display_link:
+        full_caption += f"\n\n🔗 Haberin Detayı: {display_link}"
 
     if len(full_caption) > 1020:
         full_caption = full_caption[:1015] + "..."
@@ -59,6 +82,17 @@ def send_telegram_news(image_path: str, caption: str, news_link: str = "") -> bo
         "chat_id": config.TELEGRAM_CHAT_ID,
         "caption": full_caption
     }
+    if display_link:
+        payload["reply_markup"] = json.dumps({
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "📖 Haberi Oku: www.gündemanalizi.com.tr",
+                        "url": display_link
+                    }
+                ]
+            ]
+        })
 
     try:
         with open(image_path, "rb") as img:
@@ -85,9 +119,12 @@ def send_telegram_video(video_path: str, caption: str, news_link: str = "") -> b
         print(f"Video bulunamadı: {video_path}")
         return False
 
-    full_caption = caption
-    if news_link:
-        full_caption += f"\n\n🔗 Haberin Detayı: {news_link}"
+    display_link = clean_news_link(news_link)
+    # Kaynak parantezlerini (örn: (Motor1 Otomobil), (Habertürk Spor) vb.) kesinlikle kaldır
+    clean_caption = re.sub(r'\s*\([A-Za-z0-9\sğüşıöçĞÜŞİÖÇ\.\'\-]{3,40}\)\s*$', '', caption)
+    full_caption = clean_caption
+    if display_link:
+        full_caption += f"\n\n🔗 Haberin Detayı: {display_link}"
 
     url = f"{BASE_URL}/sendVideo"
     payload = {
@@ -95,6 +132,17 @@ def send_telegram_video(video_path: str, caption: str, news_link: str = "") -> b
         "caption": full_caption[:1020],
         "supports_streaming": "true"
     }
+    if display_link:
+        payload["reply_markup"] = json.dumps({
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "📖 Haberi Oku: www.gündemanalizi.com.tr",
+                        "url": display_link
+                    }
+                ]
+            ]
+        })
 
     try:
         with open(video_path, "rb") as vid:

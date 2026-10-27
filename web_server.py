@@ -1,3 +1,4 @@
+import asyncio
 
 def smart_sentence_split(text: str) -> list:
     """Türkçe sıra sayıları (14., 1., 2026.) ve unvan/kısaltmaları (Dr., Prof., vb.) bozmadan tam cümlelere böler."""
@@ -299,14 +300,14 @@ app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str):
-    """Haber görselini önce yerel diskte arar. Yoksa dinamik oluşturur veya yedek döner."""
+    """Haber görselini önce yerel diskte, yoksa Neon veritabanında arar ve döner. Event loop'u asla kilitlemez."""
     safe_name = os.path.basename(filename)
     local_path = os.path.join(OUTPUT_DIR, safe_name)
     if os.path.exists(local_path):
         return FileResponse(local_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
 
-    # 1. Kalıcı veritabanında binary varsa çek (eğer önceden kalmışsa)
-    data = database.get_image(safe_name)
+    # 1. Kalıcı Neon veritabanında binary varsa çek (0 ms bekleme)
+    data = await asyncio.to_thread(database.get_image, safe_name)
     if data:
         try:
             with open(local_path, "wb") as f:
@@ -316,22 +317,44 @@ async def serve_image(filename: str):
         except Exception:
             pass
 
-    # 2. Yerelde yoksa (Render yeniden başladığında), konuya uygun şık tipografik kart üret ve diske yaz
-    try:
+    # 2. Disk ve DB'de yoksa, event loop'u dondurmadan ayrı iş parçacığında gerçek basın görselini ara ve indir
+    def _fetch_or_create_photo():
         import image_generator
         title = ""
         category = "Gündem"
-        with database.get_connection() as conn:
-            row = conn.execute("SELECT title, category FROM articles WHERE image_path LIKE ? LIMIT 1", (f"%{safe_name}%",)).fetchone()
-            if row:
-                title = row["title"] or ""
-                category = row["category"] or "Gündem"
+        try:
+            with database.get_connection() as conn:
+                row = conn.execute("SELECT title, category FROM articles WHERE image_path LIKE ? LIMIT 1", (f"%{safe_name}%",)).fetchone()
+                if row:
+                    title = row.get("title") or ""
+                    category = row.get("category") or "Gündem"
+        except Exception:
+            pass
 
-        card_path = image_generator.create_thematic_editorial_card(local_path, title=title, category=category)
-        if card_path and os.path.exists(card_path):
-            return FileResponse(card_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
-    except Exception as e:
-        print(f"Dinamik görsel oluşturma hatası: {e}")
+        # Habere özel gerçek basın fotoğrafı ara
+        if title:
+            try:
+                web_img = image_generator.search_editorial_web_image(title, category)
+                if web_img:
+                    photo_path = image_generator.create_single_news_photo(web_img, local_path)
+                    if photo_path and os.path.exists(photo_path):
+                        database.save_image_file(photo_path)
+                        return photo_path
+            except Exception as e:
+                print(f"Basın görseli otomatik tamamlama hatası: {e}")
+
+        try:
+            card_path = image_generator.create_thematic_editorial_card(local_path, title=title, category=category)
+            if card_path and os.path.exists(card_path):
+                database.save_image_file(card_path)
+                return card_path
+        except Exception:
+            pass
+        return None
+
+    res_path = await asyncio.to_thread(_fetch_or_create_photo)
+    if res_path and os.path.exists(res_path):
+        return FileResponse(res_path, headers={"Cache-Control": "public, max-age=2592000, immutable"})
 
     fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(fallback_logo):
@@ -687,7 +710,7 @@ def get_live_earthquakes(limit=50) -> list:
 @app.get("/api/deprem")
 async def api_deprem(limit: int = 50):
     """AFAD ve Kandilli son 50 canlı deprem verisini döner."""
-    quakes = get_live_earthquakes(limit=limit)
+    quakes = await asyncio.to_thread(get_live_earthquakes, limit)
     return JSONResponse({
         "ok": True,
         "count": len(quakes),
@@ -711,7 +734,7 @@ async def api_nobetci_eczaneler(city: str = "istanbul"):
 async def api_superlig():
     """TFF Resmi Trendyol Süper Lig Canlı Puan Durumu ve Gelecek Maçlar API'si."""
     import live_services
-    data = live_services.get_live_superlig()
+    data = await asyncio.to_thread(live_services.get_live_superlig)
     return JSONResponse(data)
 
 @app.get("/son-dakika", response_class=HTMLResponse)

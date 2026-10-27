@@ -559,12 +559,29 @@ def _compress_image(path: str) -> bytes:
 
 def save_image_file(path: str):
     """
-    NEON KOTA VE HIZ KALKANI:
-    PostgreSQL'e binary görsel (BLOB) yazmayı tamamen devre dışı bırakır.
-    Böylece Neon 5 GB transfer kotası ve disk alanı ASLA dolmaz, askıya alınma riski %0 olur.
-    Görseller yerel diskte (output/) ve Cloudflare CDN önbelleğinde 30 gün boyunca saklanır.
+    Görseli Neon PostgreSQL (images tablosu) ve yerel diskte kalıcı olarak saklar.
+    Render yeniden başlasa bile haber görselleri ASLA silinmez ve kaybolmaz.
     """
-    return
+    if not path or not os.path.exists(path):
+        return
+    filename = os.path.basename(path)
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+        if not data or len(data) < 200:
+            return
+        with get_connection() as conn:
+            if conn.is_pg:
+                conn.execute("""
+                    INSERT INTO images (filename, data) VALUES (?, ?)
+                    ON CONFLICT (filename) DO UPDATE SET data = EXCLUDED.data
+                """, (filename, psycopg2.Binary(data)))
+            else:
+                conn.execute("""
+                    INSERT OR REPLACE INTO images (filename, data) VALUES (?, ?)
+                """, (filename, data))
+    except Exception as e:
+        print(f"Görsel kalıcı kayıt istisnası ({filename}): {e}")
 
 
 def cleanup_old_images(days: int = 180) -> int:
@@ -598,11 +615,17 @@ def get_storage_stats() -> Dict:
 
 
 def get_image(filename: str) -> Optional[bytes]:
-    """
-    NEON KOTA VE HIZ KALKANI:
-    Neon veritabanından binary görsel çekmeyi engeller.
-    Böylece her görsel isteğinde Neon'dan 100 KB çekilmez, veritabanı kotası %0 kalır.
-    """
+    """Görseli Neon PostgreSQL veya yerel veritabanından anında çeker."""
+    if not filename:
+        return None
+    safe_name = os.path.basename(filename)
+    try:
+        with get_connection() as conn:
+            row = conn.execute("SELECT data FROM images WHERE filename = ? LIMIT 1", (safe_name,)).fetchone()
+            if row and row.get("data"):
+                return bytes(row["data"])
+    except Exception as e:
+        print(f"Görsel veritabanı okuma hatası ({safe_name}): {e}")
     return None
 
 

@@ -14,10 +14,11 @@ import config
 
 def generate_telegram_post(title: str, summary: str, source: str) -> str:
     """
-    Önde gelen haber Telegram kanallarının (ANA HABER, Asayiş Berkemal, BPT) tarzında:
-    - İlk satır: Vurucu başlık / giriş
-    - 2-3 adet madde işareti (— ...) ile kritik rakamlar, kararlar, cezalar ve gelişmeler
-    - En altta kaynak parantezi: (Kaynak)
+    Önde gelen haber kanallarının (BPT, Ana Haber) tarzında:
+    - İlk satır: Vurucu, net başlık
+    - Boşluk
+    - En az 3, en fazla 4 adet doyurucu, akıcı ve bilgilendirici madde (— ...)
+    - KESİNLİKLE kaynak adı yazılmaz (Kaynak biziz).
     - Kesinlikle hashtag veya yapay soru içermez.
     """
     import news_fetcher
@@ -29,33 +30,36 @@ def generate_telegram_post(title: str, summary: str, source: str) -> str:
             from google import genai
             client = genai.Client(api_key=config.GEMINI_API_KEY)
             prompt = f"""
-Sen Türkiye'nin en popüler haber Telegram kanallarının (BPT, Asayiş Berkemal, Ana Haber) uzman baş editörüsün.
-Aşağıdaki haber için Telegram takipçilerine olayın arka planını, nedenlerini ve ayrıntılarını net şekilde aktaran, doyurucu ve maddeli bir haber metni hazırla.
+Sen Türkiye'nin en popüler haber kanallarının uzman baş editörüsün.
+Aşağıdaki haber için Telegram takipçilerine olayın arka planını, nedenlerini, perde arkasını ve ayrıntılarını net şekilde aktaran, DOYURUCU VE EN AZ 3-4 MADDELİ bir haber metni hazırla.
 
 Haber Başlığı: {title}
 Haber Detayı: {summary}
-Kaynak: {source}
 
 Format:
-İlk satır: Haberin ana konusunu ve önemini anlatan net, açıklayıcı ve vurucu bir giriş cümlesi.
+İlk satır: Haberin ana konusunu ve önemini anlatan net, açıklayıcı ve vurucu bir giriş başlığı.
 Boş satır.
-Maddeler: Haberdeki en kritik sayıları, kararları, yetkili açıklamalarını ve gelişmeleri açıklayan 3-4 adet doyurucu madde işareti (— ile başlayan). Her madde sadece 2-3 kelime olmamalı; olayın o boyutunu akıcı, net ve dil bilgisi düzgün bir dille izah etmelidir.
-Son satır: Parantez içinde kaynak, örn: ({source})
+Maddeler: KESİNLİKLE EN AZ 3, EN FAZLA 4 ADET DOYURUCU MADDE (— ile başlayan).
+- Her madde tam ve akıcı bir Türkçe cümleden oluşmalı; olayın nedenini, arka planını, varsa kritik rakamları, cezaları, kurum açıklamalarını ve sektörel/toplumsal etkilerini net bir dille izah etmelidir.
+- Haber detayı kısa veya tek cümle bile olsa, haber başlığından ve konunun genel bağlamından yararlanarak olayı doyurucu, bilgilendirici cümlelerle açıkla. Tek kelimelik veya yarım cümle KESİNLİKLE yazma.
 
-Kurallar:
-1. CÜMLE KALİTESİ: Cümleleri uzatacağım diye yapay, devrik veya bozuk cümleler kurma. Açık, duru ve kusursuz Türkçe kullan.
-2. ASLA hashtag (#haber, #sondakika vb.) KULLANMA.
-3. ASLA 'Siz ne düşünüyorsunuz?' gibi yapay sorular SORMA.
-4. ASLA link/URL ekleme.
-5. Varsa kesin sayıları, TL tutarlarını, oranları, ceza/hapis sürelerini, kurum açıklamalarını maddelere koy.
-6. ASLA borsa/SPK yasal uyarı metinlerini veya ajans telif şablonlarını maddelere KOYMA.
+ÖNEMLİ KURALLAR:
+1. KESİNLİKLE HİÇBİR KAYNAK ADI YAZMA (örn: Motor1, Habertürk, AA, İHA, TRT vb. ASLA YAZILMAYACAK). Kaynak biz kendimiziz.
+2. Metnin sonuna KESİNLİKLE parantez içinde kaynak veya ajans adı EKLEME.
+3. ASLA hashtag (#haber, #sondakika vb.) KULLANMA.
+4. ASLA 'Siz ne düşünüyorsunuz?' gibi yapay sorular SORMA.
+5. ASLA link/URL ekleme.
+6. Cümleleri dil bilgisi hatası olmadan, duru ve kusursuz Türkçe ile yaz.
 7. Yalnızca doğrudan paylaşılacak nihai metni yaz.
 """
             for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
                 try:
                     res = client.models.generate_content(model=m_name, contents=prompt)
                     if res and res.text:
-                        return res.text.strip()
+                        text = res.text.strip()
+                        # Güvenlik Kalkanı: Metin sonundaki parantezli kaynak kalıntılarını temizle
+                        text = re.sub(r'\s*\([A-Za-z0-9\sğüşıöçĞÜŞİÖÇ\.\'\-]{3,40}\)\s*$', '', text)
+                        return text
                 except Exception:
                     continue
         except Exception:
@@ -63,13 +67,11 @@ Kurallar:
 
     # Kural Tabanlı Akıllı Editör (Fallback)
     import re
-    # Finans / Borsa canlı ticker yüzdelerini ve kategori kırıntılarını ayıkla
     clean_summary = re.sub(r'^(?:\s*%\s*[-+]?\d+[\.,]\d+\s*)+(?:Haberler|FİNANS|Ekonomi|Gündem|Son Dakika|\s)*', '', clean_summary, flags=re.I)
     clean_summary = re.sub(r'\b(?:Haberler\s+FİNANS\s+Ekonomi)\b', '', clean_summary, flags=re.I)
 
     raw_sentences = [s.strip() for s in re.split(r'(?<=[!?:])\s+|(?<=[0-9a-zA-ZçğıöşüÇĞİÖŞÜ]{3}\.)\s+(?=[A-ZÇĞİÖŞÜ0-9])', clean_summary) if len(s.strip()) > 20]
 
-    # Başlık parçalarını topla (başlıktaki cümlelerin maddelerde tekrarlanmasını önle)
     headline_parts = [p.strip().lower() for p in re.split(r'[:!,—\-\.]+', headline) if len(p.strip()) > 10]
 
     filtered_sentences = []
@@ -79,13 +81,11 @@ Kurallar:
 
         if s_lower == headline.lower():
             continue
-        # SPK, borsa yasal uyarısı ve ajans telif şablonlarını kesinlikle ele
         if any(w in s_lower for w in ["spk", "yatırım danışmanlığı", "resmi gazete", "tavsiyesi değildir", "mevduat kabul etmeyen", "aracı kurumlar", "portföy yönetim", "yasal uyarı", "burada yer alan", "kişisel görüşlerine"]):
             continue
         if any(s_lower == part for part in headline_parts):
             continue
 
-        # Eğer cümlenin başı başlığın bir parçasıyla başlıyorsa kırp
         for part in headline_parts:
             if s_lower.startswith(part):
                 s_clean = s_clean[len(part):].lstrip(' ,:!-—.')
@@ -96,7 +96,6 @@ Kurallar:
         if any(b in s_lower for b in ["tıklayınız", "tıklayın", "abone olun", "ayrıntılar geliyor", "fotoğraf:", "iha", "aa", "dha", "son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
             continue
 
-        # Başındaki yazar adı ve tarihi temizle (Erhan Şencan 24 Ekim 2026, Hakan Hasırcıoğlu 24 Ekim 2026 vb.)
         s_clean = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', s_clean, flags=re.I).strip()
         if len(s_clean) < 25:
             continue
@@ -114,17 +113,28 @@ Kurallar:
         else:
             normal_sentences.append(s)
 
-    selected_bullets = (priority_sentences + normal_sentences)[:3]
+    selected_bullets = (priority_sentences + normal_sentences)[:4]
 
-    clean_src = source
-    if any(x in clean_src.lower() for x in ["mynet", "ensonhaber", "haberler"]):
-        clean_src = "Gündem Analizi"
+    # Eğer kaynak metin çok kısaysa (1 cümle vb.), haberi tek satırda bırakma; doyurucu hale getir
+    if len(selected_bullets) == 1 and clean_summary:
+        first_s = selected_bullets[0]
+        # Uzun bileşik cümleyi mantıklı iki parçaya ayır
+        clauses = [c.strip() for c in re.split(r'[,;]\s+(?:ve|ancak|fakat|ayrıca|çünkü|bu kapsamda|bununla birlikte)\s+', first_s, flags=re.I) if len(c.strip()) > 20]
+        if len(clauses) >= 2:
+            selected_bullets = clauses[:3]
+        else:
+            selected_bullets.append("Gelişmenin sektörel maliyet dengeleri ve tüketici süreçleri üzerindeki olası etkileri yakından takip ediliyor.")
 
     if selected_bullets:
         bullet_text = "\n".join([f"— {s}" for s in selected_bullets])
-        return f"{headline}\n\n{bullet_text}\n({clean_src})"
+        res = f"{headline}\n\n{bullet_text}"
     else:
-        return f"{headline}\n({clean_src})"
+        res = f"{headline}\n\n— Konuyla ilgili resmi açıklamalar ve son dakika detayları geldikçe aktarılmaya devam edecektir."
+
+    # Kesinlikle kaynak parantezi yazma (Kaynak biz kendimiziz)
+    res = re.sub(r'\s*\([A-Za-z0-9\sğüşıöçĞÜŞİÖÇ\.\'\-]{3,40}\)\s*$', '', res)
+    return res
+
 def generate_social_caption(title: str, summary: str, source: str) -> dict:
     """
     Saygın ve kurumsal bir haber medya kuruluşu (Gündem Analizi) tarzında:
