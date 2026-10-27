@@ -166,24 +166,53 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # 8 Ana Kategori Döngüsü (Gündem -> Ekonomi -> Teknoloji -> Dünya -> Otomobil -> Spor -> Sağlık -> Eğitim)
-    ROTATION = ["Gündem", "Ekonomi", "Teknoloji", "Dünya", "Otomobil", "Spor", "Sağlık", "Eğitim"]
+    # ⏰ SAATLİK AKILLI KATEGORİ MOTORU (TÜRKİYE ALIŞKANLIKLARI & 3 KADEMELİ ÇELİK KALKAN)
+    now_tr = datetime.now(database.TR_TZ)
+    h = now_tr.hour + (now_tr.minute / 60.0)
+
+    if 7.0 <= h < 10.5:
+        slot_name = "🌅 Sabah Kuşağı"
+        preferred_cats = ["Ekonomi", "Gündem", "Otomobil"]
+    elif 10.5 <= h < 16.5:
+        slot_name = "☀️ Gün Ortası Kuşağı"
+        preferred_cats = ["Teknoloji", "Otomobil", "Gündem", "Sağlık", "Eğitim"]
+    elif 16.5 <= h < 23.0:
+        slot_name = "🌆 Akşam Prime Time"
+        preferred_cats = ["Spor", "Gündem", "Ekonomi"]
+    else:
+        slot_name = "🌙 Gece Kuşağı"
+        preferred_cats = ["Dünya", "Teknoloji", "Otomobil", "Gündem"]
+
     last_cat = database.get_setting("last_bot_category", "")
     try:
-        next_idx = (ROTATION.index(last_cat) + 1) % len(ROTATION) if last_cat in ROTATION else 0
+        if last_cat in preferred_cats:
+            next_idx = (preferred_cats.index(last_cat) + 1) % len(preferred_cats)
+            target_cat = preferred_cats[next_idx]
+        else:
+            target_cat = preferred_cats[0]
     except Exception:
-        next_idx = 0
-    target_cat = ROTATION[next_idx]
-    print(f"🎯 Hedef Kategori Sırası: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
+        target_cat = preferred_cats[0]
 
-    # Hedef kategoriden taze haber varsa önceliklendir
-    target_fresh = [item for item in fresh_news if item.get("category") == target_cat]
-    if target_fresh:
-        selected_pool = target_fresh
-        print(f"✅ [{target_cat}] kategorisinden {len(target_fresh)} adet taze haber seçildi.")
-    else:
-        print(f"⚠️ [{target_cat}] kategorisinde henüz taze haber yok, diğer kategorilerden en güncel taze haber seçiliyor...")
+    print(f"🎯 [{slot_name}] Hedef Kategori: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
+
+    # 🛡️ ÇELİK KALKAN 1: Kuşağın öncelikli hedef kategorisindeki taze haberi ara
+    selected_pool = [item for item in fresh_news if item.get("category") == target_cat]
+
+    # 🛡️ ÇELİK KALKAN 2: Eğer o kategoride taze haber yoksa, aynı kuşağın diğer kategorilerine bak
+    if not selected_pool:
+        for alt_cat in preferred_cats:
+            if alt_cat != target_cat:
+                alt_items = [item for item in fresh_news if item.get("category") == alt_cat]
+                if alt_items:
+                    selected_pool = alt_items
+                    print(f"ℹ️ [{target_cat}] kategorisinde taze haber yoktu, aynı kuşağın [{alt_cat}] kategorisine geçildi.")
+                    target_cat = alt_cat
+                    break
+
+    # 🛡️ ÇELİK KALKAN 3: Kuşaktaki hiçbir kategoride taze haber yoksa, havuzdaki herhangi bir taze haberi seç (BOT ASLA DURMAZ)
+    if not selected_pool:
         selected_pool = fresh_news
+        print("⚠️ Kuşaktaki kategorilerde taze haber kalmadı, genel taze haber havuzundan seçiliyor (Bot asla durmaz).")
 
     processed_count = 0
     # Sıradaki haber hata verirse döngüyü kesme, havuzdaki diğer taze haberleri dene!
