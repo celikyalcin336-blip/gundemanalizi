@@ -297,11 +297,7 @@ async def track_visitors_middleware(request: Request, call_next):
 
             country = request.headers.get("cf-ipcountry", "TR")
             city = request.headers.get("cf-ipcity", "")
-            threading.Thread(
-                target=database.log_visitor,
-                args=(vis_hash, path, source, device, country, city),
-                daemon=True
-            ).start()
+            database.log_visitor(vis_hash, path, source, device, country, city)
         except Exception:
             pass
     return await call_next(request)
@@ -753,15 +749,21 @@ _TURBO_PAGE_CACHE = {}
 
 def get_turbo_page(key: str):
     item = _TURBO_PAGE_CACHE.get(key)
-    if item and (time.time() - item["ts"]) < 90:
+    if item and (time.time() - item["ts"]) < 120:
         return item["html"]
     return None
 
 def set_turbo_page(key: str, html: str):
     global _TURBO_PAGE_CACHE
-    if len(_TURBO_PAGE_CACHE) > 50:
-        _TURBO_PAGE_CACHE.clear()
-    _TURBO_PAGE_CACHE[key] = {"html": html, "ts": time.time()}
+    now = time.time()
+    if len(_TURBO_PAGE_CACHE) >= 800:
+        # 120 sn dolmuş eski önbellekleri ayıkla, aktif sayfaları koru
+        _TURBO_PAGE_CACHE = {k: v for k, v in _TURBO_PAGE_CACHE.items() if (now - v["ts"]) < 120}
+        if len(_TURBO_PAGE_CACHE) >= 700:
+            oldest_keys = sorted(_TURBO_PAGE_CACHE.keys(), key=lambda k: _TURBO_PAGE_CACHE[k]["ts"])[:100]
+            for k in oldest_keys:
+                _TURBO_PAGE_CACHE.pop(k, None)
+    _TURBO_PAGE_CACHE[key] = {"html": html, "ts": now}
 
 def clear_turbo_cache():
     global _TURBO_PAGE_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
@@ -807,11 +809,11 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     if cache_key and request.cookies.get("ga_admin") != "1":
         cached_html = get_turbo_page(cache_key)
         if cached_html:
-            threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
+            database.record_visit("home_visits")
             return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60, s-maxage=60", "CDN-Cache-Control": "max-age=60", "Cloudflare-CDN-Cache-Control": "max-age=60"})
 
     if request.cookies.get("ga_admin") != "1":
-        threading.Thread(target=database.record_visit, args=("home_visits",), daemon=True).start()
+        database.record_visit("home_visits")
     import math
     import urllib.parse
     page = max(1, sayfa)

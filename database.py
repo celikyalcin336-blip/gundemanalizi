@@ -78,20 +78,39 @@ class _Conn:
         self.is_pg = False
         self.from_pool = False
         if USE_PG:
-            try:
-                pool = _get_pg_pool()
-                if pool:
-                    self.raw = pool.getconn()
-                    self.from_pool = True
-                    self.is_pg = True
-                else:
+            pool = _get_pg_pool()
+            if pool:
+                for retry in range(4):
+                    try:
+                        self.raw = pool.getconn()
+                        self.from_pool = True
+                        self.is_pg = True
+                        _PG_LAST_ERROR = None
+                        break
+                    except Exception as pool_err:
+                        if retry < 3:
+                            time.sleep(0.04)
+                            continue
+                        # Havuz tamamen doluysa SQLite'a düşmek yerine anlık tekil PG bağlantısı dene
+                        try:
+                            self.raw = psycopg2.connect(DATABASE_URL, connect_timeout=8)
+                            self.from_pool = False
+                            self.is_pg = True
+                            _PG_LAST_ERROR = None
+                            break
+                        except Exception as direct_err:
+                            _PG_LAST_ERROR = f"PoolError + DirectConnectFail: {direct_err}"
+                            print(f"⚠️ PostgreSQL bağlantı hatası, yerel SQLite'a geçiliyor: {direct_err}")
+                            self.is_pg = False
+            else:
+                try:
                     self.raw = psycopg2.connect(DATABASE_URL, connect_timeout=15)
                     self.is_pg = True
-                _PG_LAST_ERROR = None
-            except Exception as e:
-                _PG_LAST_ERROR = f"{type(e).__name__}: {str(e)}"
-                print(f"⚠️ PostgreSQL bağlantı hatası, yerel SQLite'a geçiliyor: {e}")
-                self.is_pg = False
+                    _PG_LAST_ERROR = None
+                except Exception as e:
+                    _PG_LAST_ERROR = f"{type(e).__name__}: {str(e)}"
+                    print(f"⚠️ PostgreSQL bağlantı hatası, yerel SQLite'a geçiliyor: {e}")
+                    self.is_pg = False
 
         if not self.is_pg:
             self.from_pool = False
@@ -919,20 +938,15 @@ def get_articles_total_count(category: str = None) -> int:
         return 0
 
 
-def _async_inc_view(art_id: int):
-    try:
-        with get_connection() as conn:
-            conn.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (art_id,))
-    except Exception:
-        pass
-
 def get_article_by_slug(slug: str) -> Optional[Dict]:
-    """Slug'a göre makale detayını çeker ve okunma sayısını arka planda artırır (0 ms bekleme)."""
+    """Slug'a göre makale detayını çeker ve okunma sayısını RAM'de sıfır gecikmeyle biriktirir (0 ms bekleme, 0 thread)."""
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
         if row:
-            import threading
-            threading.Thread(target=_async_inc_view, args=(row["id"],), daemon=True).start()
+            art_id = row["id"]
+            _start_db_buffer_worker()
+            with _RAM_ARTICLE_VIEWS_LOCK:
+                _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
             return _row_to_dict(row)
     return None
 
@@ -1000,6 +1014,8 @@ _VISITOR_LOG_QUEUE = []
 _VISITOR_QUEUE_LOCK = threading.Lock()
 _RAM_METRICS = {}
 _RAM_METRICS_LOCK = threading.Lock()
+_RAM_ARTICLE_VIEWS = {}
+_RAM_ARTICLE_VIEWS_LOCK = threading.Lock()
 _DASHBOARD_CACHE = {"data": None, "ts": 0}
 _BUFFER_WORKER_STARTED = False
 
@@ -1033,7 +1049,7 @@ def _start_db_buffer_worker():
                                     row = conn.execute("SELECT val FROM site_metrics WHERE key = ?", (k,)).fetchone()
                                     new_val = (row["val"] + v) if row else v
                                     conn.execute("INSERT OR REPLACE INTO site_metrics (key, val) VALUES (?, ?)", (k, new_val))
-                except Exception as e:
+                except Exception:
                     pass
 
             # B. Ziyaretçi Loglarını Toplu Yaz
@@ -1052,7 +1068,23 @@ def _start_db_buffer_worker():
                                 INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
                                 VALUES (?, 0, ?, ?, ?, ?, ?)
                             """, (v_hash, page, ref, dev, ctry, city))
-                except Exception as e:
+                except Exception:
+                    pass
+
+            # C. Makale Okunma Sayılarını Toplu Yaz (0 kilitlenme, 0 gecikme)
+            views_copy = {}
+            with _RAM_ARTICLE_VIEWS_LOCK:
+                if _RAM_ARTICLE_VIEWS:
+                    views_copy = dict(_RAM_ARTICLE_VIEWS)
+                    _RAM_ARTICLE_VIEWS.clear()
+
+            if views_copy:
+                try:
+                    with get_connection() as conn:
+                        for art_id, count in views_copy.items():
+                            if count > 0:
+                                conn.execute("UPDATE articles SET views = views + ? WHERE id = ?", (count, art_id))
+                except Exception:
                     pass
 
     t = threading.Thread(target=_worker, daemon=True)
