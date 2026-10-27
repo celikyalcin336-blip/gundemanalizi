@@ -574,7 +574,7 @@ def save_image_file(path: str):
         with get_connection() as conn:
             if conn.is_pg:
                 conn.execute("""
-                    INSERT INTO images (filename, data) VALUES (?, ?)
+          INSERT INTO images (filename, data) VALUES (?, ?)
                     ON CONFLICT (filename) DO UPDATE SET data = EXCLUDED.data
                 """, (filename, psycopg2.Binary(data)))
             else:
@@ -1257,7 +1257,7 @@ def get_dashboard_summary() -> Dict:
         "images_count": images_count,
         "db_size_mb": db_size_mb,
         "use_pg": USE_PG,
-        "last_article_time": recent_list[0]["created_at"] if recent_list else "-",
+        "last_article_time": (recent_list[0].get("created_at") or "-") if recent_list else "-",
         "top_articles": top_list,
         "recent_articles": recent_list,
         "categories": [dict(r) for r in cat_rows],

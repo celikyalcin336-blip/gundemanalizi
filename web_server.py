@@ -893,40 +893,75 @@ async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
     return await home(request=request, kategori=kategori_adi, sayfa=sayfa)
 
 @app.get("/panel", response_class=HTMLResponse)
-async def admin_panel_decoy(request: Request):
-    """Eski veya tahmin edilen /panel adresine gelenlere sahte 404 gösterir."""
-    return HTMLResponse(
-        status_code=404,
-        content="""<!DOCTYPE html>
-<html lang="tr">
-<head><meta charset="UTF-8"><title>404 - Sayfa Bulunamadı</title>
-<style>body{background:#0a0e17;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column;text-align:center;}h1{color:#ef4444;font-size:3rem;margin:0;}p{margin:10px 0 20px;}a{color:#38bdf8;text-decoration:none;font-weight:bold;}</style>
-</head>
-<body>
-<h1>404</h1>
-<p>Aradığınız sayfa mevcut değil veya taşınmış olabilir.</p>
-<a href="/">← Ana Sayfaya Dön</a>
-</body>
-</html>"""
-    )
-
 @app.get(f"/{PANEL_SECRET_SLUG}", response_class=HTMLResponse)
 @app.get("/yonetim-71453", response_class=HTMLResponse)
 async def admin_panel(request: Request):
-    stats = database.get_dashboard_summary()
+    try:
+        stats = database.get_dashboard_summary() or {}
+    except Exception as e:
+        print(f"⚠️ Panel özet verisi çekme hatası: {e}")
+        stats = {}
+
     stats["gemini_active"] = bool(config.GEMINI_API_KEY)
     stats["telegram_active"] = bool(config.TELEGRAM_BOT_TOKEN and config.TELEGRAM_CHAT_ID)
     stats["check_interval"] = config.CHECK_INTERVAL_MINUTES
-    stats["total_articles"] = database.get_articles_total_count()
+    try:
+        stats["total_articles"] = database.get_articles_total_count()
+    except Exception:
+        stats["total_articles"] = stats.get("total_articles", 0)
     stats["db_status"] = "🟢 Neon PostgreSQL (Ücretli / Always-On)" if database.USE_PG else "🟡 Yerel SQLite"
     stats["watchdog_status"] = "Gece Vardiyasında (00:00 - 09:00 / 10 dk aralıkla)"
     stats["cache_status"] = "🟢 RAM Önbellek Devrede (0 ms Gecikme)"
     stats["archive_status"] = "🔒 %100 Güvende (Asla Haber Silinmez)"
-    return templates.TemplateResponse(
+
+    # Güvenli varsayılanlar (Jinja2 asla NoneType hatası vermez)
+    stats.setdefault("total_all_hits", 0)
+    stats.setdefault("home_visits", 0)
+    stats.setdefault("total_views", 0)
+    stats.setdefault("avg_views", 0)
+    stats.setdefault("active_now", 1)
+    stats.setdefault("today_uniques", 0)
+    stats.setdefault("first_time_today", 0)
+    stats.setdefault("returning_today", 0)
+    stats.setdefault("traffic_sources", [])
+    stats.setdefault("device_stats", [])
+    stats.setdefault("live_visitors", [])
+    stats.setdefault("total_revenue", 0.0)
+    stats.setdefault("month_revenue", 0.0)
+    stats.setdefault("revenue_records", [])
+    stats.setdefault("images_count", 0)
+    stats.setdefault("db_size_mb", 0.0)
+    stats.setdefault("use_pg", database.USE_PG)
+    stats.setdefault("last_article_time", "-")
+    stats.setdefault("top_articles", [])
+    stats.setdefault("recent_articles", [])
+    stats.setdefault("categories", [])
+    stats.setdefault("sources", [])
+
+    if not stats.get("last_article_time"):
+        stats["last_article_time"] = "-"
+    if stats.get("db_size_mb") is None:
+        stats["db_size_mb"] = 0.0
+
+    for item in stats.get("top_articles", []):
+        if not item.get("created_at"):
+            item["created_at"] = "-"
+    for a in stats.get("recent_articles", []):
+        if not a.get("created_at"):
+            a["created_at"] = "-"
+
+    try:
+        ad_settings = get_site_ad_settings()
+    except Exception:
+        ad_settings = {}
+
+    response = templates.TemplateResponse(
         request=request,
         name="panel.html",
-        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG, "ad_settings": get_site_ad_settings()}
+        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG, "ad_settings": ad_settings}
     )
+    response.set_cookie(key="ga_admin", value="1", max_age=3600*24*30, httponly=False)
+    return response
 
 @app.post("/api/panel/fetch-now")
 async def panel_fetch_now(request: Request):
