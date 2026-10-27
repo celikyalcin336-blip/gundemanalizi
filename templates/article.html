@@ -255,9 +255,17 @@
         .bg-red-600, .bg-red-600 *,
         .bg-emerald-600, .bg-emerald-600 *,
         .bg-blue-600, .bg-blue-600 *,
-        span[class*="bg-red-"], span[class*="bg-red-"] *,
+        .bg-red-700, .bg-red-700 *,
+        .bg-sky-600, .bg-sky-600 *,
+        .bg-pink-600, .bg-pink-600 *,
+        .bg-fuchsia-600, .bg-fuchsia-600 *,
         button[class*="bg-emerald-"], button[class*="bg-emerald-"] * {
             color: #ffffff !important;
+        }
+
+        .bg-red-50, .bg-red-50 *,
+        .bg-red-100, .bg-red-100 * {
+            color: #dc2626 !important;
         }
 
         /* 7. Kenarlıklar */
@@ -384,7 +392,7 @@
             <a href="/" class="flex items-center gap-3 group shrink-0">
                 <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md group-hover:scale-105 transition">
                 <div>
-                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
+                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
                         GÜNDEM <span class="text-red-500">ANALİZİ</span>
                     </span>
                     <p class="text-[9px] font-semibold text-slate-400 tracking-wider uppercase hidden sm:block">
@@ -394,14 +402,14 @@
             </a>
 
             <!-- Kategori Linkleri -->
-            <nav class="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-300">
-                <a href="/" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Ana Sayfa</a>
-                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Gündem</a>
-                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Ekonomi</a>
-                <a href="/?kategori=Eğitim" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Eğitim</a>
-                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Otomobil</a>
-                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Teknoloji</a>
-                <a href="/?kategori=Spor" class="px-2.5 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition">Spor</a>
+            <nav class="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-700">
+                <a href="/" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ana Sayfa</a>
+                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Gündem</a>
+                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ekonomi</a>
+                <a href="/?kategori=Eğitim" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Eğitim</a>
+                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Otomobil</a>
+                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Teknoloji</a>
+                <a href="/?kategori=Spor" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Spor</a>
             </nav>
 
             <!-- Sağ Taraf: Arama, Ana Sayfa & Erişilebilirlik Butonları -->
@@ -490,6 +498,7 @@
                 </span>
                 <span class="text-slate-500 hidden sm:inline">•</span>
                 <span class="inline-flex items-center gap-1 text-slate-300 bg-slate-800/80 px-2.5 py-0.5 rounded-md text-[11px] font-medium border border-slate-700/60">
+
                     <i data-lucide="clock" class="w-3 h-3 text-red-400"></i> {{ reading_time_min or 2 }} dk okuma
                 </span>
                 <div class="inline-flex items-center gap-1.5 bg-slate-800/80 px-2 py-0.5 rounded-md text-[11px] text-slate-300 ml-auto border border-slate-700/60">
@@ -501,7 +510,7 @@
             </div>
 
             <!-- Başlık -->
-            <h1 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight mb-6">
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-6">
                 {{ article.title }}
             </h1>
 
@@ -542,7 +551,8 @@
             <!-- Ana Görsel (Haber Kartı) -->
             <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save">
+                    <img src="/images/{{ article.image_path.split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" oncontextmenu="return false;" class="w-full h
+-auto object-cover max-h-[500px] pointer-events-none no-save">
                 {% endif %}
             </div>
 
@@ -623,10 +633,10 @@
             {% if next_article %}
             <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-white border-2 border-red-500/40 shadow-lg relative overflow-hidden group">
                 <div class="flex items-center justify-between mb-4">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-black tracking-wider uppercase">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-600 text-white text-xs font-black tracking-wider uppercase shadow-md">
                         <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                         </span>
                         SIRADAKİ HABER
                     </span>
@@ -664,15 +674,15 @@
             {% endif %}
 
             <!-- ÖNCEKİ / SONRAKİ HABER NAVİGASYON BUTONLARI -->
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-brand-border/60">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-200">
                 {% if prev_article %}
-                <a href="/haber/{{ prev_article.slug }}" class="flex items-center gap-3 p-3.5 rounded-xl bg-brand-card hover:bg-slate-900 border border-brand-border hover:border-slate-700 transition group text-left">
-                    <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-red-600 transition shrink-0">
+                <a href="/haber/{{ prev_article.slug }}" class="flex items-center gap-3 p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-red-400 transition shadow-sm group text-left">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 group-hover:text-white group-hover:bg-red-600 transition shrink-0">
                         <i data-lucide="chevron-left" class="w-5 h-5"></i>
                     </div>
                     <div class="min-w-0">
                         <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Önceki Haber</span>
-                        <h4 class="text-xs font-bold text-slate-300 group-hover:text-red-400 transition line-clamp-1">{{ prev_article.title }}</h4>
+                        <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-1">{{ prev_article.title }}</h4>
                     </div>
                 </a>
                 {% else %}
@@ -680,12 +690,12 @@
                 {% endif %}
 
                 {% if next_article %}
-                <a href="/haber/{{ next_article.slug }}" class="flex items-center justify-end gap-3 p-3.5 rounded-xl bg-brand-card hover:bg-slate-900 border border-brand-border hover:border-slate-700 transition group text-right">
+                <a href="/haber/{{ next_article.slug }}" class="flex items-center justify-end gap-3 p-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-red-400 transition shadow-sm group text-right">
                     <div class="min-w-0">
-                        <span class="text-[10px] text-red-400 font-bold uppercase tracking-wider block">Sonraki Haber</span>
-                        <h4 class="text-xs font-bold text-slate-300 group-hover:text-red-400 transition line-clamp-1">{{ next_article.title }}</h4>
+                        <span class="text-[10px] text-red-600 font-bold uppercase tracking-wider block">Sonraki Haber</span>
+                        <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-1">{{ next_article.title }}</h4>
                     </div>
-                    <div class="w-8 h-8 rounded-lg bg-red-600/20 text-red-400 group-hover:text-white group-hover:bg-red-600 flex items-center justify-center transition shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 group-hover:text-white group-hover:bg-red-600 flex items-center justify-center transition shrink-0">
                         <i data-lucide="chevron-right" class="w-5 h-5"></i>
                     </div>
                 </a>
@@ -729,9 +739,7 @@
                             <span class="text-sm">♿</span>
                             <span class="hidden sm:inline">Erişilebilirlik</span>
                         </button>
-                        <button type="button" onclick="openIhbarModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-md transition whitespace-nowrap">
-                            🚨 7/24 İhbar & Video Gönder
-                        </button>
+                        <button type="button" onclick="openIhbarModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-md transition whitespace-nowrap">🚨 7/24 İhbar & Video Gönder</button>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200 text-xs font-bold">
@@ -744,41 +752,23 @@
                     <a href="https://x.com/gndmanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition">🐦 X (Twitter)</a>
                 </div>
             </div>
-                    <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
-                    <span class="text-sm">♿</span>
-                    <span class="hidden sm:inline">Erişilebilirlik</span>
-                </button>
-                <button type="button" onclick="openIhbarModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition whitespace-nowrap">
-                        🚨 7/24 İhbar & Video Gönder
-                    </button>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-red-900/50 text-xs font-bold">
-                    <a href="https://news.google.com/search?q=g%C3%BCndemanalizi.com.tr&hl=tr&gl=TR&ceid=TR:tr" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-red-400 border border-slate-700 transition flex items-center gap-1.5"><span class="font-black text-red-500">N</span> Google News</a>
-                    <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition">💬 WhatsApp Kanalı</a>
-                    <a href="https://t.me/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white transition">📲 Telegram</a>
-                    <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-3.5 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white transition">📸 Instagram</a>
-                    <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white transition">🎵 TikTok</a>
-                    <a href="https://www.facebook.com/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition">📘 Facebook</a>
-                    <a href="https://x.com/gndmanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition">🐦 X (Twitter)</a>
-                </div>
-            </div>
 
             <!-- KATEGORİ BAZLI İLGİLİ HABERLER (OKUYUCU ETKİLEŞİMİ) -->
             {% if related_articles and related_articles|length > 0 %}
-            <div class="mt-10 pt-8 border-t border-brand-border">
+            <div class="mt-10 pt-8 border-t border-slate-200">
                 <div class="flex items-center justify-between mb-5">
-                    <h3 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                         <span class="w-3 h-3 bg-red-600 rounded-sm"></span>
-                        İLGİLİ HABERLER <span class="text-red-400 text-xs font-bold uppercase tracking-wider">({{ article.category }})</span>
+                        İLGİLİ HABERLER <span class="text-red-600 text-xs font-bold uppercase tracking-wider">({{ article.category }})</span>
                     </h3>
-                    <a href="/?kategori={{ article.category }}" class="text-xs font-bold text-slate-400 hover:text-red-400 transition flex items-center gap-1">
+                    <a href="/?kategori={{ article.category }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition flex items-center gap-1">
                         Tümünü Gör →
                     </a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% for rel in related_articles %}
-                    <a href="/haber/{{ rel.slug }}" class="group flex gap-3.5 p-3 rounded-2xl bg-brand-card hover:bg-slate-900/90 border border-brand-border/80 hover:border-red-600/40 transition shadow-md">
-                        <div class="w-24 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80">
+                    <a href="/haber/{{ rel.slug }}" class="group flex gap-3.5 p-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-red-400 transition shadow-sm">
+                        <div class="w-24 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200">
                             {% if rel.image_path %}
                             <img src="/images/{{ rel.image_path.split('/')[-1] }}" alt="{{ rel.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
@@ -786,11 +776,11 @@
                             {% endif %}
                         </div>
                         <div class="flex flex-col justify-between min-w-0">
-                            <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wide">{{ rel.category }}</span>
-                            <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-red-400 transition line-clamp-2 leading-snug">
+                            <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-wide">{{ rel.category }}</span>
+                            <h4 class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                 {{ rel.title }}
                             </h4>
-                            <span class="text-[10px] text-slate-400 font-mono">{{ rel.created_at[:10] }}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">{{ rel.published_date }}</span>
                         </div>
                     </a>
                     {% endfor %}
@@ -805,7 +795,7 @@
             
             <!-- 1. EN ÇOK OKUNANLAR (TREND İLK 5 - NUMARALI ROZETLERLE) -->
             <div class="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-xl">
-                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center justify-between pb-3 border-b border-brand-border">
+                <h3 class="text-sm font-extrabold text-slate-900 mb-4 flex items-center justify-between pb-3 border-b border-slate-200">
                     <span class="flex items-center gap-2">
                         <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
                         🔥 EN ÇOK OKUNANLAR
@@ -837,7 +827,7 @@
                         <!-- Başlık & Kategori -->
                         <div class="flex-1 min-w-0">
                             <span class="text-[10px] font-extrabold text-red-400 uppercase tracking-wider block mb-0.5">{{ trend.category }}</span>
-                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
+                            <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition leading-snug line-clamp-2">
                                 {{ trend.title }}
                             </h4>
                         </div>
@@ -848,7 +838,7 @@
 
             <!-- 2. DİĞER GÜNCEL HABERLER (GÖRSELLİ) -->
             <div class="rounded-2xl border border-brand-border bg-brand-card p-5 shadow-xl">
-                <h3 class="text-sm font-extrabold text-white mb-4 flex items-center gap-2 pb-3 border-b border-brand-border">
+                <h3 class="text-sm font-extrabold text-slate-900 mb-4 flex items-center gap-2 pb-3 border-b border-slate-200">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span>
                     ⚡ DİĞER GÜNCEL HABERLER
                 </h3>
@@ -869,7 +859,7 @@
                                 <span>•</span>
                                 <span>{{ other.created_at[:10] }}</span>
                             </div>
-                            <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition leading-snug line-clamp-2">
+                            <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition leading-snug line-clamp-2">
                                 {{ other.title }}
                             </h4>
                         </div>
@@ -959,13 +949,14 @@
                 <div>
                     <label class="block text-slate-300 font-semibold mb-1">🔗 Varsa Sosyal Medya Linki veya İsim/İletişim (İsteğe Bağlı)</label>
                     <input id="ih-contact" type="text" placeholder="Anonim kalmak için boş bırakabilirsiniz"
-                        class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white text-xs focus:outline-none focus:border-red-500">
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white text-xs focus:outline-none focus:border-red-500">
                 </div>
 
                 <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
 
                 <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
+                    <button type="button" oncl
+ick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
                     <button id="ih-submit" type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-red-900/50 transition">
                         🚀 İhbarı Haber Merkezine Gönder
                     </button>
@@ -1344,7 +1335,7 @@
             <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-3 pb-3 border-slate-800">
                 <div class="p-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-2xl flex items-center justify-center">
                     <span>♿</span>
                 </div>
