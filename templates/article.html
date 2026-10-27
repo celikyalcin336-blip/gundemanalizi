@@ -174,6 +174,24 @@
             box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.06) !important;
         }
 
+                #market-rates-bar > div,
+        .w-full.grid.grid-cols-2 > div {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+        }
+        #market-rates-bar .text-slate-400,
+        #market-rates-bar .text-slate-300 {
+            color: #64748b !important;
+        }
+        #market-rates-bar strong,
+        #market-rates-bar .font-bold,
+        #market-rates-bar .font-black,
+        #market-rates-bar .text-white,
+        #market-rates-bar .text-slate-200 {
+            color: #0f172a !important;
+        }
+
         /* 2. Header & Menü */
         header.sticky {
             background-color: rgba(255, 255, 255, 0.98) !important;
@@ -429,19 +447,19 @@
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
                     {% for r in market_rates %}
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition shadow-sm">
+                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">{{ r.icon }}</span>
                             <div>
-                                <div class="font-bold text-slate-200 text-[11px] sm:text-xs leading-tight">{{ r.name }}</div>
-                                <div class="text-[9px] text-slate-400 font-mono hidden sm:block leading-none">{{ r.symbol }}</div>
+                                <div class="font-bold text-slate-900 text-[11px] sm:text-xs leading-tight">{{ r.name }}</div>
+                                <div class="text-[9px] text-slate-500 font-mono hidden sm:block leading-none">{{ r.symbol }}</div>
                             </div>
                         </div>
                         <div class="text-right pl-2">
-                            <div class="font-black text-white text-xs sm:text-sm tracking-tight font-mono leading-tight">
-                                {{ r.price }} <span class="text-[10px] font-semibold text-slate-400">{{ r.unit }}</span>
+                            <div class="font-black text-slate-900 text-xs sm:text-sm tracking-tight font-mono leading-tight">
+                                {{ r.price }} <span class="text-[10px] font-semibold text-slate-500">{{ r.unit }}</span>
                             </div>
-                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none {{ 'text-emerald-400' if r.direction == 'up' else 'text-red-400' }}">
+                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none {{ 'text-emerald-600' if r.direction == 'up' else 'text-red-600' }}">
                                 <span>{{ '▲' if r.direction == 'up' else '▼' }}</span>
                                 <span>%{{ r.change|abs }}</span>
                             </div>
@@ -542,20 +560,20 @@
                 </button>
             </div>
 
-            <!-- Diğer Paylaşım Butonları -->
-            <div class="flex flex-wrap items-center gap-2 py-3 px-4 rounded-xl bg-brand-card border border-brand-border mb-8 text-xs font-semibold">
-                <span class="text-slate-400 mr-2 flex items-center gap-1"><i data-lucide="share-2" class="w-3.5 h-3.5"></i> Paylaş:</span>
-                <button type="button" onclick="shareArticleWhatsApp()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 transition flex items-center gap-1 font-bold">
+            <!-- Paylaşım Butonları Barı -->
+            <div class="flex flex-wrap items-center gap-2 py-3 px-4 rounded-2xl bg-white border border-slate-200 shadow-sm mb-8 text-xs font-bold">
+                <span class="text-slate-700 mr-2 flex items-center gap-1.5"><i data-lucide="share-2" class="w-4 h-4 text-red-600"></i> Paylaş:</span>
+                <button type="button" onclick="shareArticleWhatsApp()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm">
                     💬 WhatsApp
                 </button>
-                <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-sky-600/20 text-sky-400 hover:bg-sky-600/30 transition flex items-center gap-1">
-                    Telegram
+                <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white transition flex items-center gap-1.5 shadow-sm">
+                    📲 Telegram
                 </a>
-                <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition flex items-center gap-1">
-                    X (Twitter)
+                <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white transition flex items-center gap-1.5 shadow-sm">
+                    🐦 X (Twitter)
                 </a>
-                <button onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition flex items-center gap-1">
-                    Linki Kopyala
+                <button onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition flex items-center gap-1.5 shadow-sm">
+                    🔗 Linki Kopyala
                 </button>
             </div>
 
@@ -1064,19 +1082,19 @@
                 const container = document.getElementById('market-rates-bar');
                 if (!container) return;
                 container.innerHTML = data.rates.map(r => `
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition shadow-sm">
+                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">${r.icon}</span>
                             <div>
-                                <div class="font-bold text-slate-200 text-[11px] sm:text-xs leading-tight">${r.name}</div>
-                                <div class="text-[9px] text-slate-400 font-mono hidden sm:block leading-none">${r.symbol}</div>
+                                <div class="font-bold text-slate-900 text-[11px] sm:text-xs leading-tight">${r.name}</div>
+                                <div class="text-[9px] text-slate-500 font-mono hidden sm:block leading-none">${r.symbol}</div>
                             </div>
                         </div>
                         <div class="text-right pl-2">
-                            <div class="font-black text-white text-xs sm:text-sm tracking-tight font-mono leading-tight">
-                                ${r.price} <span class="text-[10px] font-semibold text-slate-400">${r.unit}</span>
+                            <div class="font-black text-slate-900 text-xs sm:text-sm tracking-tight font-mono leading-tight">
+                                ${r.price} <span class="text-[10px] font-semibold text-slate-500">${r.unit}</span>
                             </div>
-                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none ${r.direction === 'up' ? 'text-emerald-400' : 'text-red-400'}">
+                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none ${r.direction === 'up' ? 'text-emerald-600' : 'text-red-600'}">
                                 <span>${r.direction === 'up' ? '▲' : '▼'}</span>
                                 <span>%${Math.abs(r.change)}</span>
                             </div>
