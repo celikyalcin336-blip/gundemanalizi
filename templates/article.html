@@ -524,7 +524,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                     <div class="flex items-center gap-3">
                         <button type="button" id="audio-play-btn" onclick="toggleAudioReading()" aria-label="Haberi sesli dinlemeyi başlat veya duraklat" role="button" class="w-12 h-12 rounded-2xl bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-md transition active:scale-95 flex-shrink-0 group">
-                            <i id="audio-play-icon" data-lucide="play" class="w-6 h-6 ml-0.5 fill-white"></i>
+                            <svg id="audio-play-icon" class="w-6 h-6 ml-0.5 fill-white" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon></svg>
                         </button>
                         <div>
                             <div class="flex items-center gap-2">
@@ -547,7 +547,7 @@
                             1.0x
                         </button>
                         <button type="button" onclick="stopAudioReading()" aria-label="Sesli okumayı tamamen durdur" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-600 text-xs border border-slate-300 transition" title="Durdur">
-                            <i data-lucide="square" class="w-4 h-4"></i>
+                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"></rect></svg>
                         </button>
                     </div>
                 </div>
@@ -968,7 +968,14 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        function initLucideSafe() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e){}
+            }
+        }
+        initLucideSafe();
+        window.addEventListener('DOMContentLoaded', initLucideSafe);
+        window.addEventListener('load', initLucideSafe);
         if (!localStorage.getItem('ga_cookie_consent')) {
             document.getElementById('cookie-banner').classList.remove('hidden');
         }
@@ -1150,46 +1157,71 @@
             }
         });
     
-        // 🎧 HABERİ SESLİ DİNLEME MOTORU (WEB SPEECH API)
+        // 🎧 HABERİ SESLİ DİNLEME MOTORU (WEB SPEECH API - MOBİL & MASAÜSTÜ ÇELİK KALKAN)
         let isAudioPlaying = false;
         let isAudioPaused = false;
         let audioRate = 1.0;
         let speechChunks = [];
         let currentChunkIndex = 0;
+        let speechKeepAliveTimer = null;
+        let cachedVoices = [];
+
+        function updateCachedVoices() {
+            if ('speechSynthesis' in window) {
+                try {
+                    const v = window.speechSynthesis.getVoices();
+                    if (v && v.length > 0) cachedVoices = v;
+                } catch(e){}
+            }
+        }
+        if ('speechSynthesis' in window) {
+            updateCachedVoices();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = updateCachedVoices;
+            }
+        }
 
         function getArticleTextForSpeech() {
             const title = {{ article.title | tojson }};
-            let text = title + ". ";
+            const summary = {{ article.summary | default('') | tojson }};
+            let text = (title || "") + ". ";
+            if (summary && summary.trim() && !text.includes(summary.trim())) {
+                text += summary.trim() + ". ";
+            }
             const articleBody = document.querySelector('.article-body');
             if (articleBody) {
                 const paragraphs = articleBody.querySelectorAll('p');
                 const seenSentences = new Set();
-                paragraphs.forEach(p => {
-                    let t = p.innerText.trim();
-                    const lower = t.toLowerCase();
-                    if (t && !t.includes('http') && !t.includes('Gündem Analizi Değerlendirmesi') && !t.includes('WhatsApp') && !lower.includes('içindekiler') && !lower.includes('editör hakkında') && !lower.includes('oy ver') && !lower.includes('tam boyutta gör') && !lower.includes('scorsese')) {
-                        // Cümle bazında mükerrer kontrolü
-                        const sents = t.match(/[^.!?]+[.!?]+/g) || [t];
-                        sents.forEach(s => {
-                            const trimmed = s.trim();
-                            if (trimmed.length > 15 && !seenSentences.has(trimmed.toLowerCase())) {
-                                seenSentences.add(trimmed.toLowerCase());
-                                text += trimmed + " ";
-                            }
-                        });
-                    }
-                });
+                if (paragraphs && paragraphs.length > 0) {
+                    paragraphs.forEach(p => {
+                        let t = (p.innerText || '').trim();
+                        const lower = t.toLowerCase();
+                        if (t && !t.includes('http') && !t.includes('Gündem Analizi Değerlendirmesi') && !t.includes('WhatsApp') && !lower.includes('içindekiler') && !lower.includes('editör hakkında') && !lower.includes('oy ver') && !lower.includes('tam boyutta gör') && !lower.includes('scorsese')) {
+                            const sents = t.match(/[^.!?]+[.!?]+/g) || [t];
+                            sents.forEach(s => {
+                                const trimmed = s.trim();
+                                if (trimmed.length > 15 && !seenSentences.has(trimmed.toLowerCase())) {
+                                    seenSentences.add(trimmed.toLowerCase());
+                                    text += trimmed + " ";
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    const raw = (articleBody.innerText || '').trim();
+                    if (raw) text += raw;
+                }
             }
-            return text.trim();
+            return text.replace(/\s+/g, ' ').trim();
         }
 
         function splitTextIntoSentences(text) {
-            // Cümleleri 200 karakterlik akıcı bloklara birleştir (mobildeki hantal duraklamaları önler)
+            // Cümleleri 160-200 karakterlik akıcı bloklara böl (mobilde takılma ve duraksamaları önler)
             const raw = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
             const chunks = [];
             let buffer = "";
             raw.forEach(s => {
-                if ((buffer + " " + s).length < 220) {
+                if ((buffer + " " + s).length < 200) {
                     buffer = (buffer + " " + s).trim();
                 } else {
                     if (buffer) chunks.push(buffer);
@@ -1200,6 +1232,20 @@
             return chunks.length > 0 ? chunks : [text];
         }
 
+        function startSpeechKeepAlive() {
+            clearInterval(speechKeepAliveTimer);
+            speechKeepAliveTimer = setInterval(() => {
+                if (isAudioPlaying && !isAudioPaused && window.speechSynthesis && window.speechSynthesis.speaking) {
+                    window.speechSynthesis.pause();
+                    window.speechSynthesis.resume();
+                }
+            }, 10000);
+        }
+
+        function stopSpeechKeepAlive() {
+            clearInterval(speechKeepAliveTimer);
+        }
+
         window.toggleAudioReading = function() {
             if (!('speechSynthesis' in window)) {
                 alert('Tarayıcınız sesli okumayı desteklemiyor.');
@@ -1208,12 +1254,14 @@
 
             if (isAudioPlaying) {
                 if (isAudioPaused) {
-                    window.speechSynthesis.resume();
+                    try { window.speechSynthesis.resume(); } catch(e){}
                     isAudioPaused = false;
+                    startSpeechKeepAlive();
                     updateAudioUI(true, 'Sesli okunuyor...');
                 } else {
-                    window.speechSynthesis.pause();
+                    try { window.speechSynthesis.pause(); } catch(e){}
                     isAudioPaused = true;
+                    stopSpeechKeepAlive();
                     updateAudioUI(false, 'Duraklatıldı (Devam için tıklayın)');
                 }
                 return;
@@ -1223,14 +1271,21 @@
         };
 
         function startAudioReading() {
-            window.speechSynthesis.cancel();
+            try {
+                window.speechSynthesis.cancel();
+            } catch(e){}
+
             const fullText = getArticleTextForSpeech();
-            if (!fullText) return;
+            if (!fullText) {
+                updateAudioUI(false, 'Okunacak metin bulunamadı.');
+                return;
+            }
 
             speechChunks = splitTextIntoSentences(fullText);
             currentChunkIndex = 0;
             isAudioPlaying = true;
             isAudioPaused = false;
+            startSpeechKeepAlive();
             updateAudioUI(true, 'Haber seslendiriliyor...');
 
             playNextChunk();
@@ -1250,44 +1305,54 @@
                 return;
             }
 
-            const utterance = new SpeechSynthesisUtterance(chunk);
-            utterance.lang = 'tr-TR';
-            
-            // Telefonlarda Google TTS hantal kalmasın diye tempoyu canlı haber spikeri hızına (%12) ayarla
-            const isMobile = /mobile|android|iphone|ipad/i.test(navigator.userAgent);
-            utterance.rate = isMobile ? (audioRate * 1.12) : audioRate;
-            utterance.pitch = isMobile ? 1.02 : 1.0;
+            try {
+                const utterance = new SpeechSynthesisUtterance(chunk);
+                window.__currentSpeechUtterance = utterance; // Chromium GC hafıza kalkanı
+                utterance.lang = 'tr-TR';
+                
+                const isMobile = /mobile|android|iphone|ipad/i.test(navigator.userAgent);
+                utterance.rate = isMobile ? (audioRate * 1.05) : audioRate;
+                utterance.pitch = 1.0;
 
-            const voices = window.speechSynthesis.getVoices();
-            const trVoices = voices.filter(v => (v.lang && v.lang.toLowerCase().includes('tr')) || (v.name && v.name.toLowerCase().includes('turkish')));
-            // Kaliteli Doğal / Network / Google sesini önceliklendir
-            const bestVoice = trVoices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Online')) || trVoices[0];
-            if (bestVoice) utterance.voice = bestVoice;
-
-            utterance.onend = () => {
-                currentChunkIndex++;
-                if (isAudioPlaying && !isAudioPaused) {
-                    playNextChunk();
+                const voices = cachedVoices.length ? cachedVoices : (window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
+                if (voices && voices.length > 0) {
+                    const trVoices = voices.filter(v => (v.lang && (v.lang.toLowerCase().includes('tr') || v.lang.toLowerCase().startsWith('tr'))) || (v.name && v.name.toLowerCase().includes('turkish')));
+                    const bestVoice = trVoices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Siri') || v.name.includes('Online')) || trVoices[0];
+                    if (bestVoice) utterance.voice = bestVoice;
                 }
-            };
 
-            utterance.onerror = (e) => {
-                if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                utterance.onend = () => {
                     currentChunkIndex++;
-                    if (isAudioPlaying) playNextChunk();
-                }
-            };
+                    if (isAudioPlaying && !isAudioPaused) {
+                        playNextChunk();
+                    }
+                };
 
-            window.speechSynthesis.speak(utterance);
+                utterance.onerror = (e) => {
+                    if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                        currentChunkIndex++;
+                        if (isAudioPlaying && !isAudioPaused) {
+                            playNextChunk();
+                        }
+                    }
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } catch (err) {
+                console.error('Speech synthesis hatası:', err);
+                stopAudioReading();
+            }
         }
 
         window.stopAudioReading = function() {
+            stopSpeechKeepAlive();
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+                try { window.speechSynthesis.cancel(); } catch(e){}
             }
             isAudioPlaying = false;
             isAudioPaused = false;
             currentChunkIndex = 0;
+            window.__currentSpeechUtterance = null;
             updateAudioUI(false, 'Bu haberi sesli dinlemek için oynat\'a basın.');
         };
 
@@ -1297,14 +1362,14 @@
             audioRate = rates[idx];
             const btn = document.getElementById('audio-rate-btn');
             if (btn) btn.innerText = audioRate + 'x';
-            if (isAudioPlaying) {
-                window.speechSynthesis.cancel();
+            if (isAudioPlaying && !isAudioPaused) {
+                try { window.speechSynthesis.cancel(); } catch(e){}
                 playNextChunk();
             }
         };
 
         function updateAudioUI(playing, statusText) {
-            const icon = document.getElementById('audio-play-icon');
+            const iconWrap = document.getElementById('audio-play-icon');
             const status = document.getElementById('audio-status-text');
             const wave = document.getElementById('audio-wave');
             if (status) status.innerText = statusText;
@@ -1317,16 +1382,18 @@
                     wave.classList.add('hidden');
                 }
             }
-            if (icon) {
+            if (iconWrap) {
                 if (playing) {
-                    icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"></rect><rect x="14" y="4" width="4" height="16" fill="white"></rect>';
+                    iconWrap.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"></rect><rect x="14" y="4" width="4" height="16" fill="white"></rect>';
+                    iconWrap.classList.remove('ml-0.5');
                 } else {
-                    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>';
+                    iconWrap.innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>';
+                    iconWrap.classList.add('ml-0.5');
                 }
             }
         }
 
-    </script>
+        </script>
 
     <!-- MOBİL & MASAÜSTÜ YUKARI ÇIK BUTONU -->
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-5 z-40 p-3 rounded-full bg-red-600/90 hover:bg-red-500 text-white shadow-2xl border border-red-400/40 transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center justify-center" title="Yukarı Çık">
