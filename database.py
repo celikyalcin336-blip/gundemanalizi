@@ -59,7 +59,7 @@ if USE_PG:
             _PG_POOL_LAST_TRY = now
             try:
                 _PG_POOL = psycopg2.pool.ThreadedConnectionPool(
-                    minconn=2, maxconn=30, dsn=DATABASE_URL, connect_timeout=15
+                    minconn=1, maxconn=8, dsn=DATABASE_URL, connect_timeout=5
                 )
                 _PG_LAST_ERROR = None
                 print("✅ [PostgreSQL] Connection Pool başarıyla kuruldu.")
@@ -918,14 +918,22 @@ def get_articles_total_count(category: str = None) -> int:
         return 0
 
 
+def _async_inc_view(art_id: int):
+    try:
+        with get_connection() as conn:
+            conn.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (art_id,))
+    except Exception:
+        pass
+
 def get_article_by_slug(slug: str) -> Optional[Dict]:
-    """Slug'a göre makale detayını çeker ve okunma sayısını 1 artırır."""
+    """Slug'a göre makale detayını çeker ve okunma sayısını arka planda artırır (0 ms bekleme)."""
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
         if row:
-            conn.execute("UPDATE articles SET views = views + 1 WHERE id = ?", (row["id"],))
+            import threading
+            threading.Thread(target=_async_inc_view, args=(row["id"],), daemon=True).start()
             return _row_to_dict(row)
-        return None
+    return None
 
 
 def delete_article(article_id: int) -> bool:
@@ -982,8 +990,14 @@ def update_article(article_id: int, title: str, summary: str, content: str, cate
         return (cur.rowcount or 0) > 0
 
 
+_LAST_VISIT_FLUSH = 0
 def record_visit(key: str = "home_visits"):
-    """Genel sayfa ziyaret sayacını 1 artırır."""
+    """Genel sayfa ziyaret sayacını artırır (15 sn throttling ile DB kilitlenmesini engeller)."""
+    global _LAST_VISIT_FLUSH
+    now = time.time()
+    if now - _LAST_VISIT_FLUSH < 15:
+        return
+    _LAST_VISIT_FLUSH = now
     try:
         with get_connection() as conn:
             if conn.is_pg:

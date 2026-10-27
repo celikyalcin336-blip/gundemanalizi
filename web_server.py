@@ -1571,6 +1571,12 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
 
 @app.api_route("/haber/{slug}", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
+    cache_key = f"art_{slug}"
+    if request.cookies.get("ga_admin") != "1":
+        cached_html = get_turbo_page(cache_key)
+        if cached_html:
+            return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=120"})
+
     article = database.get_article_by_slug(slug)
     if not article:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
@@ -1643,7 +1649,7 @@ async def article_detail(request: Request, slug: str):
             raw_content = "</p>".join(parts[:2]) + mid_banner + "</p>".join(parts[2:])
 
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
-    return templates.TemplateResponse(
+    resp = templates.TemplateResponse(
         request=request,
         name="article.html",
         context={
@@ -1662,6 +1668,12 @@ async def article_detail(request: Request, slug: str):
             "canonical_url": canonical_url
         }
     )
+    if cache_key and resp.body:
+        try:
+            set_turbo_page(cache_key, resp.body.decode("utf-8"))
+        except Exception:
+            pass
+    return resp
 
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
