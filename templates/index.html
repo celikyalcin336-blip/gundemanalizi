@@ -19,11 +19,9 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
 
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
-    {% if site_css %}
-    <style>{{ site_css | safe }}</style>
-    {% else %}
+    <!-- Ultra Hızlı Statik CSS & Preload -->
+    <link rel="preload" href="/assets/style.min.css" as="style">
     <link rel="stylesheet" href="/assets/style.min.css">
-    {% endif %}
     <script src="/assets/lucide.min.js" defer></script>
     <script src="/assets/app.js" defer></script>
 
@@ -1286,7 +1284,7 @@
                 <h4 class="font-extrabold text-slate-900 text-sm mb-3">İletişim & İhbar</h4>
                 <p class="text-[11px] text-slate-600 mb-2">Haber merkezimiz ve ihbar hattımız 7/24 aktiftir.</p>
                 <div class="space-y-1 text-xs">
-                    <p class="text-slate-800 font-semibold">📧 iletisim@gundemanalizi.com.tr</p>
+                    <p class="text-slate-800 font-semibold">📧 <!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></p>
                     <p class="text-slate-800 font-semibold">📢 Telegram: @gundemanalizi</p>
                 </div>
             </div>

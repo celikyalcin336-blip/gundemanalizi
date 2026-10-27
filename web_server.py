@@ -382,15 +382,8 @@ async def health():
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-STYLE_CSS_FILE = os.path.join(ASSETS_DIR, "style.min.css")
-CACHED_STYLE_CSS = ""
-if os.path.exists(STYLE_CSS_FILE):
-    try:
-        with open(STYLE_CSS_FILE, "r", encoding="utf-8") as _f:
-            CACHED_STYLE_CSS = _f.read()
-    except Exception as _e:
-        print(f"Warning: could not cache style.min.css: {_e}")
-templates.env.globals["site_css"] = CACHED_STYLE_CSS
+# Static CSS served externally with preload for optimal caching and lightweight HTML
+templates.env.globals['site_css'] = ''
 
 _AD_SETTINGS_CACHE = {"data": None, "ts": 0}
 
