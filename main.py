@@ -88,6 +88,13 @@ def process_single_news(item: dict) -> bool:
     site_article_url = f"{config.SITE_URL}/haber/{slug}"
     print(f"   [Haber Linki: {site_article_url}]")
 
+    # 3.1. Google Indexing API - Anlık Google Bot İndeksleme Çağrısı
+    try:
+        import google_indexer
+        google_indexer.notify_google_indexing(site_article_url)
+    except Exception as e:
+        print(f"⚠️ Google Indexing API atlandı: {e}")
+
     # 4. Telegram Bildirimi (Rakiplerin formatında: Net fotoğraf / 2'li kolaj + Maddeli özet)
     print("📲 Telegram kanalına profesyonel maddeli formatla gönderiliyor...")
     telegram_notifier.send_telegram_news(visual_path, telegram_caption, site_article_url)

@@ -1,5 +1,7 @@
 # Gizli bilgiler ve geçici dosyalar
 .env
+*token*.json
+*secret*.json
 __pycache__/
 *.pyc
 
