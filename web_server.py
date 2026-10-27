@@ -1679,35 +1679,9 @@ async def article_detail(request: Request, slug: str):
     ad_mid = ad_settings.get("ad_slot_article_mid", "").strip() if ad_settings.get("ads_enabled") else ""
     raw_content = article.get("content", "")
 
-    # 🔗 AKILLI İÇ LİNKLEME (INTERNAL LINKING - YÜKSEK ETKİLEŞİM & ADSENSE ÇARPANI)
-    if related_articles and "</p>" in raw_content:
-        rel_top = related_articles[0]
-        rel_title = rel_top.get("title", "")
-        rel_slug = rel_top.get("slug", "")
-        rel_cat = rel_top.get("category", "Gündem")
-        if rel_slug and rel_title:
-            rel_card = f'''</p>
-            <div class="my-6 p-4 rounded-2xl bg-amber-50/80 border border-amber-300/80 flex items-center justify-between gap-4 transition hover:bg-amber-100/70 shadow-sm group">
-                <div class="flex items-center gap-3.5 min-w-0">
-                    <span class="flex-shrink-0 w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-base shadow-sm">💡</span>
-                    <div class="min-w-0">
-                        <span class="text-[10px] font-black text-amber-800 uppercase tracking-widest block">İLGİLİ HABER ({rel_cat})</span>
-                        <a href="/haber/{rel_slug}" class="font-extrabold text-slate-900 group-hover:text-red-600 text-sm sm:text-base line-clamp-1 transition">
-                            {rel_title}
-                        </a>
-                    </div>
-                </div>
-                <a href="/haber/{rel_slug}" aria-label="Habere git" class="text-slate-400 group-hover:text-red-600 font-bold text-xl flex-shrink-0 group-hover:translate-x-1 transition-transform">→</a>
-            </div>'''
-            p_parts = raw_content.split("</p>")
-            if len(p_parts) >= 4:
-                raw_content = "</p>".join(p_parts[:2]) + rel_card + "</p>".join(p_parts[2:])
-            elif len(p_parts) >= 2:
-                raw_content = p_parts[0] + rel_card + "</p>".join(p_parts[1:])
-
     if ad_mid and "</p>" in raw_content:
         parts = raw_content.split("</p>")
-        if len(parts) >= 5:
+        if len(parts) >= 3:
             mid_banner = f'''</p>
             <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
                 <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
@@ -1715,7 +1689,7 @@ async def article_detail(request: Request, slug: str):
                     {ad_mid}
                 </div>
             </div>'''
-            raw_content = "</p>".join(parts[:4]) + mid_banner + "</p>".join(parts[4:])
+            raw_content = "</p>".join(parts[:2]) + mid_banner + "</p>".join(parts[2:])
 
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     resp = templates.TemplateResponse(
