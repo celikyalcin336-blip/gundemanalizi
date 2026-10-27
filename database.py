@@ -9,6 +9,7 @@ Haber kartı görselleri de PostgreSQL modunda veritabanında saklanır; böylec
 Render ücretsiz planında sunucu yeniden başlasa bile haberler ve görseller kaybolmaz.
 """
 import sqlite3
+import threading
 import os
 import sys
 import time
