@@ -137,7 +137,92 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
-        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+        
+        /* ========================================================
+           📰 GÜNDEM ANALİZİ RESMİ BEYAZ GAZETE TEMASI (LIGHT THEME)
+           Haber Okuma Sayfası (Kusursuz Makale Kontrastı)
+           ======================================================== */
+        :root {
+            --bg-page: #f1f5f9;
+            --card-bg: #ffffff;
+            --border-col: #e2e8f0;
+            --text-dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        header.sticky {
+            background-color: rgba(255, 255, 255, 0.97) !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05) !important;
+        }
+        header nav a {
+            color: #334155 !important;
+        }
+        header .text-white {
+            color: #0f172a !important;
+        }
+
+        /* Ana Makale Kartı ve Kutuları */
+        article,
+        .bg-brand-card,
+        aside .bg-brand-card,
+        .bg-slate-900,
+        .bg-slate-950 {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+        }
+
+        /* Başlıklar & Metinler (Kapkara & Kristal Netlikte) */
+        h1, h2, h3, h4,
+        article h1,
+        .text-white {
+            color: #0f172a !important;
+        }
+
+        article p,
+        .article-content,
+        .prose {
+            color: #1e293b !important;
+            line-height: 1.8 !important;
+        }
+
+        .text-slate-200,
+        .text-slate-300 {
+            color: #334155 !important;
+        }
+
+        .text-slate-400 {
+            color: #64748b !important;
+        }
+
+        .border-brand-border,
+        .border-slate-800,
+        .border-slate-700 {
+            border-color: #e2e8f0 !important;
+        }
+
+        /* Sesli Dinle ve Özet Kutuları */
+        .bg-slate-900\/90,
+        .bg-slate-900\/80,
+        .bg-slate-800\/80 {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        footer {
+            background-color: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+        footer .text-white {
+            color: #f8fafc !important;
+        }
+
         video::-internal-media-controls-download-button { display: none !important; }
         video::-webkit-media-controls-enclosure { overflow: hidden !important; }
         .no-save { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
