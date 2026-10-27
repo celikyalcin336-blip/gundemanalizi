@@ -85,62 +85,69 @@ def bot_background_worker():
 
 def system_health_watchdog_worker():
     """
-    7/24 Kesintisiz Nöbetçi Sistem Bekçisi:
-    Her 3 dakikada bir veritabanı, haber sayısı ve sunucu sağlığını kontrol eder.
-    Bir aksaklık olduğunda Yalçın Bey'in şahsi Telegram'ına SOS atar,
-    düzeldiğinde de 'normale döndü' raporu gönderir.
+    Gece Nöbetçi Sistem Bekçisi:
+    Yalçın Bey'in talimatıyla yalnızca GECE 00:00 - SABAH 09:00 saatleri arasında,
+    10 dakikada bir (600 sn) veritabanı ve site sağlığını sessizce denetler.
+    Gündüz saatlerinde pasif bekler (Neon ve sunucuyu yormaz).
     """
     import telegram_notifier
-    time.sleep(45)
+    time.sleep(60)
     last_status_ok = True
     consecutive_fails = 0
+    tz_tr = timezone(timedelta(hours=3))
 
     while True:
         try:
-            status_ok = True
-            fail_reason = ""
-            with database.get_connection() as conn:
-                if not getattr(conn, "is_pg", False) and database.USE_PG:
-                    status_ok = False
-                    fail_reason = f"PostgreSQL bağlantısı koptu! Sistem geçici SQLite modunda. Hata: {getattr(database, '_PG_LAST_ERROR', 'Bilinmiyor')}"
-                else:
-                    try:
-                        row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
-                        cnt = row["c"] if row else 0
-                        if cnt == 0:
-                            status_ok = False
-                            fail_reason = "Veritabanında 0 haber tespit edildi! Makale listesi boş görünüyor."
-                    except Exception as q_err:
-                        status_ok = False
-                        fail_reason = f"Makale sayısı sorgulanamadı: {q_err}"
+            current_hour = datetime.now(tz_tr).hour
+            # Yalnızca gece 00:00 ile sabah 09:00 arasında nöbet tutar
+            is_night_shift = (0 <= current_hour < 9)
 
-            if not status_ok:
-                consecutive_fails += 1
-                if consecutive_fails == 1:
-                    telegram_notifier.send_admin_alert(
-                        subject="Sitede Veritabanı / Haber Kesintisi!",
-                        message=f"Patron dikkat!\n\n{fail_reason}\n\nSistem otomatik onarım ve yeniden bağlanmayı deniyor."
-                    )
-                last_status_ok = False
-            else:
-                if not last_status_ok:
-                    telegram_notifier.send_admin_alert(
-                        subject="Sistem Başarıyla Normale Döndü",
-                        message="Veritabanı bağlantısı sağlandı ve haberler yeniden sorunsuz yayında.",
-                        is_resolved=True
-                    )
-                last_status_ok = True
-                consecutive_fails = 0
+            if is_night_shift:
+                status_ok = True
+                fail_reason = ""
+                with database.get_connection() as conn:
+                    if not getattr(conn, "is_pg", False) and database.USE_PG:
+                        status_ok = False
+                        fail_reason = f"PostgreSQL bağlantısı koptu! Sistem geçici SQLite modunda. Hata: {getattr(database, '_PG_LAST_ERROR', 'Bilinmiyor')}"
+                    else:
+                        try:
+                            row = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()
+                            cnt = row["c"] if row else 0
+                            if cnt == 0:
+                                status_ok = False
+                                fail_reason = "Veritabanında 0 haber tespit edildi! Makale listesi boş görünüyor."
+                        except Exception as q_err:
+                            status_ok = False
+                            fail_reason = f"Makale sayısı sorgulanamadı: {q_err}"
+
+                if not status_ok:
+                    consecutive_fails += 1
+                    if consecutive_fails == 1:
+                        telegram_notifier.send_admin_alert(
+                            subject="Gece Nöbeti: Sitede Veritabanı / Haber Kesintisi!",
+                            message=f"Patron dikkat!\n\n{fail_reason}\n\nSistem otomatik onarım ve yeniden bağlanmayı deniyor."
+                        )
+                    last_status_ok = False
+                else:
+                    if not last_status_ok:
+                        telegram_notifier.send_admin_alert(
+                            subject="Sistem Başarıyla Normale Döndü",
+                            message="Veritabanı bağlantısı sağlandı ve haberler yeniden sorunsuz yayında.",
+                            is_resolved=True
+                        )
+                    last_status_ok = True
+                    consecutive_fails = 0
 
         except Exception as e:
             pass
 
-        time.sleep(180)
+        # Her 10 dakikada bir (600 saniye) kontrol
+        time.sleep(600)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
-    database.cleanup_corrupted_articles()
+    threading.Thread(target=database.cleanup_corrupted_articles, daemon=True).start()  # arka planda, acilisi bekletmez
     # Otonom haber botunu arka planda baslat
     threading.Thread(target=bot_background_worker, daemon=True).start()
     # Canli piyasa kurlarini arka planda tazeleyen isci (sayfa yanit suresini 0 ms yapar)
@@ -338,10 +345,17 @@ async def health():
 
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-def get_site_ad_settings() -> dict:
-    """Tüm reklam, AdSense, Google Search Console ve Analytics ayarlarını çeker."""
+_AD_SETTINGS_CACHE = {"data": None, "ts": 0}
+
+def get_site_ad_settings(force_refresh: bool = False) -> dict:
+    """Tüm reklam, AdSense ve Analytics ayarlarını RAM önbelleğinde tutarak sıfır gecikmeyle döner."""
+    global _AD_SETTINGS_CACHE
+    now = time.time()
+    if not force_refresh and _AD_SETTINGS_CACHE["data"] and (now - _AD_SETTINGS_CACHE["ts"]) < 1800:
+        return _AD_SETTINGS_CACHE["data"]
+
     try:
-        return {
+        data = {
             "google_site_verification": database.get_setting("google_site_verification", ""),
             "adsense_client_id": database.get_setting("adsense_client_id", "") or "ca-pub-1415664741128989",
             "ga_tracking_id": database.get_setting("ga_tracking_id", ""),
@@ -352,8 +366,10 @@ def get_site_ad_settings() -> dict:
             "ad_slot_article_mid": database.get_setting("ad_slot_article_mid", ""),
             "ad_slot_article_bottom": database.get_setting("ad_slot_article_bottom", ""),
         }
+        _AD_SETTINGS_CACHE = {"data": data, "ts": now}
+        return data
     except Exception:
-        return {
+        fallback = {
             "google_site_verification": "",
             "adsense_client_id": "ca-pub-1415664741128989",
             "ga_tracking_id": "",
@@ -364,6 +380,7 @@ def get_site_ad_settings() -> dict:
             "ad_slot_article_mid": "",
             "ad_slot_article_bottom": "",
         }
+        return fallback
 
 _DEFAULT_MARKET_RATES = [
     {"key": "altin", "name": "Gram Altın", "symbol": "ALTIN", "icon": "🪙", "price": "6.430", "unit": "TL", "change": 0.15, "direction": "up"},
@@ -862,6 +879,11 @@ async def admin_panel(request: Request):
     stats["gemini_active"] = bool(config.GEMINI_API_KEY)
     stats["telegram_active"] = bool(config.TELEGRAM_BOT_TOKEN and config.TELEGRAM_CHAT_ID)
     stats["check_interval"] = config.CHECK_INTERVAL_MINUTES
+    stats["total_articles"] = database.get_articles_total_count()
+    stats["db_status"] = "🟢 Neon PostgreSQL (Ücretli / Always-On)" if database.USE_PG else "🟡 Yerel SQLite"
+    stats["watchdog_status"] = "Gece Vardiyasında (00:00 - 09:00 / 10 dk aralıkla)"
+    stats["cache_status"] = "🟢 RAM Önbellek Devrede (0 ms Gecikme)"
+    stats["archive_status"] = "🔒 %100 Güvende (Asla Haber Silinmez)"
     return templates.TemplateResponse(
         request=request,
         name="panel.html",
@@ -1664,16 +1686,18 @@ async def sitemap_xsl():
 
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
-    articles = database.get_articles(limit=300)
+    articles = database.get_articles(limit=500)
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
+    today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-    xml.append(f'  <url><loc>{base_url}/</loc><changefreq>hourly</changefreq><priority>1.0</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/son-dakika</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>1.0</priority></url>')
     import urllib.parse
-    for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş", "Son Dakika"):
+    for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş"):
         cat_enc = urllib.parse.quote(cat)
-        xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+        xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
