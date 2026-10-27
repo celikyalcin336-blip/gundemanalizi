@@ -140,6 +140,7 @@ def system_health_watchdog_worker():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
+    database.cleanup_corrupted_articles()
     # Otonom haber botunu arka planda baslat
     threading.Thread(target=bot_background_worker, daemon=True).start()
     # Canli piyasa kurlarini arka planda tazeleyen isci (sayfa yanit suresini 0 ms yapar)

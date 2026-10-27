@@ -152,6 +152,10 @@
             <!-- CNN Türk Tarzı Ferah Kategori Menüsü -->
             <nav class="hidden md:flex items-center gap-1 text-xs lg:text-sm font-bold text-slate-300">
                 <a href="/" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if not active_category else '' }}">Tümü</a>
+                <a href="/son-dakika" class="px-3 py-1.5 rounded-lg font-black transition flex items-center gap-1.5 {{ 'bg-red-600 text-white shadow-lg shadow-red-900/50 scale-105' if active_category in ['Son Dakika', 'sondakika'] else 'text-red-400 hover:text-white hover:bg-red-950/40 border border-red-500/30' }}">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                    🔴 Son Dakika
+                </a>
                 <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Gündem' else '' }}">Gündem</a>
                 <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Ekonomi' else '' }}">Ekonomi</a>
                 <a href="/?kategori=Eğitim" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Eğitim' else '' }}">Eğitim</a>
@@ -190,6 +194,10 @@
     <div class="md:hidden bg-brand-dark/95 border-b border-brand-border/80 px-3 py-2 overflow-x-auto no-scrollbar sticky top-[61px] z-30 backdrop-blur shadow-md">
         <div class="flex items-center gap-1.5 whitespace-nowrap text-xs font-bold">
             <a href="/" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if not active_category else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Tümü</a>
+            <a href="/son-dakika" class="shrink-0 px-3.5 py-1.5 rounded-full font-black text-xs transition flex items-center gap-1.5 {{ 'bg-red-600 text-white shadow-lg shadow-red-900/50 scale-105' if active_category in ['Son Dakika', 'sondakika'] else 'bg-red-950/80 text-red-300 border border-red-500/40' }}">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                🔴 Son Dakika
+            </a>
             <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if active_category == 'Gündem' else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Gündem</a>
             <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if active_category == 'Ekonomi' else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Ekonomi</a>
             <a href="/?kategori=Eğitim" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if active_category == 'Eğitim' else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Eğitim</a>

@@ -287,6 +287,17 @@ def init_db():
 
 
 def cleanup_corrupted_articles():
+    # Hatalı kategori düzeltmesi: Estetik, cerrahi ve bıçak altına yatma haberleri kesinlikle Sağlık olmalıdır
+    try:
+        with get_connection() as conn:
+            conn.execute("""
+                UPDATE articles 
+                SET category = 'Sağlık' 
+                WHERE (LOWER(title) LIKE '%bıçak altına%' OR LOWER(title) LIKE '%genç görünme%' OR LOWER(title) LIKE '%estetik%' OR LOWER(title) LIKE '%botoks%')
+                AND category != 'Sağlık'
+            """)
+    except Exception as e:
+        print(f"Kategori onarım hatası: {e}")
     """
     Veritabanındaki makaleleri tarayarak:
     1. ai_writer.classify_article motoruyla tüm makaleleri yeniden sınıflandırıp hatalı kategorileri düzeltir.
@@ -783,9 +794,14 @@ def normalize_category_name(cat: Optional[str]) -> Optional[str]:
 
 
 def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List[Dict]:
-    """Son yayınlanan makaleleri listeler."""
+    """Son yayınlanan makaleleri listeler. 'Son Dakika' tüm kategorilerden anlık sıcak haber akışıdır."""
     with get_connection() as conn:
         if category:
+            clean_cat = category.strip()
+            if clean_cat.lower() in ["son dakika", "sondakika", "son-dakika", "breaking"]:
+                cur = conn.execute("SELECT * FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
+                return [_row_to_dict(row) for row in cur.fetchall()]
+
             cat_norm = normalize_category_name(category) or category
             cur = conn.execute(
                 """SELECT * FROM articles 
@@ -846,6 +862,12 @@ def get_articles_total_count(category: str = None) -> int:
     try:
         with get_connection() as conn:
             if category:
+                clean_cat = category.strip()
+                if clean_cat.lower() in ["son dakika", "sondakika", "son-dakika", "breaking"]:
+                    cur = conn.execute("SELECT COUNT(*) AS c FROM articles")
+                    row = cur.fetchone()
+                    return (row["c"] if row else 0) if isinstance(row, dict) else (row[0] if row else 0)
+
                 cat_norm = normalize_category_name(category) or category
                 cur = conn.execute(
                     """SELECT COUNT(*) AS c FROM articles 

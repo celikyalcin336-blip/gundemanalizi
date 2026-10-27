@@ -271,7 +271,7 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
         "Otomobil": r'\b(otomobil\w*|araba\w*|araç lansmanı\w*|yeni model\w*|fiyat listesi\w*|başlangıç fiyatı\w*|ötv indirimi\w*|taşıt kredisi\w*|sıfır araç\w*|sıfır km|ikinci el oto\w*|elektrikli araç\w*|elektrikli otomobil\w*|hibrit\w*|şarj istasyonu\w*|menzil\w*|batarya kapasitesi\w*|beygir gücü\w*|şanzıman\w*|suv\w*|sedan\w*|hatchback\w*|togg\w*|t10x|t10f|fiat\w*|egea\w*|doblo\w*|renault\w*|clio\w*|megane\w*|chery\w*|tiggo\w*|omoda\w*|jaecoo\w*|byd\w*|tesla\w*|model y|model 3|volkswagen\w*|golf\w*|passat\w*|toyota\w*|corolla\w*|hyundai\w*|i20\w*|tucson\w*|honda\w*|civic\w*|skoda\w*|octavia\w*|ford\w*|focus\w*|bmw\w*|mercedes\w*|audi\w*|porsche\w*|volvo\w*|nissan\w*|qashqai\w*|peugeot\w*|citroen\w*|dacia\w*|sandero\w*|kia\w*|sportage\w*|cupra\w*|mg\w*|suzuki\w*)\b',
         "Eğitim": r'\b(meb\w*|milli eğitim\w*|yusuf tekin\w*|ösym\w*|yks\w*|tyt\w*|ayt\w*|lgs\w*|kpss\w*|dgs\w*|ales\w*|tus\w*|sınav\w*|soru kitapçığı\w*|cevap anahtarı\w*|taban puan\w*|tercih sonuç\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil\w*|yarıyıl tatili\w*|kar tatili\w*|karne\w*|müfredat\w*|öğretmen atama\w*)\b',
         "Teknoloji": r'\b(yapay zeka\w*|yapay zekâ\w*|ai|chatgpt\w*|openai\w*|gemini\w*|claude\w*|deepseek\w*|midjourney\w*|sora\w*|kimi k3|robot\w*|robotik\w*|akıllı telefon\w*|cep telefonu\w*|iphone\w*|apple\w*|samsung\w*|galaxy\w*|xiaomi\w*|redmi\w*|huawei\w*|honor\w*|android\w*|ios\w*|işlemci\w*|snapdragon\w*|intel\w*|amd\w*|ryzen\w*|nvidia\w*|rtx\w*|ekran kartı\w*|çip\w*|mikroçip\w*|yarı iletken\w*|bilgisayar\w*|laptop\w*|dizüstü\w*|tablet\w*|ipad\w*|akıllı saat\w*|kulaklık\w*|airpods\w*|playstation\w*|play station\w*|ps5\w*|ps4\w*|xbox\w*|nintendo\w*|steam\w*|konsol\w*|video oyunu\w*|pc oyunu\w*|oyun dünyası\w*|jailbreak\w*|yazılım\w*|siber güvenlik\w*|hacker\w*|whatsapp\w*|instagram\w*|meta\w*|tiktok\w*|youtube\w*|twitter\w*|telegram\w*|discord\w*|uzay aracı\w*|nasa\w*|spacex\w*|uydu\w*|astronot\w*|teleskop\w*|4k|blu-ray\w*|akıllı televizyon\w*|akıllı tv\w*|güneş paneli\w*|perovskit\w*)\b',
-        "Sağlık": r'\b(hastalık\w*|virüs\w*|bakteri\w*|enfeksiyon\w*|salgın\w*|grip\w*|nezle\w*|koronavirüs\w*|covid\w*|kanser\w*|tümör\w*|kalp krizi\w*|tansiyon\w*|kolesterol\w*|diyabet\w*|şeker hastalığı\w*|obezite\w*|karaciğer\w*|böbrek\w*|organ nakli\w*|ameliyat\w*|cerrahi\w*|tedavi\w*|ilaç\w*|reçete\w*|aşı\w*|aşılama\w*|doktor\w*|hekim\w*|uzman hekim\w*|hastane\w*|acil servis\w*|poliklinik\w*|mhrs\w*|randevu\w*|beslenme\w*|diyet\w*|diyetisyen\w*|kalori\w*|vitamin\w*|bağışıklık\w*|uyku apnesi\w*|kronik yorgunluk\w*|göz sağlığı\w*|diş sağlığı\w*|cilt sağlığı\w*|reçel\w*|meyve oranı\w*)\b',
+        "Sağlık": r'\b(estetik\w*|plastik cerrahi\w*|bıçak altına\w*|genç görün\w*|botoks\w*|dolgu\w*|saç ekim\w*|burun ameliyat\w*|liposuction|dermatolog\w*|klinik\w*|hastalık\w*|virüs\w*|bakteri\w*|enfeksiyon\w*|salgın\w*|grip\w*|nezle\w*|koronavirüs\w*|covid\w*|kanser\w*|tümör\w*|kalp krizi\w*|tansiyon\w*|kolesterol\w*|diyabet\w*|şeker hastalığı\w*|obezite\w*|karaciğer\w*|böbrek\w*|organ nakli\w*|ameliyat\w*|cerrahi\w*|tedavi\w*|ilaç\w*|reçete\w*|aşı\w*|aşılama\w*|doktor\w*|hekim\w*|uzman hekim\w*|hastane\w*|acil servis\w*|poliklinik\w*|mhrs\w*|randevu\w*|beslenme\w*|diyet\w*|diyetisyen\w*|kalori\w*|vitamin\w*|bağışıklık\w*|uyku apnesi\w*|kronik yorgunluk\w*|göz sağlığı\w*|diş sağlığı\w*|cilt sağlığı\w*|sağlık\w*)\b',
         "Ekonomi": r'\b(ekonomi\w*|finans\w*|borsa\w*|bist\w*|hisse\w*|faiz\w*|tcmb\w*|merkez bankası\w*|enflasyon\w*|tüfe\w*|üfe\w*|dolar\w*|euro\w*|döviz\w*|altın\w*|ons altın\w*|gümüş\w*|emtia\w*|petrol\w*|brent\w*|doğalgaz\w*|mevduat\w*|kredi\w*|kredi kartı\w*|asgari ücret\w*|emekli maaşı\w*|emekli zammı\w*|memur zammı\w*|zam\w*|indirim\w*|vergi\w*|kdv\w*|ötv\w*|hazine\w*|bakan şimşek\w*|mehmet şimşek\w*|fed\w*|ecb\w*|ihracat\w*|ithalat\w*|cari açık\w*|resesyon\w*|gss\w*|genel sağlık sigortası\w*|borç\w*|borcu silinecek\w*|warren buffett\w*|yatırım\w*|fon\w*|işçi çıkar\w*)\b',
         "Dünya": r'\b(dünya\w*|bm|birleşmiş milletler\w*|iklim planı\w*|küresel ısınma\w*|körfez ülkeleri\w*|abd\w*|amerika\w*|rusya\w*|ukrayna\w*|çin\w*|almanya\w*|fransa\w*|ingiltere\w*|israil\w*|gazze\w*|filistin\w*|iran\w*|ırak\w*|suriye\w*|lübnan\w*|kktc\w*|kıbrıs\w*|yunanistan\w*|bulgaristan\w*|nato\w*|pentagon\w*|beyaz saray\w*|kremlin\w*|tahran\w*|tel aviv\w*|kudüs\w*|hürmüz\w*|zelenskiy\w*|putin\w*|trump\w*|biden\w*|netanyahu\w*|diplomasi\w*|uluslararası\w*|ateşkes\w*|füze saldırısı\w*|hava saldırısı\w*)\b',
     }
@@ -289,14 +289,26 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
         best_cat = max(scores.items(), key=lambda x: x[1])[0]
         return best_cat
 
-    # ADIM 3: Besleme kategorisi varsa doğrula
+    # ADIM 3: Besleme kategorisi varsa içerikle çapraz doğrula
     if force_category and force_category in regex_map:
+        if force_category == "Ekonomi":
+            econ_check = r'(lira|tl|faiz|enflasyon|dolar|euro|altın|borsa|hisse|maaş|zam|vergi|kdv|ötv|banka|kredi|mevduat|ihracat|ithalat|bütçe)'
+            if not re.search(econ_check, full_text, re.IGNORECASE):
+                if re.search(r'(estetik|ameliyat|bıçak altına|hasta|doktor|tedavi|sağlık)', full_text, re.IGNORECASE):
+                    return "Sağlık"
+                return "Gündem"
         return force_category
 
     return "Gündem"
 
-    # ADIM 3: Besleme kategorisi varsa doğrula
+    # ADIM 3: Besleme kategorisi varsa içerikle çapraz doğrula
     if force_category and force_category in regex_map:
+        if force_category == "Ekonomi":
+            econ_check = r'(lira|tl|faiz|enflasyon|dolar|euro|altın|borsa|hisse|maaş|zam|vergi|kdv|ötv|banka|kredi|mevduat|ihracat|ithalat|bütçe)'
+            if not re.search(econ_check, full_text, re.IGNORECASE):
+                if re.search(r'(estetik|ameliyat|bıçak altına|hasta|doktor|tedavi|sağlık)', full_text, re.IGNORECASE):
+                    return "Sağlık"
+                return "Gündem"
         return force_category
 
     return "Gündem"
