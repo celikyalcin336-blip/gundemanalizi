@@ -152,7 +152,9 @@
         /* 6. Tüm Haber Kartları (Temiz Beyaz Zemin, İnce Gri Kenarlık) */
         .bg-brand-card,
         article.bg-brand-card,
-        article {
+        article,
+        .category-hero-card,
+        .category-side-card {
             background-color: #ffffff !important;
             border-color: #e2e8f0 !important;
             box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
@@ -550,15 +552,15 @@
         <!-- 6. 🔴 GÜNDEM & SICAK GELİŞMELER (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set gundem_items = gundem_articles if (gundem_articles and gundem_articles|length >= 3) else articles[0:5] %}
         {% if gundem_items and gundem_items|length > 0 %}
-        <section class="pt-4 border-t border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-red-600 rounded-sm animate-pulse"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        GÜNDEM & SICAK GELİŞMELER <span class="text-xs font-bold text-red-400 tracking-normal hidden sm:inline">| Son Dakika ve Türkiye Gündemi</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        GÜNDEM & SICAK GELİŞMELER <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Son Dakika ve Türkiye Gündemi</span>
                     </h2>
                 </div>
-                <a href="/?kategori=Gündem" class="text-xs font-bold text-slate-400 hover:text-red-400 transition flex items-center gap-1">
+                <a href="/?kategori=Gündem" class="text-xs font-bold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
                     Tüm Gündem Haberleri →
                 </a>
             </div>
@@ -567,25 +569,24 @@
                 <!-- Sol Taraf: 1 Büyük Vitrin Haberi (7 Kolon) -->
                 <div class="lg:col-span-7">
                     {% set hero = gundem_items[0] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
-                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
+                    <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
+                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
                                 <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
                                 {{ hero.category }}
                             </span>
                         </a>
                         <div class="p-5">
-                            <span class="text-xs text-slate-400 font-medium">{{ hero.created_at[:16] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">{{ hero.created_at[:16] }}</span>
                             <a href="/haber/{{ hero.slug }}">
-                                <h3 class="text-lg sm:text-xl font-black text-white group-hover:text-red-400 transition mt-1 line-clamp-2">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2">
                                     {{ hero.title }}
                                 </h3>
                             </a>
-                            <p class="text-xs sm:text-sm text-slate-300 mt-2 line-clamp-2 font-normal">
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 font-normal leading-relaxed">
                                 {{ hero.summary or hero.content[:140] }}
                             </p>
                         </div>
@@ -595,20 +596,19 @@
                 <!-- Sağ Taraf: 4 Küçük Yan Kart (5 Kolon - 2x2 Grid) -->
                 <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% for item in gundem_items[1:5] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
-                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
+                    <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
+                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
                                 <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
                         <div class="p-3">
                             <a href="/haber/{{ item.slug }}">
-                                <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition line-clamp-2 leading-snug">
+                                <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                     {{ item.title }}
                                 </h4>
                             </a>
-                            <span class="text-[10px] text-slate-500 mt-1 block">{{ item.created_at[:10] }}</span>
+                            <span class="text-[10px] text-slate-400 mt-1 block">{{ item.created_at[:10] }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -620,15 +620,15 @@
         <!-- 7. 💻 TEKNOLOJİ & YAPAY ZEKA VİTRİNİ (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set tech_items = tech_articles if (tech_articles and tech_articles|length >= 3) else articles[2:7] %}
         {% if tech_items and tech_items|length > 0 %}
-        <section class="pt-4 border-t border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-blue-600 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        TEKNOLOJİ & DİJİTAL DÜNYA <span class="text-xs font-bold text-blue-400 tracking-normal hidden sm:inline">| Yapay Zeka, Donanım, Akıllı Telefonlar & Güvenlik</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        TEKNOLOJİ & DİJİTAL DÜNYA <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Yapay Zeka, Donanım, Akıllı Telefonlar & Güvenlik</span>
                     </h2>
                 </div>
-                <a href="/?kategori=Teknoloji" class="text-xs font-bold text-slate-400 hover:text-blue-400 transition flex items-center gap-1">
+                <a href="/?kategori=Teknoloji" class="text-xs font-bold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
                     Tüm Teknoloji Haberleri →
                 </a>
             </div>
@@ -637,24 +637,23 @@
                 <!-- Sol Taraf: 1 Büyük Vitrin Haberi (7 Kolon) -->
                 <div class="lg:col-span-7">
                     {% set hero = tech_items[0] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
-                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
+                    <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
+                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
                                 <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-blue-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
                             </span>
                         </a>
                         <div class="p-5">
-                            <span class="text-xs text-slate-400 font-medium">{{ hero.created_at[:16] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">{{ hero.created_at[:16] }}</span>
                             <a href="/haber/{{ hero.slug }}">
-                                <h3 class="text-lg sm:text-xl font-black text-white group-hover:text-blue-400 transition mt-1 line-clamp-2">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2">
                                     {{ hero.title }}
                                 </h3>
                             </a>
-                            <p class="text-xs sm:text-sm text-slate-300 mt-2 line-clamp-2 font-normal">
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 font-normal leading-relaxed">
                                 {{ hero.summary or hero.content[:140] }}
                             </p>
                         </div>
@@ -664,20 +663,19 @@
                 <!-- Sağ Taraf: 4 Küçük Yan Kart (5 Kolon - 2x2 Grid) -->
                 <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% for item in tech_items[1:5] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
-                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
+                    <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
+                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
                                 <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
                         <div class="p-3">
                             <a href="/haber/{{ item.slug }}">
-                                <h4 class="text-xs font-bold text-slate-200 group-hover:text-blue-400 transition line-clamp-2 leading-snug">
+                                <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                     {{ item.title }}
                                 </h4>
                             </a>
-                            <span class="text-[10px] text-slate-500 mt-1 block">{{ item.created_at[:10] }}</span>
+                            <span class="text-[10px] text-slate-400 mt-1 block">{{ item.created_at[:10] }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -689,15 +687,15 @@
         <!-- 8. 📈 EKONOMİ & FİNANS VİTRİNİ (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set eco_items = economy_articles if (economy_articles and economy_articles|length >= 3) else articles[4:9] %}
         {% if eco_items and eco_items|length > 0 %}
-        <section class="pt-4 border-t border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-emerald-600 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        EKONOMİ & PİYASALAR <span class="text-xs font-bold text-emerald-400 tracking-normal hidden sm:inline">| Borsa, Altın, Döviz, Emekli & Yatırım Analizleri</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        EKONOMİ & PİYASALAR <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Borsa, Altın, Döviz, Emekli & Yatırım Analizleri</span>
                     </h2>
                 </div>
-                <a href="/?kategori=Ekonomi" class="text-xs font-bold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1">
+                <a href="/?kategori=Ekonomi" class="text-xs font-bold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
                     Tüm Ekonomi Haberleri →
                 </a>
             </div>
@@ -706,24 +704,23 @@
                 <!-- Sol Taraf: 1 Büyük Vitrin Haberi (7 Kolon) -->
                 <div class="lg:col-span-7">
                     {% set hero = eco_items[0] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
-                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
+                    <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
+                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
                                 <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-emerald-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
                             </span>
                         </a>
                         <div class="p-5">
-                            <span class="text-xs text-slate-400 font-medium">{{ hero.created_at[:16] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">{{ hero.created_at[:16] }}</span>
                             <a href="/haber/{{ hero.slug }}">
-                                <h3 class="text-lg sm:text-xl font-black text-white group-hover:text-emerald-400 transition mt-1 line-clamp-2">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2">
                                     {{ hero.title }}
                                 </h3>
                             </a>
-                            <p class="text-xs sm:text-sm text-slate-300 mt-2 line-clamp-2 font-normal">
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 font-normal leading-relaxed">
                                 {{ hero.summary or hero.content[:140] }}
                             </p>
                         </div>
@@ -733,20 +730,19 @@
                 <!-- Sağ Taraf: 4 Küçük Yan Kart (5 Kolon - 2x2 Grid) -->
                 <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% for item in eco_items[1:5] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
-                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
+                    <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
+                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
                                 <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
                         <div class="p-3">
                             <a href="/haber/{{ item.slug }}">
-                                <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-400 transition line-clamp-2 leading-snug">
+                                <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                     {{ item.title }}
                                 </h4>
                             </a>
-                            <span class="text-[10px] text-slate-500 mt-1 block">{{ item.created_at[:10] }}</span>
+                            <span class="text-[10px] text-slate-400 mt-1 block">{{ item.created_at[:10] }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -757,15 +753,15 @@
 
         <!-- 9. ⚽ SPOR & FUTBOL MERKEZİ (CNN TÜRK MODELİ: SPOR VİTRİNİ + CANLI PUAN DURUMU & HAFTALIK FİKSTÜR) -->
         {% set sport_items = sports_articles if (sports_articles and sports_articles|length >= 3) else articles[5:10] %}
-        <section class="pt-4 border-t border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-green-500 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        SPOR & FUTBOL DÜNYASI <span class="text-xs font-bold text-green-400 tracking-normal hidden sm:inline">| Süper Lig, Canlı Puan Tablosu & Fikstür</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        SPOR & FUTBOL DÜNYASI <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Süper Lig, Canlı Puan Tablosu & Fikstür</span>
                     </h2>
                 </div>
-                <a href="/?kategori=Spor" class="text-xs font-bold text-slate-400 hover:text-green-400 transition flex items-center gap-1">
+                <a href="/?kategori=Spor" class="text-xs font-bold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
                     Tüm Spor Haberleri →
                 </a>
             </div>
@@ -774,40 +770,41 @@
                 <!-- Sol Taraf: 1 Büyük Spor Haberi + Altında 3 Kulüp Haberi (8 Kolon) -->
                 <div class="lg:col-span-8 space-y-4">
                     {% if sport_items and sport_items|length > 0 %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl relative h-72 sm:h-96">
-                        <a href="/haber/{{ sport_items[0].slug }}" class="block w-full h-full relative">
+                    <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <a href="/haber/{{ sport_items[0].slug }}" class="block relative h-56 sm:h-72 overflow-hidden bg-slate-100">
                             {% if sport_items[0].image_path %}
                                 <img src="/images/{{ sport_items[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sport_items[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                                <span class="bg-green-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
-                                    {{ sport_items[0].category }}
-                                </span>
-                                <h3 class="text-lg sm:text-2xl font-black text-white group-hover:text-green-400 transition mt-2 line-clamp-2 drop-shadow">
+                            <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
+                                {{ sport_items[0].category }}
+                            </span>
+                        </a>
+                        <div class="p-5">
+                            <span class="text-xs text-slate-500 font-medium">{{ sport_items[0].created_at[:16] if sport_items[0].created_at else '' }}</span>
+                            <a href="/haber/{{ sport_items[0].slug }}">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2">
                                     {{ sport_items[0].title }}
                                 </h3>
-                                <p class="text-xs sm:text-sm text-slate-300 mt-1 line-clamp-1 hidden sm:block">
-                                    {{ sport_items[0].summary or sport_items[0].content[:120] }}
-                                </p>
-                            </div>
-                        </a>
+                            </a>
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 font-normal leading-relaxed">
+                                {{ sport_items[0].summary or sport_items[0].content[:140] }}
+                            </p>
+                        </div>
                     </div>
                     {% endif %}
 
                     <!-- Alt 3'lü Kulüp Haberleri -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {% for sp in sport_items[1:4] %}
-                        <div class="rounded-xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow flex flex-col justify-between">
-                            <a href="/haber/{{ sp.slug }}" class="block relative h-28 overflow-hidden">
+                        <div class="category-side-card rounded-xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
+                            <a href="/haber/{{ sp.slug }}" class="block relative h-28 overflow-hidden bg-slate-100">
                                 {% if sp.image_path %}
                                     <img src="/images/{{ sp.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sp.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                                 {% endif %}
-                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                             </a>
                             <div class="p-2.5">
                                 <a href="/haber/{{ sp.slug }}">
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-green-400 transition line-clamp-2 leading-snug">
+                                    <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                         {{ sp.title }}
                                     </h4>
                                 </a>
@@ -820,12 +817,12 @@
                 <!-- Sağ Taraf: Canlı Puan Durumu (Genel / İç / Dış) + Haftalık Fikstür (4 Kolon) -->
                 <div class="lg:col-span-4 space-y-4">
                     <!-- Canlı Puan Durumu Tablosu (İnteraktif Genel / İç Saha / Deplasman) -->
-                    <div class="p-4 rounded-2xl bg-brand-card border border-brand-border shadow-xl">
-                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-brand-border">
-                            <h3 class="text-xs font-black text-white uppercase flex items-center gap-1.5">
+                    <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                            <h3 class="text-xs font-black text-slate-900 uppercase flex items-center gap-1.5">
                                 🏆 SÜPER LİG PUAN DURUMU
                             </h3>
-                            <span id="standings-status-label" class="text-[10px] text-green-400 font-bold">Genel Sıralama</span>
+                            <span id="standings-status-label" class="text-[10px] text-emerald-600 font-bold">Genel Sıralama</span>
                         </div>
                         <!-- Genel / İç / Deplasman Sekmeleri -->
                         <div class="flex items-center gap-1 mb-2.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
@@ -853,9 +850,9 @@
                     </div>
 
                     <!-- Haftalık Fikstür & Maç Programı (Hafta Hafta Değişebilen İnteraktif Motor) -->
-                    <div class="p-4 rounded-2xl bg-brand-card border border-brand-border shadow-xl">
-                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-brand-border">
-                            <h3 class="text-xs font-black text-white uppercase flex items-center gap-1.5">
+                    <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200">
+                            <h3 class="text-xs font-black text-slate-900 uppercase flex items-center gap-1.5">
                                 📅 HAFTANIN MAÇLARI & FİKSTÜR
                             </h3>
                             <div class="flex items-center gap-1.5">
@@ -866,29 +863,29 @@
                         </div>
 
                         <!-- Hızlı Hafta Butonları -->
-                        <div class="flex items-center gap-1 mb-2.5 bg-slate-900 p-1 rounded-xl text-[11px] font-bold">
+                        <div class="flex items-center gap-1 mb-2.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-bold">
                             <button type="button" id="tab-week-10" onclick="setFixtureWeek(10)" class="flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow-sm">10. Hafta (Güncel)</button>
-                            <button type="button" id="tab-week-11" onclick="setFixtureWeek(11)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">11. Hafta</button>
-                            <button type="button" id="tab-week-12" onclick="setFixtureWeek(12)" class="flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">12. Hafta</button>
+                            <button type="button" id="tab-week-11" onclick="setFixtureWeek(11)" class="flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer">11. Hafta</button>
+                            <button type="button" id="tab-week-12" onclick="setFixtureWeek(12)" class="flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer">12. Hafta</button>
                         </div>
 
                         <!-- Maç Listesi Kutusu (Varsayılan 9. Hafta Dolu Gelir) -->
                         <div id="fixture-matches-list" class="space-y-2 text-xs">
-                            <div class="p-2 rounded-xl bg-slate-900 border border-amber-500/40 bg-amber-950/20 flex items-center justify-between transition hover:border-slate-700">
+                            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between transition hover:border-slate-300 shadow-xs">
                                 <span class="font-bold text-slate-900">Antalyaspor - Galatasaray</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-red-500/20 text-red-400 border-red-500/30">19 Eki • 19:00</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-red-100 text-red-700 border-red-200">19 Eki • 19:00</span>
                             </div>
-                            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition hover:border-slate-700">
-                                <span class="font-bold text-slate-200">Trabzonspor - Başakşehir</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-500/20 text-blue-400 border-blue-500/30">19 Eki • 16:00</span>
+                            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between transition hover:border-slate-300 shadow-xs">
+                                <span class="font-bold text-slate-900">Trabzonspor - Başakşehir</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-blue-100 text-blue-700 border-blue-200">19 Eki • 16:00</span>
                             </div>
-                            <div class="p-2 rounded-xl bg-slate-900 border border-amber-500/40 bg-amber-950/20 flex items-center justify-between transition hover:border-slate-700">
+                            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between transition hover:border-slate-300 shadow-xs">
                                 <span class="font-bold text-slate-900">Fenerbahçe - Samsunspor</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-yellow-500/20 text-yellow-400 border-yellow-500/30">20 Eki • 19:00</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-amber-100 text-amber-700 border-amber-300">20 Eki • 19:00</span>
                             </div>
-                            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between transition hover:border-slate-700">
-                                <span class="font-bold text-slate-200">Beşiktaş - Konyaspor</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-slate-500/20 text-slate-300 border-slate-500/30">20 Eki • 16:00</span>
+                            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between transition hover:border-slate-300 shadow-xs">
+                                <span class="font-bold text-slate-900">Beşiktaş - Konyaspor</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border bg-slate-200 text-slate-800 border-slate-300">20 Eki • 16:00</span>
                             </div>
                         </div>
                     </div>
@@ -899,15 +896,15 @@
         <!-- 10. 🚗 OTOMOBİL DÜNYASI (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set auto_items = auto_articles if (auto_articles and auto_articles|length >= 3) else articles[0:5] %}
         {% if auto_items and auto_items|length > 0 %}
-        <section class="pt-4 border-t border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-                        OTOMOBİL DÜNYASI <span class="text-xs font-bold text-red-400 tracking-normal hidden sm:inline">| Yeni Modeller, Fiyat Listeleri & ÖTV</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        OTOMOBİL DÜNYASI <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Yeni Modeller, Fiyat Listeleri & ÖTV</span>
                     </h2>
                 </div>
-                <a href="/?kategori=Otomobil" class="text-xs font-bold text-slate-400 hover:text-red-400 transition flex items-center gap-1">
+                <a href="/?kategori=Otomobil" class="text-xs font-bold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
                     Tüm Otomobil Haberleri →
                 </a>
             </div>
@@ -916,24 +913,23 @@
                 <!-- Sol Taraf: 1 Büyük Vitrin Haberi (7 Kolon) -->
                 <div class="lg:col-span-7">
                     {% set hero = auto_items[0] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
-                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
+                    <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
+                        <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
                                 <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
                             </span>
                         </a>
                         <div class="p-5">
-                            <span class="text-xs text-slate-400 font-medium">{{ hero.created_at[:16] }}</span>
+                            <span class="text-xs text-slate-500 font-medium">{{ hero.created_at[:16] }}</span>
                             <a href="/haber/{{ hero.slug }}">
-                                <h3 class="text-lg sm:text-xl font-black text-white group-hover:text-red-400 transition mt-1 line-clamp-2">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2">
                                     {{ hero.title }}
                                 </h3>
                             </a>
-                            <p class="text-xs sm:text-sm text-slate-300 mt-2 line-clamp-2 font-normal">
+                            <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 font-normal leading-relaxed">
                                 {{ hero.summary or hero.content[:140] }}
                             </p>
                         </div>
@@ -943,20 +939,19 @@
                 <!-- Sağ Taraf: 4 Küçük Yan Kart (5 Kolon - 2x2 Grid) -->
                 <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% for item in auto_items[1:5] %}
-                    <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
-                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
+                    <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
+                        <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
                                 <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
                         <div class="p-3">
                             <a href="/haber/{{ item.slug }}">
-                                <h4 class="text-xs font-bold text-slate-200 group-hover:text-red-400 transition line-clamp-2 leading-snug">
+                                <h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">
                                     {{ item.title }}
                                 </h4>
                             </a>
-                            <span class="text-[10px] text-slate-500 mt-1 block">{{ item.created_at[:10] }}</span>
+                            <span class="text-[10px] text-slate-400 mt-1 block">{{ item.created_at[:10] }}</span>
                         </div>
                     </div>
                     {% endfor %}
@@ -1267,19 +1262,19 @@
     {% endif %}
 
                 <!-- 10. 🔮 12 BURÇ GÜNLÜK ASTROLOJİ DÜNYASI -->
-        <section class="pt-6 border-t border-brand-border/60" id="burclar-section">
+        <section class="pt-6 border-t border-slate-200" id="burclar-section">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
                 <div class="flex items-center gap-3">
                     <span class="w-3.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-sm shadow-md shadow-purple-500/30"></span>
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight uppercase flex items-center gap-2">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
                             GÜNLÜK BURÇ YORUMLARI & ASTROLOJİ
                         </h2>
-                        <p class="text-xs text-purple-300 font-medium">Gündem Analizi Astroloji Masası • Günlük, Haftalık ve Aylık Gökyüzü Rehberi</p>
+                        <p class="text-xs text-slate-500 font-medium">Gündem Analizi Astroloji Masası • Günlük, Haftalık ve Aylık Gökyüzü Rehberi</p>
                     </div>
                 </div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-950/60 border border-purple-500/40 text-purple-300 text-xs font-semibold self-start sm:self-auto shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-semibold self-start sm:self-auto shadow-xs">
+                    <span class="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
                     <span>Burcunuzu Seçin & Detaylı Yorumu Okuyun</span>
                 </div>
             </div>
@@ -1303,12 +1298,12 @@
                 {% for name, symbol, dates, element, style in signs %}
                 <button type="button" 
                         onclick="window.openAstroModal('{{ name }}', '{{ symbol }}', '{{ dates }}')"
-                        class="p-4 rounded-2xl bg-gradient-to-b {{ style }} bg-slate-900/90 border transition-all duration-200 flex flex-col items-center justify-center gap-1.5 group shadow-lg hover:shadow-purple-500/20 hover:-translate-y-0.5 cursor-pointer text-center relative overflow-hidden"
+                        class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all duration-200 flex flex-col items-center justify-center gap-1.5 group shadow-xs hover:-translate-y-0.5 cursor-pointer text-center relative overflow-hidden"
                         aria-label="{{ name }} Burcu Günlük Yorumunu Oku">
                     <span class="text-3xl sm:text-4xl group-hover:scale-115 transition-transform duration-200">{{ symbol }}</span>
-                    <span class="text-sm font-black text-white tracking-wide uppercase">{{ name }}</span>
+                    <span class="text-sm font-black text-slate-900 group-hover:text-purple-600 transition tracking-wide uppercase">{{ name }}</span>
                     <span class="text-[10px] text-slate-500 font-medium">{{ dates }}</span>
-                    <span class="mt-1 px-2 py-0.5 rounded text-[9px] font-bold bg-white/10 text-slate-300 uppercase tracking-wider group-hover:bg-purple-600 group-hover:text-white transition">Yorumu Oku →</span>
+                    <span class="mt-1 px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 group-hover:bg-purple-600 group-hover:text-white transition uppercase tracking-wider">Yorumu Oku →</span>
                 </button>
                 {% endfor %}
             </div>
@@ -1336,17 +1331,17 @@
                             id="btn-open-namaz"
                             onclick="window.openNamazModal()" 
                             aria-label="81 İl Canlı Namaz Vakitleri Sayfasını Aç"
-                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-amber-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
+                            class="p-4 rounded-xl bg-slate-50 hover:bg-amber-50/50 border border-slate-200 hover:border-amber-400 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-xs hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-3xl p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-slate-900">🕌</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-slate-900">🕌</span>
                             <div>
-                                <div class="font-extrabold text-white group-hover:text-amber-400 transition text-sm">
+                                <div class="font-extrabold text-slate-900 group-hover:text-amber-600 transition text-sm">
                                     <span id="card-city-name">İstanbul</span> Namaz Vakitleri
                                 </div>
-                                <div class="text-[11px] text-slate-400 font-medium">81 İl Diyanet Saatleri & İftar/Sahur</div>
+                                <div class="text-[11px] text-slate-500 font-medium">81 İl Diyanet Saatleri & İftar/Sahur</div>
                             </div>
                         </div>
-                        <span id="live-namaz-vakti" class="font-mono text-amber-400 font-black text-xs px-2.5 py-1.5 rounded-lg bg-amber-950/80 border border-amber-500/40 shadow-inner">
+                        <span id="live-namaz-vakti" class="font-mono text-amber-700 font-black text-xs px-2.5 py-1.5 rounded-lg bg-amber-100 border border-amber-300 shadow-xs">
                             Yatsı 19:44
                         </span>
                     </button>
@@ -1356,15 +1351,15 @@
                             id="btn-open-nobetci"
                             onclick="window.openNobetciModal()" 
                             aria-label="81 İl Nöbetçi Eczaneler Rehberini Aç"
-                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
+                            class="p-4 rounded-xl bg-slate-50 hover:bg-emerald-50/50 border border-slate-200 hover:border-emerald-400 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-xs hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-3xl p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">💊</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600">💊</span>
                             <div>
-                                <div class="font-extrabold text-white group-hover:text-emerald-400 transition text-sm">Nöbetçi Eczaneler</div>
-                                <div class="text-[11px] text-slate-400 font-medium">81 İl & İlçe Açık Nöbetçi Listesi</div>
+                                <div class="font-extrabold text-slate-900 group-hover:text-emerald-600 transition text-sm">Nöbetçi Eczaneler</div>
+                                <div class="text-[11px] text-slate-500 font-medium">81 İl & İlçe Açık Nöbetçi Listesi</div>
                             </div>
                         </div>
-                        <span class="text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <span class="text-emerald-700 text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-100 border border-emerald-300 shadow-xs group-hover:bg-emerald-600 group-hover:text-white transition">
                             Listele →
                         </span>
                     </button>
@@ -1374,15 +1369,15 @@
                             id="btn-open-deprem"
                             onclick="window.openDepremModal()" 
                             aria-label="Kandilli ve AFAD Son Depremler Sayfasını Aç"
-                            class="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-rose-500/70 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-md hover:-translate-y-0.5">
+                            class="p-4 rounded-xl bg-slate-50 hover:bg-rose-50/50 border border-slate-200 hover:border-rose-400 transition-all duration-200 flex items-center justify-between group cursor-pointer text-left shadow-xs hover:-translate-y-0.5">
                         <div class="flex items-center gap-3">
-                            <span class="text-3xl p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400">📉</span>
+                            <span class="text-3xl p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600">📉</span>
                             <div>
-                                <div class="font-extrabold text-white group-hover:text-rose-400 transition text-sm">Son Depremler</div>
-                                <div class="text-[11px] text-slate-400 font-medium">AFAD & Kandilli Canlı Veri Akışı</div>
+                                <div class="font-extrabold text-slate-900 group-hover:text-rose-600 transition text-sm">Son Depremler</div>
+                                <div class="text-[11px] text-slate-500 font-medium">AFAD & Kandilli Canlı Veri Akışı</div>
                             </div>
                         </div>
-                        <span class="text-rose-400 text-xs font-black px-3 py-1.5 rounded-lg bg-rose-950/80 border border-rose-500/40 shadow-inner group-hover:bg-rose-600 group-hover:text-white transition">
+                        <span class="text-rose-700 text-xs font-black px-3 py-1.5 rounded-lg bg-rose-100 border border-rose-300 shadow-xs group-hover:bg-rose-600 group-hover:text-white transition">
                             İncele →
                         </span>
                     </button>
