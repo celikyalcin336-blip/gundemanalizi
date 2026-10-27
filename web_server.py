@@ -145,7 +145,6 @@ def system_health_watchdog_worker():
         # Her 10 dakikada bir (600 saniye) kontrol
         time.sleep(600)
 
-@asynccontextmanager
 def _warmup_turbo_cache():
     """Sunucu ayağa kalkar kalkmaz ana sayfayı ve popüler kategorileri RAM'e çeker."""
     time.sleep(3)
@@ -157,6 +156,7 @@ def _warmup_turbo_cache():
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
 
+@asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
     threading.Thread(target=database.cleanup_corrupted_articles, daemon=True).start()

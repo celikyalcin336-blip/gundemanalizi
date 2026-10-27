@@ -120,27 +120,33 @@
         .bg-brand-card,
         article.bg-brand-card,
         .bg-slate-950,
+        .bg-slate-900,
+        [class*="bg-slate-900"],
         .rounded-2xl.bg-brand-card {
             background-color: #ffffff !important;
             border-color: #e2e8f0 !important;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
         }
 
-        /* 3. BEYAZ KART İÇİNDEKİ YAZILAR - JİLET GİBİ SİYAH / KOYU FÜME */
-        article h2,
-        article h3,
-        article h4,
-        .bg-brand-card h2,
-        .bg-brand-card h3,
-        .bg-brand-card h4,
-        .bg-brand-card .text-white,
-        article.bg-brand-card .text-white,
-        .p-4 > div .text-white,
-        .p-5 > div .text-white {
+        /* 3. BÖLÜM BAŞLIKLARI VE KART İÇİNDEKİ TÜM YAZILAR - JİLET GİBİ SİYAH */
+        h1, h2, h3, h4,
+        section h2,
+        section h2.text-white,
+        article h2, article h3, article h4,
+        .p-5 h3, .p-4 h3, .p-3 h4, .p-2 h4,
+        .p-5 a, .p-4 a, .p-3 a,
+        .p-5 .text-white, .p-4 .text-white, .p-3 .text-white,
+        .p-3 .text-slate-200, .p-4 .text-slate-200 {
             color: #0f172a !important;
         }
 
-        /* 4. ⭐ EN KRİTİK KURAL: FOTOĞRAF ÜZERİNDEKİ YAZILAR (MANŞET SLIDER VE VİTRİNLER)
+        /* Kart İçi Özet Yazıları ve Açıklamalar */
+        .p-5 p, .p-4 p, .p-3 p, article p,
+        .p-5 .text-slate-300, .p-4 .text-slate-300 {
+            color: #475569 !important;
+        }
+
+        /* 4. ⭐ EN KRİTİK KURAL: FOTOĞRAF ÜZERİNDEKİ YAZILAR (MANŞET SLIDER VE GÖRSEL OVERLAYLERİ)
            Fotoğraf altındaki siyah gölgenin üzerinde KESİNLİKLE BEYAZ kalır! */
         .manset-slide .text-white,
         .manset-slide h2,
@@ -151,9 +157,14 @@
         [class*="from-slate-950"] ~ div h2,
         [class*="from-black"] ~ div h2,
         [class*="from-black"] .text-white,
-        [class*="from-slate-950"] .text-white {
+        [class*="from-slate-950"] .text-white,
+        /* Rozetler daima beyaz */
+        .bg-red-600, .bg-red-600 *,
+        .bg-blue-600, .bg-blue-600 *,
+        .bg-emerald-600, .bg-emerald-600 *,
+        .bg-green-600, .bg-green-600 * {
             color: #ffffff !important;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
         }
 
         /* 5. Kart İçi Açıklama & Özet Yazıları */
