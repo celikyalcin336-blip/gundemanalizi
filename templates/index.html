@@ -99,6 +99,10 @@
             color: #0f172a !important;
         }
 
+        .canli-piyasa-label {
+            color: #ffffff !important;
+        }
+
         /* 1. Kırmızı Son Dakika & Breaking Vurguları (A Haber Kırmızısı) */
         .bg-red-600, .bg-red-700, .bg-red-800 {
             background-color: #dc2626 !important;
@@ -357,9 +361,12 @@
     <!-- 3. CANLI PİYASA & FİNANS BANDI (Altın, Dolar, Euro, Bitcoin) -->
     <section class="bg-brand-card/90 border-b border-brand-border/70 backdrop-blur py-2 px-3 sm:px-6 shadow-md relative z-30">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-            <div class="flex items-center gap-2 shrink-0">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[11px] sm:text-xs font-black tracking-wider uppercase text-slate-800">CANLI PİYASA</span>
+            <div class="flex items-center gap-2 shrink-0 pr-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span class="canli-piyasa-label text-[11px] sm:text-xs font-black tracking-wider uppercase text-white drop-shadow-xs">CANLI PİYASA</span>
             </div>
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
