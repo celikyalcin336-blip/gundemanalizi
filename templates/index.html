@@ -132,16 +132,19 @@
         }
         #market-rates-bar > div,
         .w-full.grid.grid-cols-2 > div {
-            background-color: #f8fafc !important;
+            background-color: #ffffff !important;
             border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
         }
         #market-rates-bar .text-slate-400,
         #market-rates-bar .text-slate-300 {
             color: #64748b !important;
         }
         #market-rates-bar strong,
-        #market-rates-bar .font-bold {
+        #market-rates-bar .font-bold,
+        #market-rates-bar .font-black,
+        #market-rates-bar .text-white,
+        #market-rates-bar .text-slate-200 {
             color: #0f172a !important;
         }
 
@@ -423,24 +426,24 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
             <div class="flex items-center gap-2 shrink-0">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[11px] sm:text-xs font-black tracking-wider uppercase text-slate-300">CANLI PİYASA</span>
+                <span class="text-[11px] sm:text-xs font-black tracking-wider uppercase text-slate-800">CANLI PİYASA</span>
             </div>
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
                     {% for r in market_rates %}
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700/80 transition shadow-sm">
+                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">{{ r.icon }}</span>
                             <div>
-                                <div class="font-bold text-slate-200 text-[11px] sm:text-xs leading-tight">{{ r.name }}</div>
-                                <div class="text-[9px] text-slate-400 font-mono hidden sm:block leading-none">{{ r.symbol }}</div>
+                                <div class="font-bold text-slate-900 text-[11px] sm:text-xs leading-tight">{{ r.name }}</div>
+                                <div class="text-[9px] text-slate-500 font-mono hidden sm:block leading-none">{{ r.symbol }}</div>
                             </div>
                         </div>
                         <div class="text-right pl-2">
-                            <div class="font-black text-white text-xs sm:text-sm tracking-tight font-mono leading-tight">
-                                {{ r.price }} <span class="text-[10px] font-semibold text-slate-400">{{ r.unit }}</span>
+                            <div class="font-black text-slate-900 text-xs sm:text-sm tracking-tight font-mono leading-tight">
+                                {{ r.price }} <span class="text-[10px] font-semibold text-slate-500">{{ r.unit }}</span>
                             </div>
-                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none {{ 'text-emerald-400' if r.direction == 'up' else 'text-red-400' }}">
+                            <div class="text-[10px] font-bold font-mono flex items-center justify-end gap-0.5 leading-none {{ 'text-emerald-600' if r.direction == 'up' else 'text-red-600' }}">
                                 <span>{{ '▲' if r.direction == 'up' else '▼' }}</span>
                                 <span>%{{ r.change|abs }}</span>
                             </div>

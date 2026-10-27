@@ -155,31 +155,23 @@
             color: #0f172a !important;
         }
 
-        /* 1. Üst Kayan Son Dakika Bandı (Koyu yerine Tertemiz Beyaz Bant) */
+        /* 1. Üst Kayan Son Dakika Bandı (Kusursuz Beyaz Gazete Bandı) */
         #floating-reader-bar {
-            background-color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.98) !important;
             border-bottom: 1px solid #e2e8f0 !important;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06) !important;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05) !important;
         }
-        #floating-reader-bar a,
-        #floating-reader-bar span:not(.bg-red-600) {
+        #floating-reader-bar .breaking-item {
             color: #0f172a !important;
             font-weight: 600 !important;
         }
-        #floating-reader-bar a:hover {
+        #floating-reader-bar .breaking-item:hover {
             color: #dc2626 !important;
         }
-        #floating-reader-bar .bg-red-600,
-        #floating-reader-bar .bg-red-600 * {
-            background-color: #dc2626 !important;
-            color: #ffffff !important;
-        }
-        #floating-reader-bar button,
-        #floating-reader-bar .rounded-lg,
-        #floating-reader-bar .rounded-full {
-            background-color: #f1f5f9 !important;
-            color: #0f172a !important;
-            border-color: #cbd5e1 !important;
+        #floating-next-bar {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            border-top: 1px solid #e2e8f0 !important;
+            box-shadow: 0 -2px 10px rgba(15, 23, 42, 0.06) !important;
         }
 
         /* 2. Header & Menü */
@@ -321,11 +313,11 @@
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white pt-10">
 
     <!-- 100% FIXED ÜST BİLGİ & SON DAKİKA CANLI BANDI (MOBİLDE VE PC'DE ASLA KAYBOLMAZ) -->
-    <div id="floating-reader-bar" class="fixed top-0 left-0 right-0 w-full bg-slate-950/95 backdrop-blur-md text-white text-xs border-b border-red-900/60 shadow-2xl h-10 flex items-center" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 9999 !important; -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform;">
+    <div id="floating-reader-bar" class="fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md text-slate-800 text-xs border-b border-slate-200 shadow-sm h-10 flex items-center" style="position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; z-index: 9999 !important; -webkit-transform: translateZ(0); transform: translateZ(0); will-change: transform;">
         <div class="max-w-6xl mx-auto w-full px-3 sm:px-6 flex items-center justify-between gap-2.5">
             <!-- Sol: Son Dakika Kayan Bant -->
             <div class="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
-                <span class="inline-flex items-center gap-1.5 bg-red-600 px-2 py-0.5 rounded-full text-white font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px] shrink-0 shadow-sm">
+                <span class="inline-flex items-center gap-1.5 bg-red-600 px-2.5 py-0.5 rounded-full text-white font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px] shrink-0 shadow-sm">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -335,13 +327,13 @@
                 <div id="breaking-ticker-container" class="overflow-hidden flex-1 relative h-5 flex items-center">
                     {% if breaking_news and breaking_news|length > 0 %}
                         {% for b in breaking_news %}
-                        <a href="/haber/{{ b.slug }}" class="breaking-item absolute inset-0 flex items-center text-slate-200 hover:text-white transition-all duration-500 truncate text-xs {% if loop.first %}opacity-100 translate-y-0{% else %}opacity-0 translate-y-3 pointer-events-none{% endif %}" title="{{ b.title }}">
-                            <span class="text-red-400 text-[10px] mr-1.5 font-bold hidden sm:inline">[{{ b.category }}]</span>
+                        <a href="/haber/{{ b.slug }}" class="breaking-item absolute inset-0 flex items-center text-slate-800 hover:text-red-600 transition-all duration-500 truncate text-xs font-semibold {% if loop.first %}opacity-100 translate-y-0{% else %}opacity-0 translate-y-3 pointer-events-none{% endif %}" title="{{ b.title }}">
+                            <span class="text-red-600 text-[10px] mr-1.5 font-bold hidden sm:inline">[{{ b.category }}]</span>
                             <span class="truncate hover:underline">{{ b.title }}</span>
                         </a>
                         {% endfor %}
                     {% else %}
-                        <span class="text-slate-300 text-xs truncate">Gündem Analizi teyitli son dakika haber akışı.</span>
+                        <span class="text-slate-600 text-xs truncate">Gündem Analizi teyitli son dakika haber akışı.</span>
                     {% endif %}
                 </div>
             </div>
@@ -496,18 +488,18 @@
             </h1>
 
             <!-- 🎧 HABERİ SESLİ DİNLE OYNATICISI (BBC & HÜRRİYET STANDARDI) -->
-            <div id="audio-reader-box" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-brand-card to-slate-900 border border-brand-border shadow-xl">
+            <div id="audio-reader-box" class="mb-6 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                     <div class="flex items-center gap-3">
-                        <button type="button" id="audio-play-btn" onclick="toggleAudioReading()" aria-label="Haberi sesli dinlemeyi başlat veya duraklat" role="button" class="w-12 h-12 rounded-2xl bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/40 transition active:scale-95 flex-shrink-0 group">
+                        <button type="button" id="audio-play-btn" onclick="toggleAudioReading()" aria-label="Haberi sesli dinlemeyi başlat veya duraklat" role="button" class="w-12 h-12 rounded-2xl bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-md transition active:scale-95 flex-shrink-0 group">
                             <i id="audio-play-icon" data-lucide="play" class="w-6 h-6 ml-0.5 fill-white"></i>
                         </button>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="font-extrabold text-white text-sm sm:text-base">Haberi Sesli Dinle</span>
-                                <span id="audio-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wider">AI Seslendirici</span>
+                                <span class="font-extrabold text-slate-900 text-sm sm:text-base">Haberi Sesli Dinle</span>
+                                <span id="audio-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300 uppercase tracking-wider">AI Seslendirici</span>
                             </div>
-                            <p id="audio-status-text" class="text-xs text-slate-400">Bu haberi sesli olarak dinlemek için oynat'a basın.</p>
+                            <p id="audio-status-text" class="text-xs text-slate-500">Bu haberi sesli olarak dinlemek için oynat'a basın.</p>
                         </div>
                     </div>
                     <!-- Ses Hızı ve Durdurma Butonları -->
@@ -519,10 +511,10 @@
                             <span class="w-1 bg-red-500 rounded-full animate-bounce h-4" style="animation-delay: 0.3s"></span>
                             <span class="w-1 bg-amber-500 rounded-full animate-bounce h-2" style="animation-delay: 0.45s"></span>
                         </div>
-                        <button type="button" onclick="cycleAudioRate()" id="audio-rate-btn" aria-label="Sesli okuma hızını değiştir" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-mono font-bold text-xs border border-slate-700 transition" title="Okuma Hızı">
+                        <button type="button" onclick="cycleAudioRate()" id="audio-rate-btn" aria-label="Sesli okuma hızını değiştir" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono font-bold text-xs border border-slate-300 transition" title="Okuma Hızı">
                             1.0x
                         </button>
-                        <button type="button" onclick="stopAudioReading()" aria-label="Sesli okumayı tamamen durdur" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs border border-slate-700 transition" title="Durdur">
+                        <button type="button" onclick="stopAudioReading()" aria-label="Sesli okumayı tamamen durdur" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-red-600 text-xs border border-slate-300 transition" title="Durdur">
                             <i data-lucide="square" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -537,15 +529,15 @@
             </div>
 
             <!-- WhatsApp ve Sosyal Medya Hızlı Paylaşım Barı (Doğrudan Site Trafiği Çeker) -->
-            <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-brand-card border border-emerald-500/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
-                    <span class="p-2.5 rounded-xl bg-emerald-600 text-white text-xl">📲</span>
+                    <span class="p-2.5 rounded-xl bg-emerald-600 text-white text-xl shadow-sm">📲</span>
                     <div>
-                        <div class="font-extrabold text-white text-sm">Bu Haberi & Videoyu Arkadaşlarınla Paylaş</div>
-                        <div class="text-[11px] text-slate-300">Haberi WhatsApp gruplarında tek tıkla paylaş, herkes görsün!</div>
+                        <div class="font-extrabold text-emerald-950 text-sm sm:text-base">Bu Haberi & Videoyu Arkadaşlarınla Paylaş</div>
+                        <div class="text-[11px] text-emerald-800">Haberi WhatsApp gruplarında tek tıkla paylaş, herkes görsün!</div>
                     </div>
                 </div>
-                <button type="button" onclick="shareArticleWhatsApp()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-900/50 transition flex items-center justify-center gap-2 hover:scale-105">
+                <button type="button" onclick="shareArticleWhatsApp()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 hover:scale-105">
                     <span>💬 WhatsApp'ta Paylaş</span>
                 </button>
             </div>
@@ -579,15 +571,15 @@
 
             {% if highlights and highlights|length > 0 %}
             <!-- Haberin Önemli Noktaları (Özet Kutusu - Kesintisiz Tam Cümleler) -->
-            <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-950/40 via-brand-card to-brand-card border-l-4 border-red-600 border-y border-r border-brand-border/80 shadow-md">
-                <div class="flex items-center gap-2 mb-3 text-red-400 font-extrabold text-xs uppercase tracking-wider">
+            <div class="mb-6 p-4 sm:p-5 rounded-2xl bg-red-50/70 border-l-4 border-red-600 border-y border-r border-red-200/80 shadow-sm">
+                <div class="flex items-center gap-2 mb-3 text-red-600 font-black text-xs uppercase tracking-wider">
                     <i data-lucide="bookmark-check" class="w-4 h-4"></i> Haberin Önemli Noktaları
                 </div>
-                <ul class="space-y-2.5 text-slate-200 text-xs sm:text-sm font-medium leading-relaxed">
+                <ul class="space-y-2.5 text-slate-900 text-xs sm:text-sm font-semibold leading-relaxed">
                     {% for h in highlights %}
                     <li class="flex items-start gap-2.5">
-                        <span class="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0 shadow-sm shadow-red-500/50"></span>
-                        <span>{{ h }}</span>
+                        <span class="w-2 h-2 rounded-full bg-red-600 mt-1.5 shrink-0 shadow-sm"></span>
+                        <span class="text-slate-900">{{ h }}</span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -611,41 +603,39 @@
 
             <!-- SIRADAKİ HABER VE KESİNTİSİZ OKUMA AKIŞI KARTI -->
             {% if next_article %}
-            <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-red-950/70 via-brand-card to-slate-900 border-2 border-red-600/50 shadow-2xl relative overflow-hidden group">
-                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
-                
+            <div class="mt-8 p-5 sm:p-6 rounded-2xl bg-white border-2 border-red-500/40 shadow-lg relative overflow-hidden group">
                 <div class="flex items-center justify-between mb-4">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-black tracking-wider uppercase">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-black tracking-wider uppercase">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                         </span>
                         SIRADAKİ HABER
                     </span>
-                    <span class="text-[11px] text-slate-400 font-medium hidden sm:inline">Okumaya devam et →</span>
+                    <span class="text-[11px] text-slate-500 font-bold hidden sm:inline">Okumaya devam et →</span>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 items-center">
-                    <a href="/haber/{{ next_article.slug }}" class="w-full sm:w-48 h-32 rounded-xl overflow-hidden shrink-0 bg-slate-950 border border-brand-border block relative shadow-md">
+                    <a href="/haber/{{ next_article.slug }}" class="w-full sm:w-48 h-32 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200 block relative shadow-sm">
                         {% if next_article.image_path %}
-                        <img src="/images/{{ next_article.image_path.split('\\')[-1].split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img src="/images/{{ next_article.image_path.split('\')[-1].split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         {% else %}
                         <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-3">
                         {% endif %}
-                        <span class="absolute top-2 left-2 bg-black/75 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-extrabold text-red-400 uppercase">
+                        <span class="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-[10px] font-extrabold text-white uppercase shadow-sm">
                             {{ next_article.category }}
                         </span>
                     </a>
 
                     <div class="flex-1 min-w-0 space-y-2 text-center sm:text-left">
-                        <h3 class="text-sm sm:text-base font-extrabold text-white group-hover:text-red-400 transition leading-snug line-clamp-2">
+                        <h3 class="text-base sm:text-lg font-black text-slate-900 group-hover:text-red-600 transition leading-snug line-clamp-2">
                             <a href="/haber/{{ next_article.slug }}">{{ next_article.title }}</a>
                         </h3>
-                        <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                        <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
                             {{ next_article.summary }}
                         </p>
                         <div class="pt-1 flex items-center justify-center sm:justify-start">
-                            <a href="/haber/{{ next_article.slug }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg shadow-red-900/40 transition hover:translate-x-1">
+                            <a href="/haber/{{ next_article.slug }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md transition hover:translate-x-1">
                                 <span>Sonraki Habere Geç</span>
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </a>
@@ -707,15 +697,35 @@
             </div>
 
             <!-- TÜM SOSYAL MEDYA KANALLARI & İHBAR HATTI BANNERI -->
-            <div class="mt-10 p-6 rounded-2xl bg-gradient-to-r from-red-950/80 to-brand-card border border-red-800/50 shadow-xl space-y-4">
+            <div class="mt-10 p-6 rounded-2xl bg-white border border-slate-200 shadow-md space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
                         <img src="/assets/logo.png" alt="Logo" class="w-14 h-14 rounded-full border-2 border-red-500 shadow-md">
                         <div>
-                            <h4 class="font-extrabold text-white text-base sm:text-lg">Gündemi İstediğiniz Kanaldan Takip Edin!</h4>
-                            <p class="text-xs sm:text-sm text-slate-300">Son dakika gelişmelerini kaçırmamak için resmi sosyal medya hesaplarımıza katılın veya ihbar gönderin.</p>
+                            <h4 class="font-extrabold text-slate-900 text-base sm:text-lg">Gündemi İstediğiniz Kanaldan Takip Edin!</h4>
+                            <p class="text-xs sm:text-sm text-slate-600">Son dakika gelişmelerini kaçırmamak için resmi sosyal medya hesaplarımıza katılın veya ihbar gönderin.</p>
                         </div>
                     </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
+                            <span class="text-sm">♿</span>
+                            <span class="hidden sm:inline">Erişilebilirlik</span>
+                        </button>
+                        <button type="button" onclick="openIhbarModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-md transition whitespace-nowrap">
+                            🚨 7/24 İhbar & Video Gönder
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200 text-xs font-bold">
+                    <a href="https://news.google.com/search?q=g%C3%BCndemanalizi.com.tr&hl=tr&gl=TR&ceid=TR:tr" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition flex items-center gap-1.5"><span class="font-black text-red-600">N</span> Google News</a>
+                    <a href="https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition">💬 WhatsApp Kanalı</a>
+                    <a href="https://t.me/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white transition">📲 Telegram</a>
+                    <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-3.5 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white transition">📸 Instagram</a>
+                    <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white transition">🎵 TikTok</a>
+                    <a href="https://www.facebook.com/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition">📘 Facebook</a>
+                    <a href="https://x.com/gndmanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition">🐦 X (Twitter)</a>
+                </div>
+            </div>
                     <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-2 rounded-xl transition shadow-sm cursor-pointer" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
                     <span class="text-sm">♿</span>
                     <span class="hidden sm:inline">Erişilebilirlik</span>
@@ -1492,15 +1502,15 @@
     </script>
     <!-- MOBİL VE DESKTOP İÇİN SABİT SIRADAKİ HABER BARI -->
     {% if next_article %}
-    <div id="floating-next-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-red-900/60 p-2.5 sm:px-6 shadow-2xl transition-transform duration-300">
+    <div id="floating-next-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2.5 sm:px-6 shadow-lg transition-transform duration-300">
         <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5 min-w-0">
                 <span class="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-black uppercase shrink-0">Sıradaki</span>
-                <a href="/haber/{{ next_article.slug }}" class="text-xs sm:text-sm font-bold text-white hover:text-red-400 transition truncate">
+                <a href="/haber/{{ next_article.slug }}" class="text-xs sm:text-sm font-bold text-slate-900 hover:text-red-600 transition truncate">
                     {{ next_article.title }}
                 </a>
             </div>
-            <a href="/haber/{{ next_article.slug }}" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shrink-0 flex items-center gap-1.5 shadow-lg shadow-red-900/50 transition whitespace-nowrap">
+            <a href="/haber/{{ next_article.slug }}" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shrink-0 flex items-center gap-1.5 shadow transition whitespace-nowrap">
                 <span>Sonraki Haber</span>
                 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             </a>
