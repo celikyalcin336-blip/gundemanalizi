@@ -828,7 +828,7 @@
                             <span id="standings-status-label" class="text-[10px] text-green-400 font-bold">Genel Sıralama</span>
                         </div>
                         <!-- Genel / İç / Deplasman Sekmeleri -->
-                        <div class="flex items-center gap-1 mb-2.5 bg-slate-900 p-1 rounded-xl text-xs font-bold">
+                        <div class="flex items-center gap-1 mb-2.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold">
                             <button type="button" id="tab-standings-genel" onclick="switchStandings('genel')" class="flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer">Genel</button>
                             <button type="button" id="tab-standings-icsaha" onclick="switchStandings('icsaha')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">İç Saha</button>
                             <button type="button" id="tab-standings-deplasman" onclick="switchStandings('deplasman')" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer">Deplasman</button>
@@ -3250,20 +3250,20 @@
                     if (t === type) {
                         btn.className = 'flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-sm';
                     } else {
-                        btn.className = 'flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer';
+                        btn.className = 'flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer';
                     }
                 }
             });
 
             if (!tbody) return;
             tbody.innerHTML = list.map(function(t) {
-                return '<tr class="hover:bg-slate-800/40 transition">' +
-                    '<td class="py-1.5 font-bold ' + (t.lead ? 'text-red-500' : 'text-slate-400') + '">' + t.rank + '</td>' +
-                    '<td class="py-1.5 font-bold text-white truncate max-w-[120px]">' + t.team + '</td>' +
-                    '<td class="py-1.5 text-center text-slate-400">' + t.o + '</td>' +
-                    '<td class="py-1.5 text-center text-slate-400">' + t.g + '</td>' +
-                    '<td class="py-1.5 text-center ' + (t.av.startsWith('+') ? 'text-emerald-400 font-semibold' : 'text-slate-400') + '">' + t.av + '</td>' +
-                    '<td class="py-1.5 text-right font-black text-white">' + t.p + '</td>' +
+                return '<tr class="hover:bg-slate-50 transition border-b border-slate-100">' +
+                    '<td class="py-1.5 font-bold ' + (t.lead ? 'text-red-600' : 'text-slate-500') + '">' + t.rank + '</td>' +
+                    '<td class="py-1.5 font-bold text-slate-900 truncate max-w-[120px]">' + t.team + '</td>' +
+                    '<td class="py-1.5 text-center text-slate-600">' + t.o + '</td>' +
+                    '<td class="py-1.5 text-center text-slate-600">' + t.g + '</td>' +
+                    '<td class="py-1.5 text-center ' + (t.av.startsWith('+') ? 'text-emerald-600 font-semibold' : 'text-slate-600') + '">' + t.av + '</td>' +
+                    '<td class="py-1.5 text-right font-black text-slate-900">' + t.p + '</td>' +
                 '</tr>';
             }).join('');
         }
@@ -3316,18 +3316,22 @@
                 var btn = document.getElementById('tab-week-' + w);
                 if (btn) {
                     if (w === week) {
-                        btn.className = 'flex-1 py-1 rounded-lg bg-amber-500 text-slate-950 font-black text-center transition cursor-pointer shadow-sm text-xs';
+                        btn.className = 'flex-1 py-1 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-xs text-xs';
                     } else {
-                        btn.className = 'flex-1 py-1 rounded-lg text-slate-400 hover:text-white text-center transition cursor-pointer text-xs';
+                        btn.className = 'flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer text-xs';
                     }
                 }
             });
 
             if (!listEl) return;
             listEl.innerHTML = data.matches.map(function(m) {
-                return '<div class="p-2 rounded-xl bg-slate-900 border ' + (m.highlight ? 'border-amber-500/40 bg-amber-950/20' : 'border-slate-800') + ' flex items-center justify-between transition hover:border-slate-700">' +
-                    '<span class="font-bold ' + (m.highlight ? 'text-amber-300' : 'text-slate-200') + '">' + m.home + ' - ' + m.away + '</span>' +
-                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + m.badge + '">' + m.date + '</span>' +
+                var isHigh = m.highlight;
+                var boxCls = isHigh ? 'bg-red-50/50 border-red-200 hover:border-red-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300';
+                var textCls = isHigh ? 'text-red-700 font-extrabold' : 'text-slate-900 font-bold';
+                var badgeCls = isHigh ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-200 text-slate-800 border-slate-300';
+                return '<div class="p-2.5 rounded-xl border ' + boxCls + ' flex items-center justify-between transition hover:bg-white shadow-xs">' +
+                    '<span class="text-xs sm:text-sm ' + textCls + '">' + m.home + ' - ' + m.away + '</span>' +
+                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + badgeCls + '">' + m.date + '</span>' +
                 '</div>';
             }).join('');
         }
@@ -3720,8 +3724,6 @@
                     '</div>' +
                 '</div>';
             }).join('');
-        }
-
         }
 
         function filterDepremMag(level) {
