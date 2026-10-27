@@ -145,7 +145,7 @@ def create_single_news_photo(img_url: str, output_path: str, width: int = 1280, 
         return None
         
     sharp = img.filter(ImageFilter.UnsharpMask(radius=1.2, percent=115, threshold=3))
-    sharp.save(output_path, "JPEG", quality=95)
+    sharp.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
     return output_path
 
 def create_dual_news_collage(url1: str, url2: str, output_path: str, width: int = 1280, height: int = 720, border_width: int = 4) -> str:
@@ -175,7 +175,7 @@ def create_dual_news_collage(url1: str, url2: str, output_path: str, width: int 
     canvas.paste(img2, (half_width + border_width, 0))
     
     sharp = canvas.filter(ImageFilter.UnsharpMask(radius=1.0, percent=110, threshold=3))
-    sharp.save(output_path, "JPEG", quality=95)
+    sharp.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
     return output_path
 
 def search_editorial_web_image(title: str, category: str = "") -> str:
@@ -281,7 +281,7 @@ def create_thematic_editorial_card(output_path: str, title: str = "", category: 
     sub_font = get_font(FONT_REGULAR_PATH, 22)
     draw.text((b_left, height - card_margin - 55), "gündemanalizi.com.tr | Doğru Haber • Tarafsız Analiz", font=sub_font, fill=(148, 163, 184))
     
-    canvas.save(output_path, "JPEG", quality=95)
+    canvas.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
     return output_path
 
 def create_default_brand_backdrop(output_path: str, title: str = "", category: str = "GÜNDEM", width: int = 1280, height: int = 720) -> str:
@@ -467,7 +467,7 @@ def create_story_card(candidate_urls: list, output_filename: str, title: str = "
     h_w = h_bbox[2] - h_bbox[0]
     draw.text(((width - h_w) // 2, 1835), hint_text, font=f_hint, fill=(148, 163, 184))
 
-    canvas.save(output_path, "JPEG", quality=95)
+    canvas.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
     return output_path
 
 def generate_news_card(title: str, source: str, image_url: str = None, tag: str = "TÜRKİYE GÜNDEMİ", output_filename: str = "post.jpg") -> str:

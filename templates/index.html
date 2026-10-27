@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ active_category + ' Haberleri - Gündem Analizi' if active_category else ('Arama: ' + search_query + ' - Gündem Analizi' if search_query else 'Gündem Analizi | Doğru Haber • Tarafsız Analiz') }}</title>
     
+        <!-- DNS & CDN Önbağlantıları (Hız ve LCP Optimizasyonu) -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+
     <!-- Favicon & Touch Icon -->
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="apple-touch-icon" href="/assets/logo.png">
@@ -65,7 +73,7 @@
             }
         }
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 
     <!-- Google Web Fonts -->
     <style>
@@ -350,7 +358,7 @@
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
                         <a href="/haber/{{ slider_list[1].slug }}" class="block w-full h-full relative">
                             {% if slider_list[1].image_path %}
-                                <img src="/images/{{ slider_list[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[1].title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ slider_list[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[1].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
@@ -364,7 +372,7 @@
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
                         <a href="/haber/{{ slider_list[2].slug }}" class="block w-full h-full relative">
                             {% if slider_list[2].image_path %}
-                                <img src="/images/{{ slider_list[2].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[2].title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ slider_list[2].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[2].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
@@ -401,7 +409,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase flex items-center gap-1">
@@ -429,7 +437,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
@@ -471,7 +479,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-blue-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
@@ -498,7 +506,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
@@ -540,7 +548,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-emerald-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
@@ -567,7 +575,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
@@ -608,7 +616,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl relative h-72 sm:h-96">
                         <a href="/haber/{{ sport_items[0].slug }}" class="block w-full h-full relative">
                             {% if sport_items[0].image_path %}
-                                <img src="/images/{{ sport_items[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sport_items[0].title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <img src="/images/{{ sport_items[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sport_items[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
@@ -632,7 +640,7 @@
                         <div class="rounded-xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow flex flex-col justify-between">
                             <a href="/haber/{{ sp.slug }}" class="block relative h-28 overflow-hidden">
                                 {% if sp.image_path %}
-                                    <img src="/images/{{ sp.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sp.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <img src="/images/{{ sp.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sp.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                                 {% endif %}
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                             </a>
@@ -750,7 +758,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900 group shadow-xl h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
@@ -777,7 +785,7 @@
                     <div class="rounded-2xl overflow-hidden border border-brand-border bg-slate-900/90 group shadow-md flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
                         </a>
@@ -960,9 +968,7 @@
                         <div class="lg:col-span-7 relative h-[260px] sm:h-[360px] lg:h-[420px] overflow-hidden bg-black">
                             <a href="/haber/{{ hero.slug }}" class="block w-full h-full">
                                 {% if hero.image_path %}
-                                    <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" 
-                                         alt="{{ hero.title }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                                    <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out aspect-[16/9]">
                                 {% else %}
                                     <div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-600">
                                         <i data-lucide="image" class="w-16 h-16"></i>
@@ -1840,6 +1846,16 @@
             <div id="nobetci-status-bar" class="flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-800">
                 <span id="nobetci-city-title" class="font-bold text-emerald-400">İstanbul Nöbetçi Eczaneleri</span>
                 <span id="nobetci-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 Canlı Veri</span>
+            </div>
+
+            <!-- Mesai ve Nöbet Çalışma Saatleri Bilgilendirmesi -->
+            <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-[11px] text-blue-200 flex items-start gap-2.5">
+                <span class="text-base shrink-0">⏰</span>
+                <div class="leading-relaxed">
+                    <strong class="text-blue-300 font-bold block mb-0.5">Eczane Mesai & Nöbet Bilgisi:</strong>
+                    Gündüz mesaisi (08:30 - 18:30) boyunca bölgenizdeki <strong>tüm eczaneler</strong> açıktır. 
+                    Saat <strong>18:30</strong>'dan itibaren aşağıda listelenen nöbetçi eczaneler sabaha kadar kesintisiz (08:30) hizmet vermektedir.
+                </div>
             </div>
 
             <!-- Canlı Eczane Listesi -->
@@ -3347,7 +3363,7 @@
             if (listEl) {
                 listEl.innerHTML = '<div class="p-6 text-center text-emerald-400 text-xs flex items-center justify-center gap-2">' +
                     '<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>' +
-                    '<span>Canlı nöbetçi eczaneler alınıyor...</span></div>';
+                    '<span>' + cityName + ' nöbetçi eczaneleri alınıyor...</span></div>';
             }
 
             fetch('/api/nobetci-eczaneler?city=' + encodeURIComponent(cityName))
@@ -3360,46 +3376,61 @@
                                 city: cityName,
                                 district: p.district || cityName,
                                 address: p.address || 'Adres bilgisi mevcut',
-                                phone: p.phone || '-'
+                                phone: p.phone || '-',
+                                hours: p.hours,
+                                status: p.status,
+                                is_now_open: p.is_now_open
                             };
                         });
                         if (badgeEl) badgeEl.innerText = '🟢 Canlı (' + CURRENT_NOBETCI_DATA.length + ' Eczane)';
                         renderNobetciList(CURRENT_NOBETCI_DATA);
                     } else {
                         if (badgeEl) badgeEl.innerText = 'Nöbetçi Bilgisi';
-                        CURRENT_NOBETCI_DATA = SAMPLE_PHARMACIES;
-                        renderNobetciList(CURRENT_NOBETCI_DATA);
+                        CURRENT_NOBETCI_DATA = [];
+                        if (listEl) {
+                            listEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">' + cityName + ' için nöbetçi eczane kaydı bulunamadı. Lütfen birazdan tekrar deneyiniz.</div>';
+                        }
                     }
                 })
                 .catch(function(err) {
                     console.error('Nobetci fetch err:', err);
-                    if (badgeEl) badgeEl.innerText = 'Çevrimdışı';
-                    CURRENT_NOBETCI_DATA = SAMPLE_PHARMACIES;
-                    renderNobetciList(CURRENT_NOBETCI_DATA);
+                    if (badgeEl) badgeEl.innerText = 'Bağlantı Hatası';
+                    if (listEl) {
+                        listEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Eczane verisi yüklenirken hata oluştu. Lütfen sayfayı yenileyiniz.</div>';
+                    }
                 });
         }
         window.loadNobetciCity = loadNobetciCity;
 
-        function renderNobetciList(items) {
+                function renderNobetciList(items) {
             var listEl = document.getElementById('nobetci-list');
             if (!listEl) return;
             if (!items || items.length === 0) {
-                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Aradığınız kriterde nöbetçi eczane bulunamadı.</div>';
+                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Bu şehir için nöbetçi eczane listelenemedi. Lütfen tekrar deneyin.</div>';
                 return;
             }
             listEl.innerHTML = items.map(function(p) {
                 var phoneClean = (p.phone || '').replace(/[^0-9+]/g, '');
-                return '<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between hover:border-emerald-500/50 transition gap-2">' +
-                    '<div class="min-w-0 flex-1">' +
-                        '<div class="font-bold text-white text-xs flex items-center gap-1.5 flex-wrap">' +
-                            '<span>' + p.name + '</span>' +
-                            '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">' + (p.district || p.city) + '</span>' +
+                var isNowOpen = p.is_now_open;
+                var badgeText = p.hours || "18:30 - 08:30 (Sabaha Kadar Açık)";
+                var statusText = p.status || (isNowOpen ? "🟢 ŞU AN AÇIK" : "Akşam Nöbetçisi (18:30)");
+                var badgeClass = isNowOpen ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" : "bg-blue-500/20 text-blue-300 border-blue-500/40";
+
+                return '<div class="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">' +
+                    '<div class="min-w-0 flex-1 space-y-1">' +
+                        '<div class="flex items-center gap-2 flex-wrap">' +
+                            '<span class="font-extrabold text-white text-xs">' + p.name + '</span>' +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-slate-800 text-emerald-400 border border-slate-700">' + (p.district || p.city) + '</span>' +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-semibold border ' + badgeClass + '">' + statusText + '</span>' +
                         '</div>' +
-                        '<div class="text-[11px] text-slate-400 mt-0.5 truncate">' + (p.address || '') + '</div>' +
+                        '<div class="text-[11px] text-slate-300 leading-snug">' + (p.address || '') + '</div>' +
+                        '<div class="text-[10px] text-amber-400/90 font-medium flex items-center gap-1">🕒 Nöbet Saatleri: ' + badgeText + '</div>' +
                     '</div>' +
-                    '<a href="tel:' + phoneClean + '" class="shrink-0 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 transition shadow">' +
-                        '📞 <span class="hidden sm:inline">' + (p.phone || 'Ara') + '</span>' +
-                    '</a>' +
+                    '<div class="shrink-0 flex items-center gap-2">' +
+                        (phoneClean ? '<a href="tel:' + phoneClean + '" class="w-full sm:w-auto text-center px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition shadow cursor-pointer">' +
+                            '📞 ' + (p.phone || 'Hemen Ara') +
+                        '</a>' : '') +
+                    '</div>' +
                 '</div>';
             }).join('');
         }
