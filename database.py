@@ -973,26 +973,35 @@ def get_trending_articles(limit: int = 5) -> List[Dict]:
 
 
 def get_adjacent_articles(article_id: int) -> Tuple[Optional[Dict], Optional[Dict]]:
-    """Mevcut makalenin bir önceki ve bir sonraki makalesini döner (prev, next)."""
+    """
+    Sonsuz ve Kesintisiz Okuma Akışı (Ping-Pong Kısırdöngüsünü Önler):
+    - Okuyucu 'Sonraki Haber'e bastıkça geriye doğru sırayla TÜM haberleri okur:
+      (742 -> 741 -> 740 -> 739 -> 738...). Asla aynı 2 haber arasında sıkışıp kalmaz.
+    - En eski habere gelindiğinde başa (en yeniye) sararak akışı sonsuz tutar.
+    """
     with get_connection() as conn:
-        # Önceki haber (ID'si daha küçük olan)
-        cur_prev = conn.execute("SELECT * FROM articles WHERE id < ? ORDER BY id DESC LIMIT 1", (article_id,))
-        row_prev = cur_prev.fetchone()
-        prev_art = _row_to_dict(row_prev) if row_prev else None
+        # 1. Okuma akışındaki Sıradaki Haber (Daha önce yayınlanmış sıradaki haber)
+        cur_older = conn.execute("SELECT * FROM articles WHERE id < ? ORDER BY id DESC LIMIT 1", (article_id,))
+        row_older = cur_older.fetchone()
+        next_step_art = _row_to_dict(row_older) if row_older else None
 
-        # Sonraki haber (ID'si daha büyük olan)
-        cur_next = conn.execute("SELECT * FROM articles WHERE id > ? ORDER BY id ASC LIMIT 1", (article_id,))
-        row_next = cur_next.fetchone()
-        next_art = _row_to_dict(row_next) if row_next else None
+        # En eski habere ulaşıldıysa akış kopmasın diye en yeni habere sar
+        if not next_step_art:
+            cur_wrap = conn.execute("SELECT * FROM articles WHERE id != ? ORDER BY id DESC LIMIT 1", (article_id,))
+            row_wrap = cur_wrap.fetchone()
+            next_step_art = _row_to_dict(row_wrap) if row_wrap else None
 
-        # Eğer kullanıcı en yeni haberdeyse (next yoksa), akışı koparmamak için önceki haberi sonraki olarak ver
-        if not next_art and prev_art:
-            next_art = prev_art
-        # Eğer kullanıcı en eski haberdeyse (prev yoksa), sonraki haberi önceki olarak ver
-        if not prev_art and next_art:
-            prev_art = next_art
+        # 2. Geriye Dönüş Haberi (Daha yeni haber)
+        cur_newer = conn.execute("SELECT * FROM articles WHERE id > ? ORDER BY id ASC LIMIT 1", (article_id,))
+        row_newer = cur_newer.fetchone()
+        prev_step_art = _row_to_dict(row_newer) if row_newer else None
 
-        return prev_art, next_art
+        # En yeni haberdeyse geriye dönüş olarak bir öncekini ver
+        if not prev_step_art:
+            prev_step_art = next_step_art
+
+        # Şablonda next_article değişkeni "Sonraki Habere Geç" kartını besler
+        return prev_step_art, next_step_art
 
 
 def update_article(article_id: int, title: str, summary: str, content: str, category: str) -> bool:
