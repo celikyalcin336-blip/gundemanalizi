@@ -159,11 +159,44 @@
         window.closeModal = closeModal;
 
         // Modal Kısayolları (Tüm Cihazlar İçin Güvenli)
-        function openNamazModal() { openModal('namaz-modal'); }
+        var _namazInitialized = false;
+        function openNamazModal() {
+            openModal('namaz-modal');
+            if (!_namazInitialized) {
+                _namazInitialized = true;
+                try {
+                    populateNamazCities();
+                    updateNamazModal('İstanbul');
+                    startPrayerCountdown();
+                } catch(e) {}
+            }
+        }
         function closeNamazModal() { closeModal('namaz-modal'); }
-        function openNobetciModal() { openModal('nobetci-modal'); }
+
+        var _nobetciInitialized = false;
+        function openNobetciModal() {
+            openModal('nobetci-modal');
+            if (!_nobetciInitialized) {
+                _nobetciInitialized = true;
+                try {
+                    populateNobetciCities();
+                    loadNobetciCity('İstanbul');
+                } catch(e) {}
+            }
+        }
         function closeNobetciModal() { closeModal('nobetci-modal'); }
-        function openDepremModal() { openModal('deprem-modal'); }
+
+        var _depremInitialized = false;
+        function openDepremModal() {
+            openModal('deprem-modal');
+            if (!_depremInitialized) {
+                _depremInitialized = true;
+                try {
+                    renderDepremList(SAMPLE_QUAKES);
+                } catch(e) {}
+            }
+            try { fetchLiveDeprem(); } catch(e) {}
+        }
         function closeDepremModal() { closeModal('deprem-modal'); }
         function openIhbarModal() { openModal('ihbar-modal'); }
         function closeIhbarModal() { closeModal('ihbar-modal'); }
@@ -1574,10 +1607,7 @@
             renderDepremList(filtered);
         }
 
-        function openDepremModal() {
-            openModal('deprem-modal');
-            fetchLiveDeprem();
-        }
+        // openDepremModal üstte lazy tanımlandı
         window.openDepremModal = openDepremModal;
         function closeDepremModal() { closeModal('deprem-modal'); }
         window.closeDepremModal = closeDepremModal;
@@ -1708,15 +1738,6 @@
 
         function initApp() {
             if (window.lucide) window.lucide.createIcons();
-            switchStandings('genel');
-            renderFixtures(10);
-            populateNamazCities();
-            updateNamazModal('İstanbul');
-            startPrayerCountdown();
-            populateNobetciCities();
-            loadNobetciCity('İstanbul');
-            renderDepremList(SAMPLE_QUAKES);
-            fetchLiveSuperlig();
 
             var btnNamaz = document.getElementById('btn-open-namaz');
             if (btnNamaz) btnNamaz.addEventListener('click', openNamazModal);

@@ -1130,10 +1130,11 @@
                 const next = items[idx];
                 next.style.transform = 'translateY(24px)';
                 next.style.opacity = '0';
-                void next.offsetHeight; // Reflow tetikle
-                next.style.opacity = '1';
-                next.style.transform = 'translateY(0)';
-                next.style.pointerEvents = 'auto';
+                requestAnimationFrame(() => {
+                    next.style.opacity = '1';
+                    next.style.transform = 'translateY(0)';
+                    next.style.pointerEvents = 'auto';
+                });
             }
         })();
 
