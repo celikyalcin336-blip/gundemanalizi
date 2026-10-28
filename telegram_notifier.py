@@ -291,23 +291,22 @@ def send_admin_whatsapp_prompt(image_path: str, title: str, summary: str, site_u
     emoji = category_emojis.get(category, "🔴")
     clean_title = title.strip()
 
-    # WhatsApp için optimize edilmiş bülten metni
-    wp_text = f"*{emoji} {clean_title}*\n\n"
+    # WhatsApp Kanalı için optimize edilmiş bülten metni
+    wp_channel_text = f"*{emoji} {clean_title}*\n\n"
     if summary:
         first_sentence = summary.split('.')[0].strip()
         if first_sentence:
-            wp_text += f"📌 {first_sentence}.\n\n"
-    wp_text += f"🔗 *Detaylar:* {site_url}\n\n#GündemAnalizi #{category}"
+            wp_channel_text += f"📌 {first_sentence}.\n\n"
+    wp_channel_text += f"🔗 *Detaylar:* {site_url}\n\n#GündemAnalizi #{category}"
 
-    encoded_text = urllib.parse.quote(wp_text)
-    wa_share_url = f"https://api.whatsapp.com/send?text={encoded_text}"
+    channel_url = getattr(config, "WHATSAPP_CHANNEL_URL", "https://whatsapp.com/channel/0029VbDjlhj8qIzpKkjeWz08")
 
     caption = (
-        f"👑 <b>[YALÇIN BEY - WHATSAPP KANAL ÖNERİSİ]</b>\n"
+        f"👑 <b>[YALÇIN BEY - WHATSAPP KANALI İÇİN HAZIR BÜLTEN]</b>\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🔥 <b>Bu haber çok tıklandı / öne çıktı:</b>\n"
-        f"<b>{clean_title}</b>\n\n"
-        f"💡 Aşağıdaki butona tek tıkla basarak doğrudan <b>WhatsApp Kanalında</b> paylaşabilirsiniz:"
+        f"👇 <b>Metne 1 kez dokun (otomatik kopyalanır):</b>\n\n"
+        f"<pre>{html.escape(wp_channel_text)}</pre>\n\n"
+        f"💡 Aşağıdaki butona basarak doğrudan <b>Gündem Analizi Kanalı</b>na geçip yapıştırabilirsiniz:"
     )
 
     url = f"{BASE_URL}/sendPhoto"
@@ -319,8 +318,8 @@ def send_admin_whatsapp_prompt(image_path: str, title: str, summary: str, site_u
             "inline_keyboard": [
                 [
                     {
-                        "text": "📲 WhatsApp Kanalında Paylaş (Tek Tık)",
-                        "url": wa_share_url
+                        "text": "📢 Gündem Analizi Kanalını Aç",
+                        "url": channel_url
                     }
                 ],
                 [
