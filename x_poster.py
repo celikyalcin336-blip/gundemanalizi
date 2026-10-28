@@ -17,7 +17,6 @@ from requests_oauthlib import OAuth1
 from PIL import Image
 
 import config
-import database
 
 # Doğrulanmış Oturum Çerezleri (@gndmanalizi)
 TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip() or "2a76b61426aa6fd6cddcb13505801653449db92f"
@@ -116,9 +115,17 @@ def can_post_to_x(force: bool = False) -> Tuple[bool, str]:
 
     # 2. Zaman Kilidi (Cooldown) Kontrolü
     try:
-        last_ts_str = database.get_setting("last_x_post_ts", "")
-        if last_ts_str:
-            last_ts = float(last_ts_str)
+        history_path = os.path.join(os.path.dirname(__file__), "x_posted_history.json")
+        last_ts = 0.0
+        if os.path.exists(history_path):
+            import json
+            with open(history_path, "r", encoding="utf-8") as f:
+                hist = json.load(f)
+                posted_items = [h for h in hist if isinstance(h, dict) and h.get("status") == "posted" and h.get("ts")]
+                if posted_items:
+                    last_ts = float(posted_items[-1]["ts"])
+
+        if last_ts > 0:
             elapsed_minutes = (time.time() - last_ts) / 60.0
             if elapsed_minutes < X_COOLDOWN_MINUTES:
                 remaining = round(X_COOLDOWN_MINUTES - elapsed_minutes, 1)
@@ -271,10 +278,6 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     res = post_tweet_playwright(tweet_text, media_path=image_path)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
-        try:
-            database.set_setting("last_x_post_ts", str(time.time()))
-        except Exception:
-            pass
         return {"status": "success", "url": "https://x.com/gndmanalizi"}
 
     return res
