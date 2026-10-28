@@ -35,7 +35,7 @@ jobs:
           SITE_URL: "https://xn--gndemanalizi-dlb.com.tr"
           TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
           TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
-          X_COOLDOWN_MINUTES: "55.0"
+          X_COOLDOWN_MINUTES: "45.0"
           PYTHONUNBUFFERED: "1"
         run: |
           python -u run_x_cycle.py
