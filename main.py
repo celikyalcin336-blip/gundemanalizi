@@ -99,6 +99,24 @@ def process_single_news(item: dict) -> bool:
     print("📲 Telegram kanalına profesyonel maddeli formatla gönderiliyor...")
     telegram_notifier.send_telegram_news(visual_path, telegram_caption, site_article_url)
 
+    # 4.1. X (Twitter) Akıllı ve Seçici Paylaşım Kalkanı (@gndmanalizi)
+    # Çöp ve magazin haberleri eler; sadece yüksek değerli flaş haberleri 45 dk aralıkla fotoğraflı tweet atar
+    try:
+        import x_poster
+        x_res = x_poster.post_article_to_x(
+            title=title,
+            summary=summary,
+            site_url=site_article_url,
+            image_path=visual_path,
+            category=category
+        )
+        if x_res.get("status") == "success":
+            print(f"   [X/Twitter Paylaşıldı: {x_res.get('url')}]")
+        elif x_res.get("status") == "skipped":
+            print(f"   [X/Twitter Pas Geçildi: {x_res.get('reason')}]")
+    except Exception as e:
+        print(f"⚠️ X/Twitter paylaşımı atlandı: {e}")
+
     # 5. Otomatik Hikaye (Story) Kalkanı:
     # Gönderi akışını spama boğmadan, 4 saatte 1 (günde 5-6 adet) Facebook ve Instagram'a
     # BAŞLIKLI, LOGOLU VE 9:16 DİKEY FORMATTA profesyonel HİKAYE (STORY) atar!

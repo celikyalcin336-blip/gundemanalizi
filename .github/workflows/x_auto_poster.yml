@@ -1,0 +1,38 @@
+name: X (Twitter) 7/24 Auto Poster
+
+on:
+  schedule:
+    # Her 45 dakikada bir çalış (Günde ~20 kaliteli tweet)
+    - cron: '*/45 * * * *'
+  workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
+
+jobs:
+  post-to-x:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Kodu Çek (Checkout)
+        uses: actions/checkout@v4
+
+      - name: Python 3.12 Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Bağımlılıkları Yükle
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pillow feedparser python-dotenv psycopg2-binary playwright
+          playwright install chromium --with-deps
+
+      - name: X (Twitter) Seçici Paylaşım Döngüsünü Çalıştır
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SITE_URL: "https://www.gündemanalizi.com.tr"
+          TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
+          TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
+          X_COOLDOWN_MINUTES: "45.0"
+        run: |
+          python run_x_cycle.py

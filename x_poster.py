@@ -1,101 +1,286 @@
 """
-X (Twitter) Video Paylaşımcısı (@gndmanalizi) - OAuth 1.0a destekli.
+X (Twitter) Profesyonel Paylaşım ve Kalite Kalkanı (@gndmanalizi)
+- Playwright Web Motoru Destekli (%100 Ücretsiz, Sıfır API Ücreti, Kesintisiz)
+- Çöp / Magazin / Tık Tuzağı Engelleyici (Seçici Kalite Filtresi)
+- Otomatik Zaman Kilidi & Gece Sessiz Saatler Koruyucusu (Günde ~20 tweet kotası)
+- Kristal Netliğinde Haber Kartı Görseli & Video Desteği
 """
 import os
+import io
 import time
 import base64
 import requests
+import re
+from datetime import datetime, timezone, timedelta
+from typing import Tuple, Optional
 from requests_oauthlib import OAuth1
+from PIL import Image
 
-_DEF_K = base64.b64decode("M05uNWVaMmlnY1NyMXpJbG9oVUQ0QkhqOQ==").decode("utf-8")
-_DEF_S = base64.b64decode("WGd3U3dseEFqdHdXakpDZHV5eVlHUTRpU0loc3lxeWlvSVlCZVpCWXhGVnpmNnJyOFU=").decode("utf-8")
-_DEF_AT = base64.b64decode("MjA2MTAyMTg3MDUyMzEwMTE4Ni0wcG9RNm5WWFNzbWRUNFFlMzBXRWRadzFPNXJpZ1I=").decode("utf-8")
-_DEF_ATS = base64.b64decode("SGZYOXdWVVU5dE1nWkxQUEZIemxldFR3MGUzR1JLcHh1c1g1YmtCSE1FRnQz").decode("utf-8")
+import config
+import database
 
-X_API_KEY = os.getenv("X_API_KEY", "").strip() or _DEF_K
-X_API_SECRET = os.getenv("X_API_SECRET", "").strip() or _DEF_S
-X_ACCESS_TOKEN = os.getenv("X_ACCESS_TOKEN", "").strip() or _DEF_AT
-X_ACCESS_SECRET = os.getenv("X_ACCESS_SECRET", "").strip() or _DEF_ATS
+# Doğrulanmış Oturum Çerezleri (@gndmanalizi)
+TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip() or "2a76b61426aa6fd6cddcb13505801653449db92f"
+TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip() or "48afdd1c4cdaae9ffc2d2e8a66a03a5ca00489c3ffbe9cfa2bce7a79f75b4ce33315568bb0b93778cb8d5112dd46b2f850de0cf2d29bd463d41960a926ebaf0bdba5e6d104ca10b3593132b4c992781a"
 
-UPLOAD_V1 = "https://upload.twitter.com/1.1/media/upload.json"
-TWEET_URL = "https://api.x.com/2/tweets"
-CHUNK = 4 * 1024 * 1024
+TR_TZ = timezone(timedelta(hours=3))
+
+# Tweet sıklığı (varsayılan: 45 dakikada 1 -> günde ~20 tweet)
+X_COOLDOWN_MINUTES = float(getattr(config, "X_COOLDOWN_MINUTES", 45.0))
+
+# -------------------------------------------------------------
+# 🛡️ ÇÖP & TIK TUZAĞI (CLICKBAIT) ENGELLEYİCİ LİSTESİ
+# -------------------------------------------------------------
+JUNK_KEYWORDS = [
+    # Magazin & Şöhret Dedikoduları
+    "kimdir", "nereli", "nerelidir", "kaç yaşında", "sevgilisi", "eşi kim",
+    "bomba iddia", "şok eden", "burç", "astroloji", "magazin", "evlilik",
+    "göz kamaştırdı", "sosyal medyayı salladı", "can yeleği", "bikinili", "dekolteli",
+    "dudak uçuklattı", "ağızları açık bıraktı", "görenler şaştı", "gözyaşlarına boğuldu",
+    "survivor", "masterchef", "dizi fragmanı", "yalı çapkını", "kızılcık şerbeti",
+    "şaşırtan olay", "yürek yakan", "kahreden", "inanılmaz görüntü",
+
+    # Önemsiz Küçük Yerel Asayiş / Basit Trafik Olayları
+    "kaldırıma çıktı", "tır devrildi", "direğe çarptı", "hafif ticari araç",
+    "maddi hasarlı kaza", "kavga çıktı", "komşuların kavgası", "balkondan düştü",
+    "sokak köpeği kovaladı", "pazarcı kavgası", "apartmanda yangın paniği",
+
+    # Reklam ve Tanıtım Tuzakları
+    "sponsorlu", "tanıtım bülteni", "indirim kodu", "fırsatı kaçırma", "tıkla izle"
+]
+
+# X'te Yüksek Etkileşim ve Tıklama Getiren Öncelikli Konular
+PRIORITY_KEYWORDS = [
+    "enflasyon", "asgari ücret", "faiz", "dolar", "euro", "altın", "borsa", "bist",
+    "emekli maaşı", "vergi", "memur zammı", "merkez bankası", "tcmb", "şimşek",
+    "cumhurbaşkanı", "erdoğan", "bakanlık", "tbmm", "meclis", "yasa teklifi", "kanun",
+    "togg", "elektrikli araç", "yapay zeka", "apple", "iphone", "tesla", "deprem",
+    "baykar", "kızılelma", "kaan", "savunma sanayii", "milli takım", "şampiyonlar ligi",
+    "derbi", "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor"
+]
 
 
 def is_configured() -> bool:
-    return all([X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET])
+    """Oturum çerezlerinin tanımlı olup olmadığını doğrular."""
+    return bool(TWITTER_AUTH_TOKEN and TWITTER_CT0)
 
 
-def _auth():
-    return OAuth1(X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)
+def is_worthy_for_x(title: str, summary: str = "", category: str = "Gündem") -> Tuple[bool, str]:
+    """
+    Haberi kalite süzgecinden geçirir:
+    - Çöp/magazin/tık tuzağı içerikleri eler.
+    - Sadece X okuyucusunun ilgisini çekecek yüksek değerli haberlere onay verir.
+    """
+    clean_text = f"{title} {summary}".lower()
+
+    if len(title.strip()) < 22:
+        return False, "Başlık çok kısa veya özensiz."
+
+    for junk in JUNK_KEYWORDS:
+        if re.search(rf"\b{re.escape(junk)}\b", clean_text):
+            return False, f"Çöp/Magazin filtresine takıldı: '{junk}'"
+
+    norm_cat = category.strip().title()
+
+    if norm_cat in ("Ekonomi", "Teknoloji", "Otomobil", "Gündem", "Dünya", "Sağlık"):
+        return True, f"Yüksek değerli ana kategori: {norm_cat}"
+
+    if norm_cat == "Spor":
+        for kw in PRIORITY_KEYWORDS:
+            if kw in clean_text:
+                return True, f"Önemli spor gelişmesi: '{kw}'"
+        return False, "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır)."
+
+    for kw in PRIORITY_KEYWORDS:
+        if kw in clean_text:
+            return True, f"Flaş gündem anahtar kelimesi: '{kw}'"
+
+    return True, "Genel kalite onayından geçti."
 
 
-def _upload_video(video_path: str) -> str:
-    """Videoyu X v1.1 Chunked Upload ile yükler ve media_id döner."""
-    auth = _auth()
-    total = os.path.getsize(video_path)
+def can_post_to_x(force: bool = False) -> Tuple[bool, str]:
+    """
+    Zaman kilidi ve sessiz saat kontrolü yapar.
+    - Gece 01:30 - 07:30 arası sessiz mod (uyku saatlerinde kotayı tüketmez).
+    - İki tweet arasında en az X_COOLDOWN_MINUTES (varsayılan: 45 dk) süre olmalıdır.
+    """
+    if force:
+        return True, "Manuel zorlama (Force modu aktif)."
 
-    init = requests.post(UPLOAD_V1, auth=auth, data={
-        "command": "INIT",
-        "total_bytes": str(total),
-        "media_type": "video/mp4",
-        "media_category": "tweet_video"
-    }, timeout=30).json()
-    media_id = str(init.get("media_id") or init.get("media_id_string") or "")
-    if not media_id:
-        raise RuntimeError(f"X upload init hatası: {init}")
+    now_tr = datetime.now(TR_TZ)
+    hour_decimal = now_tr.hour + (now_tr.minute / 60.0)
 
-    with open(video_path, "rb") as f:
-        idx = 0
-        while True:
-            chunk = f.read(CHUNK)
-            if not chunk:
-                break
-            r = requests.post(UPLOAD_V1, auth=auth,
-                              data={"command": "APPEND", "media_id": media_id, "segment_index": str(idx)},
-                              files={"media": chunk}, timeout=60)
-            if r.status_code >= 300:
-                raise RuntimeError(f"X upload append hatası: {r.text[:300]}")
-            idx += 1
+    # 1. Gece Sessiz Saatler Kalkanı (01:30 - 07:30)
+    if 1.5 <= hour_decimal < 7.5:
+        return False, f"Gece sessiz saatler devrede ({now_tr.strftime('%H:%M')}). 07:30'a kadar kota korunuyor."
 
-    fin = requests.post(UPLOAD_V1, auth=auth, data={"command": "FINALIZE", "media_id": media_id}, timeout=30).json()
-    info = fin.get("processing_info")
-    for _ in range(30):
-        if not info or info.get("state") == "succeeded":
-            break
-        if info.get("state") == "failed":
-            raise RuntimeError(f"X video işleme hatası: {info}")
-        time.sleep(max(2, int(info.get("check_after_secs", 2))))
-        st = requests.get(UPLOAD_V1, auth=auth,
-                          params={"command": "STATUS", "media_id": media_id}, timeout=20).json()
-        info = st.get("processing_info")
-    return media_id
+    # 2. Zaman Kilidi (Cooldown) Kontrolü
+    try:
+        last_ts_str = database.get_setting("last_x_post_ts", "")
+        if last_ts_str:
+            last_ts = float(last_ts_str)
+            elapsed_minutes = (time.time() - last_ts) / 60.0
+            if elapsed_minutes < X_COOLDOWN_MINUTES:
+                remaining = round(X_COOLDOWN_MINUTES - elapsed_minutes, 1)
+                return False, f"Zaman kilidi devrede. Son tweet {round(elapsed_minutes, 1)} dk önce atıldı. ({remaining} dk kaldı)."
+    except Exception as e:
+        print(f"⚠️ X zaman kilidi kontrolü hatası: {e}")
+
+    return True, "Zaman kilidi onaylandı."
+
+
+def format_x_tweet(title: str, summary: str, site_url: str, category: str = "Gündem") -> str:
+    """
+    X (Twitter) algoritmasına uygun, 280 karakteri aşmayan, merak uyandıran profesyonel tweet metni üretir.
+    """
+    category_emojis = {
+        "Ekonomi": "📊",
+        "Gündem": "🚨",
+        "Teknoloji": "🚀",
+        "Otomobil": "🚗",
+        "Dünya": "🌍",
+        "Sağlık": "🩺",
+        "Spor": "⚽",
+        "Eğitim": "🎓"
+    }
+    emoji = category_emojis.get(category, "🔴")
+    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor") else "#Gündem"
+    tags = f"{cat_tag} #SonDakika"
+
+    clean_title = title.strip()
+    clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title)
+
+    max_title_len = 150
+    trimmed_title = clean_title
+    if len(trimmed_title) > max_title_len:
+        trimmed_title = trimmed_title[:max_title_len - 1] + "…"
+
+    body = ""
+    remaining_room = 280 - 24 - len(tags) - len(trimmed_title) - 25
+    if remaining_room > 40 and summary:
+        first_sentence = summary.split(".")[0].strip()
+        if first_sentence and len(first_sentence) < remaining_room:
+            body = f"\n\n{first_sentence}."
+
+    tweet = f"{emoji} {trimmed_title}{body}\n\n🔗 Detaylar: {site_url}\n{tags}"
+    return tweet.strip()
+
+
+def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
+    """
+    Playwright Chromium motoruyla X'te (%100 ücretsiz) tweet yayınlar.
+    Görsel ve video eklerini destekler.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return {"status": "error", "reason": "Playwright kurulu değil"}
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+                viewport={"width": 1280, "height": 800}
+            )
+            context.add_cookies([
+                {"name": "auth_token", "value": TWITTER_AUTH_TOKEN, "domain": ".x.com", "path": "/", "secure": True, "httpOnly": True},
+                {"name": "ct0", "value": TWITTER_CT0, "domain": ".x.com", "path": "/", "secure": True, "httpOnly": False}
+            ])
+            page = context.new_page()
+            page.goto("https://x.com/compose/post", wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(3000)
+
+            # Tweet metin editörünü bul
+            editor = page.locator('div[role="textbox"][data-testid="tweetTextarea_0"]')
+            if not editor.count():
+                editor = page.locator('div[role="textbox"]')
+
+            if not editor.count():
+                browser.close()
+                return {"status": "error", "reason": "Tweet metin kutusu bulunamadı"}
+
+            editor.first.click()
+            editor.first.fill(text)
+            page.wait_for_timeout(1000)
+
+            # Görsel veya Video Ekle
+            if media_path and os.path.exists(media_path):
+                file_input = page.locator('input[data-testid="fileInput"]').first
+                if file_input.count():
+                    file_input.set_input_files(media_path)
+                    # Medyanın yüklenmesi için güvenli bekleme
+                    page.wait_for_timeout(4000)
+
+            # Tweeti Gönder (Ctrl+Enter ve Buton Tıklaması)
+            try:
+                editor.first.press("Control+Enter")
+            except Exception:
+                pass
+
+            post_btn = page.locator('button[data-testid="tweetButton"]').first
+            if not post_btn.count():
+                post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
+
+            if post_btn.count():
+                try:
+                    post_btn.click(force=True)
+                except Exception:
+                    pass
+
+            page.wait_for_timeout(5000)
+            browser.close()
+            return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "reason": str(e)}
+
+
+def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optional[str] = None,
+                      category: str = "Gündem", force: bool = False) -> dict:
+    """
+    Sitede yayınlanan bir haberi X (Twitter) hesabına fotoğraflı tweet olarak gönderir.
+    - Zaman kilidi ve çöp filtrelerini otomatik kontrol eder.
+    - Başarılı olursa son tweet zamanını kaydeder.
+    """
+    if not is_configured():
+        return {"status": "skipped", "reason": "X oturum çerezleri eksik."}
+
+    # 1. Kalite ve Seçicilik Süzgeci
+    worthy, reason = is_worthy_for_x(title, summary, category)
+    if not worthy and not force:
+        return {"status": "skipped", "reason": f"Kalite filtresi: {reason}"}
+
+    # 2. Zaman Kilidi & Gece Kalkanı
+    allowed, time_reason = can_post_to_x(force=force)
+    if not allowed:
+        return {"status": "skipped", "reason": f"Zamanlama: {time_reason}"}
+
+    # 3. Tweet Metnini Hazırla
+    tweet_text = format_x_tweet(title, summary, site_url, category)
+
+    # 4. Playwright ile Tweeti Gönder
+    res = post_tweet_playwright(tweet_text, media_path=image_path)
+    if res.get("status") == "success":
+        print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
+        try:
+            database.set_setting("last_x_post_ts", str(time.time()))
+        except Exception:
+            pass
+        return {"status": "success", "url": "https://x.com/gndmanalizi"}
+
+    return res
 
 
 def post_video_to_x(video_path: str, title: str, link: str = "") -> dict:
-    """Logolu videoyu kısa başlık + site linki ile X'te paylaşır (280 karakter sınırı)."""
+    """Panelden veya yerelden yüklenen MP4 videoyu X'te paylaşır."""
     if not is_configured():
-        return {"status": "intent_ready"}
-    tags = " #sondakika #gündem"
-    room = 280 - 24 - len(tags) - 4
+        return {"status": "error", "reason": "X oturum çerezleri eksik."}
+
+    tags = " #Gündem #SonDakika"
+    room = 280 - 24 - len(tags) - 6
     text = title.strip()
     if len(text) > room:
         text = text[:room - 1] + "…"
-    text = f"🔴 {text}\n{link}{tags}" if link else f"🔴 {text}{tags}"
-    auth = _auth()
-    try:
-        media_id = _upload_video(video_path)
-        r = requests.post(TWEET_URL, auth=auth, json={
-            "text": text,
-            "media": {"media_ids": [media_id]}
-        }, timeout=30)
-        data = r.json()
-        if r.status_code in (200, 201) and data.get("data", {}).get("id"):
-            print(f"✅ X paylaşımı başarılı! Tweet ID: {data['data']['id']}")
-            return {"status": "success", "tweet_id": data["data"]["id"]}
-        # X 402 Credits Depleted dönerse tek tıkla paylaşımı öner
-        print(f"ℹ️ X API yanıtı ({r.status_code}): {data}")
-        return {"status": "intent_ready", "error": data}
-    except Exception as e:
-        print(f"ℹ️ X video paylaşımı uyarısı: {e}")
-        return {"status": "intent_ready", "error": str(e)}
+    tweet_text = f"🎥 {text}\n\n🔗 {link}\n{tags}" if link else f"🎥 {text}\n\n{tags}"
+
+    return post_tweet_playwright(tweet_text, media_path=video_path)

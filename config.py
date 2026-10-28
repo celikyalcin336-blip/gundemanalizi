@@ -29,6 +29,7 @@ TIKTOK_URL = "https://www.tiktok.com/@gundemanalizi"
 INSTAGRAM_URL = "https://www.instagram.com/gundem_analiz/"
 FACEBOOK_URL = "https://www.facebook.com/gundemanalizi"
 X_URL = "https://x.com/gndmanalizi"
+X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Tweetler arası bekleme süresi (Günde ~20 tweet)
 
 # Telegram Bildirim Ayarları
 # Gizli bilgiler koda YAZILMAZ: yerelde .env dosyasından, Render'da Environment ayarlarından okunur.
