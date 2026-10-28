@@ -1072,11 +1072,15 @@ def _start_db_buffer_worker():
                 try:
                     with get_connection() as conn:
                         for item in logs_copy:
-                            v_hash, page, ref, dev, ctry, city = item
+                            if len(item) == 7:
+                                v_hash, is_first, page, ref, dev, ctry, city = item
+                            else:
+                                v_hash, page, ref, dev, ctry, city = item
+                                is_first = 1
                             conn.execute("""
                                 INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
-                                VALUES (?, 0, ?, ?, ?, ?, ?)
-                            """, (v_hash, page, ref, dev, ctry, city))
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                            """, (v_hash, is_first, page, ref, dev, ctry, city))
                 except Exception:
                     pass
 
@@ -1131,14 +1135,14 @@ def set_setting(key: str, val: str):
         print(f"⚠️ Ayar kaydedilemedi ({key}): {e}")
 
 
-def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "") -> bool:
+def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "", is_first_visit: int = 1) -> bool:
     """Ziyaretçiyi RAM kuyruğuna ekler (0 ms bekleme, 0 DB kilidi)."""
     if not page or page.startswith("/api/") or page.startswith("/assets") or page.startswith("/images"):
         return False
     _start_db_buffer_worker()
     with _VISITOR_QUEUE_LOCK:
         if len(_VISITOR_LOG_QUEUE) < 4000:
-            _VISITOR_LOG_QUEUE.append((visitor_hash, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
+            _VISITOR_LOG_QUEUE.append((visitor_hash, is_first_visit, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
     return True
 
 
@@ -1274,10 +1278,17 @@ def get_dashboard_summary() -> Dict:
                 ).fetchone()
                 today_uniques = uniq_row["c"] if uniq_row else 0
 
-                first_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ? AND is_first_visit = 1", (today_start_utc,)
-                ).fetchone()
+                # İlk defa girenler: Bugün gelmiş ve bugünden önce HİÇ kaydı olmayanlar veya is_first_visit=1 olanlar
+                first_row = conn.execute("""
+                    SELECT COUNT(DISTINCT visitor_hash) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? 
+                      AND (is_first_visit = 1 OR visitor_hash NOT IN (
+                          SELECT visitor_hash FROM visitor_logs WHERE created_at < ?
+                      ))
+                """, (today_start_utc, today_start_utc)).fetchone()
                 first_time_today = first_row["c"] if first_row else 0
+                first_time_today = min(first_time_today, today_uniques)
 
                 traffic_rows = conn.execute(
                     "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
@@ -1289,10 +1300,23 @@ def get_dashboard_summary() -> Dict:
                 ).fetchall()
                 device_stats = [dict(r) for r in dev_rows]
 
-                lv_rows = conn.execute(
-                    "SELECT * FROM visitor_logs WHERE page NOT LIKE ? ORDER BY id DESC LIMIT 20", ('/api/%',)
-                ).fetchall()
-                live_visitors = [_row_to_dict(r) for r in lv_rows]
+                lv_rows = conn.execute("""
+                    SELECT v.*,
+                           CASE 
+                               WHEN v.is_first_visit = 1 THEN 1
+                               WHEN NOT EXISTS (SELECT 1 FROM visitor_logs v2 WHERE v2.visitor_hash = v.visitor_hash AND v2.created_at < v.created_at) THEN 1
+                               ELSE 0 
+                           END AS computed_first
+                    FROM visitor_logs v
+                    WHERE v.page NOT LIKE ?
+                    ORDER BY v.id DESC LIMIT 20
+                """, ('/api/%',)).fetchall()
+                live_visitors = []
+                for r in lv_rows:
+                    d = _row_to_dict(r)
+                    if "computed_first" in d:
+                        d["is_first_visit"] = d["computed_first"]
+                    live_visitors.append(d)
             except Exception as e:
                 if hasattr(conn.raw, "rollback"):
                     try: conn.raw.rollback()

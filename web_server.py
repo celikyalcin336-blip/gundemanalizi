@@ -295,12 +295,24 @@ async def track_visitors_middleware(request: Request, call_next):
             else:
                 source = "Doğrudan"
 
+            # Gerçek kullanıcılar için cookie tabanlı yeni/eski tespiti
+            has_cookie = bool(request.cookies.get("ga_vis"))
+            is_first = 0 if has_cookie else 1
+            if bot_type:
+                is_first = 0
+
             country = request.headers.get("cf-ipcountry", "TR")
             city = request.headers.get("cf-ipcity", "")
-            database.log_visitor(vis_hash, path, source, device, country, city)
+            database.log_visitor(vis_hash, path, source, device, country, city, is_first_visit=is_first)
         except Exception:
             pass
-    return await call_next(request)
+    resp = await call_next(request)
+    if not (is_api_or_admin or is_static_or_system) and not bot_type and not request.cookies.get("ga_vis"):
+        try:
+            resp.set_cookie("ga_vis", "1", max_age=31536000, httponly=True, samesite="lax", path="/")
+        except Exception:
+            pass
+    return resp
 
 
 # Statik Dosya Dizinleri
