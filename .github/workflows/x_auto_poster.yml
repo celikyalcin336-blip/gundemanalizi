@@ -2,8 +2,8 @@ name: X (Twitter) 7/24 Auto Poster
 
 on:
   schedule:
-    # Her 45 dakikada bir çalışır (Günde ~20 kaliteli tweet)
-    - cron: '*/45 * * * *'
+    # Her 30 dakikada bir çalışır (Günde ~20 kaliteli tweet)
+    - cron: '*/30 * * * *'
   workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
 
 permissions:
@@ -28,22 +28,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests pillow feedparser python-dotenv playwright
-          playwright install chromium --with-deps
+          python -m playwright install chromium --with-deps
 
       - name: X (Twitter) Seçici Paylaşım Döngüsünü Çalıştır
         env:
-          SITE_URL: "https://www.gündemanalizi.com.tr"
-          TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN || '2a76b61426aa6fd6cddcb13505801653449db92f' }}
-          TWITTER_CT0: ${{ secrets.TWITTER_CT0 || '48afdd1c4cdaae9ffc2d2e8a66a03a5ca00489c3ffbe9cfa2bce7a79f75b4ce33315568bb0b93778cb8d5112dd46b2f850de0cf2d29bd463d41960a926ebaf0bdba5e6d104ca10b3593132b4c992781a' }}
+          SITE_URL: "https://xn--gndemanalizi-dlb.com.tr"
+          TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
+          TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
           X_COOLDOWN_MINUTES: "45.0"
+          PYTHONUNBUFFERED: "1"
         run: |
-          python run_x_cycle.py
+          python -u run_x_cycle.py
 
       - name: Paylaşım Geçmişini Kaydet
         if: always()
         run: |
-          git config user.name "Gundem Bot"
-          git config user.email "bot@gundemanalizi.com.tr"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add x_posted_history.json || true
-          git commit -m "chore: update x_posted_history [skip ci]" || true
-          git push || true
+          git diff --staged --quiet || (git commit -m "chore: update x_posted_history [skip ci]" && git push) || true
