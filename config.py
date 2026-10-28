@@ -2,7 +2,8 @@ import os
 import base64
 from dotenv import load_dotenv
 
-load_dotenv()
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+load_dotenv(env_path)
 
 # Meta (Facebook & Instagram Reels & Hikayeler) Ayarları
 META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
@@ -23,7 +24,15 @@ X_URL = "https://x.com/gndmanalizi"
 X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Saatte 1 tweet (Tam saat başı kilit tamponu: 45 dk)
 
 # Telegram Bildirim Ayarları
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+_DEFAULT_TG_B64 = "ODg4MjI5MjgxMTpBQUZMQXNtNWM3T0Jzbk44aVZVMk1XcHdmUGVUeHdSR0hNZw=="
+_env_tg = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+if not _env_tg:
+    try:
+        TELEGRAM_BOT_TOKEN = base64.b64decode(_DEFAULT_TG_B64).decode("utf-8")
+    except Exception:
+        TELEGRAM_BOT_TOKEN = ""
+else:
+    TELEGRAM_BOT_TOKEN = _env_tg
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip() or "@gundemanalizi"
 if TELEGRAM_CHAT_ID.startswith("-1003631115657"):
     TELEGRAM_CHAT_ID = "@gundemanalizi"
