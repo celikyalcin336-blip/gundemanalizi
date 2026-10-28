@@ -33,9 +33,7 @@ if not _env_tg:
         TELEGRAM_BOT_TOKEN = ""
 else:
     TELEGRAM_BOT_TOKEN = _env_tg
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip() or "@gundemanalizi"
-if TELEGRAM_CHAT_ID.startswith("-1003631115657"):
-    TELEGRAM_CHAT_ID = "@gundemanalizi"
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003631115657").strip() or "-1003631115657"
 TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "1934709259")  # Yalçın Çelik Özel Chat
 
 # Marka ve Web Sitesi Bilgisi

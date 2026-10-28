@@ -52,11 +52,28 @@ import sys
 
 def bot_background_worker():
     """
-    Bağımsız 15 dakikalık haber botu (news_bot.py).
-    Saatini veritabanındaki kendi anahtarında tutar; panelden atılan manuel haberler sayılmaz.
+    Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
+    - 60 saniyede bir yoklar; main.py içindeki 14.5 dakikalık hassas veritabanı kilidi sayesinde
+      hazırlık süresiyle birlikte tam 15:00. dakikada haber yayına girer.
     """
-    import news_bot
-    news_bot.run_forever()
+    time.sleep(30)
+    print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
+    main_script = os.path.join(BASE_DIR, "main.py")
+
+    while True:
+        try:
+            res = subprocess.run(
+                [sys.executable, main_script, "--max-items", "1"],
+                capture_output=True,
+                text=True,
+                timeout=180
+            )
+            if res.stdout:
+                for line in res.stdout.strip().splitlines()[-4:]:
+                    print(f"   [Bot]: {line}")
+        except Exception as e:
+            print(f"⚠️ [Otonom Bot İstisnası]: {e}")
+        time.sleep(60)
 
 def system_health_watchdog_worker():
     """
