@@ -77,24 +77,36 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     print(f"========================================================\n")
 
     # 1. ADIM: Video Hazırlığı (Yoksa Renderla)
+    stories = []
     if not video_path or not os.path.exists(video_path):
-        print("🎬 1/4 - Video motoru tetikleniyor...")
-        video_path = daily_bulletin_engine.render_bulletin_video()
+        print("🎬 1/4 - Video motoru tetikleniyor (taze haberlerle sıfırdan render)...")
+        video_path, stories = daily_bulletin_engine.render_bulletin_video()
     else:
-        print(f"🎬 1/4 - Mevcut video kullanılıyor: {video_path}")
+        print(f"🎬 1/4 - Belirtilen video kullanılıyor: {video_path}")
 
     report["video_path"] = video_path
+
+    # Dinamik başlık listesi (Asla eski haberleri tekrar paylaşma)
+    num_emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣"]
+    if stories:
+        story_lines = []
+        for idx, s in enumerate(stories[:6]):
+            emoji = num_emojis[idx] if idx < len(num_emojis) else f"{idx+1}️⃣"
+            cat = s.get("category", "").upper()
+            hl = s.get("headline", "")
+            story_lines.append(f"{emoji} {cat}: {hl}")
+        story_text = "\n".join(story_lines)
+    else:
+        story_text = (
+            "1️⃣ EKONOMİ | 2️⃣ SAĞLIK | 3️⃣ SPOR\n"
+            "4️⃣ EĞİTİM | 5️⃣ OTOMOBİL | 6️⃣ TEKNOLOJİ"
+        )
 
     caption = (
         f"🔴 GÜNÜN ÖZETİ ({today_str})\n"
         f"Türkiye gündeminde son 24 saatte öne çıkan 6 kritik gelişme tek dakikada!\n\n"
-        f"1️⃣ Ekonomi: Kasım İndirimlerine Sıkı Denetim\n"
-        f"2️⃣ Sağlık: Yerli Kalp-Akciğer Cihazı\n"
-        f"3️⃣ Spor: Zirve Yarışında Sıcak Kararlar\n"
-        f"4️⃣ Eğitim: 2027 YKS Sınav Takvimi\n"
-        f"5️⃣ Otomobil: Togg'dan 126 Bin Araç Rekoru\n"
-        f"6️⃣ Teknoloji: Huawei Pura 90 Plus\n\n"
-        f"🌐 Tüm detaylar ve tarafsız analizler: www.gundemanalizi.com.tr\n"
+        f"{story_text}\n\n"
+        f"🌐 Tüm detaylar ve tarafsız analizler: https://gundemanalizi.com.tr\n"
         f"#GündemAnalizi #GününÖzeti #Haberler #SonDakika #Türkiye #Ekonomi #Teknoloji #Otomobil"
     )
 
@@ -200,11 +212,16 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     # 7. ADIM: TWITTER / X
     print("\n🐦 7/7 - Twitter / X (@gndmanalizi) Video Paylaşılıyor...")
     try:
+        if stories:
+            x_items = [f"{num_emojis[idx]} {s.get('category','').upper()}" for idx, s in enumerate(stories[:6])]
+            x_cat_lines = " | ".join(x_items[:3]) + "\n" + " | ".join(x_items[3:6])
+        else:
+            x_cat_lines = "1️⃣ EKONOMİ | 2️⃣ SAĞLIK | 3️⃣ SPOR\n4️⃣ EĞİTİM | 5️⃣ OTOMOBİL | 6️⃣ TEKNOLOJİ"
+
         x_tweet_text = (
             f"🔴 GÜNÜN ÖZETİ ({today_str})\n"
             f"Türkiye gündeminde son 24 saatte öne çıkan 6 kritik gelişme tek dakikada!\n\n"
-            f"1️⃣ Ekonomi | 2️⃣ Sağlık | 3️⃣ Spor\n"
-            f"4️⃣ Eğitim | 5️⃣ Otomobil | 6️⃣ Teknoloji\n\n"
+            f"{x_cat_lines}\n\n"
             f"🌐 Detaylar: https://gundemanalizi.com.tr\n"
             f"#GündemAnalizi #GününÖzeti #Haberler #SonDakika"
         )
@@ -223,13 +240,15 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     return report
 
 if __name__ == "__main__":
-    # Test için daha önce masaüstüne çıkardığımız onaylı videoyu verebiliriz
-    custom_video = r"C:\Users\celik\Desktop\GUNUN_OZETI_58SN_BULTEN.mp4"
-    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-        custom_video = sys.argv[1]
-    
-    if os.path.exists(custom_video):
-        print(f"Test için masaüstündeki video kullanılıyor: {custom_video}")
-        run_bulletin_cycle(video_path=custom_video)
+    import argparse
+    parser = argparse.ArgumentParser(description="Gündem Analizi Günlük Bülten Dağıtıcı")
+    parser.add_argument("--video", type=str, default=None, help="Özel bir video yolu vermek için (varsayılan: taze render)")
+    args = parser.parse_args()
+
+    # Altın kural: Asla eski bülten videosu varsayılan olarak paylaşılmaz, her zaman taze haberlerle sıfırdan render edilir!
+    if args.video and os.path.exists(args.video):
+        print(f"🎬 Manuel video belirtildi: {args.video}")
+        run_bulletin_cycle(video_path=args.video)
     else:
-        run_bulletin_cycle()
+        print("🎬 Otomatik mod: Canlı ve taze haberlerle bülten sıfırdan üretilip dağıtılacak...")
+        run_bulletin_cycle(video_path=None)

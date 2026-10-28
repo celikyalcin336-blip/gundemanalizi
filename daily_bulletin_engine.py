@@ -433,7 +433,7 @@ def render_bulletin_video(output_mp4_path: str = None) -> str:
         os.remove(wav_path)
 
     print(f"🎉 BÜLTEN HAZIR: {output_mp4_path} ({os.path.getsize(output_mp4_path) / (1024*1024):.1f} MB)")
-    return output_mp4_path
+    return output_mp4_path, stories
 
 if __name__ == "__main__":
     render_bulletin_video()
