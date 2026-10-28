@@ -117,6 +117,19 @@ def process_single_news(item: dict) -> bool:
     except Exception as e:
         print(f"⚠️ X/Twitter paylaşımı atlandı: {e}")
 
+    # 4.2. VIP WhatsApp Kanalı Paylaşım Asistanı (Yalçın Bey Özel Bildirim)
+    # Her kaliteli haber yayınlandığında Yalçın Bey'in telefonuna tek tıkla "WhatsApp Kanalında Paylaş" butonu atar
+    try:
+        telegram_notifier.send_admin_whatsapp_prompt(
+            image_path=visual_path,
+            title=title,
+            summary=summary,
+            site_url=site_article_url,
+            category=category
+        )
+    except Exception as e:
+        print(f"⚠️ VIP WhatsApp bildirimi atlandı: {e}")
+
     # 5. Otomatik Hikaye (Story) Kalkanı:
     # Gönderi akışını spama boğmadan, 4 saatte 1 (günde 5-6 adet) Facebook ve Instagram'a
     # BAŞLIKLI, LOGOLU VE 9:16 DİKEY FORMATTA profesyonel HİKAYE (STORY) atar!

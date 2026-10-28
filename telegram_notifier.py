@@ -261,3 +261,101 @@ def send_admin_alert(subject: str, message: str, is_resolved: bool = False) -> b
     except Exception as e:
         print(f"Admin uyari mesaji gonderme hatasi: {e}")
         return False
+
+
+def send_admin_whatsapp_prompt(image_path: str, title: str, summary: str, site_url: str, category: str = "Gündem") -> bool:
+    """
+    VIP Editör Modu:
+    Haber yayınlandığında Yalçın Bey'in özel Telegram hesabına (TELEGRAM_ADMIN_ID):
+    - Hazır formatlanmış WhatsApp bülten metni
+    - Tek tıkla "📲 WhatsApp Kanalında Paylaş" butonu gönderir.
+    Telefondan butona tek bir tıkla basıldığında resmi WhatsApp açılır ve kanal seçilerek 1 saniyede paylaşılır!
+    """
+    if not config.TELEGRAM_BOT_TOKEN:
+        return False
+
+    admin_chat = getattr(config, "TELEGRAM_ADMIN_ID", "") or config.TELEGRAM_CHAT_ID
+    if not admin_chat:
+        return False
+
+    category_emojis = {
+        "Ekonomi": "📊",
+        "Gündem": "🚨",
+        "Teknoloji": "🚀",
+        "Otomobil": "🚗",
+        "Dünya": "🌍",
+        "Sağlık": "🩺",
+        "Spor": "⚽",
+        "Eğitim": "🎓"
+    }
+    emoji = category_emojis.get(category, "🔴")
+    clean_title = title.strip()
+
+    # WhatsApp için optimize edilmiş bülten metni
+    wp_text = f"*{emoji} {clean_title}*\n\n"
+    if summary:
+        first_sentence = summary.split('.')[0].strip()
+        if first_sentence:
+            wp_text += f"📌 {first_sentence}.\n\n"
+    wp_text += f"🔗 *Detaylar:* {site_url}\n\n#GündemAnalizi #{category}"
+
+    encoded_text = urllib.parse.quote(wp_text)
+    wa_share_url = f"https://api.whatsapp.com/send?text={encoded_text}"
+
+    caption = (
+        f"👑 <b>[YALÇIN BEY - WHATSAPP KANAL ÖNERİSİ]</b>\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🔥 <b>Bu haber çok tıklandı / öne çıktı:</b>\n"
+        f"<b>{clean_title}</b>\n\n"
+        f"💡 Aşağıdaki butona tek tıkla basarak doğrudan <b>WhatsApp Kanalında</b> paylaşabilirsiniz:"
+    )
+
+    url = f"{BASE_URL}/sendPhoto"
+    payload = {
+        "chat_id": admin_chat,
+        "caption": caption[:1020],
+        "parse_mode": "HTML",
+        "reply_markup": json.dumps({
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "📲 WhatsApp Kanalında Paylaş (Tek Tık)",
+                        "url": wa_share_url
+                    }
+                ],
+                [
+                    {
+                        "text": "🌐 Haberi Sitede Gör",
+                        "url": site_url
+                    }
+                ]
+            ]
+        })
+    }
+
+    try:
+        if image_path and os.path.exists(image_path):
+            with open(image_path, "rb") as img:
+                resp = requests.post(url, data=payload, files={"photo": img}, timeout=30)
+                data = resp.json()
+                if data.get("ok"):
+                    print("📲 [VIP WhatsApp] Paylaşım önerisi Telegram yöneticisine iletildi.")
+                    return True
+
+        # Görüntü yoksa düz mesaj olarak ilet
+        msg_url = f"{BASE_URL}/sendMessage"
+        resp = requests.post(msg_url, json={
+            "chat_id": admin_chat,
+            "text": caption,
+            "parse_mode": "HTML",
+            "reply_markup": json.loads(payload["reply_markup"])
+        }, timeout=20)
+        data = resp.json()
+        if data.get("ok"):
+            print("📲 [VIP WhatsApp] Paylaşım önerisi metin olarak iletildi.")
+            return True
+        print(f"⚠️ VIP WhatsApp önerisi hatası: {data}")
+        return False
+    except Exception as e:
+        print(f"⚠️ VIP WhatsApp önerisi istisnası: {e}")
+        return False
