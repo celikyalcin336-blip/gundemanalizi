@@ -1268,27 +1268,54 @@ def get_dashboard_summary() -> Dict:
                 five_min_ago_utc = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
                 seven_days_ago_utc = (today_start_tr - timedelta(days=7)).astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
-                act_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (five_min_ago_utc,)
-                ).fetchone()
-                active_now = act_row["c"] if act_row else 1
+                # 🤖 Bot Filtresi: Googlebot, Bingbot, MetaBot, Arama Botları hariç SADECE GERÇEK İNSANLAR
+                human_filter = "AND (device NOT LIKE '🤖%' AND device NOT LIKE '%Bot%' AND device NOT LIKE '%bot%' AND device NOT LIKE '%crawl%' AND device NOT LIKE '%spider%')"
 
-                uniq_row = conn.execute(
-                    "SELECT COUNT(DISTINCT visitor_hash) AS c FROM visitor_logs WHERE created_at >= ?", (today_start_utc,)
-                ).fetchone()
-                today_uniques = uniq_row["c"] if uniq_row else 0
-
-                # İlk defa girenler: Bugün gelmiş ve bugünden önce HİÇ kaydı olmayanlar veya is_first_visit=1 olanlar
-                first_row = conn.execute("""
+                act_row = conn.execute(f"""
                     SELECT COUNT(DISTINCT visitor_hash) AS c 
                     FROM visitor_logs 
-                    WHERE created_at >= ? 
+                    WHERE created_at >= ? {human_filter}
+                """, (five_min_ago_utc,)).fetchone()
+                active_now = act_row["c"] if (act_row and act_row["c"]) else 1
+
+                # Gerçek İnsan Tekil Ziyaretçi (Botlar hariç)
+                uniq_row = conn.execute(f"""
+                    SELECT COUNT(DISTINCT visitor_hash) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? {human_filter}
+                """, (today_start_utc,)).fetchone()
+                today_uniques = uniq_row["c"] if uniq_row else 0
+
+                # İlk Defa Giren Gerçek İnsanlar (Botlar hariç)
+                first_row = conn.execute(f"""
+                    SELECT COUNT(DISTINCT visitor_hash) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? {human_filter}
                       AND (is_first_visit = 1 OR visitor_hash NOT IN (
                           SELECT visitor_hash FROM visitor_logs WHERE created_at < ?
                       ))
                 """, (today_start_utc, today_start_utc)).fetchone()
                 first_time_today = first_row["c"] if first_row else 0
                 first_time_today = min(first_time_today, today_uniques)
+
+                # Google Organik Aramadan Gelen Gerçek İnsanlar
+                goog_row = conn.execute(f"""
+                    SELECT COUNT(DISTINCT visitor_hash) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? 
+                      AND (referrer = 'Google' OR referrer LIKE '%google%')
+                      {human_filter}
+                """, (today_start_utc,)).fetchone()
+                google_today = goog_row["c"] if goog_row else 0
+
+                # Bugünkü Arama Botu Taramaları (İndeksleme İstatistiği)
+                bot_row = conn.execute("""
+                    SELECT COUNT(DISTINCT visitor_hash) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? 
+                      AND (device LIKE '🤖%' OR device LIKE '%Bot%' OR device LIKE '%bot%')
+                """, (today_start_utc,)).fetchone()
+                bot_uniques_today = bot_row["c"] if bot_row else 0
 
                 traffic_rows = conn.execute(
                     "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
@@ -1362,6 +1389,8 @@ def get_dashboard_summary() -> Dict:
         "today_uniques": today_uniques,
         "first_time_today": first_time_today,
         "returning_today": returning_today,
+        "google_today": google_today,
+        "bot_uniques_today": bot_uniques_today,
         "traffic_sources": traffic_sources,
         "device_stats": device_stats,
         "live_visitors": live_visitors,

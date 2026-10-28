@@ -979,6 +979,8 @@ async def admin_panel(request: Request):
     stats.setdefault("today_uniques", 0)
     stats.setdefault("first_time_today", 0)
     stats.setdefault("returning_today", 0)
+    stats.setdefault("google_today", 0)
+    stats.setdefault("bot_uniques_today", 0)
     stats.setdefault("traffic_sources", [])
     stats.setdefault("device_stats", [])
     stats.setdefault("live_visitors", [])
@@ -1442,6 +1444,8 @@ async def panel_live_stats(request: Request):
         "today_uniques": stats.get("today_uniques", 0),
         "first_time_today": stats.get("first_time_today", 0),
         "returning_today": stats.get("returning_today", 0),
+        "google_today": stats.get("google_today", 0),
+        "bot_uniques_today": stats.get("bot_uniques_today", 0),
         "total_views": stats.get("total_views", 0),
         "total_all_hits": stats.get("total_all_hits", 0),
         "live_visitors": stats.get("live_visitors", [])[:15],
