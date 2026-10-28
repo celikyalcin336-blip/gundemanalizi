@@ -174,33 +174,42 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # 🎯 ZORUNLU KATEGORİ ÇEŞİTLİLİĞİ VE ROTASYON MOTORU (8 Kategori Eşit ve Dengeli)
-    # Sitede ve Telegram'da aynı kategorinin üst üste basılmasını %100 engeller!
-    recent_arts = database.get_articles(limit=5)
+    # 🎯 TAM 8 KATEGORİLİ ADİL DÖNGÜ MOTORU (Sitedeki 8 Sekmenin Tamamını Sırayla Besler)
+    # Gündem | Ekonomi | Eğitim | Otomobil | Teknoloji | Sağlık | Spor | Dünya (+ Son Dakika)
+    OFFICIAL_CATEGORIES = [
+        "Gündem", "Ekonomi", "Eğitim", "Otomobil",
+        "Teknoloji", "Sağlık", "Spor", "Dünya"
+    ]
+    recent_arts = database.get_articles(limit=24)
     recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
     last_cat = recent_cats[0] if recent_cats else ""
-    print(f"📋 Son Paylaşılan Kategoriler: {recent_cats} (Son Yayınlanan: {last_cat or 'Yok'})")
 
-    # 1. Öncelik Havuzu: Son yayınlanan kategori HARİÇ diğer 7 kategorideki taze haberler
-    diverse_candidates = [item for item in fresh_news if item.get("category") != last_cat]
+    # Her kategorinin en son kaç haber önce yayınlandığını hesapla (Hiç yoksa 999 ile en acil sıraya koy)
+    cat_wait_distance = {}
+    for idx_c, c in enumerate(OFFICIAL_CATEGORIES):
+        if c in recent_cats:
+            cat_wait_distance[c] = recent_cats.index(c)
+        else:
+            cat_wait_distance[c] = 999 - idx_c
 
-    # Son 3 haberde 2 veya daha fazla basılmış bir kategori varsa onu da geri plana it
-    from collections import Counter
-    cat_freq = Counter(recent_cats[:3])
-    overused_cats = {c for c, count in cat_freq.items() if count >= 2}
-    if overused_cats:
-        stricter = [item for item in diverse_candidates if item.get("category") not in overused_cats]
-        if stricter:
-            diverse_candidates = stricter
+    # En uzun süredir haber girilmeyen kategoriden en yeniye doğru sırala
+    priority_categories = sorted(
+        OFFICIAL_CATEGORIES,
+        key=lambda c: cat_wait_distance[c],
+        reverse=True
+    )
+    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Sıradaki Kategori Önceliği: {priority_categories}")
 
-    if diverse_candidates:
-        diverse_candidates.sort(key=lambda x: x.get("score", 0), reverse=True)
-        selected_pool = diverse_candidates
-        print(f"✅ Çeşitlilik Sağlandı: [{last_cat}] kategorisi dışındaki {len(selected_pool)} aday arasından en iyi haber seçilecek.")
-    else:
-        fresh_news.sort(key=lambda x: x.get("score", 0), reverse=True)
-        selected_pool = fresh_news
-        print("⚠️ Diğer kategorilerde taze haber kalmadığı için genel havuzdan seçiliyor.")
+    # Sırası gelen en acil kategorinin en yüksek puanlı haberini en başa koy
+    selected_pool = []
+    for target_cat in priority_categories:
+        cat_items = [item for item in fresh_news if item.get("category") == target_cat]
+        cat_items.sort(key=lambda x: x.get("score", 0), reverse=True)
+        selected_pool.extend(cat_items)
+
+    # Eğer herhangi bir nedenle liste dışı kategori varsa en sona ekle
+    remaining_items = [item for item in fresh_news if item not in selected_pool]
+    selected_pool.extend(remaining_items)
 
     processed_count = 0
     for item in selected_pool:
@@ -209,7 +218,7 @@ def run_bot(max_items: int = 1, force: bool = False):
         title_snippet = item.get('title', '')[:45]
         cat = item.get('category', 'Gündem')
         score = item.get('score', 0)
-        print(f"🎯 [Otonom Bot] Seçilen Taze Haber: [{cat}] {title_snippet}... (Puan: {score})")
+        print(f"🎯 [Otonom Bot] Sıradaki Kategoriden Seçilen Haber: [{cat}] {title_snippet}... (Puan: {score})")
         try:
             success = process_single_news(item)
             if success:

@@ -286,14 +286,18 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
         "Dünya": r'\b(dünya\w*|bm|birleşmiş milletler\w*|iklim planı\w*|küresel ısınma\w*|körfez ülkeleri\w*|abd\w*|amerika\w*|rusya\w*|ukrayna\w*|çin\w*|almanya\w*|fransa\w*|ingiltere\w*|israil\w*|gazze\w*|filistin\w*|iran\w*|ırak\w*|suriye\w*|lübnan\w*|kktc\w*|kıbrıs\w*|yunanistan\w*|bulgaristan\w*|nato\w*|pentagon\w*|beyaz saray\w*|kremlin\w*|tahran\w*|tel aviv\w*|kudüs\w*|hürmüz\w*|zelenskiy\w*|putin\w*|trump\w*|biden\w*|netanyahu\w*|diplomasi\w*|uluslararası\w*|ateşkes\w*|füze saldırısı\w*|hava saldırısı\w*)\b',
     }
 
-    # Puanlama (Başlık 4 Kat Daha Ağırlıklıdır)
+    # Puanlama (Başlık 4 Kat Daha Ağırlıklıdır + Kaynak Kategorisi Koruması)
     scores = {}
+    if force_category in regex_map:
+        # Kaynağın kendi kategorisine +3 taban puan ver (Özetten gelen tek bir 'dolar/tl' kelimesi Teknoloji/Sağlık/Eğitim haberini bozmasın)
+        scores[force_category] = 3
+
     for cat, reg in regex_map.items():
         title_hits = len(re.findall(reg, lower_title, re.IGNORECASE))
-        summary_hits = len(re.findall(reg, lower_summary, re.IGNORECASE))
-        total = (title_hits * 4) + summary_hits
+        summary_hits = min(2, len(re.findall(reg, lower_summary, re.IGNORECASE)))
+        total = (title_hits * 5) + summary_hits
         if total > 0:
-            scores[cat] = total
+            scores[cat] = scores.get(cat, 0) + total
 
     if scores:
         best_cat = max(scores.items(), key=lambda x: x[1])[0]
