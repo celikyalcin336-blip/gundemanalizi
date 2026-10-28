@@ -65,8 +65,8 @@ def bot_background_worker():
         except Exception as e:
             print(f"⚠️ [Otonom Bot] Hata: {e}")
 
-        # Her 30 saniyede bir kontrol et (Tam 15.0 dakikada bir haber yayına girer)
-        time.sleep(30)
+        # Her 15 saniyede bir kontrol et (Tam 15.0 dakikada / 900 sn'de bir haber yayına girer)
+        time.sleep(15)
 
 def system_health_watchdog_worker():
     """

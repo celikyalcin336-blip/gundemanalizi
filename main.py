@@ -185,16 +185,16 @@ def get_minutes_since_last_article() -> float:
 def run_bot(max_items: int = 1, force: bool = False):
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     if not force:
-        # Hazırlık süresi (AI metin + görsel kolajı) ~1.5 - 2 dk sürdüğü için tam 15.0 dk temposunu tutturmak üzere hedef 13.0 dk olarak sabitlendi!
-        target_cooldown = 13.0
+        # Tam 15.0 dakika (900 saniye) kuralı:
+        # AI metin ve görsel kolaj üretimi ~25-30 sn sürdüğü için, 14.5 dakikada (870 sn) tetiklenir
+        # ve tam 15.0 dakikada (900. saniyede) siteye ve Telegram'a girer!
+        target_cooldown = 14.5
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < target_cooldown:
             remaining = round(target_cooldown - minutes_passed, 1)
-            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: 15.0 dk. Yeni haber için {remaining} dk bekleniyor.")
             return 0
-    """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
-    news_items = news_fetcher.fetch_latest_news(limit_per_feed=12)
+    news_items = news_fetcher.fetch_latest_news(limit_per_feed=25)
 
     if not news_items:
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
@@ -203,8 +203,11 @@ def run_bot(max_items: int = 1, force: bool = False):
     # Mükerrer Olmayan Yepyeni Haberleri Filtrele (Aynı haber asla tekrar paylaşılmaz)
     fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
     if not fresh_news:
-        print("ℹ️  Tüm haberler daha önce paylaşılmış. Yeni taze haber bekleniyor.")
-        return 0
+        # Eğer katı filtreden geçmediyse, link ve hash bazlı taze olanları al (Bot asla 15 dakikayı kaçırmaz)
+        fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"])]
+        if not fresh_news:
+            print("ℹ️  Tüm haberler daha önce paylaşılmış. Yeni taze haber bekleniyor.")
+            return 0
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
@@ -237,7 +240,7 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"🎯 [{slot_name}] Hedef Kategori: [{target_cat}] (Önceki: {last_cat or 'Yok'})")
 
-    # 🛡️ ÇELİK KALKAN 1: Kuşağın öncelikli hedef kategorisindeki taze haberi ara (Sabah/gün içinden bekleyen yayınlanmamış haberler dahil)
+    # 🛡️ ÇELİK KALKAN 1: Kuşağın öncelikli hedef kategorisindeki taze haberi ara
     selected_pool = [item for item in fresh_news if item.get("category") == target_cat]
 
     # 🛡️ ÇELİK KALKAN 2: Eğer o kategoride taze haber yoksa, aynı kuşağın diğer kategorilerine bak
@@ -247,17 +250,17 @@ def run_bot(max_items: int = 1, force: bool = False):
                 alt_items = [item for item in fresh_news if item.get("category") == alt_cat]
                 if alt_items:
                     selected_pool = alt_items
-                    print(f"ℹ️ [{target_cat}] kategorisinde bekleyen yayınlanmamış haber kalmadı; inat edilmedi, kuşağın [{alt_cat}] kategorisindeki bekleyen haberlere geçildi.")
+                    print(f"ℹ️ [{target_cat}] kategorisinde bekleyen yayınlanmamış haber kalmadı; kuşağın [{alt_cat}] kategorisine geçildi.")
                     target_cat = alt_cat
                     break
 
-    # 🛡️ ÇELİK KALKAN 3: Kuşaktaki hiçbir kategoride taze haber yoksa, havuzdaki herhangi bir taze haberi seç (BOT ASLA DURMAZ)
+    # 🛡️ ÇELİK KALKAN 3: Kuşaktaki hiçbir kategoride taze haber yoksa, havuzdaki herhangi bir taze haberi seç
     if not selected_pool:
         selected_pool = fresh_news
         print("⚠️ Kuşaktaki kategorilerde taze haber kalmadı, genel taze haber havuzundan seçiliyor (Bot asla durmaz).")
 
     processed_count = 0
-    # Sıradaki haber hata verirse döngüyü kesme, havuzdaki diğer taze haberleri dene!
+    # 1. Aşama: Seçilen havuzdaki haberleri dene
     for item in selected_pool:
         if processed_count >= max_items:
             break
@@ -267,10 +270,29 @@ def run_bot(max_items: int = 1, force: bool = False):
                 processed_count += 1
                 cat_saved = item.get("category") or target_cat
                 database.set_setting("last_bot_category", cat_saved)
-                time.sleep(2)
+                break
         except Exception as e:
             print(f"❌ Haber ({item.get('title', '')[:30]}...) işlenirken hata oluştu: {e}, sıradaki deneniyor...")
             continue
+
+    # 2. Aşama: Eğer seçilen havuzdaki haberler mükerrer veya hatalı çıktıysa,
+    # BOT ASLA BOŞ DÖNMEZ! 15 Dakika (900 sn) kuralı şaşmasın diye havuzdaki diğer taze haberleri hemen dene!
+    if processed_count < max_items:
+        fallback_pool = [item for item in fresh_news if item not in selected_pool]
+        for item in fallback_pool:
+            if processed_count >= max_items:
+                break
+            try:
+                success = process_single_news(item)
+                if success:
+                    processed_count += 1
+                    cat_saved = item.get("category") or "Gündem"
+                    database.set_setting("last_bot_category", cat_saved)
+                    print(f"✅ [15 Dakika Garantisi] Alternatif taze haber ({cat_saved}) başarıyla yayınlandı!")
+                    break
+            except Exception as e:
+                print(f"❌ Alternatif haber hatası: {e}")
+                continue
 
     return processed_count
 
