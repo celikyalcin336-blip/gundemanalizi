@@ -4,17 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Kalıcı / Süresiz Token)
-_DEFAULT_META_B64 = (
-    "RUFHVjZiV1hhNXdFQlMyOXNVT2xqWVpBRnp3VDJqRVRCRVpCdGRTeDFjaW0zWTdpb0VnVUJWaUtHS3RoYkFNRmNUVVVzOXdGTldLMG8zQmdMSVhydmFYSEc5"
-    + "Y0tMbEhwaVpDMGZKZFZnaGNBTkZ3VHNZV3FOaTFrS3FxaWtlVURra2daQVhMYVpCN1lIczJHOXF6a2Y1cjllOUNaQkZCMXNIU1FVc2FzV0F6OWVaQmpZZGFaQVNiVnJvbWo3Yk1RaEZWUzNVR1Nr"
-)
-_env_meta = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
-# Geçici/süresi dolmuş token yerine ömür boyu kalıcı (expires_at=0) tokeni kullan
-if not _env_meta or len(_env_meta) > 230 or _env_meta.startswith("EAGV6bWXa5wEBS2c7") or _env_meta.startswith("EAGV6bWXa5wEBSyu"):
-    META_PAGE_ACCESS_TOKEN = base64.b64decode(_DEFAULT_META_B64).decode("utf-8")
-else:
-    META_PAGE_ACCESS_TOKEN = _env_meta
+# Meta (Facebook & Instagram Reels & Hikayeler) Ayarları
+META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
 
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip() or "17841437413417808"  # @gundem_analiz Instagram Hesabı

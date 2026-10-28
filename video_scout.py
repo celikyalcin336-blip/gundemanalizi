@@ -227,7 +227,7 @@ def send_scout_alert_to_admin(item: dict) -> bool:
     admin_id = getattr(config, "TELEGRAM_ADMIN_ID", "1934709259")
     bot_token = config.TELEGRAM_BOT_TOKEN
     if not bot_token or bot_token.startswith("8882292811"):
-        bot_token = "8591583248:AAHFjFXjE_NqzdDUNuwXVshiCzBMQ7rU5EE"
+        bot_token = os.getenv("TELEGRAM_SCOUT_BOT_TOKEN", "").strip()
     if not bot_token:
         print("Bot token tanımlı değil.")
         return False
