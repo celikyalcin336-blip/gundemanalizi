@@ -81,8 +81,8 @@ def bot_background_worker():
             except Exception as inner_e:
                 print(f"❌ [Otonom Bot] Kritik hata: {inner_e}")
 
-        # Her 60 saniyede bir kontrol et (main.py veritabanındaki son haber saatine göre 14.5 dk dolunca anında tetiklenir)
-        time.sleep(60)
+        # Her 30 saniyede bir kontrol et (Tam 15.0 dakikada bir haber yayına girer)
+        time.sleep(30)
 
 def system_health_watchdog_worker():
     """

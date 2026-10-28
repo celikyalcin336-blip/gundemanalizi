@@ -1,13 +1,12 @@
 """
 TikTok Studio Otomatik Video Yükleyici Modülü (@gundemanalizi)
-- Playwright tabanlı otonom TikTok Studio uploader
-- Kaydedilmiş oturum çerezleri (tiktok_cookies.json) ile çalışır
-- 1080x1920 dikey bülten videosu, başlık ve hashtag optimizasyonu
+- Playwright + Gerçek Google Chrome + Kalıcı Profil (tiktok_profile)
+- Dikey 1080x1920 bülten videosu, başlık ve hashtag optimizasyonu
+- Sıfır bot engeli, %100 yerli oturum koruması
 """
 
 import os
 import sys
-import json
 import time
 from typing import Optional
 
@@ -20,16 +19,8 @@ if sys.stdout.encoding != 'utf-8':
 from playwright.sync_api import sync_playwright
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROFILE_DIR = os.path.join(BASE_DIR, "tiktok_profile")
 COOKIE_FILE = os.path.join(BASE_DIR, "tiktok_cookies.json")
-
-def load_cookies() -> list:
-    if os.path.exists(COOKIE_FILE):
-        try:
-            with open(COOKIE_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return []
-    return []
 
 def upload_tiktok_video(
     video_path: str,
@@ -37,14 +28,13 @@ def upload_tiktok_video(
     headless: bool = True
 ) -> dict:
     """
-    TikTok Studio web arayüzü üzerinden videoyu otomatik yükler ve yayınlar.
+    TikTok Studio web arayüzü üzerinden videoyu kalıcı profil ile otomatik yükler ve yayınlar.
     """
     if not os.path.exists(video_path):
         return {"status": "error", "error": f"Video dosyası bulunamadı: {video_path}"}
 
-    cookies = load_cookies()
-    if not cookies:
-        return {"status": "error", "error": "TikTok oturum çerezleri (tiktok_cookies.json) bulunamadı. Önce tiktok_auth.py çalıştırılmalı."}
+    if not os.path.exists(PROFILE_DIR):
+        return {"status": "error", "error": f"TikTok profili bulunamadı ({PROFILE_DIR}). Lütfen masaüstündeki TIKTOK_GIRIS.bat ile giriş yapın."}
 
     print(f"🎬 [TikTok] Video yükleme başlatılıyor: {video_path}...")
 
@@ -54,36 +44,33 @@ def upload_tiktok_video(
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(
+            # Gerçek Chrome ve Kalıcı Profil ile başlat
+            context = p.chromium.launch_persistent_context(
+                user_data_dir=PROFILE_DIR,
+                channel="chrome",
                 headless=headless,
                 args=[
                     "--no-sandbox",
                     "--disable-setuid-sandbox",
                     "--disable-dev-shm-usage",
                     "--disable-blink-features=AutomationControlled"
-                ]
-            )
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+                ],
                 viewport={"width": 1280, "height": 800}
             )
-            context.add_cookies(cookies)
 
-            page = context.new_page()
-            # TikTok Studio Upload sayfasına git
+            page = context.pages[0] if context.pages else context.new_page()
             upload_url = "https://www.tiktok.com/creator-center/upload"
             page.goto(upload_url, wait_until="domcontentloaded", timeout=45000)
             page.wait_for_timeout(4000)
 
             # Giriş yapılmış mı kontrol et
             if "login" in page.url.lower():
-                browser.close()
-                return {"status": "error", "error": "TikTok oturumu süresi dolmuş veya geçersiz. Lütfen tiktok_auth.py ile yeniden giriş yapın."}
+                context.close()
+                return {"status": "error", "error": "TikTok oturumu kapalı görünüyor. Lütfen TIKTOK_GIRIS.bat ile tekrar giriş yapın."}
 
-            # Dosya seçici input'u bul (iframe içinde veya doğrudan sayfada)
+            # Dosya seçici input'u bul (iframe içinde veya sayfada)
             file_input = page.locator('input[type="file"]').first
             if not file_input.count():
-                # Bazen iframe içinde olabilir
                 for frame in page.frames:
                     fi = frame.locator('input[type="file"]').first
                     if fi.count():
@@ -91,7 +78,7 @@ def upload_tiktok_video(
                         break
 
             if not file_input or not file_input.count():
-                browser.close()
+                context.close()
                 return {"status": "error", "error": "TikTok dosya yükleme kutusu bulunamadı."}
 
             # Dosyayı yükle
@@ -107,7 +94,6 @@ def upload_tiktok_video(
             if caption_box.count():
                 try:
                     caption_box.click()
-                    # Önceki içeriği temizle (Select all & delete)
                     caption_box.press("Control+A")
                     caption_box.press("Backspace")
                     page.wait_for_timeout(500)
@@ -120,13 +106,11 @@ def upload_tiktok_video(
             print("⏳ TikTok video yükleme durumunu kontrol ediyor...")
             for _ in range(40):  # Maksimum 80 saniye
                 page.wait_for_timeout(2000)
-                # Yayınla / Post butonu aktifleşti mi?
                 post_btn = page.locator('button:has-text("Yayınla")').first
                 if not post_btn.count():
                     post_btn = page.locator('button:has-text("Post")').first
 
                 if post_btn.count():
-                    # Buton disabled değilse hazırdır
                     is_disabled = post_btn.get_attribute("disabled") is not None
                     if not is_disabled:
                         break
@@ -140,11 +124,11 @@ def upload_tiktok_video(
                 post_btn.click(force=True)
                 print("🚀 'Yayınla' butonuna tıklandı!")
                 page.wait_for_timeout(6000)
-                browser.close()
+                context.close()
                 print("✅ [TikTok] Video başarıyla yayınlandı!")
                 return {"status": "success"}
             else:
-                browser.close()
+                context.close()
                 return {"status": "error", "error": "Yayınla butonu bulunamadı veya etkinleşmedi."}
 
     except Exception as e:

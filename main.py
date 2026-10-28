@@ -182,11 +182,12 @@ def get_minutes_since_last_article() -> float:
 def run_bot(max_items: int = 1, force: bool = False):
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     if not force:
-        target_cooldown = max(14.5, float(config.CHECK_INTERVAL_MINUTES) - 0.5)
+        # Hazırlık süresi (AI metin + görsel kolajı) ~1.5 - 2 dk sürdüğü için tam 15.0 dk temposunu tutturmak üzere hedef 13.0 dk olarak sabitlendi!
+        target_cooldown = 13.0
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < target_cooldown:
             remaining = round(target_cooldown - minutes_passed, 1)
-            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: 15 dk. Yeni haber için {remaining} dk bekleniyor.")
+            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: 15.0 dk. Yeni haber için {remaining} dk bekleniyor.")
             return 0
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
