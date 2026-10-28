@@ -66,11 +66,13 @@ def bot_background_worker():
                 [sys.executable, main_script, "--max-items", "1"],
                 capture_output=True,
                 text=True,
-                timeout=180
+                timeout=360
             )
             if res.stdout:
-                for line in res.stdout.strip().splitlines()[-4:]:
+                for line in res.stdout.strip().splitlines()[-6:]:
                     print(f"   [Bot]: {line}")
+            if res.stderr and res.returncode != 0:
+                print(f"   [Bot Hata]: {res.stderr.strip()[:250]}")
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
         time.sleep(60)

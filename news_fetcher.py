@@ -3,7 +3,11 @@ import hashlib
 import re
 import html
 import requests
+import socket
 from typing import List, Dict, Optional
+
+# RSS veya harici site isteklerinin asla asili kalmamasini garanti eder
+socket.setdefaulttimeout(10)
 import config
 import database
 
