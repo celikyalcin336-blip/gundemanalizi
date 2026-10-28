@@ -28,13 +28,10 @@ X_URL = "https://x.com/gndmanalizi"
 X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Saatte 1 tweet (Tam saat başı kilit tamponu: 45 dk)
 
 # Telegram Bildirim Ayarları
-_DEFAULT_TG_B64 = "ODg4MjI5MjgxMTpBQUZMQXNtNWM3T0Jzbk44aVZVMk1XcHdmUGVUeHdSR0hNZw=="
+_DEFAULT_TG_TOKEN = "8882292811:AAFLAsm5c7OBsnN8iVU2MWpwfPeTxwRGHMg"
 _env_tg = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-if not _env_tg:
-    try:
-        TELEGRAM_BOT_TOKEN = base64.b64decode(_DEFAULT_TG_B64).decode("utf-8")
-    except Exception:
-        TELEGRAM_BOT_TOKEN = ""
+if not _env_tg or "AAHo" in _env_tg:
+    TELEGRAM_BOT_TOKEN = _DEFAULT_TG_TOKEN
 else:
     TELEGRAM_BOT_TOKEN = _env_tg
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003631115657").strip() or "-1003631115657"
