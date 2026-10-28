@@ -177,6 +177,13 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
     if any(cs in t_low for cs in catalog_spam):
         return True
 
+    # 3. Salt Soru Tuzakları ("YKS ne zaman? Saat kaçta?", "Hangi kanalda?" vb. boş SEO başlıkları)
+    question_bait = ["saat kaçta", "hangi kanalda", "ne zaman yapılacak", "kaç gün kaldı", "nasıl yapılır?", "nedir, ne zaman"]
+    if (title or "").count("?") >= 2 or any(qb in t_low for qb in question_bait):
+        return True
+    if (title or "").strip().endswith("?") and len((title or "").strip()) < 45:
+        return True
+
     combined = f"{title} {text}".lower()
     price_keywords = [
         "akaryakıt", "benzin", "motorin", "lpg", "altın fiyat", "çeyrek altın",
@@ -293,97 +300,52 @@ def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
 
 def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """
-    Haberin halkın ilgisini, cüzdanını ve günlük yaşamını ne kadar etkilediğini dengeli biçimde puanlar.
-    Her kategoriye (Gündem, Spor, Dünya, Ekonomi, Sağlık, Otomobil, Teknoloji, Eğitim) eşit adalet sağlar.
+    Haberin önemini sadece tam kelime sınırlarıyla (\b) puanlar.
+    ('zam' kelimesinin 'zaman' içinde, 'sel' kelimesinin 'küresel' içinde,
+     'kaza' kelimesinin 'kazandı' içinde yanlış eşleşmesini %100 engeller!)
     """
-    text = f"{title} {summary}".lower()
+    text = f"{title} {(summary or '')[:180]}".lower()
     score = 50  # Taban puan
 
-    # 1. SICAK GÜNDEM, SON DAKİKA, KRİZ & ADLİ OLAYLAR (+40 Puan)
-    gundem_keywords = [
-        "son dakika", "flaş", "facia", "kaza", "can kaybı", "vefat", "cinayet",
-        "katliam", "vahşet", "operasyon", "gözaltı", "tutukla", "patlama", "yangın",
-        "deprem", "afad", "sel", "fırtına", "meteoroloji", "sarı kod", "turuncu kod",
-        "bakanlık", "tbmm", "resmi gazete", "kararname", "yargıtay", "danıştay"
-    ]
-    for kw in gundem_keywords:
-        if kw in text:
-            score += 40
-            break
+    # 1. SICAK GÜNDEM, SON DAKİKA, KRİZ & ADLİ OLAYLAR (+35 Puan)
+    gundem_regex = r'\b(son dakika|flaş|facia\w*|kaza|kazası|kazada|zincirleme kaza|can kaybı|vefat\w*|cinayet\w*|katliam\w*|vahşet\w*|operasyon\w*|gözaltı\w*|tutukla\w*|patlama\w*|yangın\w*|deprem\w*|afad|sel felaketi|kuvvetli sağanak|fırtına\w*|meteoroloji\w*|sarı kod|turuncu kod|resmi gazete|kararname\w*|yargıtay|danıştay)\b'
+    if re.search(gundem_regex, text, re.I):
+        score += 35
 
-    # 2. SPOR, DERBİ, TRANSFER & SÜPER LİG (+40 Puan)
-    spor_keywords = [
-        "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor", "süper lig",
-        "şampiyonlar ligi", "uefa", "avrupa ligi", "derbi", "transfer",
-        "a milli", "milli takım", "mourinho", "okan buruk", "gol", "galibiyet"
-    ]
-    for kw in spor_keywords:
-        if kw in text:
-            score += 40
-            break
+    # 2. SPOR, DERBİ, TRANSFER & SÜPER LİG (+35 Puan)
+    spor_regex = r'\b(fenerbahçe\w*|galatasaray\w*|beşiktaş\w*|trabzonspor\w*|süper lig\w*|şampiyonlar ligi\w*|uefa|avrupa ligi\w*|derbi\w*|transfer\w*|a milli|milli takım\w*|mourinho|okan buruk|galibiyet\w*|mağlubiyet\w*|şampiyon\w*|bonservis\w*|teknik direktör\w*)\b'
+    if re.search(spor_regex, text, re.I):
+        score += 35
 
     # 3. KÜRESEL GELİŞMELER, DÜNYA & DIŞ POLİTİKA (+35 Puan)
-    dunya_keywords = [
-        "savaş", "füze", "hava saldırısı", "ateşkes", "israil", "gazze", "iran",
-        "lübnan", "abd", "rusya", "ukrayna", "çin", "trump", "putin", "nato",
-        "pentagon", "beyaz saray", "avrupa birliği", "kktc"
-    ]
-    for kw in dunya_keywords:
-        if kw in text:
-            score += 35
-            break
+    dunya_regex = r'\b(savaş\w*|füze\w*|hava saldırısı|ateşkes\w*|israil\w*|gazze\w*|iran\w*|lübnan\w*|abd|rusya\w*|ukrayna\w*|çin\w*|trump\w*|putin\w*|nato|pentagon|beyaz saray|avrupa birliği|kktc|birleşmiş milletler)\b'
+    if re.search(dunya_regex, text, re.I):
+        score += 35
 
     # 4. HALKIN CÜZDANI, EKONOMİ, MAAŞ & FİYATLAR (+35 Puan)
-    cuzdan_keywords = [
-        "asgari ücret", "emekli", "maaş", "zam", "enflasyon", "tüfe", "tcmb",
-        "merkez bankası", "faiz kararı", "altın", "dolar", "euro", "akaryakıt",
-        "benzin", "motorin", "vergi", "kira", "kredi kartı", "konut kredisi"
-    ]
-    for kw in cuzdan_keywords:
-        if kw in text:
-            score += 35
-            break
+    cuzdan_regex = r'\b(asgari ücret\w*|emekli\w*|maaş\w*|zam|zammı|zamlandı|enflasyon\w*|tüfe|tcmb|merkez bankası|faiz kararı|faiz\w*|altın\w*|dolar\w*|euro\w*|akaryakıt\w*|benzin\w*|motorin\w*|vergi\w*|kira\w*|kredi kartı|konut kredisi|ihracat\w*|borsa\w*)\b'
+    if re.search(cuzdan_regex, text, re.I):
+        score += 35
 
-    # 5. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+30 Puan)
-    tekno_keywords = [
-        "yapay zeka", "chatgpt", "openai", "gemini", "deepseek", "sora",
-        "apple", "iphone", "ios", "samsung", "galaxy", "android",
-        "nvidia", "işlemci", "siber güvenlik", "hacker"
-    ]
-    for kw in tekno_keywords:
-        if kw in text:
-            score += 30
-            break
+    # 5. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+35 Puan)
+    tekno_regex = r'\b(yapay zeka\w*|chatgpt|openai|gemini|deepseek|sora|apple|iphone\w*|macbook\w*|ios|samsung\w*|galaxy\w*|android|nvidia|işlemci\w*|siber güvenlik|hacker\w*|akıllı telefon\w*)\b'
+    if re.search(tekno_regex, text, re.I):
+        score += 35
 
-    # 6. OTOMOBİL & TAŞIT PİYASASI (+30 Puan)
-    oto_keywords = [
-        "togg", "t10x", "t10f", "sıfır araç", "fiyat listesi", "ötv",
-        "elektrikli araç", "otomobil", "chery", "byd", "clio", "egea"
-    ]
-    for kw in oto_keywords:
-        if kw in text:
-            score += 30
-            break
+    # 6. OTOMOBİL & TAŞIT PİYASASI (+35 Puan)
+    oto_regex = r'\b(togg|t10x|t10f|sıfır araç|fiyat listesi|ötv|elektrikli araç\w*|elektrikli otomobil\w*|otomobil\w*|chery|byd|tesla\w*|clio|egea|suv|hibrit\w*|şarj\w*)\b'
+    if re.search(oto_regex, text, re.I):
+        score += 35
 
-    # 7. SAĞLIK & BESLENME (+30 Puan)
-    saglik_keywords = [
-        "sağlık bakanlığı", "salgın", "virüs", "kanser", "kalp sağlığı",
-        "ilaç", "aşı", "tedavi", "hastane", "ameliyat", "bağışıklık", "grip"
-    ]
-    for kw in saglik_keywords:
-        if kw in text:
-            score += 30
-            break
+    # 7. SAĞLIK & TIP (+35 Puan)
+    saglik_regex = r'\b(sağlık bakanlığı|salgın\w*|virüs\w*|kanser\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*)\b'
+    if re.search(saglik_regex, text, re.I):
+        score += 35
 
-    # 8. EĞİTİM & SINAVLAR (+30 Puan)
-    egitim_keywords = [
-        "meb", "milli eğitim", "yusuf tekin", "yks", "lgs", "kpss", "ösym",
-        "sınav", "üniversite", "öğretmen atama", "ara tatil", "kar tatili", "karne"
-    ]
-    for kw in egitim_keywords:
-        if kw in text:
-            score += 30
-            break
+    # 8. EĞİTİM, MEB & SINAVLAR (+35 Puan)
+    egitim_regex = r'\b(meb|milli eğitim\w*|yusuf tekin|yks|lgs|kpss|dgs|ösym|sınav\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil|yarıyıl tatili|karne\w*|müfredat\w*|yerleştirme\w*|tercih\w*)\b'
+    if re.search(egitim_regex, text, re.I):
+        score += 35
 
     # Kuru bürokratik protokol cezası (-40 Puan)
     protokol_keywords = [
@@ -478,9 +440,8 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                     score += 10
 
                 feed_cat = feed_info.get("category", "Gündem")
-                # Haberin gerçek kategorisini içerik analiz motoru ile doğrula
-                import ai_writer
-                real_cat = ai_writer.classify_article(title, summary, feed_cat)
+                # Her RSS kaynağı kendi resmi kategorisine kilitlidir (Teknoloji siteleri Ekonomi/Otomobil'e sızamaz!)
+                real_cat = feed_cat
 
                 unposted_news.append({
                     "hash": news_hash,

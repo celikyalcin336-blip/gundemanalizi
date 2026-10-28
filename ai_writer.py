@@ -335,7 +335,11 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
 
-    category = classify_article(title, summary, force_category)
+    valid_official_cats = {"Gündem", "Ekonomi", "Eğitim", "Otomobil", "Teknoloji", "Sağlık", "Spor", "Dünya"}
+    if force_category in valid_official_cats:
+        category = force_category
+    else:
+        category = classify_article(title, summary, force_category)
 
     category_guide = ""
     if category == "Otomobil":
