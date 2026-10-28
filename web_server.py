@@ -53,33 +53,17 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - 60 saniyede bir yoklar; main.py içindeki 14.5 dakikalık hassas veritabanı kilidi sayesinde
-      hazırlık süresiyle birlikte tam 15:00. dakikada haber yayına girer.
+    - Doğrudan süreç içinde (in-process) çalışarak bellek tasarrufu sağlar ve subprocess çökme riskini sıfırlar.
+    - Her 30 saniyede bir yoklar; 13 dakikalık zaman kilidi + hazırlık süresiyle tam 15.0 dakikada bir haber yayına girer.
     """
-    time.sleep(30)
+    time.sleep(15)
     print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
-    main_script = os.path.join(BASE_DIR, "main.py")
 
     while True:
         try:
-            res = subprocess.run(
-                [sys.executable, main_script, "--max-items", "1"],
-                capture_output=True,
-                text=True,
-                timeout=180
-            )
-            if res.stdout:
-                for line in res.stdout.strip().splitlines()[-4:]:
-                    print(f"   [Bot]: {line}")
-            if res.returncode != 0:
-                print(f"⚠️ [Otonom Bot] Subprocess çıkış kodu {res.returncode}, doğrudan mod deneniyor...")
-                main.run_bot(max_items=1, force=False)
+            main.run_bot(max_items=1, force=False)
         except Exception as e:
-            print(f"⚠️ [Otonom Bot] Hata: {e}, doğrudan çağrılıyor...")
-            try:
-                main.run_bot(max_items=1, force=False)
-            except Exception as inner_e:
-                print(f"❌ [Otonom Bot] Kritik hata: {inner_e}")
+            print(f"⚠️ [Otonom Bot] Hata: {e}")
 
         # Her 30 saniyede bir kontrol et (Tam 15.0 dakikada bir haber yayına girer)
         time.sleep(30)

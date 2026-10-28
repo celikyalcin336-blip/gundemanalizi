@@ -710,30 +710,22 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
             exist_title = (r["title"] or "").strip().lower()
             exist_slug = (r["slug"] or "").strip().lower()
 
-            # A. Slug benzerliği (>80%)
-            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.80:
+            # A. Slug benzerliği (>85%)
+            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.85:
                 return True
 
-            # B. Doğrudan Başlık Benzerliği (>65%)
-            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.65:
+            # B. Doğrudan Başlık Benzerliği (>80%)
+            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.80:
                 return True
 
-            # C. Kelime Kökü Örtüşmesi (Ortak Kök Oranı >= %50)
-            if len(stems_incoming) >= 3:
+            # C. Kelime Kökü Örtüşmesi (Ortak Kök Oranı >= %80)
+            if len(stems_incoming) >= 4:
                 stems_exist = get_word_stems(exist_title)
-                if len(stems_exist) >= 3:
+                if len(stems_exist) >= 4:
                     overlap = len(stems_incoming & stems_exist)
                     min_len = min(len(stems_incoming), len(stems_exist))
-                    if min_len > 0 and (overlap / min_len) >= 0.50:
+                    if min_len > 0 and (overlap / min_len) >= 0.80:
                         return True
-
-            # D. Özel İsim / Anahtar İkili (Kişi veya Şirket Adı + Eylem Örtüşmesi)
-            # Örn: 'nusret altınbaş' VEYA 'spacex 40'
-            key_entities = [w for w in re.findall(r'\w+', clean_t) if len(w) >= 4 and w not in dup_stopwords]
-            for i in range(len(key_entities) - 1):
-                pair = f"{key_entities[i]} {key_entities[i+1]}"
-                if pair in exist_title:
-                    return True
 
         return False
 

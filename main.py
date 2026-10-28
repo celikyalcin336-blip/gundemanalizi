@@ -171,9 +171,12 @@ def get_minutes_since_last_article() -> float:
         val = art.get("created_at")
         if not val:
             return 999.0
-        dt = datetime.strptime(str(val)[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=database.TR_TZ)
+        clean_val = str(val).split(".")[0].replace("T", " ")[:19]
+        dt = datetime.strptime(clean_val, "%Y-%m-%d %H:%M:%S").replace(tzinfo=database.TR_TZ)
         now_tr = datetime.now(database.TR_TZ)
         diff_sec = (now_tr - dt).total_seconds()
+        if diff_sec < -60:
+            return 999.0
         return max(0.0, diff_sec / 60.0)
     except Exception as e:
         print(f"Son haber zamanı kontrolü hatası: {e}")
