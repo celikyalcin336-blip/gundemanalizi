@@ -823,6 +823,7 @@ def get_cached_category_widgets() -> dict:
     try:
         data = {
             "breaking_news": database.get_articles(limit=10),
+            "trending_articles": database.get_trending_articles(limit=10),
             "gundem_articles": database.get_articles(limit=5, category="Gündem"),
             "auto_articles": database.get_articles(limit=5, category="Otomobil"),
             "tech_articles": database.get_articles(limit=5, category="Teknoloji"),
@@ -1632,9 +1633,22 @@ async def article_detail(request: Request, slug: str):
     widgets = get_cached_category_widgets()
     breaking_news = widgets.get("breaking_news") or []
 
-    # Trend / En Çok Okunanlar (RAM önbellekten anında döner, DB yükü sıfır)
-    trending_articles = [a for a in breaking_news if a.get("slug") != slug][:5]
-    other_articles = [a for a in breaking_news if a.get("slug") != slug][2:7]
+    # Gerçek En Çok Okunanlar (views DESC - Gerçek Ziyaretçi Sayısına Göre)
+    real_trending = widgets.get("trending_articles") or database.get_trending_articles(limit=10)
+    trending_articles = [a for a in real_trending if a.get("slug") != slug][:5]
+    if len(trending_articles) < 5:
+        existing_slugs = {a.get("slug") for a in trending_articles}
+        for bn in breaking_news:
+            if bn.get("slug") != slug and bn.get("slug") not in existing_slugs:
+                trending_articles.append(bn)
+                if len(trending_articles) >= 5:
+                    break
+
+    # Diğer Güncel Haberler (En Çok Okunanlarda olanları hariç tutar, mükerrer göstermez)
+    trend_slugs = {a.get("slug") for a in trending_articles}
+    other_articles = [a for a in breaking_news if a.get("slug") != slug and a.get("slug") not in trend_slugs][:5]
+    if len(other_articles) < 5:
+        other_articles = [a for a in breaking_news if a.get("slug") != slug][:5]
 
     # Kategori İçi İlgili Haberler (RAM önbellekten anında döner)
     cat_lower = category.lower()

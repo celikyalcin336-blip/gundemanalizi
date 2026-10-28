@@ -381,7 +381,7 @@
                     <span class="text-slate-300">|</span>
                     <button type="button" onclick="adjustFontSize(1)" class="hover:text-red-600 px-1 font-extrabold" title="Yazı Boyutunu Büyüt" aria-label="Yazı boyutunu büyüt">A+</button>
                 </div>
-                <button type="button" onclick="shareArticleWhatsApp()" class="inline-flex items-center gap-1 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs px-3 py-1 rounded-full transition shadow-sm hover:scale-105 active:scale-95">
+                <button type="button" onclick="shareArticleWhatsApp()" class="inline-flex items-center gap-1 text-white font-extrabold text-xs px-3 py-1 rounded-full transition shadow-sm hover:scale-105 active:scale-95" style="background-color: #075E54 !important; color: #ffffff !important;">
                     💬 <span class="hidden sm:inline">Paylaş</span>
                 </button>
             </div>
@@ -568,13 +568,13 @@
                     <span>Paylaş:</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <button type="button" onclick="shareArticleWhatsApp()" class="px-4 py-2 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                    <button type="button" onclick="shareArticleWhatsApp()" class="px-4 py-2 rounded-full text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95" style="background-color: #075E54 !important; color: #ffffff !important;">
                         💬 WhatsApp
                     </button>
                     <a href="https://t.me/share/url?url={{ request.url }}&text={{ article.title }}" target="_blank" class="px-4 py-2 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
                         📲 Telegram
                     </a>
-                    <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-4 py-2 rounded-full bg-[#0f1419] hover:bg-black text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95">
+                    <a href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ request.url }}" target="_blank" class="px-4 py-2 rounded-full text-white font-extrabold text-xs transition flex items-center gap-1.5 shadow-sm hover:scale-105 active:scale-95 border border-slate-700" style="background-color: #0f1419 !important; color: #ffffff !important;">
                         𝕏 Paylaş
                     </a>
                     <button type="button" onclick="copyArticleLink(this)" aria-label="Haber bağlantısını kopyala" class="px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs border border-slate-300 transition flex items-center gap-1.5 shadow-xs">
