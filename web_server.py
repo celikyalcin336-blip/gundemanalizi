@@ -52,40 +52,11 @@ import sys
 
 def bot_background_worker():
     """
-    Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - Hedef: Tam 15.0 dakikada bir (900 saniye) haberin siteye ve Telegram'a girmesi.
-    - Erken Uyanma Prensibi: AI metin ve görsel üretimi ortalama 25-30 saniye sürdüğü için,
-      900 saniyenin dolmasına 30 saniye kala (870. saniyede / 14.5 dk) erken uyanır.
-    - Haberi hazırlar ve tam 900. saniyede (15.0 dakikada) site ve Telegram'a basar.
-    - Uykuyu rastgele değil, veritabanındaki son haberin saniyesine göre dinamik hesaplar.
+    Bağımsız 15 dakikalık haber botu (news_bot.py).
+    Saatini veritabanındaki kendi anahtarında tutar; panelden atılan manuel haberler sayılmaz.
     """
-    time.sleep(10)
-    print("🚀 [Otonom Bot] 7/24 Akıllı Zaman Ayarlı Haber Robotu Devrede (Tam 15 Dk / 900 Sn)...")
-
-    TARGET_INTERVAL_SEC = 900.0  # 15 dakika = 900 saniye
-    PREP_LEAD_SEC = 30.0        # 30 saniye erken uyanış (hazırlık payı)
-    WAKEUP_THRESHOLD_SEC = TARGET_INTERVAL_SEC - PREP_LEAD_SEC  # 870 saniye (14.5 dk)
-
-    while True:
-        try:
-            sec_passed = main.get_seconds_since_last_article()
-            if sec_passed >= WAKEUP_THRESHOLD_SEC:
-                # 14.5 dakika doldu, erken uyanıp haberi hazırla ve tam 15.0 dk'da yayına al
-                print(f"⏰ [Erken Uyanış] Son haberden bu yana {round(sec_passed/60.0, 1)} dk geçti. Haber hazırlanıyor...")
-                published = main.run_bot(max_items=1, force=True)
-                if published > 0:
-                    print("✅ [15 Dakika Tamamlandı] Yeni haber başarıyla site ve Telegram'da yayında.")
-                else:
-                    print("ℹ️ Bu turda taze haber işlenemedi, 15 saniye sonra tekrar yoklanacak.")
-                time.sleep(15)
-            else:
-                # Henüz 14.5 dakika dolmadı; kalan süreye göre akıllı uyku süresi belirle
-                rem_sec = WAKEUP_THRESHOLD_SEC - sec_passed
-                sleep_dur = max(5.0, min(rem_sec, 20.0))
-                time.sleep(sleep_dur)
-        except Exception as e:
-            print(f"⚠️ [Otonom Bot] Döngü hatası: {e}")
-            time.sleep(15)
+    import news_bot
+    news_bot.run_forever()
 
 def system_health_watchdog_worker():
     """
@@ -1968,6 +1939,15 @@ async def rss_feed(request: Request):
   </channel>
 </rss>"""
     return HTMLResponse(content=rss, media_type="application/rss+xml")
+
+@app.get("/api/bot-status")
+async def bot_status():
+    """15 dakikalık haber botunun son ve sıradaki yayın saatini gösterir."""
+    try:
+        import news_bot
+        return JSONResponse(news_bot.status())
+    except Exception as e:
+        return JSONResponse({"hata": str(e)}, status_code=500)
 
 def start_server(host: str = "127.0.0.1", port: int = 8000):
     uvicorn.run("web_server:app", host=host, port=port, reload=False)
