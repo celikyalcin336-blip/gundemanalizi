@@ -174,6 +174,9 @@ def get_connection():
 
 def _row_to_dict(row) -> Dict:
     d = dict(row)
+    if d.get("image_path"):
+        base_img = str(d["image_path"]).split("?")[0]
+        d["image_path"] = f"{base_img}?v=3"
     # created_at zaman damgasını daima Türkiye Yerel Saatine (TSİ, UTC+3) dönüştür
     if d.get("created_at") is not None:
         val = d["created_at"]
@@ -340,7 +343,7 @@ def cleanup_corrupted_articles():
                         t_out = os.path.join(image_generator.OUTPUT_DIR, fn)
                         res = image_generator.create_single_news_photo(real_url, t_out)
                         if res and os.path.exists(res):
-                            save_image_file(fn, t_out)
+                            save_image_file(t_out)
                             print(f"✅ [Görsel Onarıldı]: {t[:35]}")
     except Exception as e:
         print(f"Görsel otomatik onarım hatası: {e}")
@@ -416,7 +419,7 @@ def cleanup_corrupted_articles():
 
                                 # 4. Kategori Düzeltme (Örn: Otomobil haberinin Teknoloji'de veya Kanser haberinin Ekonomi'de kalmasını önle)
                 import ai_writer
-                correct_cat = ai_writer.classify_article(clean_title, clean_summary, None) if hasattr(ai_writer, 'classify_article') else category
+                correct_cat = category
                 
                 # 5. Kesilmiş / yarım kalmış lead paragraf tamiri (örn: '... düzenlenen 14.')
                 if re.search(r'\b\d+\.\s*$', clean_summary):
@@ -638,15 +641,113 @@ def get_image(filename: str) -> Optional[bytes]:
     """Görseli Neon PostgreSQL veya yerel veritabanından anında çeker."""
     if not filename:
         return None
-    safe_name = os.path.basename(filename)
+    safe_name = os.path.basename(filename).split("?")[0]
     try:
         with get_connection() as conn:
             row = conn.execute("SELECT data FROM images WHERE filename = ? LIMIT 1", (safe_name,)).fetchone()
-            if row and row.get("data"):
-                return bytes(row["data"])
+            if row:
+                data_val = row["data"] if isinstance(row, dict) or hasattr(row, "__getitem__") else getattr(row, "data", None)
+                if data_val and len(bytes(data_val)) >= 6000:
+                    return bytes(data_val)
     except Exception as e:
         print(f"Görsel veritabanı okuma hatası ({safe_name}): {e}")
     return None
+
+
+def heal_single_missing_image(filename: str) -> Optional[str]:
+    """
+    Diskte ve veritabanında bulunamayan bir haber görselini, makale başlığından
+    gerçek basın fotoğrafı bularak (veya HD editoryal kart üreterek) anında onarır ve kalıcı kaydeder.
+    """
+    if not filename:
+        return None
+    safe_name = os.path.basename(filename).split("?")[0]
+    if not safe_name.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+        return None
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    try:
+        title = ""
+        category = "Gündem"
+        with get_connection() as conn:
+            row = conn.execute(
+                "SELECT title, category FROM articles WHERE image_path LIKE ? ORDER BY id DESC LIMIT 1",
+                (f"%{safe_name}%",)
+            ).fetchone()
+            if row:
+                title = row["title"] or ""
+                category = row["category"] or "Gündem"
+        if not title:
+            return None
+        import image_generator
+        res = image_generator.create_news_visual(
+            candidate_urls=[],
+            output_filename=safe_name,
+            title=title,
+            category=category
+        )
+        if res and os.path.exists(res) and os.path.getsize(res) >= 6000:
+            save_image_file(res)
+            print(f"✅ [Görsel Kurtarıldı ve Kalıcı Kaydedildi]: {safe_name} ({title[:40]}...)")
+            return res
+    except Exception as e:
+        print(f"⚠️ Görsel onarım hatası ({safe_name}): {e}")
+    return None
+
+
+def restore_and_heal_images(limit: int = 150):
+    """
+    Sunucu açılışında son makalelerin görsellerini PostgreSQL images tablosundan diske geri yükler;
+    veritabanında eksik olan görselleri ise makale başlığından gerçek basın fotoğraflarıyla onarır.
+    """
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    try:
+        with get_connection() as conn:
+            rows = conn.execute(
+                "SELECT id, title, category, image_path FROM articles ORDER BY id DESC LIMIT ?",
+                (limit,)
+            ).fetchall()
+        missing_names = []
+        for r in rows:
+            ip = r["image_path"] or ""
+            if not ip:
+                continue
+            safe_name = os.path.basename(ip.replace("\\", "/")).split("?")[0]
+            if not safe_name:
+                continue
+            local_p = os.path.join(OUTPUT_DIR, safe_name)
+            if not os.path.exists(local_p) or os.path.getsize(local_p) < 6000:
+                missing_names.append(safe_name)
+
+        if not missing_names:
+            return
+
+        restored_count = 0
+        still_missing = []
+        for safe_name in missing_names:
+            data = get_image(safe_name)
+            if data and len(data) >= 6000:
+                local_p = os.path.join(OUTPUT_DIR, safe_name)
+                try:
+                    with open(local_p, "wb") as f:
+                        f.write(data)
+                    restored_count += 1
+                except Exception:
+                    still_missing.append(safe_name)
+            else:
+                still_missing.append(safe_name)
+
+        if restored_count > 0:
+            print(f"🖼️ [Görsel Geri Yükleme] {restored_count} adet haber görseli veritabanından diske yüklendi.")
+
+        healed_count = 0
+        for safe_name in still_missing:
+            res = heal_single_missing_image(safe_name)
+            if res:
+                healed_count += 1
+        if healed_count > 0:
+            print(f"✨ [Görsel Kurtarma] {healed_count} adet kayıp haber görseli yeniden oluşturuldu ve veritabanına kaydedildi.")
+    except Exception as e:
+        print(f"⚠️ Toplu görsel geri yükleme hatası: {e}")
 
 
 def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:

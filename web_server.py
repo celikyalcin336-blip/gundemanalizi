@@ -76,7 +76,7 @@ def bot_background_worker():
                 print(f"   [Bot Hata]: {res.stderr.strip()[:250]}")
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
-        time.sleep(60)
+        time.sleep(20)
 
 def system_health_watchdog_worker():
     """
@@ -140,8 +140,8 @@ def system_health_watchdog_worker():
         time.sleep(600)
 
 def _warmup_turbo_cache():
-    """Sunucu ayağa kalkar kalkmaz ana sayfayı ve popüler kategorileri RAM'e çeker."""
-    time.sleep(3)
+    """Sunucu ayağa kalkar kalkmaz ana sayfayı, popüler kategorileri ve kayıp görselleri onarır."""
+    time.sleep(2)
     try:
         get_cached_category_widgets()
         database.get_articles(limit=24)
@@ -149,6 +149,10 @@ def _warmup_turbo_cache():
         print("⚡ [Turbo Cache] Kategori ve ana sayfa önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
+    try:
+        database.restore_and_heal_images(limit=150)
+    except Exception as e:
+        print(f"Görsel onarım ısınma hatası: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -322,14 +326,14 @@ app.mount("/assets", CacheStaticFiles(directory=ASSETS_DIR), name="assets")
 
 @app.get("/images/{filename}")
 async def serve_image(filename: str, request: Request):
-    safe_name = os.path.basename(filename)
+    safe_name = os.path.basename(filename).split("?")[0]
     local_path = os.path.join(OUTPUT_DIR, safe_name)
 
-    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 4 sn bekle)
-    if not os.path.exists(local_path):
+    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 12 sn bekle)
+    if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
         try:
-            data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=4.0)
-            if data:
+            data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=12.0)
+            if data and len(data) >= 6000:
                 try:
                     with open(local_path, "wb") as f:
                         f.write(data)
@@ -338,23 +342,30 @@ async def serve_image(filename: str, request: Request):
         except Exception:
             pass
 
+    # 1.5. Eğer ne diskte ne de veritabanında varsa: Makale başlığından gerçek basın fotoğrafını anında kurtar!
+    if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
+        try:
+            await asyncio.wait_for(asyncio.to_thread(database.heal_single_missing_image, safe_name), timeout=15.0)
+        except Exception:
+            pass
+
     # 2. Resim diskte mevcutsa: Tarayıcı WebP destekliyorsa ultra hafif WebP formatında sun
-    if os.path.exists(local_path):
+    if os.path.exists(local_path) and os.path.getsize(local_path) >= 6000:
         accept = request.headers.get("accept", "").lower()
         if "image/webp" in accept and not safe_name.lower().endswith(".webp"):
             name_no_ext = os.path.splitext(safe_name)[0]
             webp_name = f"{name_no_ext}.webp"
             webp_path = os.path.join(OUTPUT_DIR, webp_name)
-            if not os.path.exists(webp_path):
+            if not os.path.exists(webp_path) or os.path.getsize(webp_path) < 2000:
                 try:
                     from PIL import Image
                     with Image.open(local_path) as img:
                         img = img.convert("RGB")
                         img.thumbnail((800, 450), Image.LANCZOS)
-                        img.save(webp_path, format="WEBP", quality=76, method=4)
+                        img.save(webp_path, format="WEBP", quality=78, method=4)
                 except Exception:
                     pass
-            if os.path.exists(webp_path):
+            if os.path.exists(webp_path) and os.path.getsize(webp_path) >= 2000:
                 return FileResponse(webp_path, media_type="image/webp", headers={
                     "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
                     "CDN-Cache-Control": "max-age=31536000",
@@ -369,12 +380,14 @@ async def serve_image(filename: str, request: Request):
             "Vary": "Accept"
         })
 
-    # 3. Resim bulunamadıysa asla sayfayı bekletme, anında resmi logoyu dön (0 ms)
-    fallback_logo = os.path.join(ASSETS_DIR, "logo-128.webp")
-    if not os.path.exists(fallback_logo):
-        fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
+    # 3. Resim bulunamadıysa ASLA önbelleğe (cache) alma, anlık yedek dön
+    fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(fallback_logo):
-        return FileResponse(fallback_logo, headers={"Cache-Control": "public, max-age=86400"})
+        return FileResponse(fallback_logo, headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "CDN-Cache-Control": "no-store",
+            "Cloudflare-CDN-Cache-Control": "no-store"
+        })
     return Response(content=b"", status_code=404)
 
 @app.api_route("/health", methods=["GET", "HEAD"])
@@ -1913,7 +1926,7 @@ async def video_sitemap(request: Request):
             raw_dt = raw_dt[:19] + "+03:00"
         title_esc = escape(a.get("title") or "")
         summary_esc = escape((a.get("summary") or a.get("title") or "")[:200])
-        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1]
+        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
         img_url = f"{base_url}/images/{img_name}" if img_name else f"{base_url}/assets/logo.png"
         xml.append(f"""  <url>
     <loc>{base_url}/haber/{a["slug"]}</loc>
@@ -1938,7 +1951,7 @@ async def rss_feed(request: Request):
     base_url = f"https://{host}"
     items_xml = []
     for a in articles:
-        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1]
+        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
         img_url = f"{base_url}/images/{img_name}" if img_name else f"{base_url}/assets/logo.png"
         items_xml.append(f"""    <item>
       <title>{escape(a["title"])}</title>

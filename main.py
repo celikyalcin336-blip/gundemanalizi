@@ -51,16 +51,14 @@ def process_single_news(item: dict) -> bool:
     scraped_body = article_details.get("body", "")
     summary = scraped_body if (scraped_body and len(scraped_body) > len(raw_summary)) else raw_summary
 
-    # Telegram ve Sosyal Medya Metinleri
+    # Telegram ve Web Makalesi Metinleri (Gereksiz ekstra AI çağrısı kaldırıldı, hız 2 katına çıkarıldı)
     telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
-    ai_result = ai_writer.generate_social_caption(title, summary, source)
-    social_caption = ai_result["caption"]
     item_category = item.get("category")
     article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
     category = article_data.get("category", "Gündem")
     print(f"   [Kategori: {category} | Telegram Metni Hazır]")
 
-    # 2. Kristal Netliğinde Görsel & Yan Yana 2'li Kolaj Üretimi
+    # 2. Kristal Netliğinde Görsel Üretimi
     print("🎨 Yüksek çözünürlüklü haber görseli hazırlanıyor...")
     candidate_images = article_details.get("images", [])
     if image_url and image_url not in candidate_images:
@@ -74,6 +72,16 @@ def process_single_news(item: dict) -> bool:
         category=category
     )
     print(f"   [Görsel Hazırlandı: {visual_path} | Aday Görsel Sayısı: {len(candidate_images)}]")
+
+    # 2.5. HASSAS 15:00 DAKİKA NİŞANGAHI:
+    # Haber 11.5 - 12. dakikada önceden hazırlanır; tam 14 dk 52 sn dolana kadar bekletilir ve tam 15:00'da yayına basılır!
+    while True:
+        mins_now = get_minutes_since_last_article()
+        if mins_now >= 14.85:
+            break
+        wait_sec = min(10.0, max(1.0, (14.85 - mins_now) * 60.0))
+        print(f"⏱️ [Hassas 15 Dk Kilidi] Haber hazır! Tam 15:00. dakika için {round(wait_sec, 1)} sn bekleniyor...")
+        time.sleep(wait_sec)
 
     # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
     print("🌐 Kendi sitemizde yayınlanıyor...")
@@ -150,23 +158,26 @@ def get_minutes_since_last_article() -> float:
     return 999.0
 
 def run_bot(max_items: int = 1, force: bool = False):
-    """Gündemi kontrol edip en güncel ve en yüksek puanlı taze haberleri kategori kısıtlaması olmaksızın paylaşır."""
+    """
+    11.5. dakikada uyanıp haberi önceden hazırlar ve tam 15:00. dakikada sıfır gecikmeyle yayınlar.
+    Sabit Kategori Sırası: Gündem -> Ekonomi -> Dünya -> Spor -> Teknoloji -> Otomobil -> Sağlık -> Eğitim
+    """
     if not force:
-        target_cooldown = max(14.0, float(config.CHECK_INTERVAL_MINUTES) - 1.0)
+        # Hazırlık süresi (~2-3 dk) hesaba katılarak 11.5. dakikada hazırlığa başlar, 15.0. dakikada ateşler!
+        prep_start_minute = max(11.5, float(config.CHECK_INTERVAL_MINUTES) - 3.5)
         minutes_passed = get_minutes_since_last_article()
-        if minutes_passed < target_cooldown:
-            remaining = round(target_cooldown - minutes_passed, 1)
-            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hedef: 15 dk. Yeni haber için {remaining} dk bekleniyor.")
+        if minutes_passed < prep_start_minute:
+            remaining = round(prep_start_minute - minutes_passed, 1)
+            print(f"⏳ [Zaman Kilidi] Son haber {round(minutes_passed, 1)} dk önce paylaşıldı. Hazırlık başlangıcı için {remaining} dk bekleniyor.")
             return 0
 
-    print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
-    news_items = news_fetcher.fetch_latest_news(limit_per_feed=12)
+    print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler önceden hazırlanmak üzere taranıyor...")
+    news_items = news_fetcher.fetch_latest_news(limit_per_feed=10)
 
     if not news_items:
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
         return 0
 
-    # Mükerrer Olmayan Yepyeni Haberleri Filtrele (Aynı veya benzer haber asla tekrar paylaşılmaz)
     fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
     if not fresh_news:
         print("ℹ️  Tüm haberler daha önce paylaşılmış. Yeni taze haber bekleniyor.")
@@ -174,42 +185,37 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # 🎯 TAM 8 KATEGORİLİ ADİL DÖNGÜ MOTORU (Sitedeki 8 Sekmenin Tamamını Sırayla Besler)
-    # Gündem | Ekonomi | Eğitim | Otomobil | Teknoloji | Sağlık | Spor | Dünya (+ Son Dakika)
-    OFFICIAL_CATEGORIES = [
-        "Gündem", "Ekonomi", "Eğitim", "Otomobil",
-        "Teknoloji", "Sağlık", "Spor", "Dünya"
+    # 🎯 SABİT VE ŞAŞMAZ KATEGORİ SIRASI (Önce Ana Gündem/Ekonomi/Dünya/Spor!)
+    ROTATION_ORDER = [
+        "Gündem", "Ekonomi", "Dünya", "Spor",
+        "Teknoloji", "Otomobil", "Sağlık", "Eğitim"
     ]
-    recent_arts = database.get_articles(limit=24)
+    recent_arts = database.get_articles(limit=8)
     recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
     last_cat = recent_cats[0] if recent_cats else ""
 
-    # Her kategorinin en son kaç haber önce yayınlandığını hesapla (Hiç yoksa 999 ile en acil sıraya koy)
-    cat_wait_distance = {}
-    for idx_c, c in enumerate(OFFICIAL_CATEGORIES):
-        if c in recent_cats:
-            cat_wait_distance[c] = recent_cats.index(c)
-        else:
-            cat_wait_distance[c] = 999 - idx_c
+    # Son kategori ROTATION_ORDER içinde nerede ise tam bir sonrakinden başla
+    if last_cat in ROTATION_ORDER:
+        start_idx = (ROTATION_ORDER.index(last_cat) + 1) % len(ROTATION_ORDER)
+        priority_categories = ROTATION_ORDER[start_idx:] + ROTATION_ORDER[:start_idx]
+    else:
+        priority_categories = list(ROTATION_ORDER)
 
-    # En uzun süredir haber girilmeyen kategoriden en yeniye doğru sırala
-    priority_categories = sorted(
-        OFFICIAL_CATEGORIES,
-        key=lambda c: cat_wait_distance[c],
-        reverse=True
-    )
-    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Sıradaki Kategori Önceliği: {priority_categories}")
+    # Eğer son 3 haberde hiç Gündem, Ekonomi veya Dünya yoksa, doğrudan Gündem -> Ekonomi -> Dünya'yı en başa çek!
+    core_cats = ["Gündem", "Ekonomi", "Dünya"]
+    if recent_cats and not any(c in recent_cats[:2] for c in core_cats):
+        missing_core = [c for c in core_cats if c not in recent_cats[:3]]
+        if missing_core:
+            others = [c for c in priority_categories if c not in missing_core]
+            priority_categories = missing_core + others
 
-    # Sırası gelen en acil kategorinin en yüksek puanlı haberini en başa koy
+    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Kesin Sıra: {priority_categories}")
+
     selected_pool = []
     for target_cat in priority_categories:
         cat_items = [item for item in fresh_news if item.get("category") == target_cat]
         cat_items.sort(key=lambda x: x.get("score", 0), reverse=True)
         selected_pool.extend(cat_items)
-
-    # Eğer herhangi bir nedenle liste dışı kategori varsa en sona ekle
-    remaining_items = [item for item in fresh_news if item not in selected_pool]
-    selected_pool.extend(remaining_items)
 
     processed_count = 0
     for item in selected_pool:
@@ -224,7 +230,7 @@ def run_bot(max_items: int = 1, force: bool = False):
             if success:
                 processed_count += 1
                 database.set_setting("last_bot_category", cat)
-                time.sleep(2)
+                time.sleep(1)
                 break
             else:
                 print(f"⚠️ Haber atlandı ({title_snippet}...), sıradaki deneniyor...")
