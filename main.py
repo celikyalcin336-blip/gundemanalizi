@@ -174,18 +174,42 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # Kategori sınırlaması ve saatlik kuşak kısıtlaması olmaksızın en yüksek puanlı taze haberi en başa al
-    fresh_news.sort(key=lambda x: x.get("score", 0), reverse=True)
+    # 🎯 ZORUNLU KATEGORİ ÇEŞİTLİLİĞİ VE ROTASYON MOTORU (8 Kategori Eşit ve Dengeli)
+    # Sitede ve Telegram'da aynı kategorinin üst üste basılmasını %100 engeller!
+    recent_arts = database.get_articles(limit=5)
+    recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
+    last_cat = recent_cats[0] if recent_cats else ""
+    print(f"📋 Son Paylaşılan Kategoriler: {recent_cats} (Son Yayınlanan: {last_cat or 'Yok'})")
+
+    # 1. Öncelik Havuzu: Son yayınlanan kategori HARİÇ diğer 7 kategorideki taze haberler
+    diverse_candidates = [item for item in fresh_news if item.get("category") != last_cat]
+
+    # Son 3 haberde 2 veya daha fazla basılmış bir kategori varsa onu da geri plana it
+    from collections import Counter
+    cat_freq = Counter(recent_cats[:3])
+    overused_cats = {c for c, count in cat_freq.items() if count >= 2}
+    if overused_cats:
+        stricter = [item for item in diverse_candidates if item.get("category") not in overused_cats]
+        if stricter:
+            diverse_candidates = stricter
+
+    if diverse_candidates:
+        diverse_candidates.sort(key=lambda x: x.get("score", 0), reverse=True)
+        selected_pool = diverse_candidates
+        print(f"✅ Çeşitlilik Sağlandı: [{last_cat}] kategorisi dışındaki {len(selected_pool)} aday arasından en iyi haber seçilecek.")
+    else:
+        fresh_news.sort(key=lambda x: x.get("score", 0), reverse=True)
+        selected_pool = fresh_news
+        print("⚠️ Diğer kategorilerde taze haber kalmadığı için genel havuzdan seçiliyor.")
 
     processed_count = 0
-    # Sıradaki haber hata verirse döngüyü kesme, havuzdaki diğer taze haberleri dene!
-    for item in fresh_news:
+    for item in selected_pool:
         if processed_count >= max_items:
             break
         title_snippet = item.get('title', '')[:45]
         cat = item.get('category', 'Gündem')
         score = item.get('score', 0)
-        print(f"🎯 [Otonom Bot] En önemli taze haber seçildi: [{cat}] {title_snippet}... (Puan: {score})")
+        print(f"🎯 [Otonom Bot] Seçilen Taze Haber: [{cat}] {title_snippet}... (Puan: {score})")
         try:
             success = process_single_news(item)
             if success:

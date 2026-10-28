@@ -254,7 +254,7 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     # 0. VEFAT, CENAZE, TAZİYE, YAS, ÖLÜM, KAZA & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
     # Kurban veya vefat eden kişi üniversiteli, liseli, öğretmen, doktor, polis veya sporcu olsa bile:
     # Ölüm, kaza, çarpışma, cinayet, facia haberleri ASLA Eğitim, Sağlık veya Spor yapılamaz!
-    death_accident_regex = r'\b(ölüm\w*|öldü\w*|ölen\w*|ölü\b|vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|can verdi\w*|can pazarı\w*|facia\w*|katliam\w*|kaza\w*|feci kaza\w*|zincirleme kaza\w*|çarpıştı\w*|şarampole\w*|devrildi\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*|cansız beden\w*|ceset\w*|dehşet\w*|intihar\w*|boğul\w*|yangında can\w*)\b'
+    death_accident_regex = r'\b(ölüm\w*|öldü\w*|ölen\w*|ölü\b|vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|can verdi\w*|can pazarı\w*|facia\w*|katliam\w*|cinayet\w*|katledil\w*|kıyd\w*|vahşet\w*|bıçakla\w*|vurul\w*|öldürül\w*|boğazı\w*|kaza\w*|feci kaza\w*|zincirleme kaza\w*|çarpıştı\w*|şarampole\w*|devrildi\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*|cansız beden\w*|ceset\w*|cesed\w*|dehşet\w*|intihar\w*|boğul\w*|yangında can\w*)\b'
     if re.search(death_accident_regex, lower_title, re.IGNORECASE):
         return "Gündem"
 

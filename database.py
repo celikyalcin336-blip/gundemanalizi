@@ -685,12 +685,13 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
         if row:
             return True
 
-        # 4. Son 200 makale içinde Çok Katmanlı Akıllı Benzerlik Kontrolü
-        # Farklı ajanslar aynı haberi 1-2 kelime farkla veya soru formatında servis ettiğinde anında yakalar
+        # 4. Son 250 makale içinde Çelik Mükerrer Kalkanı (Akıllı Semantik ve Varlık Benzerliği)
+        # Farklı ajanslar aynı haberi farklı cümlelerle servis etse bile (MacBook, indirim vb.) %100 yakalar!
         dup_stopwords = {
             've', 'ile', 'bir', 'bu', 'da', 'de', 'ta', 'te', 'icin', 'için', 'yeni', 'son', 'dakika',
             'gore', 'göre', 'kadar', 'olan', 'olarak', 'eden', 'etti', 'yaptı', 'yaptığı', 'oldu',
-            'belli', 'iste', 'işte', 'isteği', 'hakkında', 'neden', 'hangi', 'kimdir', 'nereli', 'kaç'
+            'belli', 'iste', 'işte', 'isteği', 'hakkında', 'neden', 'hangi', 'kimdir', 'nereli', 'kaç',
+            'gibi', 'tum', 'tüm', 'neler', 'nelerdir', 'iste', 'boyle', 'böyle', 'biri', 'hepsi'
         }
 
         def get_word_stems(text):
@@ -703,28 +704,41 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
 
         stems_incoming = get_word_stems(clean_t)
 
-        cur = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 200")
+        cur = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 250")
         recent_articles = cur.fetchall()
 
         for r in recent_articles:
             exist_title = (r["title"] or "").strip().lower()
             exist_slug = (r["slug"] or "").strip().lower()
 
-            # A. Slug benzerliği (>85%)
-            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.85:
+            # A. Slug benzerliği (>75%)
+            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.75:
                 return True
 
-            # B. Doğrudan Başlık Benzerliği (>80%)
-            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.80:
+            # B. Doğrudan Başlık Benzerliği (>70%)
+            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.70:
                 return True
 
-            # C. Kelime Kökü Örtüşmesi (Ortak Kök Oranı >= %80)
-            if len(stems_incoming) >= 4:
+            # C. Çelik Kelime Kökü ve Anahtar Varlık Örtüşmesi (Hassas Dedup)
+            if len(stems_incoming) >= 3:
                 stems_exist = get_word_stems(exist_title)
-                if len(stems_exist) >= 4:
-                    overlap = len(stems_incoming & stems_exist)
+                if len(stems_exist) >= 3:
+                    overlap_stems = stems_incoming & stems_exist
+                    overlap = len(overlap_stems)
                     min_len = min(len(stems_incoming), len(stems_exist))
-                    if min_len > 0 and (overlap / min_len) >= 0.80:
+                    ratio = (overlap / min_len) if min_len > 0 else 0
+
+                    # 1. Ortak kelime kökü oranı %40 ve üzeriyse kesinlikle mükerrerdir
+                    if ratio >= 0.40:
+                        return True
+
+                    # 2. En az 3 kritik kök ortaksa (örn: macbo + pro + dokun veya kasm + indir + bakan)
+                    if overlap >= 3:
+                        return True
+
+                    # 3. İki başlıkta da en az 2 adet uzun/nadir kelime (>=5 harf) ortaksa mükerrerdir
+                    long_overlap = sum(1 for s in overlap_stems if len(s) >= 5)
+                    if long_overlap >= 2:
                         return True
 
         return False

@@ -168,6 +168,15 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
     if sum(1 for w in bio_spam_words if w in t_low) >= 2 or ("kimdir" in t_low and any(w in t_low for w in ["nereli", "yaşında", "tutuklandı", "servet", "sahibi"])):
         return True
 
+    # 2. Market Broşür & Aktüel Katalog Çöpleri (BİM, A101, ŞOK katalogları haber değildir)
+    catalog_spam = [
+        "aktüel", "katalog", "kataloğu", "fırsat kataloğu", "broşür", "aldın aldın",
+        "bim 1-", "bim'in yeni", "a101", "şok market", "haftanın fırsatları", "katalogda neler var",
+        "indirim kataloğu", "aktüel ürünler", "aktüel kataloğu"
+    ]
+    if any(cs in t_low for cs in catalog_spam):
+        return True
+
     combined = f"{title} {text}".lower()
     price_keywords = [
         "akaryakıt", "benzin", "motorin", "lpg", "altın fiyat", "çeyrek altın",
@@ -284,97 +293,107 @@ def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
 
 def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """
-    Haberin halkın ilgisini, cüzdanını ve günlük yaşamını ne kadar etkilediğini puanlar.
-    Yüksek puan = Viral, tıklanma garantili, halkın cebine ve hayatına dokunan haber.
-    Düşük puan = Kuru resmi protokol, bürokratik sıkıcı haberler.
+    Haberin halkın ilgisini, cüzdanını ve günlük yaşamını ne kadar etkilediğini dengeli biçimde puanlar.
+    Her kategoriye (Gündem, Spor, Dünya, Ekonomi, Sağlık, Otomobil, Teknoloji, Eğitim) eşit adalet sağlar.
     """
     text = f"{title} {summary}".lower()
     score = 50  # Taban puan
 
-    # 1. HALKIN CÜZDANI, ALIŞVERİŞ, TAKSİT & PARA (+35 - +60 Puan)
+    # 1. SICAK GÜNDEM, SON DAKİKA, KRİZ & ADLİ OLAYLAR (+40 Puan)
+    gundem_keywords = [
+        "son dakika", "flaş", "facia", "kaza", "can kaybı", "vefat", "cinayet",
+        "katliam", "vahşet", "operasyon", "gözaltı", "tutukla", "patlama", "yangın",
+        "deprem", "afad", "sel", "fırtına", "meteoroloji", "sarı kod", "turuncu kod",
+        "bakanlık", "tbmm", "resmi gazete", "kararname", "yargıtay", "danıştay"
+    ]
+    for kw in gundem_keywords:
+        if kw in text:
+            score += 40
+            break
+
+    # 2. SPOR, DERBİ, TRANSFER & SÜPER LİG (+40 Puan)
+    spor_keywords = [
+        "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor", "süper lig",
+        "şampiyonlar ligi", "uefa", "avrupa ligi", "derbi", "transfer",
+        "a milli", "milli takım", "mourinho", "okan buruk", "gol", "galibiyet"
+    ]
+    for kw in spor_keywords:
+        if kw in text:
+            score += 40
+            break
+
+    # 3. KÜRESEL GELİŞMELER, DÜNYA & DIŞ POLİTİKA (+35 Puan)
+    dunya_keywords = [
+        "savaş", "füze", "hava saldırısı", "ateşkes", "israil", "gazze", "iran",
+        "lübnan", "abd", "rusya", "ukrayna", "çin", "trump", "putin", "nato",
+        "pentagon", "beyaz saray", "avrupa birliği", "kktc"
+    ]
+    for kw in dunya_keywords:
+        if kw in text:
+            score += 35
+            break
+
+    # 4. HALKIN CÜZDANI, EKONOMİ, MAAŞ & FİYATLAR (+35 Puan)
     cuzdan_keywords = [
-        "taksit", "kredi kartı", "kredi", "bddk", "alışveriş", "zam", "indirim",
-        "asgari ücret", "emekli", "maaş", "ikramiye", "promosyon", "altın", "dolar",
-        "euro", "faiz", "mevduat", "akaryakıt", "benzin", "motorin", "lpg",
-        "vergi", "ceza", "yapılandırma", "fatura", "elektrik", "doğalgaz",
-        "kira", "ev sahibi", "kiracı", "konut kredisi", "toki", "borsa", "hisse",
-        "para", "fiyat", "enflasyon", "market", "kdv", "ötv", "kota", "limit"
+        "asgari ücret", "emekli", "maaş", "zam", "enflasyon", "tüfe", "tcmb",
+        "merkez bankası", "faiz kararı", "altın", "dolar", "euro", "akaryakıt",
+        "benzin", "motorin", "vergi", "kira", "kredi kartı", "konut kredisi"
     ]
     for kw in cuzdan_keywords:
         if kw in text:
             score += 35
             break
 
-    # Ekstra yüksek tetikleyiciler (taksit, kota, zam, emekli, asgari ücret, altın)
-    super_triggers = ["taksit", "kota", "limit", "asgari ücret", "emekli maaşı", "akaryakıt", "altın", "faiz kararı"]
-    for st in super_triggers:
-        if st in text:
-            score += 25
-            break
-
-    # 2. GÜNLÜK YAŞAM, TÜKETİCİ & RESMİ HAKLAR (+25 Puan)
-    yasam_keywords = [
-        "ehliyet", "pasaport", "kimlik", "bayram", "tatil", "okul", "milli eğitim",
-        "üniversite", "sınav", "ösym", "yks", "kpss", "e-devlet", "sgk",
-        "sağlık", "hastane", "randevu", "mhrs", "ulaşım", "metro", "marmaray"
-    ]
-    for kw in yasam_keywords:
-        if kw in text:
-            score += 25
-            break
-
-        # 3. OTOMOBİL & TAŞIT KAMPANYALARI (+35 Puan)
-    oto_keywords = [
-        "otomobil", "araba", "sıfır araç", "fiyat listesi", "kampanya", "togg",
-        "t10x", "egea", "doblo", "clio", "ötv", "faizsiz", "taşıt kredisi",
-        "elektrikli araç", "hyundai", "toyota", "volkswagen", "chery", "byd",
-        "renault", "fiat", "peugeot", "skoda", "indirimli fiyat"
-    ]
-    for kw in oto_keywords:
-        if kw in text:
-            score += 35
-            break
-
-    # 4. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+30 Puan)
+    # 5. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+30 Puan)
     tekno_keywords = [
-        "whatsapp", "instagram", "apple", "iphone", "android", "telefon",
-        "dolandırıcılık", "oltalama", "yapay zeka", "chatgpt", "openai", "gemini",
-        "samsung", "galaxy", "nvidia", "işlemci", "akıllı telefon", "ios", "güncelleme"
+        "yapay zeka", "chatgpt", "openai", "gemini", "deepseek", "sora",
+        "apple", "iphone", "ios", "samsung", "galaxy", "android",
+        "nvidia", "işlemci", "siber güvenlik", "hacker"
     ]
     for kw in tekno_keywords:
         if kw in text:
             score += 30
             break
 
-    # 5. SAĞLIK & BESLENME (+30 Puan)
+    # 6. OTOMOBİL & TAŞIT PİYASASI (+30 Puan)
+    oto_keywords = [
+        "togg", "t10x", "t10f", "sıfır araç", "fiyat listesi", "ötv",
+        "elektrikli araç", "otomobil", "chery", "byd", "clio", "egea"
+    ]
+    for kw in oto_keywords:
+        if kw in text:
+            score += 30
+            break
+
+    # 7. SAĞLIK & BESLENME (+30 Puan)
     saglik_keywords = [
-        "sağlık bakanlığı", "grip", "aşı", "beslenme", "diyet", "kolesterol",
-        "tansiyon", "kanser", "tedavi", "ilaç", "check-up", "kalp sağlığı",
-        "bağışıklık", "vitamin", "doktor"
+        "sağlık bakanlığı", "salgın", "virüs", "kanser", "kalp sağlığı",
+        "ilaç", "aşı", "tedavi", "hastane", "ameliyat", "bağışıklık", "grip"
     ]
     for kw in saglik_keywords:
         if kw in text:
             score += 30
             break
 
-# 4. BÜYÜK AFETLER & HAVA DURUMU (+30 Puan)
-    afet_keywords = ["deprem", "kandilli", "afad", "fırtına", "meteoroloji", "sarı kod", "turuncu kod"]
-    for kw in afet_keywords:
+    # 8. EĞİTİM & SINAVLAR (+30 Puan)
+    egitim_keywords = [
+        "meb", "milli eğitim", "yusuf tekin", "yks", "lgs", "kpss", "ösym",
+        "sınav", "üniversite", "öğretmen atama", "ara tatil", "kar tatili", "karne"
+    ]
+    for kw in egitim_keywords:
         if kw in text:
             score += 30
             break
 
-    # 5. PROTOKOL & KURU BÜROKRATİK SİYASET CEZASI (-45 Puan)
-    # Halkı ilgilendirmeyen protokol temasları ve kuru demeçleri geri plana at
+    # Kuru bürokratik protokol cezası (-40 Puan)
     protokol_keywords = [
         "kabul etti", "ziyaret etti", "bir araya geldi", "görüştü",
         "tebrik etti", "basın toplantısı düzenledi", "heyetini ağırladı",
-        "açıklamalarda bulundu", "tbmm komisyon", "toplantısı sona erdi",
-        "protokol imzalandı", "büyükelçisi", "diplomatik temas"
+        "tbmm komisyon", "toplantısı sona erdi", "protokol imzalandı"
     ]
     for pk in protokol_keywords:
         if pk in text:
-            score -= 45
+            score -= 40
             break
 
     return score
