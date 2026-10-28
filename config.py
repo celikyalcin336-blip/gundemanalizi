@@ -33,8 +33,8 @@ X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Tweetler 
 
 # Telegram Bildirim Ayarları
 # Gizli bilgiler koda YAZILMAZ: yerelde .env dosyasından, Render'da Environment ayarlarından okunur.
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip() or "8714879941:AAHJ6JMBu0wXr_yhFVFgjb_Y0wfD-19Zrso"
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003631115657")  # Gündem Analizi Kanalı
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip() or "8882292811:AAFLAsm5c7OBsnN8iVU2MWpwfPeTxwRGHMg"
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "@gundemanalizi")  # Gündem Analizi Kanalı
 TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "1934709259")  # Yalçın Çelik Özel Chat
 
 # Marka ve Web Sitesi Bilgisi
