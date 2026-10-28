@@ -32,6 +32,7 @@ import config
 import telegram_notifier
 import meta_poster
 import youtube_uploader
+import tiktok_uploader
 import daily_bulletin_engine
 
 LOG_FILE = os.path.join(BASE_DIR, "bulletin_publish_log.json")
@@ -156,7 +157,7 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     time.sleep(3)
 
     # 5. ADIM: YOUTUBE SHORTS
-    print("\n🎬 5/5 - YouTube Shorts Kanalına Yükleniyor...")
+    print("\n🎬 5/6 - YouTube Shorts Kanalına Yükleniyor...")
     try:
         yt_res = youtube_uploader.upload_shorts(
             video_path=video_path,
@@ -171,6 +172,26 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     except Exception as e:
         print(f"❌ YouTube Shorts istisnası: {e}")
         report["platforms"]["youtube"] = {"status": "error", "error": str(e)}
+
+    # Platformlar arası 3 saniye nefes payı
+    time.sleep(3)
+
+    # 6. ADIM: TIKTOK
+    print("\n🎵 6/6 - TikTok Kanalına Yükleniyor...")
+    try:
+        tt_res = tiktok_uploader.upload_tiktok_video(
+            video_path=video_path,
+            caption=f"1 Dakikada Türkiye Gündemi! ({today_str}) #GününÖzeti",
+            headless=True
+        )
+        report["platforms"]["tiktok"] = tt_res
+        if tt_res.get("status") == "success":
+            print("✅ TikTok video paylaşımı başarılı!")
+        else:
+            print(f"⚠️ TikTok sonucu: {tt_res}")
+    except Exception as e:
+        print(f"❌ TikTok istisnası: {e}")
+        report["platforms"]["tiktok"] = {"status": "error", "error": str(e)}
 
     append_log(report)
     print("\n🎉 [TAMAMLANDI] Dağıtım özeti kaydedildi.")
