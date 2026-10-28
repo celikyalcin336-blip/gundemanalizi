@@ -13,7 +13,6 @@ import requests
 import re
 from datetime import datetime, timezone, timedelta
 from typing import Tuple, Optional
-from requests_oauthlib import OAuth1
 from PIL import Image
 
 import config
