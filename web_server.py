@@ -53,10 +53,10 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - 60 saniyede bir yoklar; main.py içindeki 14.5 dakikalık hassas veritabanı kilidi sayesinde
+    - 60 saniyede bir yoklar; main.py içindeki 14.0 dakikalık hassas veritabanı kilidi sayesinde
       hazırlık süresiyle birlikte tam 15:00. dakikada haber yayına girer.
     """
-    time.sleep(30)
+    time.sleep(25)
     print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
     main_script = os.path.join(BASE_DIR, "main.py")
 
@@ -69,8 +69,9 @@ def bot_background_worker():
                 timeout=360
             )
             if res.stdout:
-                for line in res.stdout.strip().splitlines()[-6:]:
-                    print(f"   [Bot]: {line}")
+                for line in res.stdout.strip().splitlines():
+                    if line.strip():
+                        print(f"   [Bot]: {line}")
             if res.stderr and res.returncode != 0:
                 print(f"   [Bot Hata]: {res.stderr.strip()[:250]}")
         except Exception as e:

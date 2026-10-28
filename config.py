@@ -3,7 +3,11 @@ import base64
 from dotenv import load_dotenv
 
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-load_dotenv(env_path)
+try:
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+except Exception:
+    pass
 
 # Meta (Facebook & Instagram Reels & Hikayeler) Ayarları
 META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
