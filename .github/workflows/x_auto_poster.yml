@@ -2,8 +2,8 @@ name: X (Twitter) 7/24 Auto Poster
 
 on:
   schedule:
-    # Her 10 dakikada bir kontrol eder (50 dakika dolduğunda anında paylaşır - Neon yükü %0)
-    - cron: '*/10 * * * *'
+    # Her saat başı tam vaktinde uyanır (19:00, 20:00, 21:00...), tweet atar ve 1 saat uyur
+    - cron: '0 * * * *'
   workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
 
 permissions:
@@ -35,7 +35,7 @@ jobs:
           SITE_URL: "https://xn--gndemanalizi-dlb.com.tr"
           TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
           TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
-          X_COOLDOWN_MINUTES: "50.0"
+          X_COOLDOWN_MINUTES: "55.0"
           PYTHONUNBUFFERED: "1"
         run: |
           python -u run_x_cycle.py
