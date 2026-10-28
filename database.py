@@ -747,6 +747,17 @@ def mark_as_posted(news_hash: str, title: str, source: str = "", link: str = "",
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (news_hash, title, source, link, fb_id, ig_id))
 
+def get_last_bot_posted_time() -> Optional[str]:
+    """Botun en son paylaştığı haberin zamanını döner (Yalçın Bey'in panelden attığı manuel videoları karıştırmaz)."""
+    try:
+        with get_connection() as conn:
+            row = conn.execute("SELECT created_at FROM posted_news ORDER BY id DESC LIMIT 1").fetchone()
+            if row and row.get("created_at"):
+                return str(row["created_at"])
+    except Exception as e:
+        print(f"get_last_bot_posted_time error: {e}")
+    return None
+
 
 def save_article(title: str, summary: str, content: str, image_path: str, source: str, category: str = "Gündem") -> str:
     """Makaleyi web sitesi veritabanına kaydeder ve SEO URL slug'ını döner."""

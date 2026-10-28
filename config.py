@@ -152,7 +152,7 @@ RSS_FEEDS = [
         "category": "Sağlık"
     },
 
-        # 🎓 EĞİTİM, MEB & SINAVLAR (Yüksek Tık & Aile/Öğrenci Trafiği)
+    # 🎓 EĞİTİM, MEB & SINAVLAR (Yüksek Tık & Aile/Öğrenci Trafiği)
     {
         "name": "Anadolu Ajansı Eğitim",
         "url": "https://www.aa.com.tr/tr/rss/default?cat=egitim",

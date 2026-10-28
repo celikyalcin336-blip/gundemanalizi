@@ -161,37 +161,43 @@ def process_single_news(item: dict) -> bool:
     print("💾 Haber veritabanına kaydedildi (tekrar paylaşılmayacak).")
     return True
 
-def get_minutes_since_last_article() -> float:
-    """Veritabanındaki en son yayınlanan haberin üzerinden kaç dakika geçtiğini kesin olarak hesaplar."""
+def get_seconds_since_last_article() -> float:
+    """Botun en son yayınladığı haberin üzerinden kaç saniye geçtiğini kesin olarak hesaplar (Manuel videolar botu durdurmaz)."""
     try:
-        articles = database.get_articles(limit=1)
-        if not articles:
-            return 999.0
-        art = articles[0]
-        val = art.get("created_at")
-        if not val:
-            return 999.0
-        clean_val = str(val).split(".")[0].replace("T", " ")[:19]
+        # 1. Önce botun kendi paylaştığı son habere bak (Yalçın Bey'in panele attığı manuel videolar botun saatini bozmaz!)
+        last_time_str = database.get_last_bot_posted_time()
+        if not last_time_str:
+            articles = database.get_articles(limit=1)
+            if not articles:
+                return 999999.0
+            last_time_str = str(articles[0].get("created_at") or "")
+
+        if not last_time_str:
+            return 999999.0
+
+        clean_val = str(last_time_str).split(".")[0].replace("T", " ")[:19]
         dt = datetime.strptime(clean_val, "%Y-%m-%d %H:%M:%S").replace(tzinfo=database.TR_TZ)
         now_tr = datetime.now(database.TR_TZ)
         diff_sec = (now_tr - dt).total_seconds()
         if diff_sec < -60:
-            return 999.0
-        return max(0.0, diff_sec / 60.0)
+            return 999999.0
+        return max(0.0, diff_sec)
     except Exception as e:
         print(f"Son haber zamanı kontrolü hatası: {e}")
-    return 999.0
+    return 999999.0
+
+def get_minutes_since_last_article() -> float:
+    return get_seconds_since_last_article() / 60.0
 
 def run_bot(max_items: int = 1, force: bool = False):
     """Gündemi kontrol edip en güncel ve en yüksek gelirli haberleri döngüsel paylaşır."""
     if not force:
         # Tam 15.0 dakika (900 saniye) kuralı:
-        # AI metin ve görsel kolaj üretimi ~25-30 sn sürdüğü için, 14.5 dakikada (870 sn) tetiklenir
-        # ve tam 15.0 dakikada (900. saniyede) siteye ve Telegram'a girer!
-        target_cooldown = 14.5
-        minutes_passed = get_minutes_since_last_article()
-        if minutes_passed < target_cooldown:
-            remaining = round(target_cooldown - minutes_passed, 1)
+        # 30 saniye erken uyanış (hazırlık payı) ile 870. saniyede (14.5 dk) başlar
+        # ve tam 900. saniyede (15.0 dk) site ve Telegram'da yayına girer!
+        target_cooldown_sec = 870.0
+        sec_passed = get_seconds_since_last_article()
+        if sec_passed < target_cooldown_sec:
             return 0
     print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] 🔍 Güncel haberler taranıyor...")
     news_items = news_fetcher.fetch_latest_news(limit_per_feed=25)

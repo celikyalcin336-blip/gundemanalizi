@@ -53,20 +53,39 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - Doğrudan süreç içinde (in-process) çalışarak bellek tasarrufu sağlar ve subprocess çökme riskini sıfırlar.
-    - Her 30 saniyede bir yoklar; 13 dakikalık zaman kilidi + hazırlık süresiyle tam 15.0 dakikada bir haber yayına girer.
+    - Hedef: Tam 15.0 dakikada bir (900 saniye) haberin siteye ve Telegram'a girmesi.
+    - Erken Uyanma Prensibi: AI metin ve görsel üretimi ortalama 25-30 saniye sürdüğü için,
+      900 saniyenin dolmasına 30 saniye kala (870. saniyede / 14.5 dk) erken uyanır.
+    - Haberi hazırlar ve tam 900. saniyede (15.0 dakikada) site ve Telegram'a basar.
+    - Uykuyu rastgele değil, veritabanındaki son haberin saniyesine göre dinamik hesaplar.
     """
-    time.sleep(15)
-    print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
+    time.sleep(10)
+    print("🚀 [Otonom Bot] 7/24 Akıllı Zaman Ayarlı Haber Robotu Devrede (Tam 15 Dk / 900 Sn)...")
+
+    TARGET_INTERVAL_SEC = 900.0  # 15 dakika = 900 saniye
+    PREP_LEAD_SEC = 30.0        # 30 saniye erken uyanış (hazırlık payı)
+    WAKEUP_THRESHOLD_SEC = TARGET_INTERVAL_SEC - PREP_LEAD_SEC  # 870 saniye (14.5 dk)
 
     while True:
         try:
-            main.run_bot(max_items=1, force=False)
+            sec_passed = main.get_seconds_since_last_article()
+            if sec_passed >= WAKEUP_THRESHOLD_SEC:
+                # 14.5 dakika doldu, erken uyanıp haberi hazırla ve tam 15.0 dk'da yayına al
+                print(f"⏰ [Erken Uyanış] Son haberden bu yana {round(sec_passed/60.0, 1)} dk geçti. Haber hazırlanıyor...")
+                published = main.run_bot(max_items=1, force=True)
+                if published > 0:
+                    print("✅ [15 Dakika Tamamlandı] Yeni haber başarıyla site ve Telegram'da yayında.")
+                else:
+                    print("ℹ️ Bu turda taze haber işlenemedi, 15 saniye sonra tekrar yoklanacak.")
+                time.sleep(15)
+            else:
+                # Henüz 14.5 dakika dolmadı; kalan süreye göre akıllı uyku süresi belirle
+                rem_sec = WAKEUP_THRESHOLD_SEC - sec_passed
+                sleep_dur = max(5.0, min(rem_sec, 20.0))
+                time.sleep(sleep_dur)
         except Exception as e:
-            print(f"⚠️ [Otonom Bot] Hata: {e}")
-
-        # Her 15 saniyede bir kontrol et (Tam 15.0 dakikada / 900 sn'de bir haber yayına girer)
-        time.sleep(15)
+            print(f"⚠️ [Otonom Bot] Döngü hatası: {e}")
+            time.sleep(15)
 
 def system_health_watchdog_worker():
     """
