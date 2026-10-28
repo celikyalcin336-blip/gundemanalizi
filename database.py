@@ -1268,8 +1268,8 @@ def get_dashboard_summary() -> Dict:
                 five_min_ago_utc = (datetime.now(timezone.utc) - timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
                 seven_days_ago_utc = (today_start_tr - timedelta(days=7)).astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
-                # 🤖 Bot Filtresi: Googlebot, Bingbot, MetaBot, Arama Botları hariç SADECE GERÇEK İNSANLAR
-                human_filter = "AND (device NOT LIKE '🤖%' AND device NOT LIKE '%Bot%' AND device NOT LIKE '%bot%' AND device NOT LIKE '%crawl%' AND device NOT LIKE '%spider%')"
+                # 🤖 Bot Filtresi: SADECE GERÇEK İNSANLAR (Mobil, Masaüstü, Tablet)
+                human_filter = "AND device IN ('Mobil', 'Masaüstü', 'Tablet')"
 
                 act_row = conn.execute(f"""
                     SELECT COUNT(DISTINCT visitor_hash) AS c 
@@ -1303,7 +1303,7 @@ def get_dashboard_summary() -> Dict:
                     SELECT COUNT(DISTINCT visitor_hash) AS c 
                     FROM visitor_logs 
                     WHERE created_at >= ? 
-                      AND (referrer = 'Google' OR referrer LIKE '%google%')
+                      AND referrer = 'Google'
                       {human_filter}
                 """, (today_start_utc,)).fetchone()
                 google_today = goog_row["c"] if goog_row else 0
@@ -1313,7 +1313,7 @@ def get_dashboard_summary() -> Dict:
                     SELECT COUNT(DISTINCT visitor_hash) AS c 
                     FROM visitor_logs 
                     WHERE created_at >= ? 
-                      AND (device LIKE '🤖%' OR device LIKE '%Bot%' OR device LIKE '%bot%')
+                      AND device NOT IN ('Mobil', 'Masaüstü', 'Tablet')
                 """, (today_start_utc,)).fetchone()
                 bot_uniques_today = bot_row["c"] if bot_row else 0
 
