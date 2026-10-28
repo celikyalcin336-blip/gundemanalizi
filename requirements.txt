@@ -9,3 +9,4 @@ psycopg2-binary>=2.9.9
 google-genai>=1.0.0
 gTTS>=2.5.0
 moviepy>=2.2.0
+python-multipart>=0.0.9
