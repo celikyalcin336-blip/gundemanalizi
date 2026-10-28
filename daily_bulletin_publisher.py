@@ -33,6 +33,7 @@ import telegram_notifier
 import meta_poster
 import youtube_uploader
 import tiktok_uploader
+import x_poster
 import daily_bulletin_engine
 
 LOG_FILE = os.path.join(BASE_DIR, "bulletin_publish_log.json")
@@ -177,7 +178,7 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     time.sleep(3)
 
     # 6. ADIM: TIKTOK
-    print("\n🎵 6/6 - TikTok Kanalına Yükleniyor...")
+    print("\n🎵 6/7 - TikTok Kanalına Yükleniyor...")
     try:
         tt_res = tiktok_uploader.upload_tiktok_video(
             video_path=video_path,
@@ -192,6 +193,30 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     except Exception as e:
         print(f"❌ TikTok istisnası: {e}")
         report["platforms"]["tiktok"] = {"status": "error", "error": str(e)}
+
+    # Platformlar arası 3 saniye nefes payı
+    time.sleep(3)
+
+    # 7. ADIM: TWITTER / X
+    print("\n🐦 7/7 - Twitter / X (@gndmanalizi) Video Paylaşılıyor...")
+    try:
+        x_tweet_text = (
+            f"🔴 GÜNÜN ÖZETİ ({today_str})\n"
+            f"Türkiye gündeminde son 24 saatte öne çıkan 6 kritik gelişme tek dakikada!\n\n"
+            f"1️⃣ Ekonomi | 2️⃣ Sağlık | 3️⃣ Spor\n"
+            f"4️⃣ Eğitim | 5️⃣ Otomobil | 6️⃣ Teknoloji\n\n"
+            f"🌐 Detaylar: https://gundemanalizi.com.tr\n"
+            f"#GündemAnalizi #GününÖzeti #Haberler #SonDakika"
+        )
+        x_res = x_poster.post_tweet_playwright(text=x_tweet_text, media_path=video_path)
+        report["platforms"]["x"] = x_res
+        if x_res.get("status") == "success":
+            print("✅ Twitter / X video paylaşımı başarılı!")
+        else:
+            print(f"⚠️ Twitter / X sonucu: {x_res}")
+    except Exception as e:
+        print(f"❌ Twitter / X istisnası: {e}")
+        report["platforms"]["x"] = {"status": "error", "error": str(e)}
 
     append_log(report)
     print("\n🎉 [TAMAMLANDI] Dağıtım özeti kaydedildi.")

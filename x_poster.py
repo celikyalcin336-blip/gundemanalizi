@@ -23,8 +23,8 @@ TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip() or "48afdd1c4cdaae9ffc2d2e8a6
 
 TR_TZ = timezone(timedelta(hours=3))
 
-# Tweet sıklığı (varsayılan: 45 dakikada 1 -> günde ~20 tweet)
-X_COOLDOWN_MINUTES = float(getattr(config, "X_COOLDOWN_MINUTES", 45.0))
+# Tweet sıklığı (50 dakikada 1)
+X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", getattr(config, "X_COOLDOWN_MINUTES", 50.0)))
 
 # -------------------------------------------------------------
 # 🛡️ ÇÖP & TIK TUZAĞI (CLICKBAIT) ENGELLEYİCİ LİSTESİ
@@ -224,18 +224,26 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
                 file_input = page.locator('input[data-testid="fileInput"]').first
                 if file_input.count():
                     file_input.set_input_files(media_path)
-                    # Medyanın yüklenmesi için güvenli bekleme
-                    page.wait_for_timeout(4000)
+                    is_video = media_path.lower().endswith(('.mp4', '.mov', '.avi'))
+                    wait_sec = 18 if is_video else 4
+                    print(f"⏳ Medya X'e yükleniyor ({'Video' if is_video else 'Görsel'}), {wait_sec}s bekleniyor...")
+                    page.wait_for_timeout(wait_sec * 1000)
 
-            # Tweeti Gönder (Ctrl+Enter ve Buton Tıklaması)
+            # Tweeti Gönder
+            post_btn = page.locator('button[data-testid="tweetButton"]').first
+            if not post_btn.count():
+                post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
+
+            # Video yükleme sonrası butonun aktifleşmesini bekle (maksimum 30s)
+            for _ in range(15):
+                if post_btn.count() and post_btn.get_attribute("disabled") is None:
+                    break
+                page.wait_for_timeout(2000)
+
             try:
                 editor.first.press("Control+Enter")
             except Exception:
                 pass
-
-            post_btn = page.locator('button[data-testid="tweetButton"]').first
-            if not post_btn.count():
-                post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
 
             if post_btn.count():
                 try:
@@ -243,7 +251,7 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
                 except Exception:
                     pass
 
-            page.wait_for_timeout(5000)
+            page.wait_for_timeout(6000)
             browser.close()
             return {"status": "success"}
     except Exception as e:
