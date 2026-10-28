@@ -17,9 +17,9 @@ from PIL import Image
 
 import config
 
-# Doğrulanmış Oturum Çerezleri (@gndmanalizi)
-TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip() or "2a76b61426aa6fd6cddcb13505801653449db92f"
-TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip() or "48afdd1c4cdaae9ffc2d2e8a66a03a5ca00489c3ffbe9cfa2bce7a79f75b4ce33315568bb0b93778cb8d5112dd46b2f850de0cf2d29bd463d41960a926ebaf0bdba5e6d104ca10b3593132b4c992781a"
+# Doğrulanmış Oturum Çerezleri (@gndmanalizi) - Ortam değişkeninden okunur
+TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip()
+TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip()
 
 TR_TZ = timezone(timedelta(hours=3))
 

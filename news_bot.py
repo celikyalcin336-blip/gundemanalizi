@@ -291,31 +291,15 @@ def _collect_candidates() -> list:
     return items
 
 
-def _slot_categories() -> list:
-    h = datetime.now(database.TR_TZ)
-    h = h.hour + h.minute / 60.0
-    if 7.0 <= h < 10.5:
-        return ["Ekonomi", "Gündem", "Otomobil"]
-    if 10.5 <= h < 16.5:
-        return ["Teknoloji", "Otomobil", "Gündem", "Sağlık", "Eğitim"]
-    if 16.5 <= h < 23.0:
-        return ["Spor", "Gündem", "Ekonomi"]
-    return ["Dünya", "Teknoloji", "Otomobil", "Gündem"]
-
-
 def _rank(items: list) -> list:
-    """Önce tazelik penceresi, sonra kuşak kategorisi rotasyonu, sonra en yeni haber."""
+    """En taze ve görselli haberleri en öne alır (kuşak/saat kısıtlaması yok)."""
     fresh = [i for i in items if i["age_h"] <= FRESH_HOURS_PRIMARY] or items
-    cats = _slot_categories()
     last_cat = database.get_setting(LAST_CAT_KEY, "")
-    if last_cat in cats:
-        idx = (cats.index(last_cat) + 1) % len(cats)
-        cats = cats[idx:] + cats[:idx]
 
     def key(i):
-        cat_rank = cats.index(i["category"]) if i["category"] in cats else len(cats)
+        same_cat = 1 if (last_cat and i["category"] == last_cat) else 0
         has_img = 0 if i.get("image_url") else 1
-        return (cat_rank, has_img, -i["pub_ts"])
+        return (same_cat, has_img, -i["pub_ts"])
 
     return sorted(fresh, key=key)
 
