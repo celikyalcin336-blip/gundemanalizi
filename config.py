@@ -32,12 +32,7 @@ X_URL = "https://x.com/gndmanalizi"
 X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Saatte 1 tweet (Tam saat başı kilit tamponu: 45 dk)
 
 # Telegram Bildirim Ayarları
-_env_tg = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-if not _env_tg or _env_tg.startswith("8714879941"):
-    TELEGRAM_BOT_TOKEN = "8882292811:AAFLAsm5c7OBsnN8iVU2MWpwfPeTxwRGHMg"
-else:
-    TELEGRAM_BOT_TOKEN = _env_tg
-
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip() or "@gundemanalizi"
 if TELEGRAM_CHAT_ID.startswith("-1003631115657"):
     TELEGRAM_CHAT_ID = "@gundemanalizi"
