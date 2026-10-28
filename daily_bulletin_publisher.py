@@ -31,6 +31,7 @@ if BASE_DIR not in sys.path:
 import config
 import telegram_notifier
 import meta_poster
+import youtube_uploader
 import daily_bulletin_engine
 
 LOG_FILE = os.path.join(BASE_DIR, "bulletin_publish_log.json")
@@ -135,7 +136,7 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     time.sleep(3)
 
     # 4. ADIM: FACEBOOK REELS & VİDEO
-    print("\n📘 4/4 - Facebook Sayfasına Video/Reels Olarak Yayınlanıyor...")
+    print("\n📘 4/5 - Facebook Sayfasına Video/Reels Olarak Yayınlanıyor...")
     try:
         fb_res = meta_poster.post_video_to_facebook(
             video_path=video_path,
@@ -150,6 +151,26 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     except Exception as e:
         print(f"❌ Facebook istisnası: {e}")
         report["platforms"]["facebook"] = {"status": "error", "error": str(e)}
+
+    # Platformlar arası 3 saniye nefes payı
+    time.sleep(3)
+
+    # 5. ADIM: YOUTUBE SHORTS
+    print("\n🎬 5/5 - YouTube Shorts Kanalına Yükleniyor...")
+    try:
+        yt_res = youtube_uploader.upload_shorts(
+            video_path=video_path,
+            title=f"1 Dakikada Türkiye Gündemi! ({today_str}) #Shorts",
+            description=caption
+        )
+        report["platforms"]["youtube"] = yt_res
+        if yt_res.get("status") == "success":
+            print(f"✅ YouTube Shorts yayında! URL: {yt_res.get('url')}")
+        else:
+            print(f"⚠️ YouTube sonucu: {yt_res}")
+    except Exception as e:
+        print(f"❌ YouTube Shorts istisnası: {e}")
+        report["platforms"]["youtube"] = {"status": "error", "error": str(e)}
 
     append_log(report)
     print("\n🎉 [TAMAMLANDI] Dağıtım özeti kaydedildi.")
