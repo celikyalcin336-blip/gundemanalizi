@@ -18,13 +18,16 @@ import time
 import json
 from datetime import datetime
 
-if sys.stdout.encoding != 'utf-8':
+if sys.stdout and getattr(sys.stdout, 'encoding', '') != 'utf-8':
     try:
         sys.stdout.reconfigure(encoding='utf-8')
     except Exception:
         pass
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(BASE_DIR)
+from dotenv import load_dotenv
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 if BASE_DIR not in sys.path:
     sys.path.append(BASE_DIR)
 
@@ -98,8 +101,8 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
         story_text = "\n".join(story_lines)
     else:
         story_text = (
-            "1️⃣ EKONOMİ | 2️⃣ SAĞLIK | 3️⃣ SPOR\n"
-            "4️⃣ EĞİTİM | 5️⃣ OTOMOBİL | 6️⃣ TEKNOLOJİ"
+            "1️⃣ GÜNDEM | 2️⃣ EKONOMİ | 3️⃣ DÜNYA\n"
+            "4️⃣ SAĞLIK | 5️⃣ TEKNOLOJİ | 6️⃣ SPOR"
         )
 
     caption = (

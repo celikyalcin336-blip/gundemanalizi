@@ -323,7 +323,7 @@ def generate_news_video(
 def download_social_video(url: str, output_path: str) -> str:
     """
     X (Twitter), TikTok, Instagram, Reddit veya doğrudan .mp4 linkinden
-    ham videoyu indirir. Subprocess ve hafif API kullanarak ana sunucu RAM'ini (512MB) hiç şişirmez.
+    en yüksek kaliteli (HD 1080p) ham videoyu indirir.
     """
     import re
     import subprocess
@@ -341,7 +341,7 @@ def download_social_video(url: str, output_path: str) -> str:
     if clean_url.lower().split("?")[0].endswith(".mp4"):
         return _stream_download(clean_url, output_path)
 
-    # 1. X (Twitter) linkleri için 0-RAM hızlı doğrudan CDN çözücü (fxtwitter API)
+    # 1. X (Twitter) linkleri için en yüksek bitrateli (HD) MP4 akışını seç
     m_tw = re.search(r"(?:x\.com|twitter\.com)/([^/?#]+)/status/(\d+)", clean_url)
     if m_tw:
         try:
@@ -353,11 +353,13 @@ def download_social_video(url: str, output_path: str) -> str:
                 if videos:
                     v0 = videos[0]
                     best_mp4 = v0.get("url")
-                    # Render 0.1 CPU'da çok hızlı işlenmesi için varsa orta (480p-720p) mp4 formatını seç
-                    for fmt in (v0.get("formats") or []):
-                        if fmt.get("container") == "mp4" and 400000 <= (fmt.get("bitrate") or 0) <= 1500000:
-                            best_mp4 = fmt.get("url")
-                            break
+                    mp4_formats = [
+                        fmt for fmt in (v0.get("formats") or [])
+                        if fmt.get("container") == "mp4" and fmt.get("url")
+                    ]
+                    if mp4_formats:
+                        mp4_formats.sort(key=lambda x: x.get("bitrate") or 0, reverse=True)
+                        best_mp4 = mp4_formats[0].get("url")
                     if best_mp4:
                         return _stream_download(best_mp4, output_path)
         except Exception:
@@ -371,13 +373,13 @@ def download_social_video(url: str, output_path: str) -> str:
         "--no-playlist",
         "--no-warnings",
         "--no-check-certificates",
-        "--max-filesize", "35M",
-        "-f", "best[height<=720][ext=mp4]/best[ext=mp4]/best",
+        "--max-filesize", "80M",
+        "-f", "bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/best[ext=mp4]/best",
         "--merge-output-format", "mp4",
         "-o", output_path,
         clean_url
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
     if proc.returncode != 0 or not os.path.exists(output_path):
         err_msg = (proc.stderr or proc.stdout or "Video indirilemedi").strip().splitlines()[-1]
         raise RuntimeError(f"Linkten video indirilemedi ({err_msg}). Lütfen videoyu cihazınıza indirip 'MP4 Dosyası Seç' kısmından yükleyin.")
@@ -397,198 +399,112 @@ def brand_raw_video(
     source: str = ""
 ) -> dict:
     """
-    Ultra-Hafif (~25MB RAM) Doğrudan FFmpeg Tabanlı Tam Ekran Video Logolama & Kurgu Motoru:
-    - start_sec / max_dur_sec ile başlangıç ve bitiş süresini kırpar (trim).
-    - wm_pos ('center', 'right', 'left') ile çalınmaz filigran konumunu ayarlar.
-    - audio_mode ('original', 'ambient', 'mute') ile ses modunu kontrol eder.
-    - ticker_text ile ekranın altında TV tarzı canlı kayan SON DAKİKA bandı oluşturur.
+    Orijinal Çözünürlük & Maksimum Kalite (CRF 18) Video Logolama Motoru:
+    - Videoyu küçültmez, çerçeveye sıkıştırmaz ve üstüne hiçbir yazı/bant yazmaz.
+    - Yalnızca alt-orta tarafta (wm_pos='center') 1 adet şık Gündem Analizi filigranı ekler.
+    - Orijinal video netliğini ve ses kalitesini birebir korur.
     """
     import gc
     import subprocess
     import imageio_ffmpeg
-    print(f"\n🔥 Ultra-Hızlı FFmpeg ile Tam Ekran Logolanıyor: {title[:55]}...")
+    print(f"\n🔥 Orijinal Kalite & Tek Alt-Orta Filigran ile İşleniyor: {title[:55]}...")
 
-    VW_OUT, VH_OUT = 720, 1280
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    output_path = os.path.join(OUTPUT_DIR, output_filename)
+    thumb_name = output_filename.replace(".mp4", ".jpg")
+    thumb_path = os.path.join(OUTPUT_DIR, thumb_name)
 
-    # Reels / Shorts / TikTok için İdeal Viral Tipografi
-    font_brand = get_font(FONT_BOLD, 26)
-    font_sub = get_font(FONT_REGULAR, 15)
-    font_badge = get_font(FONT_BOLD, 18)
-    
-    # Başlık uzunluğuna göre dinamik font ölçekleme (Göz alıcı dev kanca başlık)
-    raw_title = title.strip()
-    if len(raw_title) > 85:
-        title_font_size = 32
-        line_step = 42
-    else:
-        title_font_size = 38
-        line_step = 48
-    font_title = get_font(FONT_BOLD, title_font_size)
+    # 1. Orijinal videonun gerçek (döndürülmüş) genişlik ve yüksekliğini tespit et
+    probe_jpg = os.path.join(OUTPUT_DIR, f"probe_{output_filename}.jpg")
+    vw, vh = 720, 1280
+    try:
+        subprocess.run(
+            [ffmpeg_exe, "-y", "-ss", "00:00:00.2", "-i", raw_video_path, "-frames:v", "1", "-q:v", "2", probe_jpg],
+            capture_output=True,
+            timeout=15
+        )
+        if not os.path.exists(probe_jpg):
+            subprocess.run(
+                [ffmpeg_exe, "-y", "-i", raw_video_path, "-frames:v", "1", "-q:v", "2", probe_jpg],
+                capture_output=True,
+                timeout=15
+            )
+        if os.path.exists(probe_jpg):
+            with Image.open(probe_jpg) as pim:
+                vw, vh = pim.size
+            os.remove(probe_jpg)
+    except Exception:
+        if os.path.exists(probe_jpg):
+            try:
+                os.remove(probe_jpg)
+            except Exception:
+                pass
 
-    font_footer = get_font(FONT_BOLD, 17)
-    font_ticker = get_font(FONT_BOLD, 20)
+    # Çok büyük (4K vb.) videoları en fazla 1080p HD sınırına orantılı indir, aksi halde orijinal boyutu koru
+    max_dim = max(vw, vh)
+    if max_dim > 1920:
+        scale_ratio = 1920.0 / max_dim
+        vw = int(vw * scale_ratio)
+        vh = int(vh * scale_ratio)
 
-    use_ticker = (ticker_text or "").strip().lower() != "off"
-    raw_ticker = (ticker_text or "").strip() or raw_title
-    clean_src = source.strip() if source else ""
-    has_custom_src = bool(clean_src and clean_src.lower() not in ("gündem analizi", "özel"))
-    if has_custom_src:
-        ticker_unit = f"   •   {raw_ticker.upper()}   •   KAYNAK: {clean_src.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
-    else:
-        ticker_unit = f"   •   {raw_ticker.upper()}   •   DOĞRU HABER & TARAFSIZ ANALİZ: GÜNDEMANALİZİ.COM.TR (@gundemanalizi)"
+    # H.264 uyumu için çift sayı garantisi
+    vw = max(360, (vw // 2) * 2)
+    vh = max(360, (vh // 2) * 2)
 
-    # 1. Şeffaf (RGBA) Overlay PNG katmanını hazırla (HD 720x1280 Kalite)
-    overlay = Image.new("RGBA", (VW_OUT, VH_OUT), (0, 0, 0, 0))
+    # 2. Yalnızca Alt-Orta Tarafta 1 Adet Kompakt Şeffaf Filigran Hazırla (Videonun İçine Başka Yazı Yazılmaz!)
+    overlay = Image.new("RGBA", (vw, vh), (0, 0, 0, 0))
     odraw = ImageDraw.Draw(overlay)
 
-    lines = wrap_text(raw_title, font_title, VW_OUT - 60, odraw)[:3]
-    top_grad_h = 120 + len(lines) * line_step + 35
+    s = max(0.70, min(1.25, min(vw, vh) / 720.0))
+    wm_box_w = int(216 * s)
+    wm_box_h = int(46 * s)
 
-    # Üst Derin Sinematik Karartma (Videodaki ışık parlamalarını engeller, yazıyı patlatır)
-    for y in range(top_grad_h):
-        ratio = 1.0 - (y / top_grad_h)
-        alpha = int(240 * (ratio ** 1.3))
-        odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
-
-    for y in range(VH_OUT - 120, VH_OUT):
-        ratio = (y - (VH_OUT - 120)) / 120.0
-        alpha = int(230 * (ratio ** 1.1))
-        odraw.line([(0, y), (VW_OUT, y)], fill=(8, 12, 20, alpha))
-
-    logo_path = os.path.join(ASSETS_DIR, "logo.png")
-    if os.path.exists(logo_path):
-        l_raw = Image.open(logo_path).convert("RGBA")
-        ls = l_raw.resize((54, 54), Image.Resampling.LANCZOS)
-        m1 = Image.new("L", (54, 54), 0)
-        ImageDraw.Draw(m1).ellipse((0, 0, 54, 54), fill=255)
-        overlay.paste(ls, (24, 24), mask=m1)
-        odraw.ellipse((22, 22, 80, 80), outline=(220, 38, 38, 255), width=2)
-
-    odraw.text((90, 26), "GÜNDEM ANALİZİ", fill=(255, 255, 255, 255), font=font_brand)
-    odraw.text((90, 56), "Doğru Haber • Tarafsız Analiz", fill=(200, 210, 225, 230), font=font_sub)
-
-    cat_label = f"● {category.upper()}"
-    cb = odraw.textbbox((0, 0), cat_label, font=font_badge)
-    bw = (cb[2] - cb[0]) + 28
-    odraw.rounded_rectangle([VW_OUT - bw - 24, 26, VW_OUT - 24, 66], radius=8, fill=(220, 38, 38, 255))
-    odraw.text((VW_OUT - bw - 10, 35), cat_label, fill=(255, 255, 255, 255), font=font_badge)
-
-    # Kaynak Rozeti (Mynet, İHA, Habertürk vb. belirtilmişse şık TV rozeti ekle)
-    if has_custom_src:
-        src_label = f"Kaynak: {clean_src}"
-        font_src = get_font(FONT_BOLD, 14)
-        sb = odraw.textbbox((0, 0), src_label, font=font_src)
-        sw = (sb[2] - sb[0]) + 20
-        odraw.rounded_rectangle([VW_OUT - sw - 24, 72, VW_OUT - 24, 98], radius=6, fill=(15, 23, 42, 220), outline=(203, 213, 225, 140), width=1)
-        odraw.text((VW_OUT - sw - 14, 76), src_label, fill=(241, 245, 249, 240), font=font_src)
-
-    # Dev Vurucu Başlık (1.5 Saniye Kuralı - 3D Siyah Çerçeve ile Maksimum Kontrast)
-    ty = 96
-    for idx, line in enumerate(lines):
-        col = (255, 255, 255, 255) if idx == 0 else (255, 235, 10, 255)
-        odraw.text(
-            (28, ty),
-            line,
-            fill=col,
-            font=font_title,
-            stroke_width=3,
-            stroke_fill=(0, 0, 0, 255)
-        )
-        ty += line_step
-
-    # --- ÇALINMAYA KARŞI VİDEO İÇİ FİLİGRAN (WATERMARK) KATMANI ---
-    wm_y = 920
-    wm_box_w = 236
     if wm_pos == "right":
-        wm_x = VW_OUT - wm_box_w - 28
+        wm_x = vw - wm_box_w - int(24 * s)
     elif wm_pos == "left":
-        wm_x = 28
+        wm_x = int(24 * s)
     else:
-        wm_x = (VW_OUT - wm_box_w) // 2
+        wm_x = (vw - wm_box_w) // 2
+
+    # Alt-orta konum (alttan %5.5 yukarıda, videoyu kapatmayan kibar konum)
+    wm_y = vh - wm_box_h - max(int(24 * s), int(vh * 0.055))
 
     odraw.rounded_rectangle(
-        [wm_x, wm_y, wm_x + wm_box_w, wm_y + 54],
-        radius=27,
-        fill=(10, 14, 22, 160),
-        outline=(220, 38, 38, 185),
-        width=2
+        [wm_x, wm_y, wm_x + wm_box_w, wm_y + wm_box_h],
+        radius=wm_box_h // 2,
+        fill=(10, 14, 22, 140),
+        outline=(220, 38, 38, 175),
+        width=max(1, int(2 * s))
     )
+
+    logo_path = os.path.join(ASSETS_DIR, "logo.png")
+    logo_sz = int(32 * s)
+    logo_pad = (wm_box_h - logo_sz) // 2
     if os.path.exists(logo_path):
-        l_wm = Image.open(logo_path).convert("RGBA").resize((38, 38), Image.Resampling.LANCZOS)
-        m_wm = Image.new("L", (38, 38), 0)
-        ImageDraw.Draw(m_wm).ellipse((0, 0, 38, 38), fill=225)
-        overlay.paste(l_wm, (wm_x + 10, wm_y + 8), mask=m_wm)
+        l_wm = Image.open(logo_path).convert("RGBA").resize((logo_sz, logo_sz), Image.Resampling.LANCZOS)
+        m_wm = Image.new("L", (logo_sz, logo_sz), 0)
+        ImageDraw.Draw(m_wm).ellipse((0, 0, logo_sz, logo_sz), fill=230)
+        overlay.paste(l_wm, (wm_x + logo_pad + int(2 * s), wm_y + logo_pad), mask=m_wm)
 
-    font_wm_bold = get_font(FONT_BOLD, 16)
-    font_wm_sub = get_font(FONT_REGULAR, 12)
-    odraw.text((wm_x + 56, wm_y + 8), "@gundemanalizi", fill=(255, 255, 255, 235), font=font_wm_bold)
-    odraw.text((wm_x + 56, wm_y + 28), "gündemanalizi.com.tr", fill=(254, 240, 138, 220), font=font_wm_sub)
-
-    # 2. Videonun orta-sağ iç kısmına hafif hayalet (ghost) filigran (kırpılsa bile videonun içinde kalır)
-    font_ghost = get_font(FONT_BOLD, 24)
-    odraw.text((VW_OUT - 240, 620), "@gundemanalizi", fill=(255, 255, 255, 75), font=font_ghost)
-
-    # 3. ALTTAN KAYAN SON DAKİKA BANDI SOL SABİT ROZETİ (TV Stili)
-    ticker_y = 1160
-    ticker_h = 46
-    ticker_path = None
-    loop_w = 800
-    if use_ticker:
-        # Sol taraftaki sabit kırmızı "● SON DAKİKA" kutusu
-        ticker_badge_w = 170
-        odraw.rectangle([0, ticker_y, ticker_badge_w, ticker_y + ticker_h], fill=(220, 38, 38, 255))
-        odraw.line([(0, ticker_y), (VW_OUT, ticker_y)], fill=(220, 38, 38, 255), width=2)
-        odraw.line([(0, ticker_y + ticker_h), (VW_OUT, ticker_y + ticker_h)], fill=(30, 41, 59, 255), width=1)
-        odraw.text((16, ticker_y + 11), "● SON DAKİKA", fill=(255, 255, 255, 255), font=font_badge)
-
-        # Kayan şerit PNG'sini hazırla
-        tb = odraw.textbbox((0, 0), ticker_unit, font=font_ticker)
-        loop_w = max(600, (tb[2] - tb[0]))
-        strip_w = loop_w * 2 + VW_OUT
-        strip_img = Image.new("RGBA", (strip_w, ticker_h), (14, 20, 34, 240))
-        sdraw = ImageDraw.Draw(strip_img)
-        cx = 0
-        while cx < strip_w:
-            sdraw.text((cx, 11), ticker_unit, fill=(248, 250, 252, 245), font=font_ticker)
-            cx += loop_w
-
-        ticker_path = os.path.join(OUTPUT_DIR, f"tk_{output_filename}.png")
-        strip_img.save(ticker_path, "PNG")
-        del strip_img
-
-    # 4. En alt bar imzası
-    odraw.text((20, VH_OUT - 34), "gündemanalizi.com.tr", fill=(255, 255, 255, 235), font=font_footer)
-    odraw.text((VW_OUT - 135, VH_OUT - 34), "@gundemanalizi", fill=(248, 113, 113, 245), font=font_footer)
+    font_wm_bold = get_font(FONT_BOLD, max(11, int(14 * s)))
+    font_wm_sub = get_font(FONT_REGULAR, max(9, int(11 * s)))
+    text_x = wm_x + logo_pad + logo_sz + int(8 * s)
+    odraw.text((text_x, wm_y + int(6 * s)), "@gundemanalizi", fill=(255, 255, 255, 235), font=font_wm_bold)
+    odraw.text((text_x, wm_y + int(24 * s)), "gündemanalizi.com.tr", fill=(254, 240, 138, 220), font=font_wm_sub)
 
     overlay_path = os.path.join(OUTPUT_DIR, f"ov_{output_filename}.png")
     overlay.save(overlay_path, "PNG")
     del overlay
     gc.collect()
 
-    output_path = os.path.join(OUTPUT_DIR, output_filename)
-    thumb_name = output_filename.replace(".mp4", ".jpg")
-    thumb_path = os.path.join(OUTPUT_DIR, thumb_name)
-
-    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-
-    # 2. Doğrudan FFmpeg ile HD 720p Video Kurgulama (Net, Canlı ve Keskin)
-    # Ultra-Hafif (~15MB RAM) Güvenli Ölçekleme & Şık Koyu Çerçeve (Render 512MB RAM'de asla çökmez)
-    if use_ticker and ticker_path:
-        filter_complex = (
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=bicubic,"
-            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
-            f"[bg][2:v]overlay=x='170-mod(t*130\\,{loop_w})':y={ticker_y}:eof_action=repeat[bg_tk];"
-            f"[bg_tk][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
-        )
-    else:
-        filter_complex = (
-            f"[0:v]fps=30,scale={VW_OUT}:{VH_OUT}:force_original_aspect_ratio=decrease:flags=bicubic,"
-            f"pad={VW_OUT}:{VH_OUT}:(ow-iw)/2:(oh-ih)/2:color=#0a0e16,setsar=1[bg];"
-            f"[bg][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
-        )
+    # 3. Videoyu küçültmeden, orijinal boyutunda ve yüksek netlikte (CRF 18 + Lanczos) işle
+    filter_complex = (
+        f"[0:v]scale={vw}:{vh}:flags=lanczos,setsar=1[bg];"
+        f"[bg][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
+    )
 
     safe_start = max(0.0, float(start_sec or 0.0))
-    safe_dur = max(3.0, min(60.0, float(max_dur_sec or 45.0)))
+    safe_dur = max(3.0, min(90.0, float(max_dur_sec or 45.0)))
 
     amb_wav = None
     ff_cmd = [ffmpeg_exe, "-y"]
@@ -599,10 +515,7 @@ def brand_raw_video(
         "-i", raw_video_path,
         "-i", overlay_path,
     ]
-    if use_ticker and ticker_path:
-        ff_cmd += ["-i", ticker_path]
 
-    amb_input_idx = 3 if (use_ticker and ticker_path) else 2
     if audio_mode == "ambient":
         amb_wav = os.path.join(OUTPUT_DIR, f"amb_{output_filename}.wav")
         generate_ambient_news_music(min(safe_dur, 30.0), amb_wav)
@@ -615,16 +528,14 @@ def brand_raw_video(
     if audio_mode == "mute":
         ff_cmd += ["-an"]
     elif audio_mode == "ambient" and amb_wav:
-        ff_cmd += ["-map", f"{amb_input_idx}:a", "-c:a", "aac", "-b:a", "128k", "-shortest"]
+        ff_cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "192k", "-shortest"]
     else:
-        # Twitter veya internet videolarındaki Opus/farklı sesleri standart AAC formatına dönüştür (MP4 uyumsuzluğunu önler)
-        ff_cmd += ["-map", "0:a?", "-c:a", "aac", "-b:a", "128k"]
+        ff_cmd += ["-map", "0:a?", "-c:a", "aac", "-b:a", "192k"]
 
     ff_cmd += [
         "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-tune", "zerolatency",
-        "-crf", "23",
+        "-preset", "veryfast",
+        "-crf", "18",
         "-threads", "2",
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
@@ -633,8 +544,6 @@ def brand_raw_video(
     res_ff = subprocess.run(ff_cmd, capture_output=True, text=True, timeout=300)
     if os.path.exists(overlay_path):
         os.remove(overlay_path)
-    if ticker_path and os.path.exists(ticker_path):
-        os.remove(ticker_path)
     if amb_wav and os.path.exists(amb_wav):
         os.remove(amb_wav)
 
@@ -642,19 +551,17 @@ def brand_raw_video(
         err_tail = (res_ff.stderr or "")[-300:]
         raise RuntimeError(f"FFmpeg video işleme hatası: {err_tail}")
 
-    # 3. Kapak fotoğrafını (thumbnail) FFmpeg ile 0.1 saniyede çıkar
+    # 4. Kapak fotoğrafını (thumbnail) orijinal netlikte çıkar
     thumb_cmd = [
         ffmpeg_exe, "-y",
         "-ss", "00:00:01",
         "-i", output_path,
         "-frames:v", "1",
-        "-vf", f"crop={VW_OUT}:{VW_OUT}:0:0",
-        "-q:v", "4",
+        "-q:v", "2",
         thumb_path
     ]
     subprocess.run(thumb_cmd, capture_output=True, timeout=15)
     if not os.path.exists(thumb_path):
-        # Video 1 saniyeden kısaysa 0. saniyeden al
         thumb_cmd[3] = "00:00:00"
         subprocess.run(thumb_cmd, capture_output=True, timeout=15)
 
