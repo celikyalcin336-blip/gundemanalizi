@@ -53,30 +53,21 @@ import sys
 def bot_background_worker():
     """
     Arka planda 7/24 kesintisiz çalışan otonom haber robotu:
-    - 60 saniyede bir yoklar; main.py içindeki 14.0 dakikalık hassas veritabanı kilidi sayesinde
-      hazırlık süresiyle birlikte tam 15:00. dakikada haber yayına girer.
+    - Harici subprocess açmaz (Render 512MB RAM sınırını aşmamak için bellek içi çalışır).
+    - 60 saniyede bir kontrol eder, haber yayını sonrası gc.collect() ile RAM'i tamamen temizler.
     """
-    time.sleep(25)
-    print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hassas 15 dk Zaman Ayarlı)...")
-    main_script = os.path.join(BASE_DIR, "main.py")
+    time.sleep(30)
+    print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hafif Bellek-İçi Mod)...")
+    import gc
 
     while True:
         try:
-            res = subprocess.run(
-                [sys.executable, main_script, "--max-items", "1"],
-                capture_output=True,
-                text=True,
-                timeout=360
-            )
-            if res.stdout:
-                for line in res.stdout.strip().splitlines():
-                    if line.strip():
-                        print(f"   [Bot]: {line}")
-            if res.stderr and res.returncode != 0:
-                print(f"   [Bot Hata]: {res.stderr.strip()[:250]}")
+            import main as bot_main
+            bot_main.run_bot(max_items=1)
+            gc.collect()
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
-        time.sleep(10)
+        time.sleep(60)
 
 def system_health_watchdog_worker():
     """
@@ -140,8 +131,8 @@ def system_health_watchdog_worker():
         time.sleep(600)
 
 def _warmup_turbo_cache():
-    """Sunucu ayağa kalkar kalkmaz ana sayfayı, popüler kategorileri ve kayıp görselleri onarır."""
-    time.sleep(2)
+    """Sunucu ayağa kalkar kalkmaz ana sayfayı ve popüler kategorileri RAM'e hafifçe yükler."""
+    time.sleep(5)
     try:
         get_cached_category_widgets()
         database.get_articles(limit=24)
@@ -149,10 +140,6 @@ def _warmup_turbo_cache():
         print("⚡ [Turbo Cache] Kategori ve ana sayfa önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
-    try:
-        database.restore_and_heal_images(limit=15)
-    except Exception as e:
-        print(f"Görsel onarım ısınma hatası: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
