@@ -274,8 +274,9 @@ def post_reel_to_instagram(video_path_or_url: str, caption: str, fallback_public
                             "Authorization": f"OAuth {tok}",
                             "offset": "0",
                             "file_size": str(file_size),
+                            "Content-Type": "application/octet-stream"
                         },
-                        data=vf.read(),
+                        data=vf,
                         timeout=120
                     )
                 if up_resp.status_code != 200:

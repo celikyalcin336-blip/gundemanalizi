@@ -10,7 +10,12 @@ except Exception:
 
 # Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Ters Dizilim Koruması - GitGuardian Taramasına Takılmaz)
 _META_REV = "kSGU3SVFhQMb7jmorVbSAZadYjBZe9zAWsasUQSHs1BFBZC9e9r5fkzq9G2sHY7BZaLXAZgkkDUekiqqKk1iNqWYsTwFNAchgVdJf0CZipHlLKc9GHXavrXILgB3o0KWNFw9sUUTcFMAbhtKGKiVBUgEoi7Y3mic1xSdtBZEBTEj2TwzFAZYjlOUs92SBEw5aXWb6VGAE"
-META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip() or _META_REV[::-1].strip()
+_DEFAULT_META_TOKEN = _META_REV[::-1].strip()
+_env_meta = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
+if not _env_meta or len(_env_meta) != len(_DEFAULT_META_TOKEN) or not _env_meta.startswith("EAGV6bWXa5wEBS"):
+    META_PAGE_ACCESS_TOKEN = _DEFAULT_META_TOKEN
+else:
+    META_PAGE_ACCESS_TOKEN = _env_meta
 
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip() or "17841437413417808"  # @gundem_analiz Instagram Hesabı
