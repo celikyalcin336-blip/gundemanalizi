@@ -135,6 +135,23 @@ def can_post_to_x(force: bool = False) -> Tuple[bool, str]:
     return True, "Zaman kilidi onaylandı."
 
 
+def smart_sentence_split(text: str) -> list:
+    """Türkçe sıra sayıları (10., 1., 2026.) ve unvan/kısaltmaları (Dr., Prof., vb.) bozmadan tam cümlelere böler."""
+    if not text:
+        return []
+    t = text
+    abbrevs = ["dr", "prof", "doç", "doc", "av", "uzm", "vb", "vs", "yy", "mad", "no", "m", "km"]
+    for ab in abbrevs:
+        t = re.sub(rf"\b({ab})\.", r"\1___DOT___", t, flags=re.I)
+    t = re.sub(r"(\b\d+)\.", r"\1___DOT___", t)
+    parts = re.split(r"(?<=[.!?])\s+(?=[A-ZÇĞİÖŞÜ\"“])", t)
+    clean_sents = []
+    for p in parts:
+        restored = p.replace("___DOT___", ".").strip()
+        if len(restored) > 20:
+            clean_sents.append(restored)
+    return clean_sents
+
 def format_x_tweet(title: str, summary: str, site_url: str, category: str = "Gündem") -> str:
     """
     X (Twitter) algoritmasına uygun, 280 karakteri aşmayan, merak uyandıran profesyonel tweet metni üretir.
@@ -164,9 +181,11 @@ def format_x_tweet(title: str, summary: str, site_url: str, category: str = "Gü
     body = ""
     remaining_room = 280 - 24 - len(tags) - len(trimmed_title) - 25
     if remaining_room > 40 and summary:
-        first_sentence = summary.split(".")[0].strip()
+        sentences = smart_sentence_split(summary)
+        first_sentence = sentences[0].strip() if sentences else ""
         if first_sentence and len(first_sentence) < remaining_room:
-            body = f"\n\n{first_sentence}."
+            end_punc = "" if first_sentence.endswith((".", "!", "?")) else "."
+            body = f"\n\n{first_sentence}{end_punc}"
 
     tweet = f"{emoji} {trimmed_title}{body}\n\n🔗 Detaylar: {site_url}\n{tags}"
     return tweet.strip()
@@ -240,14 +259,17 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
                     break
                 page.wait_for_timeout(2000)
 
-            try:
-                editor.first.press("Control+Enter")
-            except Exception:
-                pass
-
-            if post_btn.count():
+            # Tek seferlik güvenli gönderim (Çift tıklama veya çift tweet riskini sıfırlar)
+            sent = False
+            if post_btn.count() and post_btn.get_attribute("disabled") is None:
                 try:
                     post_btn.click(force=True)
+                    sent = True
+                except Exception:
+                    pass
+            if not sent:
+                try:
+                    editor.first.press("Control+Enter")
                 except Exception:
                     pass
 
