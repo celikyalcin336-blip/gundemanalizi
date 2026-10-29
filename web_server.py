@@ -1361,18 +1361,20 @@ def _process_viral_video_job(
             if not pub_fb: return
             try:
                 r_fb = meta_poster.post_video_to_facebook(res["video_path"], clean_caption, news_link=None)
-                report_platform("Facebook", "📘", r_fb.get("status") == "success", r_fb.get("status", ""))
+                err_str = str(r_fb.get("error") or r_fb.get("status") or "")[:50]
+                report_platform("Facebook", "📘", r_fb.get("status") == "success", err_str)
             except Exception as e:
-                report_platform("Facebook", "📘", False, str(e)[:20])
+                report_platform("Facebook", "📘", False, str(e)[:30])
 
         # 3. Instagram Reels worker
         def _do_instagram():
             if not pub_ig: return
             try:
                 r_ig = meta_poster.post_reel_to_instagram(res["video_path"], clean_caption)
-                report_platform("Instagram", "📸", r_ig.get("status") == "success", r_ig.get("status", ""))
+                err_str = str(r_ig.get("error") or r_ig.get("status") or "")[:50]
+                report_platform("Instagram", "📸", r_ig.get("status") == "success", err_str)
             except Exception as e:
-                report_platform("Instagram", "📸", False, str(e)[:20])
+                report_platform("Instagram", "📸", False, str(e)[:30])
 
         # 4. Twitter / X worker
         def _do_x():
