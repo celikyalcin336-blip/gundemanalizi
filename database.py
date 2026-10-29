@@ -1404,14 +1404,14 @@ def get_dashboard_summary() -> Dict:
                 """, (today_start_utc,)).fetchone()
                 today_uniques = uniq_row["c"] if uniq_row else 0
 
-                # İlk Defa Giren Gerçek İnsanlar (Botlar hariç)
+                # İlk Defa Giren Gerçek İnsanlar (Bugünden önce hiç kaydı olmayan yeni tekil kişiler)
                 first_row = conn.execute(f"""
                     SELECT COUNT(DISTINCT visitor_hash) AS c 
                     FROM visitor_logs 
                     WHERE created_at >= ? {human_filter}
-                      AND (is_first_visit = 1 OR visitor_hash NOT IN (
+                      AND visitor_hash NOT IN (
                           SELECT visitor_hash FROM visitor_logs WHERE created_at < ?
-                      ))
+                      )
                 """, (today_start_utc, today_start_utc)).fetchone()
                 first_time_today = first_row["c"] if first_row else 0
                 first_time_today = min(first_time_today, today_uniques)
@@ -1448,7 +1448,6 @@ def get_dashboard_summary() -> Dict:
                 lv_rows = conn.execute("""
                     SELECT v.*,
                            CASE 
-                               WHEN v.is_first_visit = 1 THEN 1
                                WHEN NOT EXISTS (SELECT 1 FROM visitor_logs v2 WHERE v2.visitor_hash = v.visitor_hash AND v2.created_at < v.created_at) THEN 1
                                ELSE 0 
                            END AS computed_first
