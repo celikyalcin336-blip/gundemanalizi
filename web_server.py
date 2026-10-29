@@ -1229,18 +1229,33 @@ def _process_viral_video_job(
             "step_text": "🎨 2/5: Tam ekran Gündem Analizi logosu, kayan bant ve filigran işleniyor..."
         })
         auto_ticker = ticker_text.strip() or (f"{title} • {summary}" if summary else title)
-        res = video_generator.brand_raw_video(
-            raw_video_path=raw_path,
-            title=title,
-            category=category,
-            output_filename=out_filename,
-            start_sec=start_sec,
-            max_dur_sec=max_dur_sec,
-            wm_pos=wm_pos,
-            audio_mode=audio_mode,
-            ticker_text=auto_ticker,
-            source=source
-        )
+        res = None
+        try:
+            res = video_generator.brand_raw_video(
+                raw_video_path=raw_path,
+                title=title,
+                category=category,
+                output_filename=out_filename,
+                start_sec=start_sec,
+                max_dur_sec=max_dur_sec,
+                wm_pos=wm_pos,
+                audio_mode=audio_mode,
+                ticker_text=auto_ticker,
+                source=source
+            )
+        except Exception as e:
+            print(f"⚠️ Video filigranlama atlandı (Orijinal video korunuyor): {e}")
+            thumb_path = os.path.join(OUTPUT_DIR, out_filename.replace(".mp4", ".jpg"))
+            try:
+                import imageio_ffmpeg
+                subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-ss", "00:00:01", "-i", raw_path, "-frames:v", "1", thumb_path], capture_output=True, timeout=10)
+            except Exception:
+                pass
+            res = {
+                "video_path": raw_path,
+                "thumb_path": thumb_path if os.path.exists(thumb_path) else os.path.join(ASSETS_DIR, "logo.png"),
+                "video_filename": os.path.basename(raw_path)
+            }
 
         # ADIM 3: Yapay Zeka Haber & Sosyal Medya Metni
         job.update({
