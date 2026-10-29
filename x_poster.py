@@ -152,9 +152,10 @@ def smart_sentence_split(text: str) -> list:
             clean_sents.append(restored)
     return clean_sents
 
-def format_x_tweet(title: str, summary: str, site_url: str, category: str = "Gündem") -> str:
+def format_x_tweet(title: str, summary: str, site_url: str = "", category: str = "Gündem") -> str:
     """
-    X (Twitter) algoritmasına uygun, 280 karakteri aşmayan, merak uyandıran profesyonel tweet metni üretir.
+    X (Twitter) algoritmasına tam uyumlu, %100 linksiz, doyurucu ve takipçi kasma odaklı
+    profesyonel haber tweet metni üretir (Maksimum 275 karakter).
     """
     category_emojis = {
         "Ekonomi": "📊",
@@ -172,22 +173,44 @@ def format_x_tweet(title: str, summary: str, site_url: str, category: str = "Gü
 
     clean_title = title.strip()
     clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title)
+    header = f"{emoji} {clean_title}"
 
-    max_title_len = 150
-    trimmed_title = clean_title
-    if len(trimmed_title) > max_title_len:
-        trimmed_title = trimmed_title[:max_title_len - 1] + "…"
-
-    body = ""
-    remaining_room = 280 - 24 - len(tags) - len(trimmed_title) - 25
-    if remaining_room > 40 and summary:
+    budget = 272 - len(header) - len(tags) - 4
+    chosen_sents = []
+    if summary and budget > 35:
         sentences = smart_sentence_split(summary)
-        first_sentence = sentences[0].strip() if sentences else ""
-        if first_sentence and len(first_sentence) < remaining_room:
-            end_punc = "" if first_sentence.endswith((".", "!", "?")) else "."
-            body = f"\n\n{first_sentence}{end_punc}"
+        curr_len = 0
+        for s in sentences:
+            s_clean = s.strip()
+            if not s_clean:
+                continue
+            if s_clean.lower() in clean_title.lower() or (len(s_clean) > 20 and clean_title.lower() in s_clean.lower()):
+                continue
+            if not s_clean.endswith(('.', '!', '?')):
+                s_clean += '.'
+            if curr_len + len(s_clean) + 1 <= budget:
+                chosen_sents.append(s_clean)
+                curr_len += len(s_clean) + 1
+            elif not chosen_sents and len(s_clean) > budget:
+                words = s_clean.split()
+                short_s = ""
+                for w in words:
+                    if len(short_s) + len(w) + 2 <= budget - 1:
+                        short_s = (short_s + " " + w).strip()
+                    else:
+                        break
+                if short_s:
+                    chosen_sents.append(short_s + "…")
+                break
+            else:
+                break
 
-    tweet = f"{emoji} {trimmed_title}{body}\n\n🔗 Detaylar: {site_url}\n{tags}"
+    body = " ".join(chosen_sents).strip()
+    if body:
+        tweet = f"{header}\n\n{body}\n\n{tags}"
+    else:
+        tweet = f"{header}\n\n{tags}"
+
     return tweet.strip()
 
 
