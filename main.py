@@ -139,13 +139,26 @@ def process_single_news(item: dict) -> bool:
     return True
 
 def get_minutes_since_last_article() -> float:
-    """Veritabanındaki en son yayınlanan haberin üzerinden kaç dakika geçtiğini kesin olarak hesaplar."""
+    """
+    Veritabanındaki en son yayınlanan OTONOM BOT haberinin üzerinden kaç dakika geçtiğini hesaplar.
+    (Panelden manuel yüklenen videolar veya son dakika girişleri otonom 15 dk sayacını sıfırlamaz!)
+    """
     try:
-        articles = database.get_articles(limit=1)
+        articles = database.get_articles(limit=6)
         if not articles:
             return 999.0
-        art = articles[0]
-        val = art.get("created_at")
+        target_art = None
+        for a in articles:
+            src = (a.get("source") or "").strip().lower()
+            img_p = (a.get("image_path") or "").strip().lower()
+            # Panelden yüklenen videoların kapak resmi viral_ ile başlar veya kaynağı Gündem Analizi'dir
+            if "viral_" in img_p or src in ("gündem analizi", "özel", "sosyal medya"):
+                continue
+            target_art = a
+            break
+        if not target_art:
+            target_art = articles[0]
+        val = target_art.get("created_at")
         if not val:
             return 999.0
         clean_str = str(val).split(".")[0].replace("T", " ")[:19]

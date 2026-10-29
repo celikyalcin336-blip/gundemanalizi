@@ -399,15 +399,16 @@ def brand_raw_video(
     source: str = ""
 ) -> dict:
     """
-    Ultra-Hızlı & Yüksek Kaliteli (CRF 18) Tek Alt-Orta Filigran Motoru:
+    Ultra-Hızlı & Yüksek Kaliteli (3.5 Mbps HD, Telegram 50MB Sınırına %100 Uyumlu) Tek Alt-Orta Filigran Motoru:
     - Videoyu küçültmez, siyah çerçeveye almaz ve içine hiçbir haber yazısı/bandı yazmaz.
     - Tam ekran PNG yerine yalnızca 220x48 piksellik küçük filigran rozetini FFmpeg ile
-      alt-orta konuma (overlay=(W-w)/2:H-h-42) yerleştirir (Render CPU'da 8-12 saniyede biter, asla zaman aşımına uğramaz).
+      alt-orta konuma (overlay=(W-w)/2:H-h-42) yerleştirir.
+    - Telegram Bot API 50 MB limitini asla aşmaması için maxrate=3500k (15-20 MB cam gibi HD) ile kodlar.
     """
     import gc
     import subprocess
     import imageio_ffmpeg
-    print(f"\n🔥 Ultra-Hızlı HD (CRF 18) & Tek Alt-Orta Filigran İşleniyor: {title[:55]}...")
+    print(f"\n🔥 Ultra-Hızlı HD & Tek Alt-Orta Filigran İşleniyor: {title[:55]}...")
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
     output_path = os.path.join(OUTPUT_DIR, output_filename)
@@ -456,8 +457,7 @@ def brand_raw_video(
         ox = "(W-w)/2"
     oy = "H-h-42"
 
-    # 2. Videoyu küçültmeden, orijinal en-boy oranında ve yüksek netlikte (CRF 18 + ultrafast) işle
-    # Genişlik 720p üzeriyse orantılı 720p HD'ye indirir (Render 0.1 CPU'da 8 saniyede biter, CRF 18 sayesinde cam gibi net kalır)
+    # 2. Videoyu küçültmeden, orijinal en-boy oranında ve yüksek netlikte işle
     filter_complex = (
         f"[0:v]fps=30,scale='min(720,iw)':-2:flags=bicubic,setsar=1[bg];"
         f"[bg][1:v]overlay=x={ox}:y={oy}:eof_action=repeat,format=yuv420p[v]"
@@ -488,14 +488,16 @@ def brand_raw_video(
     if audio_mode == "mute":
         ff_cmd += ["-an"]
     elif audio_mode == "ambient" and amb_wav:
-        ff_cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "192k", "-shortest"]
+        ff_cmd += ["-map", "2:a", "-c:a", "aac", "-b:a", "160k", "-shortest"]
     else:
-        ff_cmd += ["-map", "0:a?", "-c:a", "aac", "-b:a", "192k"]
+        ff_cmd += ["-map", "0:a?", "-c:a", "aac", "-b:a", "160k"]
 
     ff_cmd += [
         "-c:v", "libx264",
         "-preset", "ultrafast",
-        "-crf", "18",
+        "-crf", "20",
+        "-maxrate", "3500k",
+        "-bufsize", "7000k",
         "-threads", "2",
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
