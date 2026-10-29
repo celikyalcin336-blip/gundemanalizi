@@ -271,32 +271,46 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
                     print(f"⏳ Medya X'e yükleniyor ({'Video' if is_video else 'Görsel'}), {wait_sec}s bekleniyor...")
                     page.wait_for_timeout(wait_sec * 1000)
 
-            # Tweeti Gönder
+            # Tweeti Gönder butonu
             post_btn = page.locator('button[data-testid="tweetButton"]').first
             if not post_btn.count():
                 post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
 
-            # Video yükleme sonrası butonun aktifleşmesini bekle (maksimum 30s)
-            for _ in range(15):
-                if post_btn.count() and post_btn.get_attribute("disabled") is None:
+            # Video yükleme sonrası butonun aktifleşmesini bekle (maksimum 40s)
+            for _ in range(25):
+                aria_dis = post_btn.get_attribute("aria-disabled") if post_btn.count() else "true"
+                if aria_dis != "true":
                     break
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(1500)
 
-            # Tek seferlik güvenli gönderim (Çift tıklama veya çift tweet riskini sıfırlar)
+            # Güvenli gönderim: Editor'e odaklanıp Ctrl+Enter kısayolu ve dispatchEvent click
+            # (Twitter modal backdrop'ının click'i engellemesini / timeout vermesini önler)
             sent = False
-            if post_btn.count() and post_btn.get_attribute("disabled") is None:
+            try:
+                editor.first.focus()
+                page.wait_for_timeout(500)
+                page.keyboard.press("Control+Enter")
+                sent = True
+            except Exception:
+                pass
+
+            page.wait_for_timeout(3000)
+
+            # Buton hala görünürse event click tetikle
+            if post_btn.count() and post_btn.is_visible():
                 try:
-                    post_btn.click(force=True)
+                    post_btn.dispatch_event("click")
                     sent = True
                 except Exception:
                     pass
-            if not sent:
-                try:
-                    editor.first.press("Control+Enter")
-                except Exception:
-                    pass
 
-            page.wait_for_timeout(6000)
+            # Modalın kapanmasını bekle
+            for _ in range(10):
+                if not post_btn.count() or not post_btn.is_visible():
+                    break
+                page.wait_for_timeout(1000)
+
+            page.wait_for_timeout(3000)
             browser.close()
             return {"status": "success"}
     except Exception as e:
