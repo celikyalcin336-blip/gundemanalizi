@@ -16,26 +16,9 @@
         {% endif %}
     {% endif %}
 
-    <!-- Google AdSense: Sayfa Hızını Kilitlemeyen Akıllı Yükleyici -->
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
     <meta name="google-adsense-account" content="ca-pub-1415664741128989">
-    <script>
-    (function() {
-        var adsLoaded = false;
-        function loadAdSense() {
-            if (adsLoaded) return;
-            adsLoaded = true;
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1415664741128989";
-            s.crossOrigin = "anonymous";
-            document.head.appendChild(s);
-        }
-        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(e) {
-            window.addEventListener(e, loadAdSense, { passive: true, once: true });
-        });
-        setTimeout(loadAdSense, 3500);
-    })();
-    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1415664741128989" crossorigin="anonymous"></script>
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
