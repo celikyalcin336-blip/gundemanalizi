@@ -297,9 +297,9 @@ def post_reel_to_instagram(video_path_or_url: str, caption: str, fallback_public
                 return {"status": "error", "error": cr}
             creation_id = cr["id"]
 
-        # Instagram videoyu işleyene kadar bekle (~15-90 saniye)
-        for _ in range(36):
-            time.sleep(4)
+        # Instagram videoyu işleyene kadar bekle (~15-60 saniye, hızlı yoklama)
+        for _ in range(24):
+            time.sleep(2.5)
             st = requests.get(f"{base}/{creation_id}", params={
                 "fields": "status_code,status", "access_token": tok
             }, timeout=15).json()

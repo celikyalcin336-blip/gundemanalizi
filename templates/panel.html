@@ -1659,12 +1659,24 @@
                 }
 
                 const jobId = startData.job_id;
+                let consecutiveErrors = 0;
                 const pollTimer = setInterval(async () => {
                     try {
                         const jr = await fetch('/api/panel/video-job/' + jobId, {
                             headers: { 'X-Admin-Pin': pin }
                         });
-                        if (!jr.ok) return;
+                        if (!jr.ok) {
+                            consecutiveErrors++;
+                            if (consecutiveErrors >= 8) {
+                                clearInterval(pollTimer);
+                                btn.disabled = false;
+                                btn.innerHTML = origHtml;
+                                lucide.createIcons();
+                                alert('İşlem durumu sorgulanamadı (Sunucu yanıt vermedi, Kod: ' + jr.status + ')');
+                            }
+                            return;
+                        }
+                        consecutiveErrors = 0;
                         const j = await jr.json();
 
                         document.querySelector('#vp-step-text span:last-child').innerText = j.step_text || 'İşleniyor...';

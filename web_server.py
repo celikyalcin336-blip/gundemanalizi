@@ -1291,13 +1291,16 @@ def _process_viral_video_job(
             if art_obj:
                 article_id = art_obj.get("id")
 
-        # ADIM 5: Tüm Sosyal Medya Kanallarına Otomatik & %100 Linksiz Dağıtım
+        # ADIM 5: Tüm Sosyal Medya Kanallarına Paralel, Hızlı & %100 Linksiz Dağıtım
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
+        
         share_report = []
+        lock = threading.Lock()
 
         def clean_social_text(text: str) -> str:
             if not text:
                 return ""
-            # Link, web adresi veya yönlendirme satırlarını tamamen temizle
             text = re.sub(r'(?i)(?:🌐|🔗|👉)?\s*(?:detaylar|kaynak|haber|link|tıklayın|oku)[^:\r\n]*:\s*https?://\S+', '', text)
             text = re.sub(r'https?://\S+', '', text)
             text = re.sub(r'(?i)\bwww\.[a-z0-9\-]+(?:\.[a-z0-9\-]+)+[/\S]*', '', text)
@@ -1308,73 +1311,104 @@ def _process_viral_video_job(
 
         clean_caption = clean_social_text(ai_cap.get("caption") or title)
 
+        def report_platform(name, icon, status_ok, extra=""):
+            with lock:
+                res_str = f"{icon} {name}: {'✅' if status_ok else '❌' + ((' ' + str(extra)) if extra else '')}"
+                share_report.append(res_str)
+                done_count = len([x for x in share_report if '✅' in x])
+                job.update({
+                    "step": 5,
+                    "percent": min(98, 86 + (len(share_report) * 2)),
+                    "eta_sec": max(3, 30 - (len(share_report) * 5)),
+                    "step_text": f"📲 Paylaşılıyor ({done_count}/{len(share_report)} tamamlandı): " + " • ".join(share_report)
+                })
+
         job.update({
             "step": 5,
-            "percent": 88,
+            "percent": 86,
             "eta_sec": 30,
-            "step_text": "📲 5/5: Tüm sosyal medya hesaplarına (%100 linksiz & yüksek kalite) dağıtılıyor..."
+            "step_text": "📲 5/5: Tüm sosyal medya hesaplarına (%100 linksiz) aynı anda dağıtılıyor..."
         })
 
-        # 1. TELEGRAM (Video + Linksiz Metin)
-        if pub_tg:
+        # 1. Telegram worker
+        def _do_telegram():
+            if not pub_tg: return
             try:
                 ok = telegram_notifier.send_telegram_video(res["video_path"], clean_caption, news_link="")
-                share_report.append("📲 Telegram: ✅" if ok is not False else "📲 Telegram: ❌")
-            except Exception:
-                share_report.append("📲 Telegram: ❌")
+                report_platform("Telegram", "📲", ok is not False)
+            except Exception as e:
+                report_platform("Telegram", "📲", False, str(e)[:20])
 
-        # 2. FACEBOOK REELS & VİDEO (Doğrudan Yükleme, Sıfır Link)
-        if pub_fb:
+        # 2. Facebook worker
+        def _do_facebook():
+            if not pub_fb: return
             try:
                 r_fb = meta_poster.post_video_to_facebook(res["video_path"], clean_caption, news_link=None)
-                share_report.append("📘 Facebook: ✅" if r_fb.get("status") == "success" else f"📘 Facebook: ❌ {r_fb.get('status')}")
-            except Exception:
-                share_report.append("📘 Facebook: ❌")
+                report_platform("Facebook", "📘", r_fb.get("status") == "success", r_fb.get("status", ""))
+            except Exception as e:
+                report_platform("Facebook", "📘", False, str(e)[:20])
 
-        # 3. INSTAGRAM REELS (@gundem_analiz - Doğrudan Meta Resumable Upload, Sıfır Link)
-        if pub_ig:
+        # 3. Instagram Reels worker
+        def _do_instagram():
+            if not pub_ig: return
             try:
-                job.update({"step_text": "📸 Instagram Reels yükleniyor ve Meta sunucularında işleniyor..."})
                 r_ig = meta_poster.post_reel_to_instagram(res["video_path"], clean_caption)
-                share_report.append("📸 Instagram: ✅" if r_ig.get("status") == "success" else f"📸 Instagram: ❌ {r_ig.get('status')}")
-            except Exception:
-                share_report.append("📸 Instagram: ❌")
+                report_platform("Instagram", "📸", r_ig.get("status") == "success", r_ig.get("status", ""))
+            except Exception as e:
+                report_platform("Instagram", "📸", False, str(e)[:20])
 
-        # 4. TWITTER / X (@gndmanalizi - Chrome Motoru, %100 Linksiz Video Tweet)
-        if pub_x:
+        # 4. Twitter / X worker
+        def _do_x():
+            if not pub_x: return
             try:
-                job.update({"step_text": "🐦 X (Twitter) video paylaşımı yapılıyor..."})
                 import x_poster
                 r_x = x_poster.post_video_to_x(res["video_path"], title, "")
-                share_report.append("🐦 X: ✅" if r_x.get("status") == "success" else f"🐦 X: ❌ {r_x.get('status')}")
+                report_platform("X", "🐦", r_x.get("status") == "success", r_x.get("status", ""))
+            except Exception as e:
+                report_platform("X", "🐦", False, str(e)[:20])
+
+        # 5. YouTube Shorts worker
+        def _do_youtube():
+            try:
+                import youtube_uploader
+                r_yt = youtube_uploader.upload_shorts(
+                    video_path=res["video_path"],
+                    title=f"{title[:80]} #Shorts",
+                    description=clean_caption
+                )
+                if r_yt.get("status") == "success":
+                    report_platform("YouTube", "🎬", True)
             except Exception:
-                share_report.append("🐦 X: ❌")
+                pass
 
-        # 5. YOUTUBE SHORTS (Varsa Doğrudan Yükle, Sıfır Link)
-        try:
-            import youtube_uploader
-            r_yt = youtube_uploader.upload_shorts(
-                video_path=res["video_path"],
-                title=f"{title[:80]} #Shorts",
-                description=clean_caption
-            )
-            if r_yt.get("status") == "success":
-                share_report.append("🎬 YouTube: ✅")
-        except Exception:
-            pass
+        # 6. TikTok worker
+        def _do_tiktok():
+            try:
+                import tiktok_uploader
+                r_tt = tiktok_uploader.upload_tiktok_video(
+                    video_path=res["video_path"],
+                    caption=f"{title[:75]} #GündemAnalizi #Haberler",
+                    headless=True
+                )
+                if r_tt.get("status") == "success":
+                    report_platform("TikTok", "🎵", True)
+            except Exception:
+                pass
 
-        # 6. TIKTOK (Varsa Doğrudan Yükle, Sıfır Link)
-        try:
-            import tiktok_uploader
-            r_tt = tiktok_uploader.upload_tiktok_video(
-                video_path=res["video_path"],
-                caption=f"{title[:75]} #GündemAnalizi #Haberler",
-                headless=True
-            )
-            if r_tt.get("status") == "success":
-                share_report.append("🎵 TikTok: ✅")
-        except Exception:
-            pass
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            tasks = [
+                executor.submit(_do_telegram),
+                executor.submit(_do_facebook),
+                executor.submit(_do_instagram),
+                executor.submit(_do_x),
+                executor.submit(_do_youtube),
+                executor.submit(_do_tiktok)
+            ]
+            for t_item in tasks:
+                try:
+                    t_item.result(timeout=75)
+                except Exception:
+                    pass
 
         if os.path.exists(raw_path):
             try:
