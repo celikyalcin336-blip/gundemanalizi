@@ -214,6 +214,24 @@ def format_x_tweet(title: str, summary: str, site_url: str = "", category: str =
     return tweet.strip()
 
 
+def strip_all_urls(text: str) -> str:
+    """X algoritması için tweet metnindeki tüm linkleri tamamen temizler."""
+    if not text:
+        return ""
+    # Detaylar ve link yönlendirme satırlarını temizle
+    text = re.sub(r'(?i)(?:🌐|🔗|👉)?\s*(?:detaylar|kaynak|haber|link|tıklayın|oku)[^\r\n:]*:\s*https?://\S+', '', text)
+    # http ve https linklerini temizle
+    text = re.sub(r'https?://\S+', '', text)
+    # www linklerini temizle
+    text = re.sub(r'(?i)\bwww\.[a-z0-9\-]+(?:\.[a-z0-9\-]+)+[/\S]*', '', text)
+    # com.tr, com vb alan adlarını temizle
+    text = re.sub(r'(?i)\b[a-z0-9\-]+\.(?:com\.tr|com|net|org|site|co|io)[/\S]*', '', text)
+    # Boşlukları ve gereksiz satırları toparla
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    return text.strip()
+
+
 def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
     """
     Playwright Chromium motoruyla X'te (%100 ücretsiz) tweet yayınlar.
@@ -224,7 +242,13 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
     except ImportError:
         return {"status": "error", "reason": "Playwright kurulu değil"}
 
+    # KESİN KURAL: %100 Linksiz tweet güvencesi
+    text = strip_all_urls(text)
+    if not text:
+        return {"status": "error", "reason": "Metin boş kalamaz"}
+
     try:
+
         with sync_playwright() as p:
             # Video H.264/AAC donanım codec desteği için öncelikle sistemdeki Google Chrome'u başlat
             launch_args = [
@@ -376,6 +400,6 @@ def post_video_to_x(video_path: str, title: str, link: str = "") -> dict:
     text = title.strip()
     if len(text) > room:
         text = text[:room - 1] + "…"
-    tweet_text = f"🎥 {text}\n\n🔗 {link}\n{tags}" if link else f"🎥 {text}\n\n{tags}"
+    tweet_text = f"🎥 {text}\n\n{tags}"
 
     return post_tweet_playwright(tweet_text, media_path=video_path)

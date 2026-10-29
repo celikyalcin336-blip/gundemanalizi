@@ -225,7 +225,6 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
             f"🔴 GÜNÜN ÖZETİ ({today_str})\n"
             f"Türkiye gündeminde son 24 saatte öne çıkan 6 kritik gelişme tek dakikada!\n\n"
             f"{x_cat_lines}\n\n"
-            f"🌐 Detaylar: https://gundemanalizi.com.tr\n"
             f"#GündemAnalizi #GününÖzeti #Haberler #SonDakika"
         )
         x_res = x_poster.post_tweet_playwright(text=x_tweet_text, media_path=video_path)
