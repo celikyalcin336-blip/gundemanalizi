@@ -1220,6 +1220,8 @@ def _process_viral_video_job(
             video_generator.download_social_video(video_url, raw_path)
 
         # ADIM 2: FFmpeg ile Tam Ekran Logolama & Filigran & Kırpma
+        import gc
+        gc.collect()
         job.update({
             "step": 2,
             "percent": 42,
@@ -1395,7 +1397,7 @@ def _process_viral_video_job(
             except Exception:
                 pass
 
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             tasks = [
                 executor.submit(_do_telegram),
                 executor.submit(_do_facebook),

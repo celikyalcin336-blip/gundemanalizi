@@ -459,7 +459,7 @@ def brand_raw_video(
 
     # 2. Videoyu küçültmeden, orijinal en-boy oranında ve yüksek netlikte işle
     filter_complex = (
-        f"[0:v]fps=30,scale='min(1080,iw)':-2:flags=lanczos,setsar=1[bg];"
+        f"[0:v]fps=30,scale='min(720,iw)':-2:flags=bicubic,setsar=1[bg];"
         f"[bg][1:v]overlay=x={ox}:y={oy}:eof_action=repeat,format=yuv420p[v]"
     )
 
@@ -494,11 +494,11 @@ def brand_raw_video(
 
     ff_cmd += [
         "-c:v", "libx264",
-        "-preset", "fast",
-        "-crf", "18",
-        "-maxrate", "6000k",
-        "-bufsize", "12000k",
-        "-threads", "2",
+        "-preset", "veryfast",
+        "-crf", "20",
+        "-maxrate", "2800k",
+        "-bufsize", "3500k",
+        "-threads", "1",
         "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
         output_path

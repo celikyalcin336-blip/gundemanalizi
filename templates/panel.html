@@ -1667,7 +1667,7 @@
                         });
                         if (!jr.ok) {
                             consecutiveErrors++;
-                            if (consecutiveErrors >= 8) {
+                            if (consecutiveErrors >= 15) {
                                 clearInterval(pollTimer);
                                 btn.disabled = false;
                                 btn.innerHTML = origHtml;

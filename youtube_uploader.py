@@ -69,6 +69,9 @@ def upload_shorts(
     """
     Dikey MP4 videoyu YouTube kanalına 'Shorts' olarak yükler.
     """
+    if not os.path.exists(TOKEN_FILE):
+        return {"status": "skipped", "reason": "youtube_token.json bulunamadı"}
+
     if not os.path.exists(video_path):
         return {"status": "error", "error": f"Video dosyası bulunamadı: {video_path}"}
 
