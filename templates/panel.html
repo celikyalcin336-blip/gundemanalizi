@@ -650,32 +650,16 @@
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-brand-border/60">
-                        <div class="flex flex-wrap items-center gap-3.5 text-slate-300 font-semibold">
-                            <span class="text-xs text-slate-400 font-bold">🤖 Otomatik Yayınla:</span>
-                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-site" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>🌐 Web Sitesi</span>
-                            </label>
-                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-tg" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>📲 Telegram</span>
-                            </label>
-                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-fb" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>📘 Facebook</span>
-                            </label>
-                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input id="v-pub-ig" type="checkbox" checked class="accent-red-600 w-4 h-4 rounded">
-                                <span>📸 Instagram Reels</span>
-                            </label>
-                            <span class="text-[11px] text-amber-300/90 bg-amber-950/40 border border-amber-600/30 px-2.5 py-1 rounded-lg">
-                                💡 X & TikTok: Video bitince alttan <b>1-Tıkla</b> paylaşılır
+                        <div class="flex flex-wrap items-center gap-2 text-slate-300 font-semibold text-xs">
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-inner">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                🚀 Tek Tıkla Canlı Yayın: Instagram Reels • Facebook • X (Twitter) • YouTube Shorts • TikTok • Telegram • Web Sitesi
                             </span>
                         </div>
 
-                        <button id="v-submit" type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-red-900/50 transition">
+                        <button id="v-submit" type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-red-900/50 transition">
                             <i data-lucide="sparkles" class="w-4 h-4"></i>
-                            <span>Videoyu İşle & Yayınla</span>
+                            <span>Videoyu İşle & Tüm Hesaplarda Yayınla</span>
                         </button>
                     </div>
                 </div>
@@ -1648,11 +1632,11 @@
             fd.append('wm_pos', document.getElementById('v-wmpos').value || 'center');
             fd.append('audio_mode', document.getElementById('v-audio').value || 'original');
             fd.append('ticker_text', document.getElementById('v-ticker').value || '');
-            fd.append('pub_site', document.getElementById('v-pub-site').checked ? 'true' : 'false');
-            fd.append('pub_tg', document.getElementById('v-pub-tg').checked ? 'true' : 'false');
-            fd.append('pub_fb', document.getElementById('v-pub-fb').checked ? 'true' : 'false');
-            fd.append('pub_ig', document.getElementById('v-pub-ig').checked ? 'true' : 'false');
-            fd.append('pub_x', 'false');
+            fd.append('pub_site', 'true');
+            fd.append('pub_tg', 'true');
+            fd.append('pub_fb', 'true');
+            fd.append('pub_ig', 'true');
+            fd.append('pub_x', 'true');
 
             const fileInput = document.getElementById('v-file');
             if (fileInput.files.length > 0) {

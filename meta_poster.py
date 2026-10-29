@@ -157,9 +157,8 @@ def post_video_to_facebook(video_path: str, caption: str, news_link: str = None)
     if not config.META_PAGE_ACCESS_TOKEN or not config.FACEBOOK_PAGE_ID:
         return {"status": "simulated"}
 
-    fb_desc = caption
-    if "gündemanalizi" not in fb_desc.lower():
-        fb_desc = f"{fb_desc}\n\n🌐 www.gündemanalizi.com.tr"
+    # %100 Linksiz doğrudan açıklama (Maksimum erişim)
+    fb_desc = caption.strip()
 
     url = f"https://graph-video.facebook.com/v21.0/{config.FACEBOOK_PAGE_ID}/videos"
     payload = {

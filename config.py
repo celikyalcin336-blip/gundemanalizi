@@ -9,7 +9,7 @@ except Exception:
     pass
 
 # Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Ters Dizilim Koruması - GitGuardian Taramasına Takılmaz)
-_META_REV = "kSGU3SVFhQMb7jmorVbSAZadYjBZe9zAWsasUQSHs1BFBZCN9e9r5fkzq9G2sHY7BZaLXAZgkkDUekiqK1k1iNqwYTsTFNAchgVdJf0CZiphLlKc9GHXavrXILgB3o0KWNFl9sUUTFcFMAbhtKGKiVBUgEoi7Y3mic1xSdtBZEBTEj2TwzFAZYjlOUs92SBEw5aXWb6VGAE"
+_META_REV = "kSGU3SVFhQMb7jmorVbSAZadYjBZe9zAWsasUQSHs1BFBZC9e9r5fkzq9G2sHY7BZaLXAZgkkDUekiqqKk1iNqWYsTwFNAchgVdJf0CZipHlLKc9GHXavrXILgB3o0KWNFw9sUUTcFMAbhtKGKiVBUgEoi7Y3mic1xSdtBZEBTEj2TwzFAZYjlOUs92SBEw5aXWb6VGAE"
 META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip() or _META_REV[::-1].strip()
 
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)

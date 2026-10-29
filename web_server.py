@@ -348,12 +348,18 @@ async def serve_image(filename: str, request: Request):
             return FileResponse(local_path, media_type="video/mp4")
         return PlainTextResponse("Video not found", status_code=404)
 
-    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
-    if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
-        if os.path.exists(local_path):
-            return FileResponse(local_path, media_type="video/mp4")
-        return PlainTextResponse("Video not found", status_code=404)
-
+    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
+
+    if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
+
+        if os.path.exists(local_path):
+
+            return FileResponse(local_path, media_type="video/mp4")
+
+        return PlainTextResponse("Video not found", status_code=404)
+
+
+
     # 1.5. Eğer ne diskte ne de veritabanında varsa: Makale başlığından gerçek basın fotoğrafını anında kurtar!
     if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
         try:
@@ -1285,41 +1291,98 @@ def _process_viral_video_job(
             if art_obj:
                 article_id = art_obj.get("id")
 
-        # ADIM 5: Seçilen Sosyal Medya Kanallarına Gönderim
+        # ADIM 5: Tüm Sosyal Medya Kanallarına Otomatik & %100 Linksiz Dağıtım
         share_report = []
-        if pub_tg or pub_fb or pub_ig or pub_x:
-            job.update({
-                "step": 5,
-                "percent": 90,
-                "eta_sec": 20 if pub_ig else 4,
-                "step_text": "📲 5/5: Logolu video seçtiğin sosyal medya hesaplarında paylaşılıyor..."
-            })
-            if pub_tg:
-                vid_caption = ai_cap["caption"]
-                if "instagram.com" not in vid_caption:
-                    vid_caption += "\n\n📸 Instagram'da İzle & Takip Et: https://www.instagram.com/gundem_analiz/"
-                ok = telegram_notifier.send_telegram_video(res["video_path"], vid_caption, site_url)
+
+        def clean_social_text(text: str) -> str:
+            if not text:
+                return ""
+            # Link, web adresi veya yönlendirme satırlarını tamamen temizle
+            text = re.sub(r'(?i)(?:🌐|🔗|👉)?\s*(?:detaylar|kaynak|haber|link|tıklayın|oku)[^:\r\n]*:\s*https?://\S+', '', text)
+            text = re.sub(r'https?://\S+', '', text)
+            text = re.sub(r'(?i)\bwww\.[a-z0-9\-]+(?:\.[a-z0-9\-]+)+[/\S]*', '', text)
+            text = re.sub(r'(?i)\b[a-z0-9\-]+\.(?:com\.tr|com|net|org|site|co|io)[/\S]*', '', text)
+            text = re.sub(r'\n{3,}', '\n\n', text)
+            text = re.sub(r'[ \t]+', ' ', text)
+            return text.strip()
+
+        clean_caption = clean_social_text(ai_cap.get("caption") or title)
+
+        job.update({
+            "step": 5,
+            "percent": 88,
+            "eta_sec": 30,
+            "step_text": "📲 5/5: Tüm sosyal medya hesaplarına (%100 linksiz & yüksek kalite) dağıtılıyor..."
+        })
+
+        # 1. TELEGRAM (Video + Linksiz Metin)
+        if pub_tg:
+            try:
+                ok = telegram_notifier.send_telegram_video(res["video_path"], clean_caption, news_link="")
                 share_report.append("📲 Telegram: ✅" if ok is not False else "📲 Telegram: ❌")
-            if pub_fb:
-                r_fb = meta_poster.post_video_to_facebook(res["video_path"], ai_cap["caption"], site_url)
-                share_report.append(f"📘 Facebook: {'✅' if r_fb.get('status') == 'success' else '❌ ' + str(r_fb.get('status'))}")
-            if pub_x:
+            except Exception:
+                share_report.append("📲 Telegram: ❌")
+
+        # 2. FACEBOOK REELS & VİDEO (Doğrudan Yükleme, Sıfır Link)
+        if pub_fb:
+            try:
+                r_fb = meta_poster.post_video_to_facebook(res["video_path"], clean_caption, news_link=None)
+                share_report.append("📘 Facebook: ✅" if r_fb.get("status") == "success" else f"📘 Facebook: ❌ {r_fb.get('status')}")
+            except Exception:
+                share_report.append("📘 Facebook: ❌")
+
+        # 3. INSTAGRAM REELS (@gundem_analiz - Doğrudan Meta Resumable Upload, Sıfır Link)
+        if pub_ig:
+            try:
+                job.update({"step_text": "📸 Instagram Reels yükleniyor ve Meta sunucularında işleniyor..."})
+                r_ig = meta_poster.post_reel_to_instagram(res["video_path"], clean_caption)
+                share_report.append("📸 Instagram: ✅" if r_ig.get("status") == "success" else f"📸 Instagram: ❌ {r_ig.get('status')}")
+            except Exception:
+                share_report.append("📸 Instagram: ❌")
+
+        # 4. TWITTER / X (@gndmanalizi - Chrome Motoru, %100 Linksiz Video Tweet)
+        if pub_x:
+            try:
+                job.update({"step_text": "🐦 X (Twitter) video paylaşımı yapılıyor..."})
                 import x_poster
-                job.update({"step_text": "🐦 X (Twitter) paylaşımı yapılıyor..."})
-                r_x = x_poster.post_video_to_x(res["video_path"], title, site_url)
-                x_st = r_x.get("status")
-                share_report.append("🐦 X: ✅" if x_st == "success" else "🐦 X: ↗️ Hazır")
-            if pub_ig:
-                job.update({"step_text": "📸 Instagram Reels (@gundem_analiz) yükleniyor (20-45 sn sürebilir)..."})
-                public_url = f"{config.PUBLIC_MEDIA_BASE}/images/{out_filename}"
-                ig_caption = f"{ai_cap['caption']}\n\n🌐 Detaylar profildeki linkte: gündemanalizi.com.tr"
-                r_ig = meta_poster.post_reel_to_instagram(res["video_path"], ig_caption, public_url)
-                share_report.append(f"📸 Instagram: {'✅' if r_ig.get('status') == 'success' else '❌ ' + str(r_ig.get('status'))}")
+                r_x = x_poster.post_video_to_x(res["video_path"], title, "")
+                share_report.append("🐦 X: ✅" if r_x.get("status") == "success" else f"🐦 X: ❌ {r_x.get('status')}")
+            except Exception:
+                share_report.append("🐦 X: ❌")
+
+        # 5. YOUTUBE SHORTS (Varsa Doğrudan Yükle, Sıfır Link)
+        try:
+            import youtube_uploader
+            r_yt = youtube_uploader.upload_shorts(
+                video_path=res["video_path"],
+                title=f"{title[:80]} #Shorts",
+                description=clean_caption
+            )
+            if r_yt.get("status") == "success":
+                share_report.append("🎬 YouTube: ✅")
+        except Exception:
+            pass
+
+        # 6. TIKTOK (Varsa Doğrudan Yükle, Sıfır Link)
+        try:
+            import tiktok_uploader
+            r_tt = tiktok_uploader.upload_tiktok_video(
+                video_path=res["video_path"],
+                caption=f"{title[:75]} #GündemAnalizi #Haberler",
+                headless=True
+            )
+            if r_tt.get("status") == "success":
+                share_report.append("🎵 TikTok: ✅")
+        except Exception:
+            pass
 
         if os.path.exists(raw_path):
-            os.remove(raw_path)
+            try:
+                os.remove(raw_path)
+            except Exception:
+                pass
 
-        social_pack = f"{ai_cap['caption']}\n\n🌐 Detaylar: {site_url}"
+        social_pack = clean_caption
         job.update({
             "status": "done",
             "step": 5,
@@ -1361,7 +1424,7 @@ async def panel_viral_video(
     pub_tg: str = Form("true"),
     pub_fb: str = Form("true"),
     pub_ig: str = Form("true"),
-    pub_x: str = Form("false"),
+    pub_x: str = Form("true"),
     source: str = Form("Gündem Analizi"),
     video_file: UploadFile = File(None)
 ):
@@ -1376,9 +1439,9 @@ async def panel_viral_video(
 
     has_uploaded_file = False
     if video_file and video_file.filename:
-        content = await video_file.read()
+        import shutil
         with open(raw_path, "wb") as f:
-            f.write(content)
+            shutil.copyfileobj(video_file.file, f)
         has_uploaded_file = True
     elif not video_url.strip():
         raise HTTPException(status_code=400, detail="Lütfen bir video dosyası seçin veya video linki girin.")
