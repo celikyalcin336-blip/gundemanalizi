@@ -417,10 +417,10 @@ def get_site_ad_settings(force_refresh: bool = False) -> dict:
     try:
         data = {
             "google_site_verification": database.get_setting("google_site_verification", ""),
-            "adsense_client_id": database.get_setting("adsense_client_id", "") or "ca-pub-1415664741128989",
+            "adsense_client_id": database.get_setting("adsense_client_id", "") or "ca-pub-3827167989675699",
             "ga_tracking_id": database.get_setting("ga_tracking_id", ""),
             "ads_enabled": database.get_setting("ads_enabled", "1") == "1",
-            "ads_txt_content": database.get_setting("ads_txt_content", "") or "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
+            "ads_txt_content": database.get_setting("ads_txt_content", "") or "google.com, pub-3827167989675699, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": database.get_setting("ad_slot_top", ""),
             "ad_slot_article_top": database.get_setting("ad_slot_article_top", ""),
             "ad_slot_article_mid": database.get_setting("ad_slot_article_mid", ""),
@@ -431,10 +431,10 @@ def get_site_ad_settings(force_refresh: bool = False) -> dict:
     except Exception:
         fallback = {
             "google_site_verification": "",
-            "adsense_client_id": "ca-pub-1415664741128989",
+            "adsense_client_id": "ca-pub-3827167989675699",
             "ga_tracking_id": "",
             "ads_enabled": True,
-            "ads_txt_content": "google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0",
+            "ads_txt_content": "google.com, pub-3827167989675699, DIRECT, f08c47fec0942fa0",
             "ad_slot_top": "",
             "ad_slot_article_top": "",
             "ad_slot_article_mid": "",
@@ -1836,7 +1836,7 @@ async def ads_txt():
     custom = database.get_setting("ads_txt_content", "").strip()
     if custom:
         return PlainTextResponse(content=custom + "\n")
-    return PlainTextResponse(content="google.com, pub-1415664741128989, DIRECT, f08c47fec0942fa0\n")
+    return PlainTextResponse(content="google.com, pub-3827167989675699, DIRECT, f08c47fec0942fa0\n")
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots(request: Request):
