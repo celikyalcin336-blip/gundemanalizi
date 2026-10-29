@@ -292,14 +292,19 @@ def _collect_candidates() -> list:
 
 
 def _rank(items: list) -> list:
-    """En taze ve görselli haberleri en öne alır (kuşak/saat kısıtlaması yok)."""
+    """Aç kalmış kategorileri (Otomobil, Sağlık, Eğitim) ve en taze görselli haberleri en öne alır."""
     fresh = [i for i in items if i["age_h"] <= FRESH_HOURS_PRIMARY] or items
-    last_cat = database.get_setting(LAST_CAT_KEY, "")
+    try:
+        recent_arts = database.get_articles(limit=24)
+        recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
+    except Exception:
+        recent_cats = []
 
     def key(i):
-        same_cat = 1 if (last_cat and i["category"] == last_cat) else 0
+        cat = i["category"]
+        starvation = -9999 if cat not in recent_cats else -recent_cats.index(cat)
         has_img = 0 if i.get("image_url") else 1
-        return (same_cat, has_img, -i["pub_ts"])
+        return (starvation, has_img, -i["pub_ts"])
 
     return sorted(fresh, key=key)
 

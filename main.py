@@ -199,31 +199,24 @@ def run_bot(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # 🎯 SABİT VE ŞAŞMAZ KATEGORİ SIRASI (Önce Ana Gündem/Ekonomi/Dünya/Spor!)
-    ROTATION_ORDER = [
+    # 🎯 8 KATEGORİ TAM EŞİTLİK VE ADİL ROTASYON (Otomobil, Sağlık, Eğitim Asla Atlanamaz!)
+    ALL_CATEGORIES = [
         "Gündem", "Ekonomi", "Dünya", "Spor",
         "Teknoloji", "Otomobil", "Sağlık", "Eğitim"
     ]
-    recent_arts = database.get_articles(limit=8)
+    recent_arts = database.get_articles(limit=24)
     recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
     last_cat = recent_cats[0] if recent_cats else ""
 
-    # Son kategori ROTATION_ORDER içinde nerede ise tam bir sonrakinden başla
-    if last_cat in ROTATION_ORDER:
-        start_idx = (ROTATION_ORDER.index(last_cat) + 1) % len(ROTATION_ORDER)
-        priority_categories = ROTATION_ORDER[start_idx:] + ROTATION_ORDER[:start_idx]
-    else:
-        priority_categories = list(ROTATION_ORDER)
+    # En uzun süredir haber paylaşılmamış kategoriyi EN BAŞA koy:
+    # Eğer bir kategori son 24 haberde hiç yoksa (Örn: Otomobil, Sağlık, Eğitim) puanı 9999 olur ve İLK SIRADA paylaşılır!
+    def get_cat_starvation_score(cat):
+        if cat not in recent_cats:
+            return 9999
+        return recent_cats.index(cat)
 
-    # Eğer son 3 haberde hiç Gündem, Ekonomi veya Dünya yoksa, doğrudan Gündem -> Ekonomi -> Dünya'yı en başa çek!
-    core_cats = ["Gündem", "Ekonomi", "Dünya"]
-    if recent_cats and not any(c in recent_cats[:2] for c in core_cats):
-        missing_core = [c for c in core_cats if c not in recent_cats[:3]]
-        if missing_core:
-            others = [c for c in priority_categories if c not in missing_core]
-            priority_categories = missing_core + others
-
-    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Kesin Sıra: {priority_categories}")
+    priority_categories = sorted(ALL_CATEGORIES, key=get_cat_starvation_score, reverse=True)
+    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Kesin Adil Sıra: {priority_categories}")
 
     selected_pool = []
     for target_cat in priority_categories:
