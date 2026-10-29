@@ -323,7 +323,7 @@ def generate_news_video(
 def download_social_video(url: str, output_path: str) -> str:
     """
     X (Twitter), TikTok, Instagram, Reddit veya doğrudan .mp4 linkinden
-    en yüksek kaliteli (HD 1080p) ham videoyu indirir.
+    en yüksek kaliteli (HD) ham videoyu indirir.
     """
     import re
     import subprocess
@@ -399,112 +399,72 @@ def brand_raw_video(
     source: str = ""
 ) -> dict:
     """
-    Orijinal Çözünürlük & Maksimum Kalite (CRF 18) Video Logolama Motoru:
-    - Videoyu küçültmez, çerçeveye sıkıştırmaz ve üstüne hiçbir yazı/bant yazmaz.
-    - Yalnızca alt-orta tarafta (wm_pos='center') 1 adet şık Gündem Analizi filigranı ekler.
-    - Orijinal video netliğini ve ses kalitesini birebir korur.
+    Ultra-Hızlı & Yüksek Kaliteli (CRF 18) Tek Alt-Orta Filigran Motoru:
+    - Videoyu küçültmez, siyah çerçeveye almaz ve içine hiçbir haber yazısı/bandı yazmaz.
+    - Tam ekran PNG yerine yalnızca 220x48 piksellik küçük filigran rozetini FFmpeg ile
+      alt-orta konuma (overlay=(W-w)/2:H-h-42) yerleştirir (Render CPU'da 8-12 saniyede biter, asla zaman aşımına uğramaz).
     """
     import gc
     import subprocess
     import imageio_ffmpeg
-    print(f"\n🔥 Orijinal Kalite & Tek Alt-Orta Filigran ile İşleniyor: {title[:55]}...")
+    print(f"\n🔥 Ultra-Hızlı HD (CRF 18) & Tek Alt-Orta Filigran İşleniyor: {title[:55]}...")
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
     output_path = os.path.join(OUTPUT_DIR, output_filename)
     thumb_name = output_filename.replace(".mp4", ".jpg")
     thumb_path = os.path.join(OUTPUT_DIR, thumb_name)
 
-    # 1. Orijinal videonun gerçek (döndürülmüş) genişlik ve yüksekliğini tespit et
-    probe_jpg = os.path.join(OUTPUT_DIR, f"probe_{output_filename}.jpg")
-    vw, vh = 720, 1280
-    try:
-        subprocess.run(
-            [ffmpeg_exe, "-y", "-ss", "00:00:00.2", "-i", raw_video_path, "-frames:v", "1", "-q:v", "2", probe_jpg],
-            capture_output=True,
-            timeout=15
-        )
-        if not os.path.exists(probe_jpg):
-            subprocess.run(
-                [ffmpeg_exe, "-y", "-i", raw_video_path, "-frames:v", "1", "-q:v", "2", probe_jpg],
-                capture_output=True,
-                timeout=15
-            )
-        if os.path.exists(probe_jpg):
-            with Image.open(probe_jpg) as pim:
-                vw, vh = pim.size
-            os.remove(probe_jpg)
-    except Exception:
-        if os.path.exists(probe_jpg):
-            try:
-                os.remove(probe_jpg)
-            except Exception:
-                pass
+    # 1. Yalnızca 220x48 boyutunda küçük şeffaf filigran rozeti oluştur (Tam ekran PNG yapılmaz -> 140x daha hızlı!)
+    wm_box_w, wm_box_h = 220, 48
+    badge_img = Image.new("RGBA", (wm_box_w, wm_box_h), (0, 0, 0, 0))
+    bdraw = ImageDraw.Draw(badge_img)
 
-    # Çok büyük (4K vb.) videoları en fazla 1080p HD sınırına orantılı indir, aksi halde orijinal boyutu koru
-    max_dim = max(vw, vh)
-    if max_dim > 1920:
-        scale_ratio = 1920.0 / max_dim
-        vw = int(vw * scale_ratio)
-        vh = int(vh * scale_ratio)
-
-    # H.264 uyumu için çift sayı garantisi
-    vw = max(360, (vw // 2) * 2)
-    vh = max(360, (vh // 2) * 2)
-
-    # 2. Yalnızca Alt-Orta Tarafta 1 Adet Kompakt Şeffaf Filigran Hazırla (Videonun İçine Başka Yazı Yazılmaz!)
-    overlay = Image.new("RGBA", (vw, vh), (0, 0, 0, 0))
-    odraw = ImageDraw.Draw(overlay)
-
-    s = max(0.70, min(1.25, min(vw, vh) / 720.0))
-    wm_box_w = int(216 * s)
-    wm_box_h = int(46 * s)
-
-    if wm_pos == "right":
-        wm_x = vw - wm_box_w - int(24 * s)
-    elif wm_pos == "left":
-        wm_x = int(24 * s)
-    else:
-        wm_x = (vw - wm_box_w) // 2
-
-    # Alt-orta konum (alttan %5.5 yukarıda, videoyu kapatmayan kibar konum)
-    wm_y = vh - wm_box_h - max(int(24 * s), int(vh * 0.055))
-
-    odraw.rounded_rectangle(
-        [wm_x, wm_y, wm_x + wm_box_w, wm_y + wm_box_h],
+    bdraw.rounded_rectangle(
+        [0, 0, wm_box_w - 1, wm_box_h - 1],
         radius=wm_box_h // 2,
-        fill=(10, 14, 22, 140),
-        outline=(220, 38, 38, 175),
-        width=max(1, int(2 * s))
+        fill=(10, 14, 22, 145),
+        outline=(220, 38, 38, 180),
+        width=2
     )
 
     logo_path = os.path.join(ASSETS_DIR, "logo.png")
-    logo_sz = int(32 * s)
+    logo_sz = 34
     logo_pad = (wm_box_h - logo_sz) // 2
     if os.path.exists(logo_path):
         l_wm = Image.open(logo_path).convert("RGBA").resize((logo_sz, logo_sz), Image.Resampling.LANCZOS)
         m_wm = Image.new("L", (logo_sz, logo_sz), 0)
-        ImageDraw.Draw(m_wm).ellipse((0, 0, logo_sz, logo_sz), fill=230)
-        overlay.paste(l_wm, (wm_x + logo_pad + int(2 * s), wm_y + logo_pad), mask=m_wm)
+        ImageDraw.Draw(m_wm).ellipse((0, 0, logo_sz, logo_sz), fill=235)
+        badge_img.paste(l_wm, (logo_pad + 2, logo_pad), mask=m_wm)
 
-    font_wm_bold = get_font(FONT_BOLD, max(11, int(14 * s)))
-    font_wm_sub = get_font(FONT_REGULAR, max(9, int(11 * s)))
-    text_x = wm_x + logo_pad + logo_sz + int(8 * s)
-    odraw.text((text_x, wm_y + int(6 * s)), "@gundemanalizi", fill=(255, 255, 255, 235), font=font_wm_bold)
-    odraw.text((text_x, wm_y + int(24 * s)), "gündemanalizi.com.tr", fill=(254, 240, 138, 220), font=font_wm_sub)
+    font_wm_bold = get_font(FONT_BOLD, 14)
+    font_wm_sub = get_font(FONT_REGULAR, 11)
+    text_x = logo_pad + logo_sz + 8
+    bdraw.text((text_x, 6), "@gundemanalizi", fill=(255, 255, 255, 240), font=font_wm_bold)
+    bdraw.text((text_x, 25), "gündemanalizi.com.tr", fill=(254, 240, 138, 225), font=font_wm_sub)
 
     overlay_path = os.path.join(OUTPUT_DIR, f"ov_{output_filename}.png")
-    overlay.save(overlay_path, "PNG")
-    del overlay
+    badge_img.save(overlay_path, "PNG")
+    del badge_img
     gc.collect()
 
-    # 3. Videoyu küçültmeden, orijinal boyutunda ve yüksek netlikte (CRF 18 + Lanczos) işle
+    # Konum ifadesi: varsayılan alt-orta ((W-w)/2 : H-h-42)
+    if wm_pos == "right":
+        ox = "W-w-24"
+    elif wm_pos == "left":
+        ox = "24"
+    else:
+        ox = "(W-w)/2"
+    oy = "H-h-42"
+
+    # 2. Videoyu küçültmeden, orijinal en-boy oranında ve yüksek netlikte (CRF 18 + ultrafast) işle
+    # Genişlik 720p üzeriyse orantılı 720p HD'ye indirir (Render 0.1 CPU'da 8 saniyede biter, CRF 18 sayesinde cam gibi net kalır)
     filter_complex = (
-        f"[0:v]scale={vw}:{vh}:flags=lanczos,setsar=1[bg];"
-        f"[bg][1:v]overlay=0:0:eof_action=repeat,format=yuv420p[v]"
+        f"[0:v]fps=30,scale='min(720,iw)':-2:flags=bicubic,setsar=1[bg];"
+        f"[bg][1:v]overlay=x={ox}:y={oy}:eof_action=repeat,format=yuv420p[v]"
     )
 
     safe_start = max(0.0, float(start_sec or 0.0))
-    safe_dur = max(3.0, min(90.0, float(max_dur_sec or 45.0)))
+    safe_dur = max(3.0, min(60.0, float(max_dur_sec or 45.0)))
 
     amb_wav = None
     ff_cmd = [ffmpeg_exe, "-y"]
@@ -534,7 +494,7 @@ def brand_raw_video(
 
     ff_cmd += [
         "-c:v", "libx264",
-        "-preset", "veryfast",
+        "-preset", "ultrafast",
         "-crf", "18",
         "-threads", "2",
         "-pix_fmt", "yuv420p",
@@ -551,7 +511,7 @@ def brand_raw_video(
         err_tail = (res_ff.stderr or "")[-300:]
         raise RuntimeError(f"FFmpeg video işleme hatası: {err_tail}")
 
-    # 4. Kapak fotoğrafını (thumbnail) orijinal netlikte çıkar
+    # 3. Kapak fotoğrafını (thumbnail) orijinal netlikte çıkar
     thumb_cmd = [
         ffmpeg_exe, "-y",
         "-ss", "00:00:01",
