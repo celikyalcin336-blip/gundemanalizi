@@ -150,7 +150,7 @@ def _warmup_turbo_cache():
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
     try:
-        database.restore_and_heal_images(limit=150)
+        database.restore_and_heal_images(limit=15)
     except Exception as e:
         print(f"Görsel onarım ısınma hatası: {e}")
 
@@ -342,6 +342,18 @@ async def serve_image(filename: str, request: Request):
         except Exception:
             pass
 
+    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
+    if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
+        if os.path.exists(local_path):
+            return FileResponse(local_path, media_type="video/mp4")
+        return PlainTextResponse("Video not found", status_code=404)
+
+    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
+    if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
+        if os.path.exists(local_path):
+            return FileResponse(local_path, media_type="video/mp4")
+        return PlainTextResponse("Video not found", status_code=404)
+
     # 1.5. Eğer ne diskte ne de veritabanında varsa: Makale başlığından gerçek basın fotoğrafını anında kurtar!
     if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
         try:
@@ -754,7 +766,7 @@ async def api_deprem(limit: int = 50):
 async def api_nobetci_eczaneler(city: str = "istanbul"):
     """81 İl Canlı Nöbetçi Eczaneler API'si (Bugünün Gerçek Nöbetçileri)."""
     import live_services
-    data = live_services.get_live_pharmacies(city)
+    data = await asyncio.to_thread(live_services.get_live_pharmacies, city)
     return JSONResponse({
         "ok": True,
         "city": city,
@@ -867,10 +879,11 @@ def get_cached_category_widgets() -> dict:
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
     # Turbo RAM Önbelleği: Arama yoksa ve ilk sayfaysa 0 ms hızında RAM'den ver
     cache_key = f"page_{kategori or 'home'}_{sayfa}" if not q else None
-    if cache_key and request.cookies.get("ga_admin") != "1":
+    if cache_key:
         cached_html = get_turbo_page(cache_key)
         if cached_html:
-            database.record_visit("home_visits")
+            if request.cookies.get("ga_admin") != "1":
+                database.record_visit("home_visits")
             return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60, s-maxage=60", "CDN-Cache-Control": "max-age=60", "Cloudflare-CDN-Cache-Control": "max-age=60"})
 
     if request.cookies.get("ga_admin") != "1":
@@ -1038,7 +1051,8 @@ async def panel_fetch_now(request: Request):
         try:
             main.run_bot(max_items=1, force=True)
         finally:
-            _CATEGORY_WIDGETS_CACHE_TIME = 0
+            clear_turbo_cache()
+    _CATEGORY_WIDGETS_CACHE_TIME = 0
     threading.Thread(target=_fetch_worker, daemon=True).start()
     return {"ok": True, "message": "Yeni haber taraması başlatıldı! 15-20 saniye içinde siteye ve Telegram'a düşecek."}
 
@@ -1079,6 +1093,7 @@ async def panel_publish_breaking(
     )
     site_url = f"{config.SITE_URL}/haber/{slug}"
     global _CATEGORY_WIDGETS_CACHE_TIME
+    clear_turbo_cache()
     _CATEGORY_WIDGETS_CACHE_TIME = 0
 
     try:
@@ -1099,6 +1114,7 @@ async def panel_delete_article(article_id: int, request: Request):
         raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
     deleted = database.delete_article(article_id)
     global _CATEGORY_WIDGETS_CACHE_TIME
+    clear_turbo_cache()
     _CATEGORY_WIDGETS_CACHE_TIME = 0
     return {"ok": deleted}
 
@@ -1263,6 +1279,7 @@ def _process_viral_video_job(
                 source=source.strip() or "Gündem Analizi",
                 category=category
             )
+            clear_turbo_cache()
             site_url = f"{config.SITE_URL}/haber/{slug}"
             art_obj = database.get_article_by_slug(slug)
             if art_obj:
@@ -1343,7 +1360,7 @@ async def panel_viral_video(
     pub_site: str = Form("true"),
     pub_tg: str = Form("true"),
     pub_fb: str = Form("true"),
-    pub_ig: str = Form("false"),
+    pub_ig: str = Form("true"),
     pub_x: str = Form("false"),
     source: str = Form("Gündem Analizi"),
     video_file: UploadFile = File(None)

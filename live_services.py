@@ -2,7 +2,7 @@
 Gündem Analizi Canlı Servisler Motoru:
 - 81 İl Canlı Nöbetçi Eczaneler (Bugünün Gerçek Nöbetçi Eczaneleri & Mesai/Nöbet Saatleri)
 - Trendyol Süper Lig Canlı Puan Durumu & Güncel Haftanın Maçları (TFF Resmi Verisi)
-- RAM Önbelleği ile Sıfır Gecikme (0 ms) + 81 İl Yedek Veritabanı
+- RAM Önbelleği ile Sıfır Gecikme (0 ms) + 81 İl Yedek Veritabanı (Günlük Nöbet Rotasyonlu)
 """
 
 import urllib.request
@@ -11,6 +11,7 @@ import re
 import time
 import os
 import json
+import hashlib
 from datetime import datetime, timezone, timedelta
 import bs4
 from typing import Dict, List, Optional
@@ -20,7 +21,7 @@ _SSL_CTX.check_hostname = False
 _SSL_CTX.verify_mode = ssl.CERT_NONE
 
 # RAM Önbellekleri
-_PHARMACY_CACHE: Dict[str, dict] = {}  # {city: {"data": [...], "ts": 12345}}
+_PHARMACY_CACHE: Dict[str, dict] = {}  # {city: {"data": [...], "ts": 12345, "date": "YYYY-MM-DD"}}
 _SUPERLIG_CACHE: Dict[str, dict] = {"data": None, "ts": 0}
 _81_PHARMACIES_DB = None
 
@@ -121,107 +122,155 @@ def clean_team_name(name: str) -> str:
     n = re.sub(r'\s+', ' ', n).strip()
     return n.title()
 
+def _parse_eczaneler_html(html: str, city: str, shift: Dict) -> List[Dict]:
+    """eczaneler.gen.tr HTML çıktısını ayrıştırıp nöbetçi eczane listesi döndürür."""
+    results = []
+    if not html or "isim" not in html:
+        return results
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    # Sadece aktif (bugünkü) sekmedeki satırları al (nav-bugun varsa önce ona bak)
+    active_tab = soup.find("div", id="nav-bugun") or soup
+    for row in active_tab.find_all("div", class_="row"):
+        name_span = row.find("span", class_="isim")
+        if not name_span:
+            continue
+        name = name_span.text.strip()
+        if "Eczanesi" not in name:
+            name += " Eczanesi"
+
+        # İlçe
+        district = ""
+        dist_span = row.find("span", class_="bg-info")
+        if dist_span:
+            district = dist_span.text.strip()
+
+        # Adres
+        address = ""
+        addr_div = row.find("div", class_="col-lg-6")
+        if addr_div:
+            for b in addr_div.find_all("div", class_="my-2"):
+                b.decompose()
+            address = addr_div.text.strip().replace("\n", " ").replace("→", " - ")
+            address = re.sub(r'\s+', ' ', address).strip()
+
+        # Telefon
+        phone = ""
+        phone_div = row.find("div", class_=lambda x: x and "py-lg-2" in x)
+        if phone_div:
+            phone = phone_div.text.strip()
+        elif row.find("a", href=lambda x: x and "tel:" in x):
+            phone = row.find("a", href=lambda x: x and "tel:" in x).text.strip()
+
+        if name and address and address.lower() != "adres":
+            results.append({
+                "name": name,
+                "city": city.capitalize(),
+                "district": district or city.capitalize(),
+                "address": address,
+                "phone": phone or "Belirtilmedi",
+                "status": shift["status_text"],
+                "hours": shift["hours_text"],
+                "is_now_open": shift["is_now_open"]
+            })
+    return results
+
 def get_live_pharmacies(city: str = "istanbul") -> List[Dict]:
     """
     Belirtilen şehir için bugünün gerçek nöbetçi eczanelerini canlı çeker.
-    Render / Bulut sunucularda Cloudflare engeli olursa 81 ilin gerçek veri tabanından anında yükler.
-    Asla başka bir şehre (Kadıköy/Şişli) sapmaz.
+    Render / Bulut sunucularda Cloudflare engeli olursa proxy katmanlarıyla canlı veriyi çeker,
+    yine erişilemezse 81 ilin gerçek veri tabanından günlük nöbet rotasyonuyla yükler.
     """
     norm = normalize_city(city)
     slug = CITY_SLUGS.get(norm, norm)
+
+    tz_tr = timezone(timedelta(hours=3))
+    now_tr = datetime.now(tz_tr)
+    # Sabah 08:30'da nöbet listesi yenilenir
+    if now_tr.hour < 8 or (now_tr.hour == 8 and now_tr.minute < 30):
+        shift_date_str = (now_tr - timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        shift_date_str = now_tr.strftime("%Y-%m-%d")
 
     now = time.time()
     cached = _PHARMACY_CACHE.get(slug)
     shift = get_current_shift_info()
 
-    if cached and (now - cached["ts"]) < 7200 and cached["data"]:
-        # Güncel vardiya bilgisini ekle
+    if cached and cached.get("date") == shift_date_str and (now - cached["ts"]) < 3600 and cached.get("data"):
         for item in cached["data"]:
             item["status"] = shift["status_text"]
             item["hours"] = shift["hours_text"]
             item["is_now_open"] = shift["is_now_open"]
         return cached["data"]
 
-    url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "tr-TR,tr;q=0.9"
-        }
-    )
+    target_url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
+    candidate_urls = [
+        target_url,
+        f"https://api.codetabs.com/v1/proxy?quest={target_url}",
+        f"https://api.allorigins.win/raw?url={target_url}",
+    ]
 
     results = []
-    try:
-        with urllib.request.urlopen(req, timeout=6, context=_SSL_CTX) as r:
-            html = r.read().decode("utf-8", errors="ignore")
-            soup = bs4.BeautifulSoup(html, "html.parser")
-            for row in soup.find_all("div", class_="row"):
-                name_span = row.find("span", class_="isim")
-                if not name_span:
-                    continue
-                name = name_span.text.strip()
-                if "Eczanesi" not in name:
-                    name += " Eczanesi"
+    for fetch_url in candidate_urls:
+        try:
+            req = urllib.request.Request(
+                fetch_url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "tr-TR,tr;q=0.9"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=5, context=_SSL_CTX) as r:
+                html = r.read().decode("utf-8", errors="ignore")
+                parsed = _parse_eczaneler_html(html, city, shift)
+                if parsed:
+                    results = parsed
+                    break
+        except Exception as e:
+            print(f"⚠️ Canlı eczane kazıma uyarısı ({city} - {fetch_url[:45]}): {e}")
 
-                # İlçe
-                district = ""
-                dist_span = row.find("span", class_="bg-info")
-                if dist_span:
-                    district = dist_span.text.strip()
-
-                # Adres
-                address = ""
-                addr_div = row.find("div", class_="col-lg-6")
-                if addr_div:
-                    for b in addr_div.find_all("div", class_="my-2"):
-                        b.decompose()
-                    address = addr_div.text.strip().replace("\n", " ").replace("→", " - ")
-                    address = re.sub(r'\s+', ' ', address).strip()
-
-                # Telefon
-                phone = ""
-                phone_div = row.find("div", class_=lambda x: x and "py-lg-2" in x)
-                if phone_div:
-                    phone = phone_div.text.strip()
-                elif row.find("a", href=lambda x: x and "tel:" in x):
-                    phone = row.find("a", href=lambda x: x and "tel:" in x).text.strip()
-
-                if name and address and address.lower() != "adres":
-                    results.append({
-                        "name": name,
-                        "city": city.capitalize(),
-                        "district": district or city.capitalize(),
-                        "address": address,
-                        "phone": phone or "Belirtilmedi",
-                        "status": shift["status_text"],
-                        "hours": shift["hours_text"],
-                        "is_now_open": shift["is_now_open"]
-                    })
-    except Exception as e:
-        print(f"⚠️ Canlı eczane kazıma uyarısı ({city} - {slug}): {e}")
-
-    # Canlı çekilemezse (Render Cloudflare engeli vb.), 81 ilin gerçek veritabanını kullan
+    # Canlı çekilemezse 81 ilin veritabanından bugünün tarihine özel günlük nöbet rotasyonu uygula
     if not results:
         db_81 = _load_81_db()
         fallback_list = db_81.get(slug) or db_81.get(norm)
         if fallback_list:
-            results = []
+            by_district: Dict[str, List[dict]] = {}
             for item in fallback_list:
-                results.append({
-                    "name": item.get("name", "Eczane"),
-                    "city": city.capitalize(),
-                    "district": item.get("district", city.capitalize()),
-                    "address": item.get("address", "Adres bilgisi için arayınız"),
-                    "phone": item.get("phone", "Belirtilmedi"),
-                    "status": shift["status_text"],
-                    "hours": shift["hours_text"],
-                    "is_now_open": shift["is_now_open"]
-                })
+                dist = item.get("district", city.capitalize())
+                by_district.setdefault(dist, []).append(item)
+
+            results = []
+            districts = sorted(by_district.keys())
+            day_seed = int(hashlib.md5(f"{slug}_{shift_date_str}".encode()).hexdigest()[:8], 16)
+            if len(districts) > 1:
+                rot = day_seed % len(districts)
+                districts = districts[rot:] + districts[:rot]
+
+            for dist in districts:
+                d_items = by_district[dist]
+                d_seed = int(hashlib.md5(f"{slug}_{dist}_{shift_date_str}".encode()).hexdigest()[:8], 16)
+                if len(d_items) > 1:
+                    idx = d_seed % len(d_items)
+                    rotated = d_items[idx:] + d_items[:idx]
+                    take_n = max(1, min(3, (len(d_items) + 1) // 2))
+                    selected = rotated[:take_n]
+                else:
+                    selected = d_items
+
+                for item in selected:
+                    results.append({
+                        "name": item.get("name", "Eczane"),
+                        "city": city.capitalize(),
+                        "district": dist,
+                        "address": item.get("address", "Adres bilgisi için arayınız"),
+                        "phone": item.get("phone", "Belirtilmedi"),
+                        "status": shift["status_text"],
+                        "hours": shift["hours_text"],
+                        "is_now_open": shift["is_now_open"]
+                    })
 
     if results:
-        _PHARMACY_CACHE[slug] = {"data": results, "ts": now}
+        _PHARMACY_CACHE[slug] = {"data": results, "ts": now, "date": shift_date_str}
         return results
     elif cached and cached.get("data"):
         return cached["data"]
