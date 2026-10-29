@@ -76,7 +76,7 @@ def bot_background_worker():
                 print(f"   [Bot Hata]: {res.stderr.strip()[:250]}")
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
-        time.sleep(20)
+        time.sleep(10)
 
 def system_health_watchdog_worker():
     """
