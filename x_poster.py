@@ -226,16 +226,19 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True,
-                args=[
-                    "--no-sandbox",
-                    "--disable-setuid-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-gpu",
-                    "--disable-blink-features=AutomationControlled"
-                ]
-            )
+            # Video H.264/AAC donanım codec desteği için öncelikle sistemdeki Google Chrome'u başlat
+            launch_args = [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-blink-features=AutomationControlled"
+            ]
+            browser = None
+            try:
+                browser = p.chromium.launch(channel="chrome", headless=True, args=launch_args)
+            except Exception:
+                browser = p.chromium.launch(headless=True, args=launch_args)
             context = browser.new_context(
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
                 viewport={"width": 1280, "height": 800}
@@ -261,27 +264,41 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
             editor.first.fill(text)
             page.wait_for_timeout(1000)
 
+            # Tweeti Gönder butonu referansı
+            post_btn = page.locator('button[data-testid="tweetButton"]').first
+            if not post_btn.count():
+                post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
+
             # Görsel veya Video Ekle
             if media_path and os.path.exists(media_path):
                 file_input = page.locator('input[data-testid="fileInput"]').first
                 if file_input.count():
                     file_input.set_input_files(media_path)
                     is_video = media_path.lower().endswith(('.mp4', '.mov', '.avi'))
-                    wait_sec = 18 if is_video else 4
-                    print(f"⏳ Medya X'e yükleniyor ({'Video' if is_video else 'Görsel'}), {wait_sec}s bekleniyor...")
-                    page.wait_for_timeout(wait_sec * 1000)
+                    print(f"⏳ Medya X'e aktarılıyor ({'Video' if is_video else 'Görsel'})...")
+                    
+                    # Medyanın DOM'a eklenmesini ve Twitter sunucularında işlenmesini bekle
+                    media_ready = False
+                    for sec in range(1, 40 if is_video else 10):
+                        page.wait_for_timeout(1000)
+                        attachments = page.locator('div[data-testid="attachments"]').count()
+                        aria_dis = post_btn.get_attribute("aria-disabled") if post_btn.count() else "true"
+                        if attachments > 0 and aria_dis != "true" and (not is_video or sec >= 6):
+                            media_ready = True
+                            print(f"✅ Medya başarıyla hazırlandı ({sec}. saniye).")
+                            break
+                    
+                    if not media_ready and page.locator('div[data-testid="attachments"]').count() == 0:
+                        print("⚠️ Medya yüklenemedi (Twitter ekleyemedi). Videonsuz tweet atılmaması için iptal ediliyor.")
+                        browser.close()
+                        return {"status": "error", "reason": "Medya yüklemesi X tarafından reddedildi"}
 
-            # Tweeti Gönder butonu
-            post_btn = page.locator('button[data-testid="tweetButton"]').first
-            if not post_btn.count():
-                post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
-
-            # Video yükleme sonrası butonun aktifleşmesini bekle (maksimum 40s)
-            for _ in range(25):
+            # Butonun aktifleştiğini son kez doğrula
+            for _ in range(10):
                 aria_dis = post_btn.get_attribute("aria-disabled") if post_btn.count() else "true"
                 if aria_dis != "true":
                     break
-                page.wait_for_timeout(1500)
+                page.wait_for_timeout(1000)
 
             # Güvenli gönderim: Editor'e odaklanıp Ctrl+Enter kısayolu ve dispatchEvent click
             # (Twitter modal backdrop'ının click'i engellemesini / timeout vermesini önler)
