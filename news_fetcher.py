@@ -85,7 +85,6 @@ def sanitize_news_text(text: str) -> str:
     t = re.sub(r'^(?:\s*%\s*[-+]?\d+[\.,]\d+\s*)+(?:Haberler|FİNANS|Ekonomi|Gündem|Son Dakika|\s)*', '', t, flags=re.I)
     t = re.sub(r'\b(?:Haberler\s+FİNANS\s+Ekonomi)\b', '', t, flags=re.I)
 
-    # 1. Menü, Kategori, Breadcrumb ve AI kutusu kalıntıları (ShiftDelete, Webtekno, DonanımHaber vb.)
     t = re.sub(r'(?:i\s+)?Son\s+Haberler\s+Yapay\s+Zeka.*?(?:Nasıl\s+Yapılır\?|Kategoriler|Haberler)\s*', ' ', t, flags=re.I)
     t = re.sub(r'Donanım\s+Yazılım\s+Android.*?AI\s+ile\s+Özetle\s*', ' ', t, flags=re.I)
     t = re.sub(r'AI\s+ile\s+Özetle\s*', ' ', t, flags=re.I)
@@ -102,7 +101,6 @@ def sanitize_news_text(text: str) -> str:
 
     # 2. Site buton, menü, SEO, borsa bandı ve telif çöplerini kaldır
     junk_patterns = [
-        # ShiftDelete / Webtekno menü, arama çubuğu ve kategori kırıntıları
         r'ARA\s+English\s+Version.*?(?:Nasıl\s+Yapılır\?|Kategoriler|Haberler)\s*',
         r'English\s+Version\s+Teknoloji\s+Haberleri[^\.\n]*',
         # Mynet / Haber siteleri favori butonları
@@ -178,7 +176,7 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
         return True
 
     # 3. Salt Soru Tuzakları ("YKS ne zaman? Saat kaçta?", "Hangi kanalda?" vb. boş SEO başlıkları)
-    question_bait = ["saat kaçta", "hangi kanalda", "ne zaman yapılacak", "kaç gün kaldı", "nasıl yapılır?", "nedir, ne zaman"]
+    question_bait = ["saat kaçta", "incelemesi", "yok satar", "alınır mı", "hangi kanalda", "ne zaman yapılacak", "kaç gün kaldı", "nasıl yapılır?", "nedir, ne zaman"]
     if (title or "").count("?") >= 2 or any(qb in t_low for qb in question_bait):
         return True
     if (title or "").strip().endswith("?") and len((title or "").strip()) < 45:
