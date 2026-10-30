@@ -109,20 +109,8 @@ def process_single_news(item: dict) -> bool:
     telegram_notifier.send_telegram_news(visual_path, telegram_caption, site_article_url)
 
     # 5. Otomatik Hikaye (Story) Kalkanı:
-    # Gönderi akışını spama boğmadan, 4 saatte 1 (günde 5-6 adet) Facebook ve Instagram'a
-    # BAŞLIKLI, LOGOLU VE 9:16 DİKEY FORMATTA profesyonel HİKAYE (STORY) atar!
-    try:
-        story_filename = f"story_{news_hash[:10]}.jpg"
-        story_path = image_generator.create_story_card(
-            candidate_urls=candidate_images,
-            output_filename=story_filename,
-            title=title,
-            category=category
-        )
-        print(f"   [Dikey Hikaye Kartı Hazırlandı: {story_path}]")
-        meta_poster.post_stories_with_cooldown(story_path)
-    except Exception as e:
-        print(f"⚠️ Otomatik hikaye istisnası: {e}")
+    # Kullanıcı talebi gereğince Facebook & Instagram sayfalarını spamdan korumak için devre dışı bırakıldı.
+    pass
 
     fb_id = None
     ig_id = None

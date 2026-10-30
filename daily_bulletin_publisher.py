@@ -133,109 +133,17 @@ def run_bulletin_cycle(video_path: str = None) -> dict:
     # Platformlar arası 3 saniye nefes payı
     time.sleep(3)
 
-    # 3. ADIM: INSTAGRAM REELS
-    print("\n📸 3/4 - Instagram (@gundem_analiz) Reels Olarak Yayınlanıyor...")
-    try:
-        ig_res = meta_poster.post_reel_to_instagram(
-            video_path_or_url=video_path,
-            caption=caption
-        )
-        report["platforms"]["instagram"] = ig_res
-        if ig_res.get("status") == "success":
-            print(f"✅ Instagram Reels başarıyla yayında! (Media ID: {ig_res.get('media_id')})")
-        else:
-            print(f"⚠️ Instagram sonucu: {ig_res}")
-    except Exception as e:
-        print(f"❌ Instagram istisnası: {e}")
-        report["platforms"]["instagram"] = {"status": "error", "error": str(e)}
-
-    # Platformlar arası 3 saniye nefes payı
-    time.sleep(3)
-
-    # 4. ADIM: FACEBOOK REELS & VİDEO
-    print("\n📘 4/5 - Facebook Sayfasına Video/Reels Olarak Yayınlanıyor...")
-    try:
-        fb_res = meta_poster.post_video_to_facebook(
-            video_path=video_path,
-            caption=caption,
-            news_link="https://xn--gndemanalizi-dlb.com.tr"
-        )
-        report["platforms"]["facebook"] = fb_res
-        if fb_res.get("status") == "success":
-            print(f"✅ Facebook video paylaşımı başarılı! (Video ID: {fb_res.get('video_id')})")
-        else:
-            print(f"⚠️ Facebook sonucu: {fb_res}")
-    except Exception as e:
-        print(f"❌ Facebook istisnası: {e}")
-        report["platforms"]["facebook"] = {"status": "error", "error": str(e)}
-
-    # Platformlar arası 3 saniye nefes payı
-    time.sleep(3)
-
-    # 5. ADIM: YOUTUBE SHORTS
-    print("\n🎬 5/6 - YouTube Shorts Kanalına Yükleniyor...")
-    try:
-        yt_res = youtube_uploader.upload_shorts(
-            video_path=video_path,
-            title=f"1 Dakikada Türkiye Gündemi! ({today_str}) #Shorts",
-            description=caption
-        )
-        report["platforms"]["youtube"] = yt_res
-        if yt_res.get("status") == "success":
-            print(f"✅ YouTube Shorts yayında! URL: {yt_res.get('url')}")
-        else:
-            print(f"⚠️ YouTube sonucu: {yt_res}")
-    except Exception as e:
-        print(f"❌ YouTube Shorts istisnası: {e}")
-        report["platforms"]["youtube"] = {"status": "error", "error": str(e)}
-
-    # Platformlar arası 3 saniye nefes payı
-    time.sleep(3)
-
-    # 6. ADIM: TIKTOK
-    print("\n🎵 6/7 - TikTok Kanalına Yükleniyor...")
-    try:
-        tt_res = tiktok_uploader.upload_tiktok_video(
-            video_path=video_path,
-            caption=f"1 Dakikada Türkiye Gündemi! ({today_str}) #GününÖzeti",
-            headless=True
-        )
-        report["platforms"]["tiktok"] = tt_res
-        if tt_res.get("status") == "success":
-            print("✅ TikTok video paylaşımı başarılı!")
-        else:
-            print(f"⚠️ TikTok sonucu: {tt_res}")
-    except Exception as e:
-        print(f"❌ TikTok istisnası: {e}")
-        report["platforms"]["tiktok"] = {"status": "error", "error": str(e)}
-
-    # Platformlar arası 3 saniye nefes payı
-    time.sleep(3)
-
-    # 7. ADIM: TWITTER / X
-    print("\n🐦 7/7 - Twitter / X (@gndmanalizi) Video Paylaşılıyor...")
-    try:
-        if stories:
-            x_items = [f"{num_emojis[idx]} {s.get('category','').upper()}" for idx, s in enumerate(stories[:6])]
-            x_cat_lines = " | ".join(x_items[:3]) + "\n" + " | ".join(x_items[3:6])
-        else:
-            x_cat_lines = "1️⃣ EKONOMİ | 2️⃣ SAĞLIK | 3️⃣ SPOR\n4️⃣ EĞİTİM | 5️⃣ OTOMOBİL | 6️⃣ TEKNOLOJİ"
-
-        x_tweet_text = (
-            f"🔴 GÜNÜN ÖZETİ ({today_str})\n"
-            f"Türkiye gündeminde son 24 saatte öne çıkan 6 kritik gelişme tek dakikada!\n\n"
-            f"{x_cat_lines}\n\n"
-            f"#GündemAnalizi #GününÖzeti #Haberler #SonDakika"
-        )
-        x_res = x_poster.post_tweet_playwright(text=x_tweet_text, media_path=video_path)
-        report["platforms"]["x"] = x_res
-        if x_res.get("status") == "success":
-            print("✅ Twitter / X video paylaşımı başarılı!")
-        else:
-            print(f"⚠️ Twitter / X sonucu: {x_res}")
-    except Exception as e:
-        print(f"❌ Twitter / X istisnası: {e}")
-        report["platforms"]["x"] = {"status": "error", "error": str(e)}
+    # 3. DİĞER SOSYAL MEDYA KANALLARI (Instagram, Facebook, YouTube, TikTok, X)
+    # Kullanıcı stratejisi: Sayfa cezası / spam filtresini önlemek ve organik kitleyi korumak için
+    # otomatik bot video yüklemeleri devre dışı bırakılmıştır.
+    # Video doğrudan Telegram kanalına iletilir; kullanıcı oradan seçerek manuel olarak paylaşır.
+    print("\n🛡️ [Sosyal Medya Koruma Modu] Facebook, Instagram, YouTube, TikTok ve X otomatik video yüklemeleri devre dışı.")
+    print("📲 Bülten videosu Telegram kanalına eksiksiz iletildi. Manuel paylaşım için Telegram'dan alabilirsiniz.")
+    report["platforms"]["instagram"] = {"status": "disabled_by_user", "reason": "Manuel mod aktif"}
+    report["platforms"]["facebook"] = {"status": "disabled_by_user", "reason": "Manuel mod aktif"}
+    report["platforms"]["youtube"] = {"status": "disabled_by_user", "reason": "Manuel mod aktif"}
+    report["platforms"]["tiktok"] = {"status": "disabled_by_user", "reason": "Manuel mod aktif"}
+    report["platforms"]["x"] = {"status": "disabled_by_user", "reason": "Manuel mod aktif"}
 
     append_log(report)
     print("\n🎉 [TAMAMLANDI] Dağıtım özeti kaydedildi.")

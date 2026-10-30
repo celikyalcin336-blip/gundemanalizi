@@ -1634,9 +1634,9 @@
             fd.append('ticker_text', document.getElementById('v-ticker').value || '');
             fd.append('pub_site', 'true');
             fd.append('pub_tg', 'true');
-            fd.append('pub_fb', 'true');
-            fd.append('pub_ig', 'true');
-            fd.append('pub_x', 'true');
+            fd.append('pub_fb', 'false');
+            fd.append('pub_ig', 'false');
+            fd.append('pub_x', 'false');
 
             const fileInput = document.getElementById('v-file');
             if (fileInput.files.length > 0) {
