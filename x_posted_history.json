@@ -271,5 +271,19 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793368410.95547
+  },
+  {
+    "slug": "10-gozalti-daha",
+    "title": "10 gözaltı daha",
+    "status": "skipped",
+    "reason": "Başlık çok kısa veya özensiz.",
+    "ts": 1793371743.6003795
+  },
+  {
+    "slug": "yenilenen-peugeot-208-onumuzdeki-yil-yollarda-olacak",
+    "title": "Yenilenen Peugeot 208, önümüzdeki yıl yollarda olacak!",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793371766.9099746
   }
 ]
