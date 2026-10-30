@@ -166,5 +166,19 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793320871.262789
+  },
+  {
+    "slug": "cristiano-ronaldodan-hat-trick-al-nassrdan-5-gollu-galibiyet",
+    "title": "Cristiano Ronaldo'dan hat-trick! Al Nassr'dan 5 gollü galibiyet",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1793325107.4776242
+  },
+  {
+    "slug": "trump-sylvianin-bilgi-sizdirdigini-soyledi",
+    "title": "Trump, Sylvia'nın \"bilgi sızdırdığını\" söyledi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793325129.9157827
   }
 ]
