@@ -313,5 +313,19 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793385523.7578835
+  },
+  {
+    "slug": "arda-turanli-shakhtar-2-yarida-acildi",
+    "title": "Arda Turan'lı Shakhtar, 2. yarıda açıldı!",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1793389275.3250382
+  },
+  {
+    "slug": "vance-iranla-sonsuz-savas-icinde-olmayacagiz",
+    "title": "Vance: İran'la 'sonsuz' savaş içinde olmayacağız",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793389299.0179794
   }
 ]
