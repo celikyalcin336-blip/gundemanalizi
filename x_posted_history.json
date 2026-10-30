@@ -243,5 +243,19 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793356919.699593
+  },
+  {
+    "slug": "de-yapilacak",
+    "title": "'de yapılacak",
+    "status": "skipped",
+    "reason": "Başlık çok kısa veya özensiz.",
+    "ts": 1793359865.0822856
+  },
+  {
+    "slug": "hmdden-yeni-tuslu-cep-telefonu-nokia-2360-flip",
+    "title": "HMD’den yeni tuşlu cep telefonu: “Nokia 2360 Flip”",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793359879.7341096
   }
 ]
