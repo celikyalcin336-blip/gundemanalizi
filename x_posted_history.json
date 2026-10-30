@@ -152,5 +152,19 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793316603.127932
+  },
+  {
+    "slug": "yks-19-20-haziranda",
+    "title": "YKS 19-20 Haziran’da",
+    "status": "skipped",
+    "reason": "Başlık çok kısa veya özensiz.",
+    "ts": 1793320847.5862968
+  },
+  {
+    "slug": "inme-tedavisinde-zamana-karsi-yarista-101-birim-gorev-yapiyor",
+    "title": "İnme tedavisinde zamana karşı yarışta 101 birim görev yapıyor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793320871.262789
   }
 ]
