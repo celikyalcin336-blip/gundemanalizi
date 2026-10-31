@@ -154,37 +154,28 @@ def smart_sentence_split(text: str) -> list:
 
 def format_x_tweet(title: str, summary: str, site_url: str = "", category: str = "Gündem") -> str:
     """
-    X (Twitter) algoritmasına tam uyumlu, %100 linksiz, doyurucu ve takipçi kasma odaklı
-    profesyonel haber tweet metni üretir (Maksimum 275 karakter).
+    X (Twitter) algoritmasına tam uyumlu, %100 linksiz, doğrudan cevabı veren,
+    doyurucu haber detaylarını aktaran ve etiketlerle desteklenen profesyonel tweet metni üretir.
+    Manşet başlığı ve takip çağrısı editoryal görsel kartında yer aldığı için, metin alanı
+    haberin cevabına ve doyurucu detaylarına ayrılır. (Maksimum 272 karakter).
     """
-    category_emojis = {
-        "Ekonomi": "📊",
-        "Gündem": "🚨",
-        "Teknoloji": "🚀",
-        "Otomobil": "🚗",
-        "Dünya": "🌍",
-        "Sağlık": "🩺",
-        "Spor": "⚽",
-        "Eğitim": "🎓"
-    }
-    emoji = category_emojis.get(category, "🔴")
-    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor") else "#Gündem"
-    tags = f"{cat_tag} #SonDakika"
+    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor", "Dünya", "Sağlık") else "#Gündem"
+    tags = f"{cat_tag} #SonDakika #Haber"
 
     clean_title = title.strip()
     clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title)
-    header = f"{emoji} {clean_title}"
 
-    budget = 272 - len(header) - len(tags) - 4
+    budget = 272 - len(tags) - 2
+
     chosen_sents = []
-    if summary and budget > 35:
+    if summary:
         sentences = smart_sentence_split(summary)
         curr_len = 0
         for s in sentences:
             s_clean = s.strip()
             if not s_clean:
                 continue
-            if s_clean.lower() in clean_title.lower() or (len(s_clean) > 20 and clean_title.lower() in s_clean.lower()):
+            if s_clean.lower() == clean_title.lower() or (len(s_clean) > 25 and clean_title.lower() in s_clean.lower()):
                 continue
             if not s_clean.endswith(('.', '!', '?')):
                 s_clean += '.'
@@ -206,11 +197,12 @@ def format_x_tweet(title: str, summary: str, site_url: str = "", category: str =
                 break
 
     body = " ".join(chosen_sents).strip()
-    if body:
-        tweet = f"{header}\n\n{body}\n\n{tags}"
-    else:
-        tweet = f"{header}\n\n{tags}"
+    if not body or len(body) < 25:
+        body = clean_title
+        if len(body) > budget:
+            body = body[:budget - 1].rsplit(' ', 1)[0] + "…"
 
+    tweet = f"{body}\n\n{tags}"
     return tweet.strip()
 
 
@@ -378,11 +370,30 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     if not allowed:
         return {"status": "skipped", "reason": f"Zamanlama: {time_reason}"}
 
-    # 3. Tweet Metnini Hazırla
+    # 3. Görseli Editoryal Haber Kartına Dönüştür
+    final_media = image_path
+    try:
+        import image_generator
+        card_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+        os.makedirs(card_dir, exist_ok=True)
+        card_out = os.path.join(card_dir, f"x_card_{int(time.time())}.jpg")
+        created_card = image_generator.create_x_editorial_card(
+            image_input=image_path,
+            title=title,
+            category=category,
+            output_path=card_out
+        )
+        if created_card and os.path.exists(created_card):
+            final_media = created_card
+            print(f"🎨 [X Editoryal Kart Hazırlandı: {final_media}]")
+    except Exception as e:
+        print(f"⚠️ X editoryal kart oluşturma istisnası: {e}")
+
+    # 4. Tweet Metnini Hazırla (Cevap ve detay odaklı ferah metin)
     tweet_text = format_x_tweet(title, summary, site_url, category)
 
-    # 4. Playwright ile Tweeti Gönder
-    res = post_tweet_playwright(tweet_text, media_path=image_path)
+    # 5. Playwright ile Tweeti Gönder
+    res = post_tweet_playwright(tweet_text, media_path=final_media)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
         return {"status": "success", "url": "https://x.com/gndmanalizi"}

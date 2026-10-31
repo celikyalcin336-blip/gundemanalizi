@@ -483,6 +483,147 @@ def generate_news_card(title: str, source: str, image_url: str = None, tag: str 
     urls = [image_url] if image_url else []
     return create_news_visual(urls, output_filename, title=title, category=tag)
 
+
+
+def create_x_editorial_card(image_input: str, title: str, category: str = "Gündem", output_path: str = None) -> str:
+    """
+    X (Twitter) için BPT/Pusholder kalitesinde 16:9 HD (1200x675) editoryal haber kartı üretir:
+    1. Haberin orijinal görselini kullanır (merkez crop ile HD 1200x675).
+    2. Alt yarıya sinematik koyu degrade çeker (yazı cam gibi parlar).
+    3. Sol üste şık kategori rozeti basar (🔴 EKONOMİ, 🚀 TEKNOLOJİ vb.).
+    4. Cevabı doğrudan veren manşet başlığını büyük beyaz puntolarla yazar.
+    5. Alt banda 'GÜNDEM ANALİZİ' ve sağ köşeye 'Takip Et: @gndmanalizi' çağrısını ekler.
+    """
+    width, height = 1200, 675
+    canvas = Image.new("RGB", (width, height), (15, 20, 26))
+
+    raw_img = None
+    if image_input:
+        if os.path.exists(image_input):
+            try:
+                raw_img = Image.open(image_input).convert("RGB")
+            except Exception as e:
+                print(f"Görsel açılamadı: {e}")
+        elif str(image_input).startswith("http"):
+            try:
+                resp = requests.get(image_input, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+                if resp.status_code == 200 and len(resp.content) > 1000:
+                    raw_img = Image.open(BytesIO(resp.content)).convert("RGB")
+            except Exception as e:
+                print(f"Görsel indirilemedi: {e}")
+
+    if raw_img is not None:
+        photo = ImageOps.fit(raw_img, (width, height), method=Image.Resampling.LANCZOS)
+        photo = photo.filter(ImageFilter.UnsharpMask(radius=1.0, percent=105, threshold=3))
+        canvas.paste(photo, (0, 0))
+    else:
+        # Fotoğraf bulunamazsa koyu şık lacivert degrade arka plan
+        for y in range(height):
+            ratio = y / float(height)
+            r = int(14 + (24 - 14) * ratio)
+            g = int(20 + (36 - 20) * ratio)
+            b = int(32 + (55 - 32) * ratio)
+            draw_bg = ImageDraw.Draw(canvas)
+            draw_bg.line([(0, y), (width, y)], fill=(r, g, b))
+
+    # 1. Sinematik Koyu Gradyan Katmanı (Yazının arkasında cam gibi netlik)
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw_ov = ImageDraw.Draw(overlay)
+    start_grad = int(height * 0.28)
+    grad_h = height - start_grad
+
+    for y in range(start_grad, height):
+        ratio = max(0.0, min(1.0, (y - start_grad) / float(grad_h)))
+        alpha = int(246 * (ratio ** 1.25))
+        draw_ov.line([(0, y), (width, y)], fill=(8, 12, 18, alpha))
+
+    canvas.paste(Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB"), (0, 0))
+    draw = ImageDraw.Draw(canvas)
+
+    # 2. Sol Üst: Kategori Rozeti
+    category_emojis = {
+        "Ekonomi": "📊", "Gündem": "🚨", "Teknoloji": "🚀", "Otomobil": "🚗",
+        "Dünya": "🌍", "Sağlık": "🩺", "Spor": "⚽", "Eğitim": "🎓"
+    }
+    cat_clean = category.strip().capitalize() if category else "Gündem"
+    cat_emoji = category_emojis.get(cat_clean, "🔴")
+    cat_text = f"{cat_emoji} {cat_clean.upper()}"
+
+    cat_font = get_font(FONT_BOLD_PATH, 22)
+    cat_bbox = cat_font.getbbox(cat_text)
+    cat_w = cat_bbox[2] - cat_bbox[0] + 32
+    cat_h = 44
+    draw.rounded_rectangle([50, 45, 50 + cat_w, 45 + cat_h], radius=10, fill=(220, 38, 38))
+    draw.text((66, 54), cat_text, font=cat_font, fill=(255, 255, 255))
+
+    # 3. Manşet Başlığı (Cevabı veren net başlık)
+    clean_title = title.strip()
+    clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title)
+
+    # Dinamik font boyutu seçimi (Başlığın uzunluğuna göre 46, 42 veya 38 px)
+    if len(clean_title) > 95:
+        font_size = 38
+        line_height = 48
+    elif len(clean_title) > 65:
+        font_size = 42
+        line_height = 54
+    else:
+        font_size = 46
+        line_height = 58
+
+    title_font = get_font(FONT_BOLD_PATH, font_size)
+
+    words = clean_title.split()
+    lines = []
+    curr = []
+    for w in words:
+        test_line = " ".join(curr + [w])
+        bbox = title_font.getbbox(test_line)
+        if (bbox[2] - bbox[0]) <= (width - 120):
+            curr.append(w)
+        else:
+            if curr:
+                lines.append(" ".join(curr))
+            curr = [w]
+    if curr:
+        lines.append(" ".join(curr))
+
+    # En fazla 3 satır izin ver (taşmayı önlemek için)
+    if len(lines) > 3:
+        lines = lines[:2] + [lines[2] + "..."]
+
+    total_text_h = len(lines) * line_height
+    start_y = height - 90 - total_text_h
+
+    for line in lines:
+        # İnce siyah gölge (Her türlü arka planda okunabilirlik)
+        draw.text((52, start_y + 2), line, font=title_font, fill=(0, 0, 0))
+        # Beyaz Manşet Metni
+        draw.text((50, start_y), line, font=title_font, fill=(255, 255, 255))
+        start_y += line_height
+
+    # 4. Alt Bilgi & Takip Şeridi
+    bar_y = height - 55
+    bar_font = get_font(FONT_BOLD_PATH, 22)
+
+    # Kırmızı marka noktası + GÜNDEM ANALİZİ
+    draw.ellipse([50, bar_y + 4, 64, bar_y + 18], fill=(239, 68, 68))
+    draw.text((75, bar_y), "GÜNDEM ANALİZİ", font=bar_font, fill=(255, 255, 255))
+
+    # Takip Et Çağrısı (Sağ alt modern hap rozet)
+    cta_text = "Takip Et: @gndmanalizi"
+    cta_bbox = bar_font.getbbox(cta_text)
+    cta_w = cta_bbox[2] - cta_bbox[0] + 32
+    cta_h = 40
+    draw.rounded_rectangle([width - 50 - cta_w, bar_y - 6, width - 50, bar_y - 6 + cta_h], radius=10, fill=(30, 41, 59))
+    draw.text((width - 50 - cta_w + 16, bar_y), cta_text, font=bar_font, fill=(56, 189, 248))
+
+    if not output_path:
+        output_path = os.path.join(OUTPUT_DIR, f"x_card_{int(time.time())}.jpg")
+
+    canvas.save(output_path, "JPEG", quality=92, optimize=True)
+    return output_path
+
 if __name__ == "__main__":
     test_urls = [
         "https://images.ntv.com.tr/images/iStock-148421596-889339.jpg?width=1200",
