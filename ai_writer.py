@@ -199,8 +199,7 @@ UYULMASI ZORUNLU KURALLAR:
     
     # Başlık ile özet aynıysa veya özet boşsa tekrarlama yapma
     if clean_summary and clean_summary.lower() != title.strip().lower():
-        if len(clean_summary) > 280:
-            clean_summary = clean_summary[:275].rsplit(' ', 1)[0] + "..."
+        # X Premium (Mavi Tik) desteği: Cümleyi asla yarıda kesme, tam cümlelerle aktar
         caption_text = f"{title}\n\n{clean_summary}"
     else:
         caption_text = f"{title}"

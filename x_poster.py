@@ -154,53 +154,45 @@ def smart_sentence_split(text: str) -> list:
 
 def format_x_tweet(title: str, summary: str, site_url: str = "", category: str = "Gündem") -> str:
     """
-    X (Twitter) algoritmasına tam uyumlu, %100 linksiz, doğrudan cevabı veren,
-    doyurucu haber detaylarını aktaran ve etiketlerle desteklenen profesyonel tweet metni üretir.
-    Manşet başlığı ve takip çağrısı editoryal görsel kartında yer aldığı için, metin alanı
-    haberin cevabına ve doyurucu detaylarına ayrılır. (Maksimum 272 karakter).
+    X Premium (Mavi Tik) uyumlu, hiçbir cümlesi yarıda kesilmeyen, doyurucu ve profesyonel tweet metni üretir.
+    - Cümleler ASLA ortasından bölünmez ve '...' ile kesilmez.
+    - Her cümle tam ve eksiksiz şekilde noktayla biter.
+    - BPT / Pusholder editoryal standardında haberin özünü ve detayını tam aktarır.
     """
     cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor", "Dünya", "Sağlık") else "#Gündem"
     tags = f"{cat_tag} #SonDakika #Haber"
 
     clean_title = title.strip()
-    clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title)
-
-    budget = 272 - len(tags) - 2
+    clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', clean_title).strip()
 
     chosen_sents = []
     if summary:
-        sentences = smart_sentence_split(summary)
-        curr_len = 0
+        clean_summary = strip_all_urls(summary)
+        sentences = smart_sentence_split(clean_summary)
         for s in sentences:
             s_clean = s.strip()
             if not s_clean:
                 continue
-            if s_clean.lower() == clean_title.lower() or (len(s_clean) > 25 and clean_title.lower() in s_clean.lower()):
+            # Başlıkla neredeyse aynı olan cümleyi mükerrer ekleme
+            if s_clean.lower() == clean_title.lower() or (len(s_clean) > 30 and clean_title.lower() in s_clean.lower()):
                 continue
+            # Cümlenin sonunun düzgün bittiğinden emin ol
             if not s_clean.endswith(('.', '!', '?')):
                 s_clean += '.'
-            if curr_len + len(s_clean) + 1 <= budget:
-                chosen_sents.append(s_clean)
-                curr_len += len(s_clean) + 1
-            elif not chosen_sents and len(s_clean) > budget:
-                words = s_clean.split()
-                short_s = ""
-                for w in words:
-                    if len(short_s) + len(w) + 2 <= budget - 1:
-                        short_s = (short_s + " " + w).strip()
-                    else:
-                        break
-                if short_s:
-                    chosen_sents.append(short_s + "…")
-                break
-            else:
+            
+            chosen_sents.append(s_clean)
+            
+            # X Premium ile en akıcı ve doyurucu okuma için 3-4 tam cümle
+            if len(chosen_sents) >= 4:
                 break
 
     body = " ".join(chosen_sents).strip()
+    
+    # Eğer özet yoksa veya çok kısaysa başlığı tam ve eksiksiz olarak al
     if not body or len(body) < 25:
         body = clean_title
-        if len(body) > budget:
-            body = body[:budget - 1].rsplit(' ', 1)[0] + "…"
+        if not body.endswith(('.', '!', '?')):
+            body += '.'
 
     tweet = f"{body}\n\n{tags}"
     return tweet.strip()
@@ -407,10 +399,7 @@ def post_video_to_x(video_path: str, title: str, link: str = "") -> dict:
         return {"status": "error", "reason": "X oturum çerezleri eksik."}
 
     tags = " #Gündem #SonDakika"
-    room = 280 - 24 - len(tags) - 6
     text = title.strip()
-    if len(text) > room:
-        text = text[:room - 1] + "…"
     tweet_text = f"🎥 {text}\n\n{tags}"
 
     return post_tweet_playwright(tweet_text, media_path=video_path)
