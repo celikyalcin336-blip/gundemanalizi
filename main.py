@@ -17,6 +17,9 @@ import ai_writer
 import image_generator
 import meta_poster
 import telegram_notifier
+import threading
+
+_BOT_PROCESS_LOCK = threading.Lock()
 
 def process_single_news(item: dict) -> bool:
     """
@@ -32,9 +35,10 @@ def process_single_news(item: dict) -> bool:
     image_url = item.get("image_url")
     news_hash = item["hash"]
 
-    # Mükerrer Paylaşım Kalkanı: Son saniye kontrolü (Aynı veya benzer haber varsa kesinlikle atla)
-    if database.is_already_posted(news_hash, title=title, link=link):
-        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış. Atlanıyor.")
+    # 🛡️ ÇELİK MÜKERRER KALKANI: Haberi atomik olarak anında rezerve et (Pre-claim Lock)
+    # (Başka bir thread veya yeni deploy konteyneri 13.5 dk bekleme süresince ASLA aynı haberi alamaz!)
+    if not database.claim_news_for_processing(news_hash, title=title, source=source, link=link):
+        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış veya başka bir işlem tarafından rezerve edilmiş. Atlanıyor.")
         return False
 
     print("\n" + "="*60)
@@ -86,14 +90,19 @@ def process_single_news(item: dict) -> bool:
 
     # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
     print("🌐 Kendi sitemizde yayınlanıyor...")
-    slug = database.save_article(
+    slug, is_created = database.save_article(
         title=article_data["title"],
         summary=article_data["summary"],
         content=article_data["content"],
         image_path=visual_path,
         source=source,
-        category=category
+        category=category,
+        return_status=True
     )
+    if not is_created:
+        print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' sitemizde zaten mevcut ({slug}). İkinci kez eklenmedi ve Telegram'a bildirim GÖNDERİLMEDİ.")
+        return False
+
     site_article_url = f"{config.SITE_URL}/haber/{slug}"
     print(f"   [Haber Linki: {site_article_url}]")
 
@@ -164,6 +173,16 @@ def run_bot(max_items: int = 1, force: bool = False):
     11.5. dakikada uyanıp haberi önceden hazırlar ve tam 15:00. dakikada sıfır gecikmeyle yayınlar.
     Sabit Kategori Sırası: Gündem -> Ekonomi -> Dünya -> Spor -> Teknoloji -> Otomobil -> Sağlık -> Eğitim
     """
+    global _BOT_PROCESS_LOCK
+    if not _BOT_PROCESS_LOCK.acquire(blocking=False):
+        print("⏳ [Bot Kilitli] Başka bir haber işleme süreci şu an aktif. Çakışmayı önlemek için bu çağrı atlandı.")
+        return 0
+    try:
+        return _run_bot_internal(max_items=max_items, force=force)
+    finally:
+        _BOT_PROCESS_LOCK.release()
+
+def _run_bot_internal(max_items: int = 1, force: bool = False):
     if not force:
         # En fazla 15 dk kuralı: Hazırlığa 10.0. dakikada başlar, 13.5. dakikada yayına basar!
         prep_start_minute = 10.0

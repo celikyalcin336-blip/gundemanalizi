@@ -805,19 +805,23 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
 
         stems_incoming = get_word_stems(clean_t)
 
-        cur = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 250")
-        recent_articles = cur.fetchall()
+        # Hem articles (AI başlıkları) hem de posted_news (orijinal ajans başlıkları) taranır
+        cur_arts = conn.execute("SELECT title, slug FROM articles ORDER BY id DESC LIMIT 250")
+        candidates = [(r["title"] or "", r["slug"] or "") for r in cur_arts.fetchall()]
 
-        for r in recent_articles:
-            exist_title = (r["title"] or "").strip().lower()
-            exist_slug = (r["slug"] or "").strip().lower()
+        cur_posted = conn.execute("SELECT title FROM posted_news ORDER BY id DESC LIMIT 250")
+        candidates.extend([(r["title"] or "", "") for r in cur_posted.fetchall()])
+
+        for exist_title_raw, exist_slug_raw in candidates:
+            exist_title = exist_title_raw.strip().lower()
+            exist_slug = exist_slug_raw.strip().lower()
 
             # A. Slug benzerliği (>75%)
-            if difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.75:
+            if exist_slug and difflib.SequenceMatcher(None, slug, exist_slug).ratio() > 0.75:
                 return True
 
-            # B. Doğrudan Başlık Benzerliği (>70%)
-            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.70:
+            # B. Doğrudan Başlık Benzerliği (>68%)
+            if difflib.SequenceMatcher(None, clean_t, exist_title).ratio() > 0.68:
                 return True
 
             # C. Çelik Kelime Kökü ve Anahtar Varlık Örtüşmesi (Hassas Dedup)
@@ -829,11 +833,11 @@ def is_already_posted(news_hash: str, title: str = "", link: str = "") -> bool:
                     min_len = min(len(stems_incoming), len(stems_exist))
                     ratio = (overlap / min_len) if min_len > 0 else 0
 
-                    # 1. Ortak kelime kökü oranı %40 ve üzeriyse kesinlikle mükerrerdir
-                    if ratio >= 0.40:
+                    # 1. Ortak kelime kökü oranı %38 ve üzeriyse kesinlikle mükerrerdir
+                    if ratio >= 0.38:
                         return True
 
-                    # 2. En az 3 kritik kök ortaksa (örn: macbo + pro + dokun veya kasm + indir + bakan)
+                    # 2. En az 3 kritik kök ortaksa
                     if overlap >= 3:
                         return True
 
@@ -874,7 +878,36 @@ def get_last_bot_posted_time() -> Optional[str]:
     return None
 
 
-def save_article(title: str, summary: str, content: str, image_path: str, source: str, category: str = "Gündem") -> str:
+def claim_news_for_processing(news_hash: str, title: str, source: str = "", link: str = "") -> bool:
+    """
+    Haberi işleme başlamadan önce atomik olarak 'rezerve' eder.
+    Haber zaten paylaşılmışsa veya başka bir işçi/deploy şu an bu haberi işliyorsa False döner.
+    İlk kapan işçi True alır ve haber anında posted_news tablosuna yazılır.
+    Böylece 13.5 dakikalık bekleme veya görsel üretimi sırasında ikinci bir bot/thread ASLA aynı haberi alamaz.
+    """
+    if is_already_posted(news_hash, title=title, link=link):
+        return False
+
+    with get_connection() as conn:
+        try:
+            if conn.is_pg:
+                res = conn.execute("""
+                    INSERT INTO posted_news (news_hash, title, source, link)
+                    VALUES (?, ?, ?, ?)
+                    ON CONFLICT (news_hash) DO NOTHING
+                """, (news_hash, title, source, link))
+            else:
+                res = conn.execute("""
+                    INSERT OR IGNORE INTO posted_news (news_hash, title, source, link)
+                    VALUES (?, ?, ?, ?)
+                """, (news_hash, title, source, link))
+            return (res.rowcount > 0)
+        except Exception as e:
+            print(f"⚠️ [Claim News Hatası]: {e}")
+            return False
+
+
+def save_article(title: str, summary: str, content: str, image_path: str, source: str, category: str = "Gündem", return_status: bool = False):
     """Makaleyi web sitesi veritabanına kaydeder ve SEO URL slug'ını döner."""
     base_slug = slugify(title)
     if not base_slug:
@@ -882,13 +915,25 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
 
     # MÜKERRER KAYIT ENGELLEYİCİ: Bu haber zaten veritabanında varsa asla tekrar kaydetme!
     with get_connection() as conn:
+        # 1. Birebir slug veya başlık kontrolü
         existing = conn.execute(
             "SELECT slug FROM articles WHERE slug = ? OR LOWER(title) = ?",
             (base_slug, title.strip().lower())
         ).fetchone()
         if existing:
             print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' zaten veritabanında mevcut ({existing['slug']}). İkinci kez eklenmedi.")
-            return existing["slug"]
+            return (existing["slug"], False) if return_status else existing["slug"]
+
+        # 2. Semantik Başlık Benzerliği (Son 150 makale içinde %68 üzeri benzerlik kontrolü)
+        cur = conn.execute("SELECT slug, title FROM articles ORDER BY id DESC LIMIT 150")
+        recent = cur.fetchall()
+        clean_t = title.strip().lower()
+        for r in recent:
+            ex_title = (r["title"] or "").strip().lower()
+            ex_slug = r["slug"]
+            if difflib.SequenceMatcher(None, clean_t, ex_title).ratio() > 0.68:
+                print(f"⚠️ [Mükerrer Haber Engellendi - Benzer Başlık] '{title[:50]}' sitede zaten var ({ex_slug}). İkinci kez eklenmedi.")
+                return (ex_slug, False) if return_status else ex_slug
 
     # Görseli kalıcı depoya yaz (Her türlü ağ/veritabanı istisnasına karşı korumalı)
     try:
@@ -908,7 +953,7 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
             INSERT INTO articles (slug, title, summary, content, category, image_path, source)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (slug, title, summary, content, category, image_path, source))
-    return slug
+    return (slug, True) if return_status else slug
 
 
 def normalize_category_name(cat: Optional[str]) -> Optional[str]:
