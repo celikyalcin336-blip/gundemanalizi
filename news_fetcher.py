@@ -331,17 +331,17 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
         score += 35
 
     # 6. OTOMOBİL & TAŞIT PİYASASI (+35 Puan)
-    oto_regex = r'\b(togg|t10x|t10f|sıfır araç|fiyat listesi|ötv|elektrikli araç\w*|elektrikli otomobil\w*|otomobil\w*|chery|byd|tesla\w*|clio|egea|suv|hibrit\w*|şarj\w*)\b'
+    oto_regex = r'\b(togg|t10x|t10f|sıfır araç|fiyat listesi|ötv|elektrikli araç\w*|elektrikli otomobil\w*|otomobil\w*|chery|byd|tesla\w*|clio|egea|suv|hibrit\w*|şarj\w*|bmw|mercedes|audi|volkswagen|renault|peugeot|fiat|toyota|hyundai|honda|ford|skoda|volvo|nissan|araba\w*|motorlu|kasko|otoyol|araç\w*|yakıt|benzinli|dizel)\b'
     if re.search(oto_regex, text, re.I):
         score += 35
 
     # 7. SAĞLIK & TIP (+35 Puan)
-    saglik_regex = r'\b(sağlık bakanlığı|salgın\w*|virüs\w*|kanser\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*)\b'
+    saglik_regex = r'\b(sağlık bakanlığı|salgın\w*|virüs\w*|kanser\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*|beslenme|diyabet|tansiyon|vitamin\w*|diyet|obezite|ruh sağlığı|depresyon|hastalık\w*|hasta\w*|sağlık|sağlıklı)\b'
     if re.search(saglik_regex, text, re.I):
         score += 35
 
     # 8. EĞİTİM, MEB & SINAVLAR (+35 Puan)
-    egitim_regex = r'\b(meb|milli eğitim\w*|yusuf tekin|yks|lgs|kpss|dgs|ösym|sınav\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil|yarıyıl tatili|karne\w*|müfredat\w*|yerleştirme\w*|tercih\w*)\b'
+    egitim_regex = r'\b(meb|milli eğitim\w*|yusuf tekin|yks|lgs|kpss|dgs|ösym|sınav\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil|yarıyıl tatili|karne\w*|müfredat\w*|yerleştirme\w*|tercih\w*|burs\w*|kyk|yurt\w*|atama\w*|ders\w*|eğitim\w*|fakülte\w*|eğitimde)\b'
     if re.search(egitim_regex, text, re.I):
         score += 35
 

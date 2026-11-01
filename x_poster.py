@@ -82,7 +82,7 @@ def is_worthy_for_x(title: str, summary: str = "", category: str = "Gündem") ->
 
     norm_cat = category.strip().title()
 
-    if norm_cat in ("Ekonomi", "Teknoloji", "Otomobil", "Gündem", "Dünya", "Sağlık"):
+    if norm_cat in ("Ekonomi", "Teknoloji", "Otomobil", "Gündem", "Dünya", "Sağlık", "Eğitim"):
         return True, f"Yüksek değerli ana kategori: {norm_cat}"
 
     if norm_cat == "Spor":

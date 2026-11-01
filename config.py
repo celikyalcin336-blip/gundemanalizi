@@ -73,6 +73,21 @@ RSS_FEEDS = [
         "url": "https://www.ensonhaber.com/rss/otomobil.xml",
         "category": "Otomobil"
     },
+    {
+        "name": "ShiftDelete Otomobil",
+        "url": "https://shiftdelete.net/otomobil/feed",
+        "category": "Otomobil"
+    },
+    {
+        "name": "NTV Otomobil",
+        "url": "https://www.ntv.com.tr/otomobil.rss",
+        "category": "Otomobil"
+    },
+    {
+        "name": "Otoajanda Otomobil",
+        "url": "https://www.otoajanda.com/feed/",
+        "category": "Otomobil"
+    },
 
     # 🚀 TEKNOLOJİ & YAPAY ZEKA (Yüksek Tık & Gelir Değeri)
     {
@@ -156,6 +171,16 @@ RSS_FEEDS = [
         "url": "https://www.haberturk.com/rss/kategori/saglik.xml",
         "category": "Sağlık"
     },
+    {
+        "name": "Cumhuriyet Sağlık",
+        "url": "https://www.cumhuriyet.com.tr/rss/saglik.xml",
+        "category": "Sağlık"
+    },
+    {
+        "name": "CNN Türk Sağlık",
+        "url": "https://www.cnnturk.com/feed/rss/saglik/news",
+        "category": "Sağlık"
+    },
 
     # 🎓 EĞİTİM, MEB & SINAVLAR (Yüksek Tık & Aile/Öğrenci Trafiği)
     {
@@ -176,6 +201,11 @@ RSS_FEEDS = [
     {
         "name": "Sabah Eğitim",
         "url": "https://www.sabah.com.tr/rss/egitim.xml",
+        "category": "Eğitim"
+    },
+    {
+        "name": "Cumhuriyet Eğitim",
+        "url": "https://www.cumhuriyet.com.tr/rss/egitim.xml",
         "category": "Eğitim"
     },
 
