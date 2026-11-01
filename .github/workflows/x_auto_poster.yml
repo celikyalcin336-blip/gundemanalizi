@@ -2,11 +2,9 @@ name: X (Twitter) 7/24 Auto Poster
 
 on:
   schedule:
-    # Tam 45 dakikalık kusursuz ritim (Günde 32 paylaşım döngüsü)
-    # 00:00 -> 00:45 -> 01:30 -> 02:15 -> 03:00 -> 03:45 -> 04:30 -> 05:15 ...
-    - cron: '0,45 0,3,6,9,12,15,18,21 * * *'
-    - cron: '30 1,4,7,10,13,16,19,22 * * *'
-    - cron: '15 2,5,8,11,14,17,20,23 * * *'
+    # Her 15 dakikada bir tetiklenir; Python içindeki 40 dakikalık zaman kilidi ile
+    # hiçbir döngü kaçırılmadan tam 40-45 dakikalık ritimde paylaşım garanti edilir.
+    - cron: '*/15 * * * *'
   workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
 
 permissions:
