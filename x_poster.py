@@ -26,7 +26,8 @@ TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip() or _DEF_X_CT0
 TR_TZ = timezone(timedelta(hours=3))
 
 # Tweet sıklığı (Saatte 1 tweet - Tam saat başı kilit tamponu: 45 dk)
-X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", 55.0))
+# Tweet sıklığı (Tam 45 dakikalık ritim - Kilit tamponu: 38.0 dk)
+X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", 38.0))
 
 # -------------------------------------------------------------
 # 🛡️ ÇÖP & TIK TUZAĞI (CLICKBAIT) ENGELLEYİCİ LİSTESİ

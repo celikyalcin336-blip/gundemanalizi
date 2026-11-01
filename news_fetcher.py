@@ -298,54 +298,66 @@ def fetch_article_body(link: str, max_paragraphs: int = 4) -> str:
 
 def calculate_virality_score(title: str, summary: str, source: str) -> int:
     """
-    Haberin önemini sadece tam kelime sınırlarıyla (\b) puanlar.
-    ('zam' kelimesinin 'zaman' içinde, 'sel' kelimesinin 'küresel' içinde,
-     'kaza' kelimesinin 'kazandı' içinde yanlış eşleşmesini %100 engeller!)
+    X ve Sosyal Medya Algoritmalarına tam uyumlu İnsani Duygu & Virallik Puanlayıcısı:
+    - İnsanların en çok reaksiyon verdiği 'Acıma / Merhamet / Vicdan / Can Pazarı' haberlerine devasa öncelik (+65 Puan).
+    - Adalet arayışı, isyan, skandal ve pes dedirten olaylara (+55 Puan).
+    - Cüzdan, maaş, zam ve hayat pahalılığına (+50 Puan).
+    - Flaş son dakika, deprem ve afetlere (+50 Puan).
     """
-    text = f"{title} {(summary or '')[:180]}".lower()
+    text = f"{title} {(summary or '')[:200]}".lower()
     score = 50  # Taban puan
 
-    # 1. SICAK GÜNDEM, SON DAKİKA, KRİZ & ADLİ OLAYLAR (+35 Puan)
-    gundem_regex = r'\b(son dakika|flaş|facia\w*|kaza|kazası|kazada|zincirleme kaza|can kaybı|vefat\w*|cinayet\w*|katliam\w*|vahşet\w*|operasyon\w*|gözaltı\w*|tutukla\w*|patlama\w*|yangın\w*|deprem\w*|afad|sel felaketi|kuvvetli sağanak|fırtına\w*|meteoroloji\w*|sarı kod|turuncu kod|resmi gazete|kararname\w*|yargıtay|danıştay)\b'
-    if re.search(gundem_regex, text, re.I):
-        score += 35
+    # 1. DERİN VİCDAN, ACIMA, MERHAMET, CAN PAZARI & İNSAN DRAMI (+65 Puan - En Yüksek Viral Etki!)
+    empati_regex = r'\b(bebek\w*|çocuk\w*|evlat\w*|anne\w*|baba\w*|öksüz\w*|yetim\w*|yaşlı\w*|nine|dede|engelli\w*|şehit\w*|gazi\w*|kahraman\w*|kurtardı\w*|kurtarıldı\w*|mucize\w*|can pazarı|can havliyle|gözyaş\w*|ağlattı|yürek yakan|yürekleri dağla\w*|kahreden\w*|acı haber|facia\w*|katliam\w*|vahşet\w*|yaşam mücadelesi|hayata tutun\w*|köpek\w*|yavru kedi\w*|can dostu\w*|hayvansever\w*|işkence\w*|vicdansız\w*|fedakar\w*)\b'
+    if re.search(empati_regex, text, re.I):
+        score += 65
 
-    # 2. SPOR, DERBİ, TRANSFER & SÜPER LİG (+35 Puan)
+    # 2. ADALET, İSYAN, SKANDAL, PES DEDİRTEN OLAYLAR & MAĞDURİYET (+55 Puan)
+    isyan_regex = r'\b(skandal\w*|isyan etti\w*|tepki yağdı|pes dedirtti|akılalmaz|şok eden|vurgun\w*|dolandırıcı\w*|dolandırıldı|sahte\w*|mağdur\w*|ihmal\w*|cezasız kalmadı|tutuklandı|tutuklama|haksızlık|ifşa\w*|suçüstü|gözaltı)\b'
+    if re.search(isyan_regex, text, re.I):
+        score += 55
+
+    # 3. SICAK GÜNDEM, FLAŞ, DEPREM & ACİL AFETLER (+50 Puan)
+    gundem_regex = r'\b(son dakika|flaş|acil kod|kaza|kazası|kazada|zincirleme kaza|can kaybı|vefat\w*|cinayet\w*|operasyon\w*|patlama\w*|yangın\w*|deprem\w*|kandilli|afad|sel felaketi|kuvvetli sağanak|fırtına\w*|meteoroloji\w*|sarı kod|turuncu kod|resmi gazete|kararname\w*|yargıtay|danıştay)\b'
+    if re.search(gundem_regex, text, re.I):
+        score += 50
+
+    # 4. HALKIN CÜZDANI, EKONOMİ, MAAŞ, ZAM & GEÇİM (+50 Puan)
+    cuzdan_regex = r'\b(asgari ücret\w*|emekli\w*|maaş\w*|zam|zammı|zamlandı|ek zam|ikramiye|enflasyon\w*|tüfe|tcmb|merkez bankası|faiz kararı|faiz\w*|altın\w*|dolar\w*|euro\w*|akaryakıt\w*|benzin\w*|motorin\w*|vergi\w*|kira\w*|kredi kartı|konut kredisi|ötv|trafik cezası|fatura\w*|borsa\w*)\b'
+    if re.search(cuzdan_regex, text, re.I):
+        score += 50
+
+    # 5. SPOR, DERBİ, TRANSFER & SÜPER LİG (+40 Puan)
     spor_regex = r'\b(fenerbahçe\w*|galatasaray\w*|beşiktaş\w*|trabzonspor\w*|süper lig\w*|şampiyonlar ligi\w*|uefa|avrupa ligi\w*|derbi\w*|transfer\w*|a milli|milli takım\w*|mourinho|okan buruk|galibiyet\w*|mağlubiyet\w*|şampiyon\w*|bonservis\w*|teknik direktör\w*)\b'
     if re.search(spor_regex, text, re.I):
-        score += 35
+        score += 40
 
-    # 3. KÜRESEL GELİŞMELER, DÜNYA & DIŞ POLİTİKA (+35 Puan)
+    # 6. KÜRESEL GELİŞMELER, DÜNYA & DIŞ POLİTİKA (+35 Puan)
     dunya_regex = r'\b(savaş\w*|füze\w*|hava saldırısı|ateşkes\w*|israil\w*|gazze\w*|iran\w*|lübnan\w*|abd|rusya\w*|ukrayna\w*|çin\w*|trump\w*|putin\w*|nato|pentagon|beyaz saray|avrupa birliği|kktc|birleşmiş milletler)\b'
     if re.search(dunya_regex, text, re.I):
         score += 35
 
-    # 4. HALKIN CÜZDANI, EKONOMİ, MAAŞ & FİYATLAR (+35 Puan)
-    cuzdan_regex = r'\b(asgari ücret\w*|emekli\w*|maaş\w*|zam|zammı|zamlandı|enflasyon\w*|tüfe|tcmb|merkez bankası|faiz kararı|faiz\w*|altın\w*|dolar\w*|euro\w*|akaryakıt\w*|benzin\w*|motorin\w*|vergi\w*|kira\w*|kredi kartı|konut kredisi|ihracat\w*|borsa\w*)\b'
-    if re.search(cuzdan_regex, text, re.I):
-        score += 35
-
-    # 5. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+35 Puan)
+    # 7. DİJİTAL, TEKNOLOJİ & YAPAY ZEKA (+35 Puan)
     tekno_regex = r'\b(yapay zeka\w*|chatgpt|openai|gemini|deepseek|sora|apple|iphone\w*|macbook\w*|ios|samsung\w*|galaxy\w*|android|nvidia|işlemci\w*|siber güvenlik|hacker\w*|akıllı telefon\w*)\b'
     if re.search(tekno_regex, text, re.I):
         score += 35
 
-    # 6. OTOMOBİL & TAŞIT PİYASASI (+35 Puan)
+    # 8. OTOMOBİL & TAŞIT PİYASASI (+35 Puan)
     oto_regex = r'\b(togg|t10x|t10f|sıfır araç|fiyat listesi|ötv|elektrikli araç\w*|elektrikli otomobil\w*|otomobil\w*|chery|byd|tesla\w*|clio|egea|suv|hibrit\w*|şarj\w*|bmw|mercedes|audi|volkswagen|renault|peugeot|fiat|toyota|hyundai|honda|ford|skoda|volvo|nissan|araba\w*|motorlu|kasko|otoyol|araç\w*|yakıt|benzinli|dizel)\b'
     if re.search(oto_regex, text, re.I):
         score += 35
 
-    # 7. SAĞLIK & TIP (+35 Puan)
+    # 9. SAĞLIK & TIP (+35 Puan)
     saglik_regex = r'\b(sağlık bakanlığı|salgın\w*|virüs\w*|kanser\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*|beslenme|diyabet|tansiyon|vitamin\w*|diyet|obezite|ruh sağlığı|depresyon|hastalık\w*|hasta\w*|sağlık|sağlıklı)\b'
     if re.search(saglik_regex, text, re.I):
         score += 35
 
-    # 8. EĞİTİM, MEB & SINAVLAR (+35 Puan)
+    # 10. EĞİTİM, MEB & SINAVLAR (+35 Puan)
     egitim_regex = r'\b(meb|milli eğitim\w*|yusuf tekin|yks|lgs|kpss|dgs|ösym|sınav\w*|üniversite\w*|öğretmen\w*|öğrenci\w*|okul\w*|ara tatil|yarıyıl tatili|karne\w*|müfredat\w*|yerleştirme\w*|tercih\w*|burs\w*|kyk|yurt\w*|atama\w*|ders\w*|eğitim\w*|fakülte\w*|eğitimde)\b'
     if re.search(egitim_regex, text, re.I):
         score += 35
 
-    # Kuru bürokratik protokol cezası (-40 Puan)
+    # Kuru bürokratik protokol cezası (-45 Puan)
     protokol_keywords = [
         "kabul etti", "ziyaret etti", "bir araya geldi", "görüştü",
         "tebrik etti", "basın toplantısı düzenledi", "heyetini ağırladı",
@@ -353,7 +365,7 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
     ]
     for pk in protokol_keywords:
         if pk in text:
-            score -= 40
+            score -= 45
             break
 
     return score

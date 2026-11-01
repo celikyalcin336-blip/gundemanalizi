@@ -166,7 +166,7 @@ def run_cycle(force: bool = False) -> bool:
             except Exception as e:
                 print(f"⚠️ Görsel indirilemedi: {e}")
 
-        print(f"🎯 [X Paylaşım Adayı] Kategori: {category} | Başlık: {title}")
+        print(f"🎯 [X Paylaşım Adayı] Kategori: {category} | Virallik/Duygu Skoru: {art.get('virality_score', 0)} | Başlık: {title}")
 
         res = x_poster.post_article_to_x(
             title=title,
