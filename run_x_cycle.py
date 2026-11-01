@@ -120,6 +120,19 @@ def run_cycle(force: bool = False) -> bool:
         print("ℹ️ Şu an taranacak haber bulunamadı.")
         return False
 
+    # 🚀 VİRALLİK SIRALAMASI: En yüksek etkileşim, son dakika ve halkın ilgisini çeken haberi en başa al
+    try:
+        import news_fetcher
+        for art in articles:
+            art["virality_score"] = news_fetcher.calculate_virality_score(
+                art.get("title", ""),
+                art.get("summary", ""),
+                art.get("category", "")
+            )
+        articles.sort(key=lambda x: x.get("virality_score", 0), reverse=True)
+    except Exception as e:
+        print(f"⚠️ Virallik puanı sıralama uyarısı: {e}")
+
     history = load_history()
     posted_slugs = {h.get("slug") for h in history if isinstance(h, dict)}
     posted_titles = {h.get("title") for h in history if isinstance(h, dict)}
