@@ -797,5 +797,20 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793645273.2861888
+  },
+  {
+    "slug": "yakit-faturasi-kabardi-ryanair-bilet-fiyatlarina-cift-haneli-zam-yapacak",
+    "title": "Yakıt faturası kabardı. Ryanair bilet fiyatlarına çift haneli zam yapacak",
+    "status": "skipped",
+    "reason": "Gerçek fotoğraf yok (yazılı kart)",
+    "ts": 1793647975.5930333
+  },
+  {
+    "slug": "misir-futbol-federasyonundan-ziyaret",
+    "title": "Mısır Futbol Federasyonu'ndan ziyaret",
+    "summary": "Trendyol Süper Lig'in 10. haftasında Trabzonspor, evinde Gaziantep FK'yı ağırladı.",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793647995.2728462
   }
 ]

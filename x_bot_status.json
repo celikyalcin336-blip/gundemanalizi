@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-02 21:47:53",
+  "last_check": "2026-11-02 22:33:15",
   "result": "posted",
-  "last_post": "2026-11-02 21:47:53",
-  "next_planned": "2026-11-02 22:32:53",
+  "last_post": "2026-11-02 22:33:15",
+  "next_planned": "2026-11-02 23:18:15",
   "runner": "github-actions",
-  "log_tail": "[2026-11-02 18:47:32] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: 15 Temmuz Şehitler Köprüsü girişind... (Birebir slug eşleşmesi: 15-temmuz-sehitler-koprusu-girisinde-kaza)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Doktorlar 'sabaha çıkmaz' demişti! ... (Birebir slug eşleşmesi: doktorlar-sabaha-cikmaz-demisti-resimle-hayata-tutundu)\n🎯 [X Paylaşım Adayı] Kategori: Sağlık | Virallik/Duygu Skoru: 185 | Başlık: Çocuklarda şiddet davranışı bir günde ortaya çıkmıyor!\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793645253.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Çocuklarda şiddet davranışı bir günde ortaya çıkmıyor!\n"
+  "log_tail": "[2026-11-02 19:32:54] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: 15 Temmuz Şehitler Köprüsü girişind... (Birebir slug eşleşmesi: 15-temmuz-sehitler-koprusu-girisinde-kaza)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Doktorlar 'sabaha çıkmaz' demişti! ... (Birebir slug eşleşmesi: doktorlar-sabaha-cikmaz-demisti-resimle-hayata-tutundu)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Çocuklarda şiddet davranışı bir gün... (Birebir slug eşleşmesi: cocuklarda-siddet-davranisi-bir-gunde-ortaya-cikmiyor)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Audi'nin 4 milyar dolarlık ABD plan... (Ortak varlıklar (audi, abd): Porsche, Audi'nin aksine ABD'de fab)\n⏩ [Görsel Zorunlu] Gerçek fotoğrafı olmayan (yazılı kart) haber atlandı: Yakıt faturası kabardı. Ryanair bilet fi\n🎯 [X Paylaşım Adayı] Kategori: Spor | Virallik/Duygu Skoru: 155 | Başlık: Mısır Futbol Federasyonu'ndan ziyaret\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793647976.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Mısır Futbol Federasyonu'ndan ziyaret\n"
 }
