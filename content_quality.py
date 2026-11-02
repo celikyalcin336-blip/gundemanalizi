@@ -139,6 +139,25 @@ def clean_article_html(content: str) -> str:
     # 5) Boş kalan paragraflar ve altı boş kalan "Gelişmenin Ayrıntıları" başlığı
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
     c = re.sub(r"<h3[^>]*>[^<]*</h3>\s*(?=(<div|$|<h3))", "", c.strip())
+
+    # 6) Alt başlıklara (<h3>) Google Arama Jump-Link SEO id etiketi ekle
+    tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
+    used_ids = set()
+
+    def _add_h3_id(m):
+        attrs, inner = m.group(1), m.group(2)
+        if "id=" in attrs.lower():
+            return m.group(0)
+        base_id = re.sub(r"[^a-z0-9]+", "-", _norm(inner).translate(tr_map).lower()).strip("-")[:64] or "bolum"
+        hid = base_id
+        idx = 2
+        while hid in used_ids:
+            hid = f"{base_id}-{idx}"
+            idx += 1
+        used_ids.add(hid)
+        return f'<h3{attrs} id="{hid}">{inner}</h3>'
+
+    c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _add_h3_id, c, flags=re.S | re.I)
     return c
 
 

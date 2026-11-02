@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı Altın Fiyatları, Döviz Kurları ve Döviz Çevirici | Gündem Analizi</title>
+    <meta name="description" content="Anlık gram altın, çeyrek altın, dolar (USD/TRY), euro (EUR/TRY), bitcoin fiyatları ve canlı döviz-altın hesaplama aracı. Gündem Analizi Ekonomi ve Piyasalar ekranı.">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/piyasalar">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu -->
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <script src="/assets/lucide.min.js" defer></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-xs" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 block leading-none">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        Ekonomi &amp; Canlı Piyasalar
+                    </span>
+                </div>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="/?kategori=Ekonomi" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition hidden sm:inline-flex">
+                    📈 Ekonomi Haberleri
+                </a>
+                <a href="/" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-xs text-white transition shadow-sm">
+                    ← Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full space-y-8">
+        <!-- Breadcrumb & Başlık -->
+        <div class="border-b border-slate-200 pb-6">
+            <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-red-600 transition">Ana Sayfa</a>
+                <span>/</span>
+                <span class="text-red-600 font-bold">Canlı Piyasalar &amp; Döviz/Altın Çevirici</span>
+            </nav>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        Canlı Altın Fiyatları, Döviz Kurları ve Hesaplama Aracı
+                    </h1>
+                    <p class="text-slate-600 text-xs sm:text-sm mt-1.5">
+                        Serbest piyasa ve Kapalıçarşı anlık verileriyle Dolar, Euro, Gram/Çeyrek Altın kurları ve canlı çevirici.
+                    </p>
+                </div>
+                <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold self-start">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+                    <span>Anlık Veri Akışı Aktif</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. 4 BÜYÜK CANLI KUR KARTI -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for r in market_rates %}
+            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl p-2 rounded-xl bg-slate-50 border border-slate-200">{{ r.icon }}</span>
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900">{{ r.name }}</h2>
+                            <span class="text-[10px] font-mono font-bold text-slate-500 uppercase">{{ r.symbol }}</span>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-black font-mono {{ 'bg-emerald-50 text-emerald-700 border border-emerald-200' if r.direction == 'up' else 'bg-red-50 text-red-700 border border-red-200' }}">
+                        {{ '▲' if r.direction == 'up' else '▼' }} %{{ r.change|abs }}
+                    </span>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex items-baseline justify-between">
+                    <span class="text-[11px] font-semibold text-slate-500">Güncel Satış</span>
+                    <span class="text-2xl font-black text-slate-900 font-mono tracking-tight">
+                        {{ r.price }} <span class="text-xs font-bold text-slate-500">{{ r.unit }}</span>
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <!-- 2. CANLI DÖVİZ & ALTIN ÇEVİRİCİ + ALTIN TABLOSU -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Sol: Canlı Çevirici (7 Kolon) -->
+            <div class="lg:col-span-7 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+                    <div>
+                        <span class="text-[11px] font-extrabold text-red-600 uppercase tracking-wider block">Hızlı Finans Aracı</span>
+                        <h2 class="text-lg sm:text-xl font-black text-slate-900">🔄 Canlı Döviz ve Altın Hesaplama</h2>
+                    </div>
+                    <span class="text-2xl">🧮</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="calc-amount" class="block text-xs font-extrabold text-slate-700 mb-1.5">Hesaplanacak Miktar</label>
+                        <input id="calc-amount" type="number" step="any" min="0" value="100" oninput="recalcMarkets()"
+                               class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-mono font-black text-base focus:outline-none focus:border-red-600 focus:bg-white transition">
+                    </div>
+                    <div>
+                        <label for="calc-unit" class="block text-xs font-extrabold text-slate-700 mb-1.5">Para / Altın Birimi Seçin</label>
+                        <select id="calc-unit" onchange="recalcMarkets()"
+                                class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 font-bold text-sm focus:outline-none focus:border-red-600 focus:bg-white transition cursor-pointer">
+                            <option value="usd">💵 Amerikan Doları (USD)</option>
+                            <option value="eur">💶 Euro (EUR)</option>
+                            <option value="gram">🪙 Gram Altın (24 Ayar)</option>
+                            <option value="ceyrek">🏅 Çeyrek Altın</option>
+                            <option value="yarim">🏅 Yarım Altın</option>
+                            <option value="tam">🏅 Tam / Cumhuriyet Altını</option>
+                            <option value="try">₺ Türk Lirası (TL)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Hızlı Hazır Tutar Butonları -->
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                    <span class="text-[11px] font-bold text-slate-500">Hızlı Seçim:</span>
+                    <button type="button" onclick="setQuickCalc(100, 'usd')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">100 Dolar</button>
+                    <button type="button" onclick="setQuickCalc(1000, 'usd')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">1.000 Dolar</button>
+                    <button type="button" onclick="setQuickCalc(100, 'eur')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">100 Euro</button>
+                    <button type="button" onclick="setQuickCalc(1, 'gram')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">1 Gram Altın</button>
+                    <button type="button" onclick="setQuickCalc(1, 'ceyrek')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">1 Çeyrek Altın</button>
+                    <button type="button" onclick="setQuickCalc(50000, 'try')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer">50.000 TL</button>
+                </div>
+
+                <!-- Sonuç Kutuları -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                    <div class="p-3.5 rounded-xl bg-red-50/70 border border-red-200">
+                        <span class="text-[10px] font-extrabold text-red-700 uppercase block">Türk Lirası Karşılığı</span>
+                        <strong id="res-try" class="text-base sm:text-lg font-black text-slate-900 font-mono mt-1 block">- TL</strong>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase block">Dolar Karşılığı</span>
+                        <strong id="res-usd" class="text-base sm:text-lg font-black text-slate-900 font-mono mt-1 block">- $</strong>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase block">Euro Karşılığı</span>
+                        <strong id="res-eur" class="text-base sm:text-lg font-black text-slate-900 font-mono mt-1 block">- €</strong>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                        <span class="text-[10px] font-extrabold text-amber-800 uppercase block">Gram Altın Karşılığı</span>
+                        <strong id="res-gram" class="text-base sm:text-lg font-black text-slate-900 font-mono mt-1 block">- gr</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ: Kapalıçarşı Altın Fiyatları Tablosu (5 Kolon) -->
+            <div class="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+                        <div>
+                            <span class="text-[11px] font-extrabold text-amber-700 uppercase tracking-wider block">Kapalıçarşı Referans</span>
+                            <h2 class="text-lg font-black text-slate-900">🪙 Güncel Altın Fiyatları</h2>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500">TL Satış</span>
+                    </div>
+                    <div class="divide-y divide-slate-200 text-xs sm:text-sm">
+                        <div class="py-3 flex items-center justify-between">
+                            <span class="font-bold text-slate-800">Gram Altın (24 Ayar)</span>
+                            <strong id="tbl-gram" class="font-mono font-black text-slate-900">- TL</strong>
+                        </div>
+                        <div class="py-3 flex items-center justify-between">
+                            <span class="font-bold text-slate-800">Çeyrek Altın</span>
+                            <strong id="tbl-ceyrek" class="font-mono font-black text-slate-900">- TL</strong>
+                        </div>
+                        <div class="py-3 flex items-center justify-between">
+                            <span class="font-bold text-slate-800">Yarım Altın</span>
+                            <strong id="tbl-yarim" class="font-mono font-black text-slate-900">- TL</strong>
+                        </div>
+                        <div class="py-3 flex items-center justify-between">
+                            <span class="font-bold text-slate-800">Tam (Ziynet) Altın</span>
+                            <strong id="tbl-tam" class="font-mono font-black text-slate-900">- TL</strong>
+                        </div>
+                        <div class="py-3 flex items-center justify-between">
+                            <span class="font-bold text-slate-800">Cumhuriyet (Ata) Altını</span>
+                            <strong id="tbl-ata" class="font-mono font-black text-slate-900">- TL</strong>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 pt-3 border-t border-slate-100 leading-relaxed">
+                    * Piyasa verileri bilgilendirme amaçlıdır ve serbest piyasa ortalamalarını yansıtır; yatırım tavsiyesi değildir.
+                </p>
+            </div>
+        </section>
+
+        <!-- 3. EKONOMİ & PİYASA ANALİZ HABERLERİ -->
+        <section class="pt-4 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-6 bg-red-600 rounded-sm"></span>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                        GÜNCEL EKONOMİ VE PİYASA HABERLERİ
+                    </h2>
+                </div>
+                <a href="/?kategori=Ekonomi" class="text-xs font-bold text-red-600 hover:underline">Tüm Ekonomi Haberleri →</a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {% for a in articles %}
+                <a href="/haber/{{ a.slug }}" class="group rounded-2xl bg-white border border-slate-200 hover:border-red-400 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+                    <div class="h-44 bg-slate-100 overflow-hidden relative">
+                        {% if a.image_path %}
+                        <img src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ a.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        {% else %}
+                        <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-6">
+                        {% endif %}
+                        <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded bg-red-600 text-white text-[10px] font-extrabold uppercase">{{ a.category }}</span>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">{{ a.title }}</h3>
+                            <p class="text-xs text-slate-600 line-clamp-2 mt-1.5 leading-relaxed">{{ a.summary }}</p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                            <span>{{ (a.created_at or '')[:16] }}</span>
+                            <span class="text-red-600 font-bold">Haberi Oku →</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-6 text-center text-xs text-slate-600 mt-10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span>© 2026 Gündem Analizi • Doğru Haber, Tarafsız Analiz.</span>
+            <div class="flex flex-wrap items-center justify-center gap-3 font-semibold">
+                <a href="/hakkimizda" class="hover:text-red-600">Hakkımızda</a>
+                <span>•</span>
+                <a href="/kunye" class="hover:text-red-600">Künye</a>
+                <span>•</span>
+                <a href="/yayin-ilkeleri" class="hover:text-red-600">Yayın İlkeleri</a>
+                <span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-red-600">Gizlilik</a>
+                <span>•</span>
+                <a href="/iletisim" class="hover:text-red-600">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const RAW_RATES = {{ market_rates | tojson }};
+        function parseTrPrice(str) {
+            if (!str) return 0;
+            const s = String(str).replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+            return parseFloat(s) || 0;
+        }
+        const RATE_MAP = { usd: 36.5, eur: 39.5, gram: 3450 };
+        for (const r of (RAW_RATES || [])) {
+            const val = parseTrPrice(r.price);
+            if (r.key === 'dolar' && val > 0) RATE_MAP.usd = val;
+            if (r.key === 'euro' && val > 0) RATE_MAP.eur = val;
+            if (r.key === 'altin' && val > 0) RATE_MAP.gram = val;
+        }
+        RATE_MAP.ceyrek = RATE_MAP.gram * 1.635;
+        RATE_MAP.yarim = RATE_MAP.gram * 3.27;
+        RATE_MAP.tam = RATE_MAP.gram * 6.54;
+        RATE_MAP.ata = RATE_MAP.gram * 6.72;
+        RATE_MAP.try = 1.0;
+
+        function fmtTL(n) {
+            return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: n >= 100 ? 0 : 2 }).format(n);
+        }
+        function fmtDec(n) {
+            return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+        }
+
+        function recalcMarkets() {
+            const amt = parseFloat(document.getElementById('calc-amount').value) || 0;
+            const unit = document.getElementById('calc-unit').value || 'usd';
+            const totalTry = amt * (RATE_MAP[unit] || 1);
+            document.getElementById('res-try').innerText = fmtTL(totalTry) + ' TL';
+            document.getElementById('res-usd').innerText = fmtDec(totalTry / RATE_MAP.usd) + ' $';
+            document.getElementById('res-eur').innerText = fmtDec(totalTry / RATE_MAP.eur) + ' €';
+            document.getElementById('res-gram').innerText = fmtDec(totalTry / RATE_MAP.gram) + ' gr';
+
+            document.getElementById('tbl-gram').innerText = fmtTL(RATE_MAP.gram) + ' TL';
+            document.getElementById('tbl-ceyrek').innerText = fmtTL(RATE_MAP.ceyrek) + ' TL';
+            document.getElementById('tbl-yarim').innerText = fmtTL(RATE_MAP.yarim) + ' TL';
+            document.getElementById('tbl-tam').innerText = fmtTL(RATE_MAP.tam) + ' TL';
+            document.getElementById('tbl-ata').innerText = fmtTL(RATE_MAP.ata) + ' TL';
+        }
+        function setQuickCalc(amount, unit) {
+            document.getElementById('calc-amount').value = amount;
+            document.getElementById('calc-unit').value = unit;
+            recalcMarkets();
+        }
+        recalcMarkets();
+    </script>
+</body>
+</html>

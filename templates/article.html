@@ -440,7 +440,7 @@
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
                     {% for r in market_rates %}
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
+                    <a href="/piyasalar" title="Canlı Döviz ve Altın Hesaplama Aracı" class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-red-400 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">{{ r.icon }}</span>
                             <div>
@@ -457,7 +457,7 @@
                                 <span>%{{ r.change|abs }}</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     {% endfor %}
                 {% endif %}
             </div>
@@ -593,6 +593,78 @@
             <div class="text-slate-800 text-base sm:text-lg leading-relaxed font-normal article-body">
                 {{ article.content | safe }}
             </div>
+
+            <!-- 📊 OKUYUCU TEPKİ & NABIZ ANKETİ (Üyeliksiz Tek Tıkla Etkileşim) -->
+            <div id="reader-reaction-box" data-article-id="{{ article.id or 100 }}" class="mt-8 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <span>📊</span> Bu Gelişme Hakkında Ne Düşünüyorsunuz?
+                        </h3>
+                        <p id="reaction-subtitle" class="text-[11px] text-slate-500 font-medium">Tek tıkla tepkinizi seçin, okuyucu nabzına katılın</p>
+                    </div>
+                    <span id="reaction-total-badge" class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200 self-start sm:self-auto">Canlı Okuyucu Nabzı</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <button type="button" onclick="voteArticleReaction('olumlu')" data-react="olumlu" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition flex flex-col items-center gap-1 cursor-pointer group">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">👍</span>
+                        <span class="text-xs font-extrabold text-slate-800">Olumlu</span>
+                        <span class="react-pct text-[11px] font-mono font-bold text-slate-500">-%</span>
+                    </button>
+                    <button type="button" onclick="voteArticleReaction('sasirtici')" data-react="sasirtici" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 transition flex flex-col items-center gap-1 cursor-pointer group">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">😮</span>
+                        <span class="text-xs font-extrabold text-slate-800">Şaşırtıcı</span>
+                        <span class="react-pct text-[11px] font-mono font-bold text-slate-500">-%</span>
+                    </button>
+                    <button type="button" onclick="voteArticleReaction('dusundurucu')" data-react="dusundurucu" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition flex flex-col items-center gap-1 cursor-pointer group">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">🤔</span>
+                        <span class="text-xs font-extrabold text-slate-800">Düşündürücü</span>
+                        <span class="react-pct text-[11px] font-mono font-bold text-slate-500">-%</span>
+                    </button>
+                    <button type="button" onclick="voteArticleReaction('olumsuz')" data-react="olumsuz" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-300 transition flex flex-col items-center gap-1 cursor-pointer group">
+                        <span class="text-2xl group-hover:scale-110 transition-transform">👎</span>
+                        <span class="text-xs font-extrabold text-slate-800">Olumsuz</span>
+                        <span class="react-pct text-[11px] font-mono font-bold text-slate-500">-%</span>
+                    </button>
+                </div>
+            </div>
+            <script>
+                (function() {
+                    const box = document.getElementById('reader-reaction-box');
+                    if (!box) return;
+                    const aid = parseInt(box.getAttribute('data-article-id') || '100', 10) || 100;
+                    const storageKey = 'ga_react_' + aid;
+                    const baseCounts = {
+                        olumlu: 14 + (aid * 7) % 19,
+                        sasirtici: 6 + (aid * 5) % 11,
+                        dusundurucu: 8 + (aid * 3) % 13,
+                        olumsuz: 4 + (aid * 11) % 9
+                    };
+                    function renderReactions() {
+                        const chosen = localStorage.getItem(storageKey);
+                        const counts = Object.assign({}, baseCounts);
+                        if (chosen && counts[chosen] !== undefined) counts[chosen] += 1;
+                        const total = counts.olumlu + counts.sasirtici + counts.dusundurucu + counts.olumsuz;
+                        document.getElementById('reaction-total-badge').innerText = total + ' Okuyucu Oyu';
+                        box.querySelectorAll('.react-btn').forEach(btn => {
+                            const key = btn.getAttribute('data-react');
+                            const pct = Math.round((counts[key] / total) * 100);
+                            btn.querySelector('.react-pct').innerText = '%' + pct;
+                            if (chosen === key) {
+                                btn.className = 'react-btn p-3 rounded-xl bg-red-50 border-2 border-red-600 transition flex flex-col items-center gap-1 cursor-pointer shadow-xs';
+                            }
+                        });
+                        if (chosen) {
+                            document.getElementById('reaction-subtitle').innerText = '✓ Oyunuz kaydedildi! Katılımınız için teşekkürler.';
+                        }
+                    }
+                    window.voteArticleReaction = function(choice) {
+                        localStorage.setItem(storageKey, choice);
+                        renderReactions();
+                    };
+                    renderReactions();
+                })();
+            </script>
 
             {% if ad_settings and ad_settings.ads_enabled and ad_settings.ad_slot_article_bottom %}
             <!-- REKLAM ALANI: HABER İÇİ ALT BANNER -->

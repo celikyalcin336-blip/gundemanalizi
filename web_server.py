@@ -1797,8 +1797,29 @@ async def article_detail(request: Request, slug: str):
     raw_content = article.get("content", "")
     # AdSense kalite: eski şablon/dolgu kalıntılarını gösterimde temizle, kısa haberleri Google dizininden çıkar
     import content_quality
+    import html as _html_mod
     raw_content = content_quality.clean_article_html(raw_content)
     is_thin_article = content_quality.visible_word_count(raw_content) < 300
+
+    # 3. alt başlığın hemen üstüne tek satırlık şık "İlginizi Çekebilir" iç bağlantısı (SEO & Sayfa Görüntüleme Artırıcı)
+    if related_articles and raw_content.count("<h3") >= 3:
+        rel_pick = related_articles[-1]
+        rel_title_esc = _html_mod.escape(rel_pick.get("title") or "")
+        rel_cat_esc = _html_mod.escape(rel_pick.get("category") or "Gündem")
+        rel_slug_esc = _html_mod.escape(rel_pick.get("slug") or "")
+        inline_box = (
+            f'<div class="my-6 p-3.5 sm:p-4 rounded-xl bg-red-50/70 border-l-4 border-red-600 border-y border-r border-red-200/80 flex items-center justify-between gap-3 not-prose shadow-xs">'
+            f'<div class="min-w-0">'
+            f'<span class="text-[10px] font-black text-red-600 uppercase tracking-wider block mb-0.5">📌 İLGİNİZİ ÇEKEBİLİR • {rel_cat_esc}</span>'
+            f'<a href="/haber/{rel_slug_esc}" class="text-xs sm:text-sm font-extrabold text-slate-900 hover:text-red-600 transition line-clamp-1">{rel_title_esc}</a>'
+            f'</div>'
+            f'<a href="/haber/{rel_slug_esc}" class="shrink-0 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold transition shadow-xs">Oku →</a>'
+            f'</div>'
+        )
+        h3_positions = [m.start() for m in re.finditer(r"<h3\b", raw_content, flags=re.I)]
+        if len(h3_positions) >= 3:
+            pos3 = h3_positions[2]
+            raw_content = raw_content[:pos3] + inline_box + raw_content[pos3:]
 
     if ad_mid and "</p>" in raw_content:
         parts = raw_content.split("</p>")
@@ -1841,6 +1862,23 @@ async def article_detail(request: Request, slug: str):
     return resp
 
 _CONTACT_RATE_LIMIT = {}
+
+@app.get("/piyasalar", response_class=HTMLResponse)
+@app.get("/canli-piyasalar", response_class=HTMLResponse)
+async def markets_page(request: Request):
+    """Canlı Altın, Dolar, Euro Kurları ve Döviz/Altın Hesaplama Aracı Sayfası."""
+    widgets = get_cached_category_widgets()
+    eco_articles = widgets.get("economy_articles") or database.get_articles(limit=12, category="Ekonomi")
+    if len(eco_articles) < 6:
+        eco_articles = database.get_articles(limit=12, category="Ekonomi") or database.get_articles(limit=12)
+    return templates.TemplateResponse(
+        request=request,
+        name="markets.html",
+        context={
+            "market_rates": get_market_rates()["rates"],
+            "articles": eco_articles[:12],
+        }
+    )
 
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
@@ -2082,6 +2120,7 @@ async def sitemap(request: Request):
         rows = [
             {"label": "Ana Sayfa", "loc": f"{base_url}/", "date": today_iso, "prio": "1.0"},
             {"label": "Son Dakika Haberleri", "loc": f"{base_url}/son-dakika", "date": today_iso, "prio": "1.0"},
+            {"label": "Canlı Piyasalar & Döviz/Altın Çevirici", "loc": f"{base_url}/piyasalar", "date": today_iso, "prio": "0.9"},
             {"label": "Hakkımızda", "loc": f"{base_url}/hakkimizda", "date": today_iso, "prio": "0.5"},
             {"label": "Künye (Medya Künyesi)", "loc": f"{base_url}/kunye", "date": today_iso, "prio": "0.5"},
             {"label": "Yayın İlkeleri", "loc": f"{base_url}/yayin-ilkeleri", "date": today_iso, "prio": "0.5"},
@@ -2100,6 +2139,7 @@ async def sitemap(request: Request):
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
     xml.append(f'  <url><loc>{base_url}/son-dakika</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>1.0</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/piyasalar</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     import urllib.parse
     for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş"):
         cat_enc = urllib.parse.quote(cat)

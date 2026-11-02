@@ -249,12 +249,12 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span class="canli-piyasa-label text-[11px] sm:text-xs font-black tracking-wider uppercase text-white drop-shadow-xs">CANLI PİYASA</span>
+                <a href="/piyasalar" class="canli-piyasa-label text-[11px] sm:text-xs font-black tracking-wider uppercase text-white hover:text-red-600 transition drop-shadow-xs">CANLI PİYASA →</a>
             </div>
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
                     {% for r in market_rates %}
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
+                    <a href="/piyasalar" title="Canlı Döviz ve Altın Hesaplama Aracı" class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-red-400 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">{{ r.icon }}</span>
                             <div>
@@ -271,7 +271,7 @@
                                 <span>%{{ r.change|abs }}</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     {% endfor %}
                 {% endif %}
             </div>
