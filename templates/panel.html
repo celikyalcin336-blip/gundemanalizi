@@ -1136,24 +1136,50 @@
 
     <script>
         lucide.createIcons();
-        const DEFAULT_PIN = "1453";
         let lastStudioArticleId = null;
+        let isPinVerified = false;
 
-        function checkAuth() {
-            const savedPin = localStorage.getItem('ga_admin_pin');
-            if (savedPin === DEFAULT_PIN) {
-                document.getElementById('pin-modal').classList.add('hidden');
-            }
+        async function checkAuth() {
+            const savedPin = (localStorage.getItem('ga_admin_pin') || '').trim();
+            if (!savedPin) return;
+            try {
+                const res = await fetch('/api/panel/verify-pin', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Pin': savedPin }
+                });
+                if (res.ok) {
+                    isPinVerified = true;
+                    document.getElementById('pin-modal').classList.add('hidden');
+                    fetchLiveAnalytics();
+                } else {
+                    localStorage.removeItem('ga_admin_pin');
+                }
+            } catch (e) {}
         }
         checkAuth();
 
-        function unlockPanel() {
+        async function unlockPanel() {
             const val = document.getElementById('pin-input').value.trim();
-            if (val === DEFAULT_PIN) {
-                localStorage.setItem('ga_admin_pin', val);
-                document.getElementById('pin-modal').classList.add('hidden');
-            } else {
-                document.getElementById('pin-error').classList.remove('hidden');
+            const errEl = document.getElementById('pin-error');
+            if (!val) return;
+            try {
+                const res = await fetch('/api/panel/verify-pin', {
+                    method: 'POST',
+                    headers: { 'X-Admin-Pin': val }
+                });
+                if (res.ok) {
+                    isPinVerified = true;
+                    localStorage.setItem('ga_admin_pin', val);
+                    errEl.classList.add('hidden');
+                    document.getElementById('pin-modal').classList.add('hidden');
+                    fetchLiveAnalytics();
+                } else {
+                    const d = await res.json().catch(() => ({}));
+                    errEl.textContent = d.detail || 'Hatalı şifre! Lütfen tekrar deneyin.';
+                    errEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errEl.classList.remove('hidden');
             }
         }
 
@@ -1400,7 +1426,7 @@
         // CANLI ZİYARETÇİ 5 SANİYELİK OTOMATİK GÜNCELLEME (POLLING)
         async function fetchLiveAnalytics() {
             const pin = localStorage.getItem('ga_admin_pin');
-            if (pin !== DEFAULT_PIN) return;
+            if (!pin || !isPinVerified) return;
             try {
                 const res = await fetch('/api/panel/live-stats', { headers: { 'X-Admin-Pin': pin } });
                 if (!res.ok) return;
@@ -1744,7 +1770,7 @@
 
         async function loadRadarVideos() {
             const list = document.getElementById('radar-list');
-            const pin = localStorage.getItem('ga_admin_pin') || DEFAULT_PIN;
+            const pin = localStorage.getItem('ga_admin_pin') || '';
             try {
                 const res = await fetch('/api/panel/radar-videos', { headers: { 'X-Admin-Pin': pin } });
                 const videos = await res.json();
@@ -1787,7 +1813,7 @@
 
         async function scanRadarNow() {
             const btn = document.getElementById('btn-scan-radar');
-            const pin = localStorage.getItem('ga_admin_pin') || DEFAULT_PIN;
+            const pin = localStorage.getItem('ga_admin_pin') || '';
             const orig = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span>⏳ Taranıyor (15-20 sn)...</span>';

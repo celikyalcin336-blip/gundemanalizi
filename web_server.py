@@ -156,10 +156,33 @@ async def lifespan(app: FastAPI):
     threading.Thread(target=system_health_watchdog_worker, daemon=True).start()
     yield
 
-ADMIN_PIN = os.getenv("ADMIN_PIN", "1453")
-PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
+import secrets as _secrets
 
-app = FastAPI(title="Gündem Analizi Web Portalı", lifespan=lifespan)
+ADMIN_PIN = os.getenv("ADMIN_PIN", "1453").strip()
+PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
+_PIN_FAILURES = {}
+
+def require_admin_pin(request: Request):
+    client_ip = (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
+    now_ts = time.time()
+    fails = [t for t in _PIN_FAILURES.get(client_ip, []) if now_ts - t < 900]
+    if len(fails) >= 5:
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! IP adresiniz 15 dakika süreyle kilitlendi.")
+    pin = (request.headers.get("X-Admin-Pin") or request.query_params.get("pin") or "").strip()
+    if not ADMIN_PIN or not pin or not _secrets.compare_digest(pin, ADMIN_PIN):
+        fails.append(now_ts)
+        _PIN_FAILURES[client_ip] = fails
+        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    if client_ip in _PIN_FAILURES:
+        _PIN_FAILURES.pop(client_ip, None)
+
+app = FastAPI(
+    title="Gündem Analizi Web Portalı",
+    lifespan=lifespan,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 @app.exception_handler(404)
@@ -206,7 +229,12 @@ async def track_visitors_middleware(request: Request, call_next):
 
     # 0. Yönetici (Admin) kendi tarayıcısından gezerken ziyaretçi listesine ASLA ekleme
     if request.cookies.get("ga_admin") == "1":
-        return await call_next(request)
+        resp = await call_next(request)
+        resp.headers["X-Content-Type-Options"] = "nosniff"
+        resp.headers["X-Frame-Options"] = "SAMEORIGIN"
+        resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return resp
 
     # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
     is_api_or_admin = (
@@ -292,6 +320,10 @@ async def track_visitors_middleware(request: Request, call_next):
         except Exception:
             pass
     resp = await call_next(request)
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "SAMEORIGIN"
+    resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     if not (is_api_or_admin or is_static_or_system) and not bot_type and not request.cookies.get("ga_vis"):
         try:
             resp.set_cookie("ga_vis", "1", max_age=31536000, httponly=True, samesite="lax", path="/")
@@ -1034,11 +1066,14 @@ async def admin_panel(request: Request):
     response.set_cookie(key="ga_admin", value="1", max_age=3600*24*30, httponly=False)
     return response
 
+@app.post("/api/panel/verify-pin")
+async def panel_verify_pin(request: Request):
+    require_admin_pin(request)
+    return {"ok": True}
+
 @app.post("/api/panel/fetch-now")
 async def panel_fetch_now(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
     def _fetch_worker():
         global _CATEGORY_WIDGETS_CACHE_TIME
         try:
@@ -1059,9 +1094,7 @@ async def panel_publish_breaking(
     source: str = Form("Gündem Analizi"),
     image_url: str = Form(None)
 ):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
 
     img_path = ""
     if image_url:
@@ -1102,9 +1135,7 @@ async def panel_publish_breaking(
 
 @app.post("/api/panel/delete/{article_id}")
 async def panel_delete_article(article_id: int, request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
     deleted = database.delete_article(article_id)
     global _CATEGORY_WIDGETS_CACHE_TIME
     clear_turbo_cache()
@@ -1113,9 +1144,7 @@ async def panel_delete_article(article_id: int, request: Request):
 
 @app.get("/api/panel/article/{article_id}")
 async def panel_get_article(article_id: int, request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
     art = database.get_article_by_id(article_id)
     if not art:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
@@ -1130,9 +1159,7 @@ async def panel_edit_article(
     content: str = Form(""),
     category: str = Form("Gündem")
 ):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
     updated = database.update_article(
         article_id=article_id,
         title=title.strip(),
@@ -1144,9 +1171,7 @@ async def panel_edit_article(
 
 @app.get("/api/panel/radar-videos")
 def get_radar_videos(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi")
+    require_admin_pin(request)
     import video_scout
     import sqlite3
     video_scout.init_scout_db()
@@ -1159,9 +1184,7 @@ def get_radar_videos(request: Request):
 
 @app.post("/api/panel/radar-scan")
 def trigger_radar_scan(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi")
+    require_admin_pin(request)
     import video_scout
     count = video_scout.run_scout_cycle()
     return {"ok": True, "count": count}
@@ -1370,9 +1393,7 @@ async def panel_viral_video(
     source: str = Form("Gündem Analizi"),
     video_file: UploadFile = File(None)
 ):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
 
     import hashlib
     vid_id = hashlib.md5(f"{title}_{time.time()}".encode("utf-8")).hexdigest()[:10]
@@ -1428,9 +1449,7 @@ async def panel_viral_video(
 
 @app.get("/api/panel/video-job/{job_id}")
 async def panel_video_job_status(job_id: str, request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
+    require_admin_pin(request)
     job = VIDEO_JOBS.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="İşlem bulunamadı")
@@ -1463,9 +1482,7 @@ async def pwa_manifest():
 
 @app.get("/api/panel/live-stats")
 async def panel_live_stats(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    require_admin_pin(request)
     stats = database.get_dashboard_summary()
     return {
         "ok": True,
@@ -1489,9 +1506,7 @@ async def panel_add_revenue(
     date: str = Form(""),
     notes: str = Form("")
 ):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    require_admin_pin(request)
     if not date:
         date = time.strftime("%Y-%m-%d")
     ok = database.add_revenue_record(source, amount, date, notes)
@@ -1499,24 +1514,18 @@ async def panel_add_revenue(
 
 @app.post("/api/panel/delete-revenue/{rec_id}")
 async def panel_del_revenue(rec_id: int, request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    require_admin_pin(request)
     database.delete_revenue_record(rec_id)
     return {"ok": True, "message": "Gelir kaydı silindi."}
 
 @app.get("/api/panel/ad-settings")
 async def get_panel_ad_settings(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    require_admin_pin(request)
     return {"ok": True, "settings": get_site_ad_settings()}
 
 @app.post("/api/panel/ad-settings")
 async def save_panel_ad_settings(request: Request):
-    pin = request.headers.get("X-Admin-Pin", "")
-    if pin != ADMIN_PIN:
-        raise HTTPException(status_code=403, detail="Yetkisiz erişim")
+    require_admin_pin(request)
     try:
         data = await request.json()
     except Exception:
@@ -1860,11 +1869,13 @@ async def api_articles(limit: int = 10):
     return database.get_articles(limit=limit)
 
 @app.get("/api/stats")
-async def api_stats():
+async def api_stats(request: Request):
+    require_admin_pin(request)
     return database.get_storage_stats()
 
 @app.get("/api/db-status")
-async def api_db_status():
+async def api_db_status(request: Request):
+    require_admin_pin(request)
     status = {
         "use_pg": database.USE_PG,
         "has_db_url": bool(database.DATABASE_URL),
@@ -1903,8 +1914,6 @@ async def robots(request: Request):
     content = f"""User-agent: *
 Allow: /
 Disallow: /panel
-Disallow: /{PANEL_SECRET_SLUG}
-Disallow: /yonetim*
 Disallow: /api/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml
@@ -2056,7 +2065,8 @@ async def rss_feed(request: Request):
     return HTMLResponse(content=rss, media_type="application/rss+xml")
 
 @app.get("/api/bot-status")
-async def bot_status():
+async def bot_status(request: Request):
+    require_admin_pin(request)
     """15 dakikalık haber botunun son ve sıradaki yayın saatini gösterir."""
     try:
         import news_bot
