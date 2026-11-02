@@ -1,22 +1,40 @@
 name: X (Twitter) 7/24 Auto Poster
 
+# 45 DAKİKALIK RİTİM NASIL ÇALIŞIR?
+# GitHub'ın cron zamanlayıcısı güvenilmez (her 10 dk yazılsa bile ~1 saatte bir çalışıyor).
+# Bu yüzden ritmi cron değil x_loop.py yönetir: tek bir iş ~5.5 saat ayakta kalır,
+# son paylaşımdan 45 dk sonra yeni haberi paylaşır, süresi bitince workflow kendini yeniden başlatır.
+# Aşağıdaki saatlik cron sadece "bekçi"dir: döngü herhangi bir sebeple durursa en geç 1 saatte yeniden başlatır.
+# concurrency sayesinde aynı anda ASLA iki döngü çalışmaz (mükerrer paylaşım imkânsız).
+
 on:
   schedule:
-    # Yoğunluk olmayan dakikalarda her 10 dakikada bir kontrol (Sıfır GitHub kuyruk gecikmesi)
-    - cron: '6,16,26,36,46,56 * * * *'
-  workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
+    - cron: '23 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'x_loop.py'
+      - '.github/workflows/x_auto_poster.yml'
+
+concurrency:
+  group: x-poster-loop
+  cancel-in-progress: false
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   post-to-x:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 355
 
     steps:
       - name: Kodu Çek (Checkout)
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Python 3.12 Kur
         uses: actions/setup-python@v5
@@ -30,25 +48,22 @@ jobs:
           pip install requests pillow feedparser python-dotenv playwright requests-oauthlib
           python -m playwright install chromium --with-deps
 
-      - name: X (Twitter) Seçici Paylaşım Döngüsünü Çalıştır
+      - name: 45 Dakikalık Paylaşım Döngüsü
         env:
           SITE_URL: "https://xn--gndemanalizi-dlb.com.tr"
           TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
           TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
-          X_COOLDOWN_MINUTES: "28.0"
+          X_INTERVAL_MINUTES: "45"
+          X_LOOP_MAX_MINUTES: "335"
           PYTHONUNBUFFERED: "1"
-        run: |
-          python -u run_x_cycle.py
-
-      - name: Paylaşım Geçmişini Kaydet
-        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          cp x_posted_history.json /tmp/x_posted_history.json || true
-          git checkout -- . || true
-          git clean -fd || true
-          git pull --rebase origin main || true
-          cp /tmp/x_posted_history.json x_posted_history.json || true
-          git add x_posted_history.json
-          git diff --staged --quiet || (git commit -m "chore: update x_posted_history [skip ci]" && git push origin main) || true
+          python -u x_loop.py
+
+      - name: Döngüyü Yeniden Başlat
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run x_auto_poster.yml --ref main --repo "${{ github.repository }}" || true

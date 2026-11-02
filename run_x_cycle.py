@@ -51,9 +51,14 @@ def load_history() -> list:
 
 
 def save_history(history: list):
+    """Paylaşılan (posted) kayıtlar ASLA atlanan kayıtlar yüzünden silinmez.
+    Son 400 paylaşım + son 150 atlama kaydı tutulur (mükerrer kalkanı hafızası)."""
     try:
+        posted = [h for h in history if isinstance(h, dict) and h.get("status") == "posted"][-400:]
+        others = [h for h in history if isinstance(h, dict) and h.get("status") != "posted"][-150:]
+        merged = sorted(posted + others, key=lambda h: float(h.get("ts", 0) or 0))
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(history[-200:], f, ensure_ascii=False, indent=2)
+            json.dump(merged, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"⚠️ Geçmiş kaydedilemedi: {e}")
 
@@ -146,6 +151,10 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
         # 1. Birebir Slug veya Başlık Eşleşmesi
         if candidate_slug and candidate_slug == h_slug:
             return True, f"Birebir slug eşleşmesi: {h_slug}"
+
+        # Aşağıdaki benzerlik kontrolleri yalnızca GERÇEKTEN paylaşılmış haberlerle yapılır
+        if h.get("status") != "posted":
+            continue
         
         h_norm_title = normalize_text_loose(h_title)
         if cand_norm_title and h_norm_title:
@@ -201,7 +210,7 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
     return False, ""
 
 
-def run_cycle(force: bool = False) -> bool:
+def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
     now_str = time.strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now_str}] 🚀 [X Auto-Poster] Kontrol başlatılıyor...")
 
@@ -232,7 +241,11 @@ def run_cycle(force: bool = False) -> bool:
     posted_slugs = {h.get("slug") for h in history if isinstance(h, dict)}
     posted_titles = {h.get("title") for h in history if isinstance(h, dict)}
 
+    attempts = 0
     for art in articles:
+        if attempts >= max_attempts:
+            print(f"⚠️ {max_attempts} paylaşım denemesi başarısız oldu, bu tur sonlandırılıyor.")
+            break
         title = art.get("title", "").strip()
         summary = art.get("summary", "").strip()
         category = art.get("category", "Gündem")
@@ -264,6 +277,11 @@ def run_cycle(force: bool = False) -> bool:
             except Exception as e:
                 print(f"⚠️ Görsel indirilemedi: {e}")
 
+        if not local_img or not os.path.exists(local_img):
+            print(f"⏩ [Görsel Zorunlu] Görseli olmayan haber atlandı: {title[:40]}")
+            continue
+
+        attempts += 1
         print(f"🎯 [X Paylaşım Adayı] Kategori: {category} | Virallik/Duygu Skoru: {art.get('virality_score', 0)} | Başlık: {title}")
 
         res = x_poster.post_article_to_x(
@@ -298,6 +316,19 @@ def run_cycle(force: bool = False) -> bool:
             save_history(history)
             print(f"🛡️ [X Auto-Poster] Canlı profilde zaten tespit edildi, mükerrer önlendi: {title}")
             continue
+        elif res.get("status") == "uncertain":
+            history.append({
+                "slug": slug,
+                "title": title,
+                "summary": summary[:250],
+                "status": "posted",
+                "url": "https://x.com/gndmanalizi",
+                "note": "uncertain",
+                "ts": time.time()
+            })
+            save_history(history)
+            print(f"⚠️ [X Auto-Poster] Gönderim sonucu belirsiz; mükerrer riskine karşı paylaşıldı sayıldı: {title}")
+            return True
         else:
             print(f"⚠️ Paylaşım hatası ({res}), sıradaki haber deneniyor...")
             continue

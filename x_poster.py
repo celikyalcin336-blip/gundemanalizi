@@ -301,8 +301,14 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                 return {"status": "error", "reason": "Tweet metin kutusu bulunamadı"}
 
             # 1. GÖRSEL/VİDEO YÜKLEME KİLİDİ (Metinden Önce Kesin Yükleme)
+            if not media_path or not os.path.exists(media_path):
+                browser.close()
+                return {"status": "error", "reason": "Görsel yok - görselsiz tweet atılmaz"}
             if media_path and os.path.exists(media_path):
                 file_input = page.locator('input[data-testid="fileInput"]').first
+                if not file_input.count():
+                    browser.close()
+                    return {"status": "error", "reason": "Görsel yükleme alanı bulunamadı (oturum/çerez sorunu olabilir)"}
                 if file_input.count():
                     file_input.set_input_files(media_path)
                     is_video = media_path.lower().endswith(('.mp4', '.mov', '.avi'))
@@ -390,7 +396,14 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                 page.wait_for_timeout(1000)
 
             page.wait_for_timeout(3000)
+            still_open = False
+            try:
+                still_open = bool(post_btn.count() and post_btn.is_visible())
+            except Exception:
+                still_open = False
             browser.close()
+            if still_open:
+                return {"status": "uncertain", "reason": "Gönder tuşuna basıldı ama pencere kapanmadı"}
             return {"status": "success"}
     except Exception as e:
         return {"status": "error", "reason": str(e)}
@@ -439,6 +452,8 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     tweet_text = format_x_tweet(title, summary, site_url, category)
 
     # 5. Playwright ile Tweeti Gönder
+    if not final_media or not os.path.exists(final_media):
+        return {"status": "error", "reason": "Görsel üretilemedi - görselsiz tweet atılmaz"}
     res = post_tweet_playwright(tweet_text, media_path=final_media, title=title)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
