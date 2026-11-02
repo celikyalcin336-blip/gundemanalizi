@@ -45,5 +45,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp x_posted_history.json /tmp/x_posted_history.json || true
+          git checkout -- . || true
+          git clean -fd || true
+          git pull --rebase origin main || true
+          cp /tmp/x_posted_history.json x_posted_history.json || true
           git add x_posted_history.json
-          git diff --staged --quiet || (git commit -m "chore: update x_posted_history [skip ci]" && git pull --rebase origin main && git push origin main) || true
+          git diff --staged --quiet || (git commit -m "chore: update x_posted_history [skip ci]" && git push origin main) || true

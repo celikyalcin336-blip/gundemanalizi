@@ -300,38 +300,50 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                 browser.close()
                 return {"status": "error", "reason": "Tweet metin kutusu bulunamadı"}
 
+            # 1. GÖRSEL/VİDEO YÜKLEME KİLİDİ (Metinden Önce Kesin Yükleme)
+            if media_path and os.path.exists(media_path):
+                file_input = page.locator('input[data-testid="fileInput"]').first
+                if file_input.count():
+                    file_input.set_input_files(media_path)
+                    is_video = media_path.lower().endswith(('.mp4', '.mov', '.avi'))
+                    print(f"⏳ Medya X'e yükleniyor ({'Video' if is_video else 'Görsel'})...")
+
+                    # Görselin/Videonun yüklenip DOM'da belirmesini KESİN OLARAK BEKLE
+                    media_ready = False
+                    for sec in range(1, 45 if is_video else 20):
+                        page.wait_for_timeout(1000)
+                        has_img = page.locator('div[data-testid="attachments"] img').count() > 0
+                        has_remove = page.locator('button[aria-label="Remove media"], div[aria-label="Remove media"], button[data-testid="removeMedia"]').count() > 0
+                        has_video_preview = is_video and page.locator('div[data-testid="attachments"] video').count() > 0
+
+                        if (has_img or has_remove or has_video_preview) and (not is_video or sec >= 6):
+                            media_ready = True
+                            print(f"✅ Medya başarıyla yüklendi ve doğrulandı ({sec}. saniye).")
+                            page.wait_for_timeout(1000)
+                            break
+
+                    if not media_ready:
+                        print("❌ KRİTİK: Medya Twitter'a yüklenemedi! Görselsiz tweet atılmaması için işlem İPTAL EDİLDİ.")
+                        browser.close()
+                        return {"status": "error", "reason": "Medya yüklemesi başarısız oldu, görselsiz gönderim engellendi"}
+
+            # 2. METNİ DOLDUR
             editor.first.click()
             editor.first.fill(text)
-            page.wait_for_timeout(1000)
+            page.wait_for_timeout(1500)
 
             # Tweeti Gönder butonu referansı
             post_btn = page.locator('button[data-testid="tweetButton"]').first
             if not post_btn.count():
                 post_btn = page.locator('button[data-testid="tweetButtonInline"]').first
 
-            # Görsel veya Video Ekle
+            # 3. SON GÜVENLİK KONTROLÜ: Eğer medya istendiyse ekranda görsel var mı?
             if media_path and os.path.exists(media_path):
-                file_input = page.locator('input[data-testid="fileInput"]').first
-                if file_input.count():
-                    file_input.set_input_files(media_path)
-                    is_video = media_path.lower().endswith(('.mp4', '.mov', '.avi'))
-                    print(f"⏳ Medya X'e aktarılıyor ({'Video' if is_video else 'Görsel'})...")
-                    
-                    # Medyanın DOM'a eklenmesini ve Twitter sunucularında işlenmesini bekle
-                    media_ready = False
-                    for sec in range(1, 40 if is_video else 10):
-                        page.wait_for_timeout(1000)
-                        attachments = page.locator('div[data-testid="attachments"]').count()
-                        aria_dis = post_btn.get_attribute("aria-disabled") if post_btn.count() else "true"
-                        if attachments > 0 and aria_dis != "true" and (not is_video or sec >= 6):
-                            media_ready = True
-                            print(f"✅ Medya başarıyla hazırlandı ({sec}. saniye).")
-                            break
-                    
-                    if not media_ready and page.locator('div[data-testid="attachments"]').count() == 0:
-                        print("⚠️ Medya yüklenemedi (Twitter ekleyemedi). Videonsuz tweet atılmaması için iptal ediliyor.")
-                        browser.close()
-                        return {"status": "error", "reason": "Medya yüklemesi X tarafından reddedildi"}
+                has_attachment = page.locator('div[data-testid="attachments"]').count() > 0
+                if not has_attachment:
+                    print("🛑 KRİTİK KORUMA: Görsel ekten düştü! Görselsiz tweet kesinlikle atılmıyor.")
+                    browser.close()
+                    return {"status": "error", "reason": "Görsel doğrulanamadı"}
 
             # Butonun aktifleştiğini son kez doğrula
             for _ in range(10):
