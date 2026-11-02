@@ -1804,7 +1804,7 @@ async def article_detail(request: Request, slug: str):
         parts = raw_content.split("</p>")
         if len(parts) >= 3:
             mid_banner = f'''</p>
-            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-900/60 border border-brand-border/60 p-2 shadow-inner">
+            <div class="my-6 w-full flex flex-col justify-center items-center overflow-hidden rounded-xl bg-slate-50 border border-slate-200 p-2 shadow-xs">
                 <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 mb-1">Sponsorlu Reklam</span>
                 <div class="w-full flex justify-center items-center overflow-hidden">
                     {ad_mid}
