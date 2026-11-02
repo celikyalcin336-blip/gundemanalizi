@@ -165,6 +165,9 @@ def main():
             git("pull", "--rebase", "--autostash", "origin", "main")
             after = git("rev-parse", "HEAD:x_loop.py", "HEAD:run_x_cycle.py", "HEAD:x_poster.py").stdout
             if before and after and before != after:
+                if not os.getenv("TWITTER_AUTH_TOKEN") or not os.getenv("TWITTER_CT0"):
+                    print("🔑 Yeni GitHub Secrets anahtarlarını yüklemek için temiz iş başlatılıyor...")
+                    break
                 print("🔄 Bot kodu güncellendi; yeni kodla yeniden başlatılıyor...")
                 sys.stdout.flush()
                 os.execv(sys.executable, [sys.executable, "-u", os.path.abspath(__file__)])

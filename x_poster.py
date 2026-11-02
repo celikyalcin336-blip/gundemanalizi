@@ -17,11 +17,9 @@ from PIL import Image
 
 import config
 
-# Doğrulanmış Oturum Çerezleri (@gndmanalizi) - Ortam değişkeninden okunur
-_DEF_X_AUTH = base64.b64decode("MmE3NmI2MTQyNmFhNmZkNmNkZGNiMTM1MDU4MDE2NTM0NDlkYjkyZg==").decode("utf-8")
-_DEF_X_CT0 = base64.b64decode("NDhhZmRkMWM0Y2RhYWU5ZmZjMmQyZThhNjZhMDNhNWNhMDA0ODljM2ZmYmU5Y2ZhMmJjZTdhNzlmNzViNGNlMzMzMTU1NjhiYjBiOTM3NzhjYjhkNTExMmRkNDZiMmY4NTBkZTBjZjJkMjliZDQ2M2Q0MTk2MGE5MjZlYmFmMGJkYmE1ZTZkMTA0Y2ExMGIzNTkzMTMyYjRjOTkyNzgxYQ==").decode("utf-8")
-TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip() or _DEF_X_AUTH
-TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip() or _DEF_X_CT0
+# Doğrulanmış Oturum Çerezleri (@gndmanalizi) - GitHub Secrets / .env ortam değişkeninden okunur
+TWITTER_AUTH_TOKEN = os.getenv("TWITTER_AUTH_TOKEN", "").strip()
+TWITTER_CT0 = os.getenv("TWITTER_CT0", "").strip()
 
 TR_TZ = timezone(timedelta(hours=3))
 
