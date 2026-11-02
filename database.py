@@ -566,8 +566,8 @@ def _basename(path: str) -> str:
 
 def _compress_image(path: str) -> bytes:
     """
-    Görseli web için küçültüp optimize eder (1200x675 Google Discover HD, JPEG kalite 68).
-    1080px ~250 KB'lık kart, gözle fark edilmeyecek kalitede ~40-60 KB'a iner.
+    Görseli web için küçültüp optimize eder (1200x675 Google Discover HD, JPEG kalite 75).
+    1080px ~250 KB'lık kart, gözle fark edilmeyecek HD kalitede ~45-65 KB'a iner.
     Telegram ve sosyal medyaya giden orijinal dosya etkilenmez.
     """
     from io import BytesIO
@@ -576,7 +576,7 @@ def _compress_image(path: str) -> bytes:
         img = img.convert("RGB")
         img.thumbnail((1200, 675), Image.LANCZOS)
         buf = BytesIO()
-        img.save(buf, format="JPEG", quality=68, optimize=True, progressive=True)
+        img.save(buf, format="JPEG", quality=75, optimize=True, progressive=True)
         return buf.getvalue()
 
 
@@ -590,9 +590,18 @@ def save_image_file(path: str):
     filename = os.path.basename(path)
     try:
         with open(path, "rb") as f:
-            data = f.read()
-        if not data or len(data) < 200:
+            raw_data = f.read()
+        if not raw_data or len(raw_data) < 200:
             return
+        data = raw_data
+        # Yalnızca büyük görselleri (>75 KB) HD kalitede optimize et; >6 KB eşiğini daima koru
+        if len(raw_data) > 76800 and filename.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+            try:
+                comp = _compress_image(path)
+                if comp and len(comp) >= 6500 and len(comp) < len(raw_data):
+                    data = comp
+            except Exception:
+                data = raw_data
         with get_connection() as conn:
             if conn.is_pg:
                 conn.execute("""
@@ -605,6 +614,26 @@ def save_image_file(path: str):
                 """, (filename, data))
     except Exception as e:
         print(f"Görsel kalıcı kayıt istisnası ({filename}): {e}")
+
+
+def cleanup_old_visitor_logs(days: int = 30) -> int:
+    """
+    30 günden eski ham ziyaretçi giriş-çıkış loglarını temizler.
+    Haberler (articles), görseller (images) ve toplam okunma/ziyaret sayaçları ASLA silinmez.
+    """
+    try:
+        with get_connection() as conn:
+            if conn.is_pg:
+                cur = conn.execute(
+                    "DELETE FROM visitor_logs WHERE created_at < NOW() - (? * INTERVAL '1 day')", (days,)
+                )
+            else:
+                cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+                cur = conn.execute("DELETE FROM visitor_logs WHERE created_at < ?", (cutoff,))
+            return cur.rowcount or 0
+    except Exception as e:
+        print(f"Ziyaretçi log bakım istisnası: {e}")
+        return 0
 
 
 def cleanup_old_images(days: int = 180) -> int:

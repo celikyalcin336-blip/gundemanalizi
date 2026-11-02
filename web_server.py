@@ -80,6 +80,7 @@ def system_health_watchdog_worker():
     time.sleep(60)
     last_status_ok = True
     consecutive_fails = 0
+    last_log_cleanup_ts = 0
     tz_tr = timezone(timedelta(hours=3))
 
     while True:
@@ -123,6 +124,14 @@ def system_health_watchdog_worker():
                         )
                     last_status_ok = True
                     consecutive_fails = 0
+
+                # Günde 1 kez 30 günden eski ham ziyaretçi ayak izi loglarını temizle (Haberler ve fotoğraflar ASLA silinmez)
+                if time.time() - last_log_cleanup_ts > 86400:
+                    last_log_cleanup_ts = time.time()
+                    try:
+                        database.cleanup_old_visitor_logs(days=30)
+                    except Exception:
+                        pass
 
         except Exception as e:
             pass
