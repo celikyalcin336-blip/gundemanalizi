@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-02 20:17:01",
+  "last_check": "2026-11-02 21:02:31",
   "result": "posted",
-  "last_post": "2026-11-02 20:17:01",
-  "next_planned": "2026-11-02 21:02:01",
+  "last_post": "2026-11-02 21:02:31",
+  "next_planned": "2026-11-02 21:47:31",
   "runner": "github-actions",
-  "log_tail": "[2026-11-02 17:16:40] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 200 | Başlık: 15 Temmuz Şehitler Köprüsü girişinde kaza\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793639800.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: 15 Temmuz Şehitler Köprüsü girişinde kaza\n"
+  "log_tail": "[2026-11-02 18:02:02] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: 15 Temmuz Şehitler Köprüsü girişind... (Birebir slug eşleşmesi: 15-temmuz-sehitler-koprusu-girisinde-kaza)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Kamyon evleri yıktı! Dehşete düşüre... (Birebir slug eşleşmesi: kamyon-evleri-yikti-dehsete-dusuren-kazada-aci-haber)\n🎯 [X Paylaşım Adayı] Kategori: Sağlık | Virallik/Duygu Skoru: 185 | Başlık: Doktorlar 'sabaha çıkmaz' demişti! Resimle hayata tutundu\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793642525.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Doktorlar 'sabaha çıkmaz' demişti! Resimle hayata tutundu\n"
 }
