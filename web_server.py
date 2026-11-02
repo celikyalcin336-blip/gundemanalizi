@@ -1805,6 +1805,11 @@ async def about_page(request: Request):
 async def kunye_page(request: Request):
     return templates.TemplateResponse(request=request, name="kunye.html", context={})
 
+@app.get("/yazar/yalcin-celik", response_class=HTMLResponse)
+async def author_yalcin_page(request: Request):
+    articles = database.get_articles(limit=15)
+    return templates.TemplateResponse(request=request, name="author.html", context={"articles": articles})
+
 @app.get("/yayin-ilkeleri", response_class=HTMLResponse)
 async def editorial_policy_page(request: Request):
     return templates.TemplateResponse(request=request, name="editorial_policy.html", context={})
@@ -1959,6 +1964,7 @@ async def sitemap(request: Request):
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/yayin-ilkeleri</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/yazar/yalcin-celik</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>')
     xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kullanim-sartlari</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')

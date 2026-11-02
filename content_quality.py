@@ -113,6 +113,8 @@ def clean_article_html(content: str) -> str:
         inner = re.sub(r"https?://t\.co/[\w]+(?:\s+[\w]{2,6}){0,4}", "", inner)
         inner = re.sub(r"(?<![\"'=])https?://[^\s<]+", "", inner)
         inner = re.sub(r"pic\.twitter\.com/\S+", "", inner)
+        # Kaynak siteden paragraf başına/içine karışmış BÜYÜK HARFLİ ara başlık kalıntılarını temizle (örn: DEV TESİSİN ODAĞINDA BÜYÜK SUV MODELLERİ YER ALIYOR)
+        inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’"\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’"\-]+\s*", "", inner.strip())
         inner = fix_brand_splits(inner)
         return f"{m.group(1)}{inner}</p>"
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p, c, flags=re.S)
