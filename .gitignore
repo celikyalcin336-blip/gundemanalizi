@@ -9,9 +9,10 @@ __pycache__/
 *.db
 data/*.db
 
-# Medya test çıktıları
+# Medya test çıktıları ve geçici dosyalar
 *.mp3
 *.mp4
-output/test_*
-output/out_*
+*.wav
+output/
 scratch/
+*.log
