@@ -27,7 +27,7 @@ TR_TZ = timezone(timedelta(hours=3))
 
 # Tweet sıklığı (Saatte 1 tweet - Tam saat başı kilit tamponu: 45 dk)
 # Tweet sıklığı (Tam 45 dakikalık ritim - Kilit tamponu: 38.0 dk)
-X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", 38.0))
+X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", 28.0))
 
 # -------------------------------------------------------------
 # 🛡️ ÇÖP & TIK TUZAĞI (CLICKBAIT) ENGELLEYİCİ LİSTESİ
@@ -129,6 +129,13 @@ def can_post_to_x(force: bool = False) -> Tuple[bool, str]:
             elapsed_minutes = (time.time() - last_ts) / 60.0
             if elapsed_minutes < X_COOLDOWN_MINUTES:
                 remaining = round(X_COOLDOWN_MINUTES - elapsed_minutes, 1)
+                # AKILLI BEKLEME TAMPONU (Buffer Wait):
+                # Kalan süre <= 7.5 dk ise görevi iptal etme, runner üzerinde bekle ve paylaş
+                if remaining <= 7.5:
+                    sleep_sec = int(remaining * 60) + 5
+                    print(f"⏳ [X Auto-Poster] Zaman kilidine {remaining} dk kaldı. İptal EDİLMİYOR; {sleep_sec} sn beklenip ardından paylaşılacak...")
+                    time.sleep(sleep_sec)
+                    return True, f"Bekleme tamponu tamamlandı ({remaining} dk beklendi), paylaşıma geçiliyor."
                 return False, f"Zaman kilidi devrede. Son tweet {round(elapsed_minutes, 1)} dk önce atıldı. ({remaining} dk kaldı)."
     except Exception as e:
         print(f"⚠️ X zaman kilidi kontrolü hatası: {e}")

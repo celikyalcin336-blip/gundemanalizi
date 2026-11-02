@@ -2,9 +2,8 @@ name: X (Twitter) 7/24 Auto Poster
 
 on:
   schedule:
-    # Çift katmanlı tetikleyici: GitHub Actions ücretsiz kuyruk gecikmelerini baypas eder
-    - cron: '*/15 * * * *'
-    - cron: '8,23,38,53 * * * *'
+    # Yoğunluk olmayan dakikalarda her 10 dakikada bir kontrol (Sıfır GitHub kuyruk gecikmesi)
+    - cron: '6,16,26,36,46,56 * * * *'
   workflow_dispatch: # GitHub panelinden tek tıkla manuel tetikleme butonu
 
 permissions:
@@ -13,7 +12,7 @@ permissions:
 jobs:
   post-to-x:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Kodu Çek (Checkout)
@@ -36,7 +35,7 @@ jobs:
           SITE_URL: "https://xn--gndemanalizi-dlb.com.tr"
           TWITTER_AUTH_TOKEN: ${{ secrets.TWITTER_AUTH_TOKEN }}
           TWITTER_CT0: ${{ secrets.TWITTER_CT0 }}
-          X_COOLDOWN_MINUTES: "25.0"
+          X_COOLDOWN_MINUTES: "28.0"
           PYTHONUNBUFFERED: "1"
         run: |
           python -u run_x_cycle.py
