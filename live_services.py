@@ -229,45 +229,9 @@ def get_live_pharmacies(city: str = "istanbul") -> List[Dict]:
         except Exception as e:
             print(f"⚠️ Canlı eczane kazıma uyarısı ({city} - {fetch_url[:45]}): {e}")
 
-    # Canlı çekilemezse 81 ilin veritabanından bugünün tarihine özel günlük nöbet rotasyonu uygula
-    if not results:
-        db_81 = _load_81_db()
-        fallback_list = db_81.get(slug) or db_81.get(norm)
-        if fallback_list:
-            by_district: Dict[str, List[dict]] = {}
-            for item in fallback_list:
-                dist = item.get("district", city.capitalize())
-                by_district.setdefault(dist, []).append(item)
-
-            results = []
-            districts = sorted(by_district.keys())
-            day_seed = int(hashlib.md5(f"{slug}_{shift_date_str}".encode()).hexdigest()[:8], 16)
-            if len(districts) > 1:
-                rot = day_seed % len(districts)
-                districts = districts[rot:] + districts[:rot]
-
-            for dist in districts:
-                d_items = by_district[dist]
-                d_seed = int(hashlib.md5(f"{slug}_{dist}_{shift_date_str}".encode()).hexdigest()[:8], 16)
-                if len(d_items) > 1:
-                    idx = d_seed % len(d_items)
-                    rotated = d_items[idx:] + d_items[:idx]
-                    take_n = max(1, min(3, (len(d_items) + 1) // 2))
-                    selected = rotated[:take_n]
-                else:
-                    selected = d_items
-
-                for item in selected:
-                    results.append({
-                        "name": item.get("name", "Eczane"),
-                        "city": city.capitalize(),
-                        "district": dist,
-                        "address": item.get("address", "Adres bilgisi için arayınız"),
-                        "phone": item.get("phone", "Belirtilmedi"),
-                        "status": shift["status_text"],
-                        "hours": shift["hours_text"],
-                        "is_now_open": shift["is_now_open"]
-                    })
+    # ÖNEMLİ: Canlı nöbet listesi alınamazsa ASLA tahmini/rastgele liste gösterilmez.
+    # (Gece kapalı bir eczaneye yönlendirilen okur gerçek zarar görür.) Boş liste dönülür;
+    # arayüz okuru e-Devlet / Eczacı Odası resmi sorgulamasına yönlendirir.
 
     if results:
         _PHARMACY_CACHE[slug] = {"data": results, "ts": now, "date": shift_date_str}

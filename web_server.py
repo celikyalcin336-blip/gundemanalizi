@@ -734,7 +734,7 @@ async def api_market_rates():
 # ========================================================
 _DEPREM_CACHE = {"time": 0, "data": []}
 
-def get_live_earthquakes(limit=50) -> list:
+def _get_live_earthquakes_raw(limit=100) -> list:
     import urllib.request, json
     global _DEPREM_CACHE
     now = time.time()
@@ -772,7 +772,9 @@ def get_live_earthquakes(limit=50) -> list:
                         "time": time_str,
                         "date": date_str,
                         "provider": "AFAD",
-                        "level": level
+                        "level": level,
+                        "lat": float(item.get("latitude") or 0) or None,
+                        "lon": float(item.get("longitude") or 0) or None,
                     })
                 except Exception:
                     continue
@@ -797,6 +799,7 @@ def get_live_earthquakes(limit=50) -> list:
                     time_str = dt.split(" ")[-1][:5] if " " in dt else dt[:5]
                     date_str = dt.split(" ")[0] if " " in dt else ""
                     level = "high" if mag >= 4.0 else ("med" if mag >= 3.0 else "low")
+                    _coords = ((item.get("geojson") or {}).get("coordinates") or [None, None])
                     quakes.append({
                         "place": place,
                         "mag": round(mag, 1),
@@ -804,7 +807,9 @@ def get_live_earthquakes(limit=50) -> list:
                         "time": time_str,
                         "date": date_str,
                         "provider": "Kandilli",
-                        "level": level
+                        "level": level,
+                        "lat": _coords[1] if len(_coords) > 1 else None,
+                        "lon": _coords[0] if _coords else None,
                     })
                 except Exception:
                     continue
@@ -815,6 +820,14 @@ def get_live_earthquakes(limit=50) -> list:
         print(f"Kandilli fetch failed: {e}")
 
     return _DEPREM_CACHE["data"] if _DEPREM_CACHE["data"] else []
+
+def get_live_earthquakes(limit=50) -> list:
+    """Her zaman 100 kayıt çekip önbellekler; istenen kadarını döner (sayfa ve modal aynı önbelleği paylaşır)."""
+    try:
+        limit = max(1, min(int(limit), 100))
+    except Exception:
+        limit = 50
+    return _get_live_earthquakes_raw(100)[:limit]
 
 @app.get("/api/deprem")
 async def api_deprem(limit: int = 50):
@@ -834,9 +847,11 @@ async def api_nobetci_eczaneler(city: str = "istanbul"):
     data = await asyncio.to_thread(live_services.get_live_pharmacies, city)
     return JSONResponse({
         "ok": True,
+        "live": bool(data),
         "city": city,
         "count": len(data),
-        "pharmacies": data
+        "pharmacies": data,
+        "official_url": "https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama",
     })
 
 @app.get("/api/superlig")
@@ -1871,6 +1886,45 @@ async def article_detail(request: Request, slug: str):
     raw_content = content_quality.clean_article_html(raw_content)
     is_thin_article = content_quality.visible_word_count(raw_content) < 300
 
+    # "Gündem Analizi Notu" bölümünü öne çıkan editoryal kutuya al (yeni makalelerde yapay zeka bu bölümü yazar)
+    raw_content = re.sub(
+        r'(<h3[^>]*>\s*Gündem Analizi Notu[^<]*</h3>\s*(?:<p[^>]*>.*?</p>\s*){1,2})',
+        lambda _m: ('<div class="ga-analiz-notu not-prose my-8 p-5 sm:p-6 rounded-2xl bg-amber-50 border-l-4 border-amber-500 border-y border-r border-amber-200">'
+                    '<style>.ga-analiz-notu h3{color:#92400e!important;margin-top:0!important;font-size:1.05rem!important}.ga-analiz-notu p{color:#1e293b!important;margin-bottom:0!important}</style>'
+                    + _m.group(1) + '</div>'),
+        raw_content, count=1, flags=re.I | re.S,
+    )
+
+    # Ekonomi haberlerinde sayfanın açıldığı andaki canlı piyasa verilerini göster (bizim verimiz → özgün katma değer)
+    if (article.get("category") or "") == "Ekonomi":
+        try:
+            _rates = {r.get("key"): r for r in (get_market_rates().get("rates") or [])}
+            _cells = ""
+            for _k, _lbl in (("dolar", "Dolar"), ("euro", "Euro"), ("altin", "Gram Altın")):
+                _r = _rates.get(_k)
+                if _r and _r.get("price"):
+                    _up = _r.get("direction") == "up"
+                    _cells += (
+                        f'<div class="p-3 rounded-xl bg-white border border-slate-200">'
+                        f'<span class="block text-[10px] font-extrabold text-slate-500 uppercase">{_html_mod.escape(_lbl)}</span>'
+                        f'<strong class="block text-base font-black text-slate-900 font-mono">{_html_mod.escape(str(_r.get("price")))} {_html_mod.escape(str(_r.get("unit") or ""))}</strong>'
+                        f'<span class="text-[11px] font-bold {"text-emerald-700" if _up else "text-red-700"}">{"▲" if _up else "▼"} %{_html_mod.escape(str(abs(float(_r.get("change") or 0))))}</span>'
+                        f'</div>'
+                    )
+            if _cells:
+                raw_content += (
+                    '<div class="not-prose my-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">'
+                    '<div class="flex items-center justify-between mb-3">'
+                    '<span class="text-xs font-black text-slate-900 uppercase tracking-wide">📊 Şu Anki Piyasa Verileri</span>'
+                    '<a href="/piyasalar" class="text-[11px] font-bold text-red-600 hover:underline">Çevirici ve tüm kurlar →</a>'
+                    '</div>'
+                    f'<div class="grid grid-cols-3 gap-2">{_cells}</div>'
+                    '<p class="text-[10px] text-slate-500 mt-2">Veriler sayfanın açıldığı andaki serbest piyasa değerleridir; yatırım tavsiyesi değildir.</p>'
+                    '</div>'
+                )
+        except Exception as _e:
+            print(f"Ekonomi piyasa kutusu atlandı: {_e}")
+
     # 3. alt başlığın hemen üstüne tek satırlık şık "İlginizi Çekebilir" iç bağlantısı (SEO & Sayfa Görüntüleme Artırıcı)
     if related_articles and raw_content.count("<h3") >= 3:
         rel_pick = related_articles[-1]
@@ -1949,6 +2003,94 @@ async def markets_page(request: Request):
             "articles": eco_articles[:12],
         }
     )
+
+@app.get("/son-depremler", response_class=HTMLResponse)
+async def earthquakes_page(request: Request):
+    """Son Depremler: canlı liste + harita (sunucuda çizilir, Google tarafından okunur)."""
+    quakes = await asyncio.to_thread(get_live_earthquakes, 100)
+    mags = [q.get("mag") or 0 for q in quakes]
+    top = max(quakes, key=lambda q: q.get("mag") or 0) if quakes else None
+    stats = {
+        "count": len(quakes),
+        "max_mag": f"{top['mag']:.1f}" if top else "-",
+        "max_place": (top or {}).get("place", ""),
+        "m3": sum(1 for m in mags if m >= 3),
+        "m4": sum(1 for m in mags if m >= 4),
+    }
+    try:
+        related = database.search_articles("deprem", limit=6)
+    except Exception:
+        related = []
+    return templates.TemplateResponse(
+        request=request,
+        name="deprem.html",
+        context={
+            "quakes": quakes,
+            "stats": stats,
+            "related": related,
+            "provider": (quakes[0].get("provider") if quakes else "AFAD"),
+            "updated_at": datetime.now(timezone(timedelta(hours=3))).strftime("%d.%m.%Y %H:%M"),
+        },
+    )
+
+_CALC_TOOLS = [
+    {"key": "maas", "path": "/hesaplama/maas", "icon": "💼", "name": "Brüt – Net Maaş Hesaplama",
+     "desc": "Brüt maaştan net maaşı ya da istediğiniz net maaş için gereken brütü, 12 ay vergi dilimleriyle birlikte hesaplayın."},
+    {"key": "kidem", "path": "/hesaplama/kidem-tazminati", "icon": "📑", "name": "Kıdem ve İhbar Tazminatı Hesaplama",
+     "desc": "Giriş-çıkış tarihi ve son maaşınıza göre güncel tavanla net kıdem tazminatınızı ve ihbar sürenizi öğrenin."},
+    {"key": "emekli", "path": "/hesaplama/emekli-zammi", "icon": "👴", "name": "Emekli Zammı Hesaplama",
+     "desc": "Mevcut emekli maaşınıza zam oranını uygulayarak yeni aylığınızı ve aylık artışı görün."},
+    {"key": "piyasa", "path": "/piyasalar", "icon": "🪙", "name": "Döviz ve Altın Çevirici",
+     "desc": "Canlı dolar, euro, gram ve çeyrek altın kurlarıyla anında çeviri yapın."},
+]
+_CALC_META = {
+    "hub": {"path": "/hesaplama", "title": "Hesaplama Araçları: Maaş, Kıdem Tazminatı, Emekli Zammı",
+            "h1": "Hesaplama Araçları",
+            "lead": "Maaş, kıdem tazminatı, emekli zammı ve döviz-altın hesaplamalarını güncel yasal parametrelerle ücretsiz yapın.",
+            "description": "Ücretsiz brüt-net maaş, kıdem ve ihbar tazminatı, emekli zammı ve döviz-altın hesaplama araçları. Güncel asgari ücret, vergi dilimleri ve kıdem tavanıyla."},
+    "maas": {"path": "/hesaplama/maas", "title": "Brüt Net Maaş Hesaplama 2026",
+             "h1": "Brüt – Net Maaş Hesaplama 2026",
+             "lead": "Güncel asgari ücret, SGK kesintileri ve gelir vergisi dilimleriyle aylık ve yıllık net maaşınızı hesaplayın.",
+             "description": "2026 brütten nete ve netten brüte maaş hesaplama. SGK, işsizlik, gelir vergisi ve damga vergisi kesintileri, asgari ücret istisnası ve 12 aylık tablo."},
+    "kidem": {"path": "/hesaplama/kidem-tazminati", "title": "Kıdem Tazminatı Hesaplama 2026 (Güncel Tavan)",
+              "h1": "Kıdem ve İhbar Tazminatı Hesaplama",
+              "lead": "Çalışma sürenize ve son brüt maaşınıza göre güncel kıdem tazminatı tavanıyla net tazminatınızı hesaplayın.",
+              "description": "2026 güncel kıdem tazminatı tavanıyla net kıdem tazminatı ve ihbar tazminatı hesaplama. Kimler kıdem tazminatı alabilir, nasıl hesaplanır?"},
+    "emekli": {"path": "/hesaplama/emekli-zammi", "title": "Emekli Zammı Hesaplama: SSK, Bağ-Kur, Memur",
+               "h1": "Emekli Zammı Hesaplama",
+               "lead": "Mevcut aylığınıza zam oranını uygulayarak yeni emekli maaşınızı hesaplayın.",
+               "description": "SSK, Bağ-Kur ve memur emeklileri için zamlı maaş hesaplama. Emekli zammı nasıl belirlenir, en düşük emekli aylığı nasıl uygulanır?"},
+}
+
+def _render_calc(request: Request, tool: str):
+    import calc_params
+    return templates.TemplateResponse(
+        request=request,
+        name="calculators.html",
+        context={
+            "tool": tool,
+            "meta": _CALC_META[tool],
+            "tools": _CALC_TOOLS,
+            "params": calc_params.CALC_PARAMS,
+            "today": datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d"),
+        },
+    )
+
+@app.get("/hesaplama", response_class=HTMLResponse)
+async def calc_hub(request: Request):
+    return _render_calc(request, "hub")
+
+@app.get("/hesaplama/maas", response_class=HTMLResponse)
+async def calc_maas(request: Request):
+    return _render_calc(request, "maas")
+
+@app.get("/hesaplama/kidem-tazminati", response_class=HTMLResponse)
+async def calc_kidem(request: Request):
+    return _render_calc(request, "kidem")
+
+@app.get("/hesaplama/emekli-zammi", response_class=HTMLResponse)
+async def calc_emekli(request: Request):
+    return _render_calc(request, "emekli")
 
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
@@ -2243,6 +2385,11 @@ async def sitemap(request: Request):
             {"label": "Ana Sayfa", "loc": f"{base_url}/", "date": today_iso, "prio": "1.0"},
             {"label": "Son Dakika Haberleri", "loc": f"{base_url}/son-dakika", "date": today_iso, "prio": "1.0"},
             {"label": "Canlı Piyasalar & Döviz/Altın Çevirici", "loc": f"{base_url}/piyasalar", "date": today_iso, "prio": "0.9"},
+            {"label": "Son Depremler — Canlı Liste ve Harita", "loc": f"{base_url}/son-depremler", "date": today_iso, "prio": "0.9"},
+            {"label": "Hesaplama Araçları", "loc": f"{base_url}/hesaplama", "date": today_iso, "prio": "0.8"},
+            {"label": "Brüt–Net Maaş Hesaplama", "loc": f"{base_url}/hesaplama/maas", "date": today_iso, "prio": "0.8"},
+            {"label": "Kıdem Tazminatı Hesaplama", "loc": f"{base_url}/hesaplama/kidem-tazminati", "date": today_iso, "prio": "0.8"},
+            {"label": "Emekli Zammı Hesaplama", "loc": f"{base_url}/hesaplama/emekli-zammi", "date": today_iso, "prio": "0.8"},
             {"label": "Hakkımızda", "loc": f"{base_url}/hakkimizda", "date": today_iso, "prio": "0.5"},
             {"label": "Künye (Medya Künyesi)", "loc": f"{base_url}/kunye", "date": today_iso, "prio": "0.5"},
             {"label": "Yayın İlkeleri", "loc": f"{base_url}/yayin-ilkeleri", "date": today_iso, "prio": "0.5"},
@@ -2262,6 +2409,9 @@ async def sitemap(request: Request):
     xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
     xml.append(f'  <url><loc>{base_url}/son-dakika</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>1.0</priority></url>')
     xml.append(f'  <url><loc>{base_url}/piyasalar</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/son-depremler</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>0.9</priority></url>')
+    for _p in ("/hesaplama", "/hesaplama/maas", "/hesaplama/kidem-tazminati", "/hesaplama/emekli-zammi"):
+        xml.append(f'  <url><loc>{base_url}{_p}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>')
     import urllib.parse
     for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş"):
         cat_enc = urllib.parse.quote(cat)

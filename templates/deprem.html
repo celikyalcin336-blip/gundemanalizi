@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Son Depremler: Canlı Deprem Listesi ve Haritası (AFAD) | Gündem Analizi</title>
+    <meta name="description" content="Türkiye'deki son depremler canlı listesi ve haritası. AFAD verileriyle deprem büyüklüğü, derinliği, yeri ve saati; deprem anında ve sonrasında yapılması gerekenler.">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/son-depremler">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
+        #quake-map { height: 420px; border-radius: 1rem; z-index: 1; }
+        .mag-badge { min-width: 3rem; }
+        .q-filter.active { background: #e11d48 !important; color: #fff !important; border-color: #e11d48 !important; }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://xn--gndemanalizi-dlb.com.tr/"},
+        {"@type": "ListItem", "position": 2, "name": "Son Depremler", "item": "https://xn--gndemanalizi-dlb.com.tr/son-depremler"}
+      ]
+    }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-xs" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 block leading-none">GÜNDEM <span class="text-red-600">ANALİZİ</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Canlı Deprem Takibi</span>
+                </div>
+            </a>
+            <a href="/" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-xs text-white transition shadow-sm">← Ana Sayfa</a>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full space-y-8">
+        <div class="border-b border-slate-200 pb-6">
+            <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-red-600 transition">Ana Sayfa</a><span>/</span>
+                <span class="text-red-600 font-bold">Son Depremler</span>
+            </nav>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">Son Depremler: Canlı Deprem Listesi ve Haritası</h1>
+                    <p class="text-slate-600 text-xs sm:text-sm mt-1.5">Türkiye ve çevresinde kaydedilen son depremler. Veriler {{ provider }} kaynağından alınır, sayfa açıkken her dakika kendiliğinden yenilenir.</p>
+                </div>
+                <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold self-start">
+                    <span class="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                    <span>Son güncelleme: <span id="q-updated">{{ updated_at }}</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÖZET KARTLARI -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">Listelenen Deprem</span>
+                <strong id="st-count" class="block text-2xl font-black text-slate-900 mt-1">{{ stats.count }}</strong>
+            </div>
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">En Büyük</span>
+                <strong id="st-max" class="block text-2xl font-black text-rose-600 mt-1">{{ stats.max_mag }}</strong>
+                <span id="st-max-place" class="text-[11px] text-slate-500 line-clamp-1">{{ stats.max_place }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">3.0 ve Üzeri</span>
+                <strong id="st-m3" class="block text-2xl font-black text-amber-600 mt-1">{{ stats.m3 }}</strong>
+            </div>
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">4.0 ve Üzeri</span>
+                <strong id="st-m4" class="block text-2xl font-black text-red-700 mt-1">{{ stats.m4 }}</strong>
+            </div>
+        </section>
+
+        <!-- HARİTA -->
+        <section class="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-lg font-black text-slate-900">🗺️ Deprem Haritası</h2>
+                <div class="flex flex-wrap gap-2" role="group" aria-label="Büyüklük filtresi">
+                    <button type="button" data-min="0" class="q-filter active px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">Tümü</button>
+                    <button type="button" data-min="2" class="q-filter px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">2.0+</button>
+                    <button type="button" data-min="3" class="q-filter px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">3.0+</button>
+                    <button type="button" data-min="4" class="q-filter px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">4.0+</button>
+                </div>
+            </div>
+            <div id="quake-map" aria-label="Son depremlerin haritası"></div>
+            <p class="text-[11px] text-slate-500">Daire büyüklüğü ve rengi depremin büyüklüğünü gösterir. Ayrıntı için daireye dokunun.</p>
+        </section>
+
+        <!-- LİSTE (sunucuda çizilir: Google ve JavaScript'siz tarayıcılar da görür) -->
+        <section class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-lg font-black text-slate-900">📋 Son Depremler Listesi</h2>
+                <input id="q-search" type="search" placeholder="İl, ilçe veya bölge ara (örn. Malatya)" class="w-full sm:w-72 px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-sm focus:outline-none focus:border-rose-500">
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-[11px] font-extrabold text-slate-500 uppercase">
+                        <tr>
+                            <th class="py-3 px-4">Büyüklük</th>
+                            <th class="py-3 px-4">Yer</th>
+                            <th class="py-3 px-4 whitespace-nowrap">Tarih / Saat</th>
+                            <th class="py-3 px-4">Derinlik</th>
+                        </tr>
+                    </thead>
+                    <tbody id="q-tbody" class="divide-y divide-slate-100">
+                        {% for q in quakes %}
+                        <tr data-mag="{{ q.mag }}" data-place="{{ q.place|lower }}">
+                            <td class="py-3 px-4"><span class="mag-badge inline-block text-center px-2 py-1 rounded-lg font-black font-mono text-xs {% if q.mag >= 4 %}bg-red-600 text-white{% elif q.mag >= 3 %}bg-amber-100 text-amber-800 border border-amber-300{% else %}bg-slate-100 text-slate-700 border border-slate-200{% endif %}">{{ '%.1f'|format(q.mag) }}</span></td>
+                            <td class="py-3 px-4 font-semibold text-slate-900">{{ q.place }}</td>
+                            <td class="py-3 px-4 text-slate-600 whitespace-nowrap font-mono text-xs">{{ q.date }} {{ q.time }}</td>
+                            <td class="py-3 px-4 text-slate-600 font-mono text-xs">{{ q.depth }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="py-6 px-4 text-center text-slate-500 text-sm">Deprem verisine şu an ulaşılamıyor. Lütfen birkaç dakika sonra tekrar deneyin veya afad.gov.tr adresini ziyaret edin.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- REHBER İÇERİK -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <article class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm text-slate-700 leading-relaxed">
+                <h2 class="text-lg font-black text-slate-900">Deprem Anında Ne Yapmalı?</h2>
+                <p><strong>Çök – Kapan – Tutun:</strong> Sarsıntı başladığında sağlam bir masa veya mobilyanın yanına çökün, başınızı ve boynunuzu kollarınızla koruyun, sarsıntı geçene kadar tutunun.</p>
+                <p><strong>Uzak durun:</strong> Pencerelerden, camlı bölmelerden, devrilebilecek dolap ve raflardan uzaklaşın. Sarsıntı sırasında merdivenlere koşmayın, asansör kullanmayın.</p>
+                <p><strong>Dışarıdaysanız:</strong> Binalardan, elektrik direklerinden ve duvar diplerinden uzak, açık bir alana geçin.</p>
+                <p><strong>Araçtaysanız:</strong> Aracı güvenli bir yerde durdurun; köprü, üst geçit ve tünel altında beklemeyin. Sarsıntı bitene kadar araçta kalın.</p>
+                <h3 class="text-base font-black text-slate-900 pt-2">Sarsıntıdan Sonra</h3>
+                <p>Gaz, su ve elektrik vanalarını kontrol edin; gaz kokusu varsa kibrit, çakmak ve elektrik düğmesi kullanmayın. Hasarlı binalara girmeyin, artçı sarsıntılara karşı hazırlıklı olun. Acil durumlarda <strong>112</strong>'yi arayın ve yalnızca resmi kurumların (AFAD, valilikler) açıklamalarını takip edin.</p>
+            </article>
+            <article class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm text-slate-700 leading-relaxed">
+                <h2 class="text-lg font-black text-slate-900">Deprem Büyüklüğü Ne Anlatır?</h2>
+                <ul class="space-y-2">
+                    <li><strong class="text-slate-900">3.0'ın altı:</strong> Çoğunlukla hissedilmez ya da yalnızca merkezüstüne çok yakın yerlerde hafifçe hissedilir.</li>
+                    <li><strong class="text-amber-700">3.0 – 3.9:</strong> Genellikle hissedilir, hasar beklenmez.</li>
+                    <li><strong class="text-orange-700">4.0 – 4.9:</strong> Belirgin sarsıntı; eşyalar sallanabilir, eski ve dayanıksız yapılarda hafif hasar görülebilir.</li>
+                    <li><strong class="text-red-700">5.0 ve üzeri:</strong> Yapı kalitesine ve derinliğe bağlı olarak hasar oluşturabilir.</li>
+                </ul>
+                <p><strong>Derinlik</strong> de önemlidir: Aynı büyüklükteki sığ bir deprem, derin bir depreme göre yüzeyde genellikle daha güçlü hissedilir.</p>
+                <h3 class="text-base font-black text-slate-900 pt-2">Veri Kaynağı Hakkında</h3>
+                <p>Veriler AFAD Deprem Dairesi'nin kamuya açık servisinden alınır; bu servise ulaşılamadığında Kandilli Rasathanesi verileri gösterilir. Kurumlar ilk açıkladıkları büyüklük ve konum bilgisini sonradan güncelleyebilir. Kesin bilgi için <a href="https://deprem.afad.gov.tr" target="_blank" rel="noopener" class="text-red-600 font-bold hover:underline">deprem.afad.gov.tr</a> adresini esas alın.</p>
+            </article>
+        </section>
+
+        {% if related %}
+        <section class="pt-4 border-t border-slate-200">
+            <h2 class="text-xl font-black text-slate-900 mb-4">Deprem ile İlgili Son Haberler</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for a in related %}
+                <a href="/haber/{{ a.slug }}" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-xs transition">
+                    <span class="text-[10px] font-extrabold text-red-600 uppercase">{{ a.category }}</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 line-clamp-2 mt-1">{{ a.title }}</h3>
+                    <span class="text-[11px] text-slate-500">{{ (a.created_at or '')[:16] }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-6 text-center text-xs text-slate-600 mt-10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span>© 2026 Gündem Analizi • Doğru Haber, Tarafsız Analiz.</span>
+            <div class="flex flex-wrap items-center justify-center gap-3 font-semibold">
+                <a href="/piyasalar" class="hover:text-red-600">Canlı Piyasalar</a><span>•</span>
+                <a href="/hesaplama" class="hover:text-red-600">Hesaplama Araçları</a><span>•</span>
+                <a href="/hakkimizda" class="hover:text-red-600">Hakkımızda</a><span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-red-600">Gizlilik</a><span>•</span>
+                <a href="/iletisim" class="hover:text-red-600">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+        (function () {
+            let QUAKES = {{ quakes | tojson }};
+            let minMag = 0, query = '';
+            let map = null, layer = null;
+
+            function color(m) { return m >= 4 ? '#dc2626' : (m >= 3 ? '#f59e0b' : '#64748b'); }
+            function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+            function visible() {
+                return QUAKES.filter(q => q.mag >= minMag && (!query || String(q.place || '').toLocaleLowerCase('tr').includes(query)));
+            }
+
+            function drawMap() {
+                if (typeof L === 'undefined') return;
+                if (!map) {
+                    map = L.map('quake-map', { scrollWheelZoom: false }).setView([39.0, 35.2], 5);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 12, attribution: '&copy; OpenStreetMap katkıda bulunanlar'
+                    }).addTo(map);
+                }
+                if (layer) layer.remove();
+                layer = L.layerGroup().addTo(map);
+                visible().forEach(q => {
+                    if (!q.lat || !q.lon) return;
+                    L.circleMarker([q.lat, q.lon], {
+                        radius: Math.max(4, q.mag * 3.2), color: color(q.mag), fillColor: color(q.mag),
+                        fillOpacity: 0.55, weight: 1.5
+                    }).bindPopup('<strong>' + q.mag.toFixed(1) + '</strong> — ' + esc(q.place) + '<br>' + esc(q.date) + ' ' + esc(q.time) + ' • Derinlik: ' + esc(q.depth)).addTo(layer);
+                });
+            }
+
+            function drawTable() {
+                const rows = visible();
+                const tb = document.getElementById('q-tbody');
+                if (!rows.length) {
+                    tb.innerHTML = '<tr><td colspan="4" class="py-6 px-4 text-center text-slate-500 text-sm">Bu filtreye uyan deprem yok.</td></tr>';
+                    return;
+                }
+                tb.innerHTML = rows.map(q => {
+                    const cls = q.mag >= 4 ? 'bg-red-600 text-white' : (q.mag >= 3 ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-200');
+                    return '<tr><td class="py-3 px-4"><span class="mag-badge inline-block text-center px-2 py-1 rounded-lg font-black font-mono text-xs ' + cls + '">' + q.mag.toFixed(1) + '</span></td>' +
+                        '<td class="py-3 px-4 font-semibold text-slate-900">' + esc(q.place) + '</td>' +
+                        '<td class="py-3 px-4 text-slate-600 whitespace-nowrap font-mono text-xs">' + esc(q.date) + ' ' + esc(q.time) + '</td>' +
+                        '<td class="py-3 px-4 text-slate-600 font-mono text-xs">' + esc(q.depth) + '</td></tr>';
+                }).join('');
+            }
+
+            function drawStats() {
+                document.getElementById('st-count').innerText = QUAKES.length;
+                if (QUAKES.length) {
+                    const mx = QUAKES.reduce((a, b) => (b.mag > a.mag ? b : a), QUAKES[0]);
+                    document.getElementById('st-max').innerText = mx.mag.toFixed(1);
+                    document.getElementById('st-max-place').innerText = mx.place || '';
+                }
+                document.getElementById('st-m3').innerText = QUAKES.filter(q => q.mag >= 3).length;
+                document.getElementById('st-m4').innerText = QUAKES.filter(q => q.mag >= 4).length;
+            }
+
+            function render() { drawTable(); drawMap(); }
+
+            document.querySelectorAll('.q-filter').forEach(btn => btn.addEventListener('click', () => {
+                document.querySelectorAll('.q-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                minMag = parseFloat(btn.getAttribute('data-min')) || 0;
+                render();
+            }));
+            document.getElementById('q-search').addEventListener('input', e => {
+                query = (e.target.value || '').trim().toLocaleLowerCase('tr');
+                render();
+            });
+
+            function refresh() {
+                fetch('/api/deprem?limit=100').then(r => r.json()).then(d => {
+                    if (d && d.quakes && d.quakes.length) {
+                        QUAKES = d.quakes;
+                        document.getElementById('q-updated').innerText = d.updated_at || '';
+                        drawStats(); render();
+                    }
+                }).catch(() => {});
+            }
+
+            window.addEventListener('load', drawMap);
+            setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+        })();
+    </script>
+</body>
+</html>

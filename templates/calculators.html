@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meta.title }} | Gündem Analizi</title>
+    <meta name="description" content="{{ meta.description }}">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr{{ meta.path }}">
+    <meta name="robots" content="index, follow, max-snippet:-1">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
+        .inp { width: 100%; padding: .75rem 1rem; border-radius: .75rem; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; font-weight: 700; }
+        .inp:focus { outline: none; border-color: #dc2626; background: #fff; }
+        .tab.active { background: #dc2626 !important; color: #fff !important; border-color: #dc2626 !important; }
+        .num { font-variant-numeric: tabular-nums; }
+    </style>
+    {% if tool != 'hub' %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": {{ meta.h1 | tojson }},
+      "url": "https://xn--gndemanalizi-dlb.com.tr{{ meta.path }}",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Tüm cihazlar",
+      "inLanguage": "tr",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "TRY"},
+      "publisher": {"@type": "NewsMediaOrganization", "name": "Gündem Analizi", "url": "https://xn--gndemanalizi-dlb.com.tr/"}
+    }
+    </script>
+    {% endif %}
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-xs" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 block leading-none">GÜNDEM <span class="text-red-600">ANALİZİ</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Hesaplama Araçları</span>
+                </div>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="/hesaplama" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition hidden sm:inline-flex">🧮 Tüm Araçlar</a>
+                <a href="/" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-xs text-white transition shadow-sm">← Ana Sayfa</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full space-y-8">
+        <div class="border-b border-slate-200 pb-6">
+            <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-red-600 transition">Ana Sayfa</a><span>/</span>
+                {% if tool == 'hub' %}
+                <span class="text-red-600 font-bold">Hesaplama Araçları</span>
+                {% else %}
+                <a href="/hesaplama" class="hover:text-red-600 transition">Hesaplama Araçları</a><span>/</span>
+                <span class="text-red-600 font-bold">{{ meta.h1 }}</span>
+                {% endif %}
+            </nav>
+            <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{{ meta.h1 }}</h1>
+            <p class="text-slate-600 text-xs sm:text-sm mt-1.5">{{ meta.lead }}</p>
+        </div>
+
+        {% if tool == 'hub' %}
+        <!-- ===================== HUB ===================== -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {% for t in tools %}
+            <a href="{{ t.path }}" class="group p-6 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-sm hover:shadow-md transition flex gap-4">
+                <span class="text-4xl">{{ t.icon }}</span>
+                <div>
+                    <h2 class="text-lg font-black text-slate-900 group-hover:text-red-600 transition">{{ t.name }}</h2>
+                    <p class="text-sm text-slate-600 mt-1 leading-relaxed">{{ t.desc }}</p>
+                    <span class="inline-block mt-3 text-xs font-bold text-red-600">Hesapla →</span>
+                </div>
+            </a>
+            {% endfor %}
+        </section>
+
+        {% elif tool == 'maas' %}
+        <!-- ===================== MAAŞ ===================== -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div class="flex gap-2" role="tablist">
+                    <button type="button" id="mode-b2n" class="tab active flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold">Brütten Nete</button>
+                    <button type="button" id="mode-n2b" class="tab flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold">Netten Brüte</button>
+                </div>
+                <div>
+                    <label for="m-amount" id="m-label" class="block text-xs font-extrabold text-slate-700 mb-1.5">Aylık Brüt Maaş (TL)</label>
+                    <input id="m-amount" type="number" min="0" step="any" class="inp num" value="{{ '%.2f'|format(params.asgari_brut) }}">
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" class="m-quick px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700" data-v="asgari">Asgari Ücret</button>
+                    <button type="button" class="m-quick px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700" data-v="50000">50.000</button>
+                    <button type="button" class="m-quick px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700" data-v="75000">75.000</button>
+                    <button type="button" class="m-quick px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700" data-v="100000">100.000</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <div class="p-4 rounded-xl bg-red-50 border border-red-200">
+                        <span class="text-[10px] font-extrabold text-red-700 uppercase">Ocak Ayı Net</span>
+                        <strong id="r-net1" class="block text-xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Ocak Ayı Brüt</span>
+                        <strong id="r-brut1" class="block text-xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Yıllık Ortalama Net</span>
+                        <strong id="r-avg" class="block text-lg font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Yıllık Toplam Vergi</span>
+                        <strong id="r-tax" class="block text-lg font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Hesaplama {{ params.year }} yılı parametreleriyle, bekâr ve engellilik indirimi olmayan özel sektör çalışanı için yapılır. Asgari ücret gelir ve damga vergisi istisnası uygulanır.</p>
+            </div>
+            <div class="lg:col-span-7 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-black text-slate-900 mb-3">Aylara Göre Maaş Tablosu</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs num">
+                        <thead class="bg-slate-50 text-[10px] font-extrabold text-slate-500 uppercase">
+                            <tr><th class="py-2 px-2 text-left">Ay</th><th class="py-2 px-2 text-right">Brüt</th><th class="py-2 px-2 text-right">SGK+İşsizlik</th><th class="py-2 px-2 text-right">Gelir V.</th><th class="py-2 px-2 text-right">Damga V.</th><th class="py-2 px-2 text-right">Net</th></tr>
+                        </thead>
+                        <tbody id="m-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-3">Yıl içinde kümülatif vergi matrahı arttıkça üst vergi dilimine geçildiği için net maaş ilerleyen aylarda düşebilir.</p>
+            </div>
+        </section>
+
+        <section class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm text-slate-700 leading-relaxed">
+            <h2 class="text-lg font-black text-slate-900">Brüt Maaştan Net Maaş Nasıl Hesaplanır?</h2>
+            <p>Brüt maaştan önce <strong>%14 SGK işçi payı</strong> ve <strong>%1 işsizlik sigortası işçi payı</strong> düşülür (prime esas kazanç üst sınırı {{ '{:,.2f}'.format(params.sgk_tavan).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL). Kalan tutar gelir vergisi matrahıdır. Gelir vergisi, yıl başından itibaren biriken (kümülatif) matraha göre artan oranlı tarifeyle hesaplanır. Son olarak brüt maaş üzerinden <strong>binde 7,59 damga vergisi</strong> kesilir.</p>
+            <p>2022'den bu yana asgari ücrete denk gelen kısım gelir ve damga vergisinden istisnadır. Bu nedenle her çalışanın vergisinden, asgari ücret üzerinden hesaplanan vergi kadar indirim yapılır.</p>
+            <h3 class="text-base font-black text-slate-900 pt-1">{{ params.year }} Gelir Vergisi Dilimleri (Ücretliler)</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                {% set ns = namespace(prev=0) %}
+                {% for d in params.gv_dilimleri %}
+                <li>{% if d[0] %}{{ '{:,.0f}'.format(ns.prev).replace(',', '.') }} – {{ '{:,.0f}'.format(d[0]).replace(',', '.') }} TL arası{% else %}{{ '{:,.0f}'.format(ns.prev).replace(',', '.') }} TL üzeri{% endif %}: <strong>%{{ (d[1]*100)|round|int }}</strong></li>
+                {% if d[0] %}{% set ns.prev = d[0] %}{% endif %}
+                {% endfor %}
+            </ul>
+            <p class="text-[12px] text-slate-500">{{ params.year }} asgari ücret: brüt {{ '{:,.2f}'.format(params.asgari_brut).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL, net {{ '{:,.2f}'.format(params.asgari_net).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL.</p>
+        </section>
+
+        {% elif tool == 'kidem' %}
+        <!-- ===================== KIDEM ===================== -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="k-start" class="block text-xs font-extrabold text-slate-700 mb-1.5">İşe Giriş Tarihi</label>
+                        <input id="k-start" type="date" class="inp" value="2020-01-01">
+                    </div>
+                    <div>
+                        <label for="k-end" class="block text-xs font-extrabold text-slate-700 mb-1.5">İşten Çıkış Tarihi</label>
+                        <input id="k-end" type="date" class="inp" value="{{ today }}">
+                    </div>
+                </div>
+                <div>
+                    <label for="k-brut" class="block text-xs font-extrabold text-slate-700 mb-1.5">Son Aylık Brüt Maaş (TL)</label>
+                    <input id="k-brut" type="number" min="0" step="any" class="inp num" value="50000">
+                </div>
+                <div>
+                    <label for="k-extra" class="block text-xs font-extrabold text-slate-700 mb-1.5">Düzenli Yan Haklar (aylık brüt: yemek, yol vb.)</label>
+                    <input id="k-extra" type="number" min="0" step="any" class="inp num" value="0">
+                </div>
+                <div id="k-warn" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-semibold"></div>
+            </div>
+            <div class="lg:col-span-7 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-lg font-black text-slate-900">Sonuç</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-4 rounded-xl bg-red-50 border border-red-200">
+                        <span class="text-[10px] font-extrabold text-red-700 uppercase">Net Kıdem Tazminatı</span>
+                        <strong id="k-net" class="block text-2xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Brüt Kıdem Tazminatı</span>
+                        <strong id="k-gross" class="block text-xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Çalışma Süresi</span>
+                        <strong id="k-dur" class="block text-base font-black text-slate-900 mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Uygulanan Tavan</span>
+                        <strong id="k-cap" class="block text-base font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+                    <div class="flex justify-between"><span class="font-bold text-slate-700">İhbar süresi</span><strong id="i-weeks">-</strong></div>
+                    <div class="flex justify-between mt-1"><span class="font-bold text-slate-700">Brüt ihbar tazminatı</span><strong id="i-gross" class="num">-</strong></div>
+                    <p class="text-[11px] text-slate-500 mt-2">İhbar tazminatı, işveren bildirim süresine uymadan iş sözleşmesini feshederse ödenir. Kıdem tazminatından farklı olarak gelir vergisine tabidir; kesinti oranı yıllık vergi matrahınıza göre %15–40 arasında değişir.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm text-slate-700 leading-relaxed">
+            <h2 class="text-lg font-black text-slate-900">Kıdem Tazminatı Nasıl Hesaplanır?</h2>
+            <p>Aynı işverende <strong>en az 1 yıl</strong> çalışmış ve kanunda sayılan nedenlerle (işveren feshi, emeklilik, askerlik, kadın çalışanın evlilikten itibaren 1 yıl içinde ayrılması, haklı nedenle istifa vb.) işten ayrılan çalışan kıdem tazminatına hak kazanır. Kendi isteğiyle haklı bir neden olmadan istifa eden çalışan genellikle bu hakkı kazanamaz.</p>
+            <p>Her tam çalışma yılı için <strong>30 günlük giydirilmiş brüt ücret</strong> ödenir; yıldan artan süreler orantılı hesaplanır. Giydirilmiş ücrete düzenli ödenen yemek, yol gibi yan haklar da dahildir. Bir yıl için ödenecek tutar yasal <strong>kıdem tazminatı tavanını</strong> aşamaz. Kıdem tazminatından yalnızca binde 7,59 damga vergisi kesilir.</p>
+            <h3 class="text-base font-black text-slate-900 pt-1">Kıdem Tazminatı Tavanları</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                {% for t in params.kidem_tavanlari %}
+                <li>{{ t[0][8:10] }}.{{ t[0][5:7] }}.{{ t[0][:4] }} – {{ t[1][8:10] }}.{{ t[1][5:7] }}.{{ t[1][:4] }}: <strong>{{ '{:,.2f}'.format(t[2]).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL</strong></li>
+                {% endfor %}
+            </ul>
+            <h3 class="text-base font-black text-slate-900 pt-1">İhbar Süreleri</h3>
+            <ul class="list-disc pl-5 space-y-1">
+                <li>6 aydan az çalışma: 2 hafta</li>
+                <li>6 ay – 1,5 yıl: 4 hafta</li>
+                <li>1,5 yıl – 3 yıl: 6 hafta</li>
+                <li>3 yıldan fazla: 8 hafta</li>
+            </ul>
+        </section>
+
+        {% elif tool == 'emekli' %}
+        <!-- ===================== EMEKLİ ===================== -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <div>
+                    <label for="e-current" class="block text-xs font-extrabold text-slate-700 mb-1.5">Şu Anki Aylık Emekli Maaşı (TL)</label>
+                    <input id="e-current" type="number" min="0" step="any" class="inp num" value="20000">
+                </div>
+                <div>
+                    <label for="e-rate" class="block text-xs font-extrabold text-slate-700 mb-1.5">Zam Oranı (%)</label>
+                    <input id="e-rate" type="number" min="0" step="any" class="inp num" value="10">
+                    <p class="text-[11px] text-slate-500 mt-1">Açıklanan veya beklenen zam oranını yazın.</p>
+                </div>
+                <div>
+                    <label for="e-floor" class="block text-xs font-extrabold text-slate-700 mb-1.5">En Düşük Emekli Aylığı (isteğe bağlı, TL)</label>
+                    <input id="e-floor" type="number" min="0" step="any" class="inp num" placeholder="Biliyorsanız yazın">
+                </div>
+            </div>
+            <div class="lg:col-span-7 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-lg font-black text-slate-900">Sonuç</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-4 rounded-xl bg-red-50 border border-red-200">
+                        <span class="text-[10px] font-extrabold text-red-700 uppercase">Zamlı Maaş</span>
+                        <strong id="e-new" class="block text-2xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">Aylık Artış</span>
+                        <strong id="e-diff" class="block text-xl font-black text-emerald-700 num mt-1">-</strong>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        <span class="text-[10px] font-extrabold text-slate-500 uppercase">6 Aylık Ek Gelir</span>
+                        <strong id="e-six" class="block text-xl font-black text-slate-900 num mt-1">-</strong>
+                    </div>
+                </div>
+                <p id="e-note" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 font-semibold"></p>
+            </div>
+        </section>
+
+        <section class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm text-slate-700 leading-relaxed">
+            <h2 class="text-lg font-black text-slate-900">Emekli Zammı Nasıl Belirlenir?</h2>
+            <p><strong>SSK ve Bağ-Kur emeklileri:</strong> Aylıklar her yıl Ocak ve Temmuz aylarında, bir önceki 6 aylık dönemin TÜİK tarafından açıklanan enflasyon (TÜFE) oranında artırılır. Örneğin Ocak zammı, Temmuz–Aralık dönemi enflasyonuna göre belirlenir.</p>
+            <p><strong>Memur emeklileri:</strong> Toplu sözleşmeyle belirlenen zam oranı uygulanır; 6 aylık enflasyon bu oranı aşarsa aradaki fark <em>enflasyon farkı</em> olarak ayrıca eklenir.</p>
+            <p><strong>En düşük emekli aylığı:</strong> Kanunla belirlenen taban tutarın altında aylık alanlara, aradaki fark devlet tarafından tamamlanır. Bu nedenle düşük aylıklarda zam oranı hesaplaması ile ele geçen tutar farklı olabilir. Kesin tutar için e-Devlet'teki SGK aylık bilgilerinizi kontrol edin.</p>
+        </section>
+        {% endif %}
+
+        {% if tool != 'hub' %}
+        <section class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-[12px] text-slate-600 leading-relaxed">
+            <strong>Önemli:</strong> Bu araç bilgilendirme amaçlıdır; sonuçlar yasal parametrelere göre yapılmış tahmini hesaplamalardır ve resmi bordro, SGK veya mahkeme hesabı yerine geçmez. Kesin tutar için işvereninize, SGK'ya veya bir mali müşavire danışın. Parametreler en son {{ params.son_guncelleme }} tarihinde güncellenmiştir.
+        </section>
+        <section>
+            <h2 class="text-base font-black text-slate-900 mb-3">Diğer Hesaplama Araçları</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for t in tools %}{% if t.key != tool %}
+                <a href="{{ t.path }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-red-400 text-sm font-bold text-slate-800 transition">{{ t.icon }} {{ t.name }}</a>
+                {% endif %}{% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-6 text-center text-xs text-slate-600 mt-10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span>© 2026 Gündem Analizi • Doğru Haber, Tarafsız Analiz.</span>
+            <div class="flex flex-wrap items-center justify-center gap-3 font-semibold">
+                <a href="/piyasalar" class="hover:text-red-600">Canlı Piyasalar</a><span>•</span>
+                <a href="/son-depremler" class="hover:text-red-600">Son Depremler</a><span>•</span>
+                <a href="/hakkimizda" class="hover:text-red-600">Hakkımızda</a><span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-red-600">Gizlilik</a><span>•</span>
+                <a href="/iletisim" class="hover:text-red-600">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    {% if tool != 'hub' %}
+    <script>
+        const P = {{ params | tojson }};
+        const fmt = n => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) + ' TL';
+        const val = id => parseFloat(document.getElementById(id).value) || 0;
+
+        {% if tool == 'maas' %}
+        function taxOn(amount) {
+            let tax = 0, prev = 0;
+            for (const [lim, rate] of P.gv_dilimleri) {
+                const top = lim === null ? Infinity : lim;
+                if (amount > prev) tax += (Math.min(amount, top) - prev) * rate;
+                if (amount <= top) break;
+                prev = top;
+            }
+            return tax;
+        }
+        const MW_MATRAH = P.asgari_brut * (1 - P.sgk_isci - P.issizlik_isci);
+        function monthRow(brut, cumPrev, mwCumPrev) {
+            const base = Math.min(brut, P.sgk_tavan);
+            const sgk = base * P.sgk_isci, iss = base * P.issizlik_isci;
+            const matrah = brut - sgk - iss;
+            const gvRaw = taxOn(cumPrev + matrah) - taxOn(cumPrev);
+            const gvIst = taxOn(mwCumPrev + MW_MATRAH) - taxOn(mwCumPrev);
+            const gv = Math.max(0, gvRaw - gvIst);
+            const dv = Math.max(0, (brut - P.asgari_brut) * P.damga);
+            return { brut, kesinti: sgk + iss, matrah, gv, dv, net: brut - sgk - iss - gv - dv };
+        }
+        function brutForNet(target, cumPrev, mwCumPrev) {
+            let lo = target, hi = target * 2.5 + 1000;
+            for (let i = 0; i < 60; i++) {
+                const mid = (lo + hi) / 2;
+                if (monthRow(mid, cumPrev, mwCumPrev).net < target) lo = mid; else hi = mid;
+            }
+            return (lo + hi) / 2;
+        }
+        let MODE = 'b2n';
+        const AYLAR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+        function calc() {
+            const amt = val('m-amount');
+            let cum = 0, mwCum = 0, totNet = 0, totTax = 0;
+            const rows = [];
+            for (let m = 0; m < 12; m++) {
+                const brut = MODE === 'b2n' ? amt : brutForNet(amt, cum, mwCum);
+                const r = monthRow(brut, cum, mwCum);
+                rows.push(r);
+                cum += r.matrah; mwCum += MW_MATRAH;
+                totNet += r.net; totTax += r.gv + r.dv;
+            }
+            document.getElementById('r-net1').innerText = fmt(rows[0].net);
+            document.getElementById('r-brut1').innerText = fmt(rows[0].brut);
+            document.getElementById('r-avg').innerText = fmt(totNet / 12);
+            document.getElementById('r-tax').innerText = fmt(totTax);
+            document.getElementById('m-tbody').innerHTML = rows.map((r, i) =>
+                '<tr><td class="py-2 px-2 font-bold text-slate-700">' + AYLAR[i] + '</td>' +
+                '<td class="py-2 px-2 text-right">' + fmt(r.brut) + '</td>' +
+                '<td class="py-2 px-2 text-right">' + fmt(r.kesinti) + '</td>' +
+                '<td class="py-2 px-2 text-right">' + fmt(r.gv) + '</td>' +
+                '<td class="py-2 px-2 text-right">' + fmt(r.dv) + '</td>' +
+                '<td class="py-2 px-2 text-right font-black text-slate-900">' + fmt(r.net) + '</td></tr>').join('');
+        }
+        function setMode(m) {
+            MODE = m;
+            document.getElementById('mode-b2n').classList.toggle('active', m === 'b2n');
+            document.getElementById('mode-n2b').classList.toggle('active', m === 'n2b');
+            document.getElementById('m-label').innerText = m === 'b2n' ? 'Aylık Brüt Maaş (TL)' : 'İstenen Aylık Net Maaş (TL)';
+            calc();
+        }
+        document.getElementById('mode-b2n').addEventListener('click', () => setMode('b2n'));
+        document.getElementById('mode-n2b').addEventListener('click', () => setMode('n2b'));
+        document.getElementById('m-amount').addEventListener('input', calc);
+        document.querySelectorAll('.m-quick').forEach(b => b.addEventListener('click', () => {
+            const v = b.getAttribute('data-v');
+            document.getElementById('m-amount').value = v === 'asgari' ? (MODE === 'b2n' ? P.asgari_brut : P.asgari_net) : v;
+            calc();
+        }));
+        calc();
+        {% endif %}
+
+        {% if tool == 'kidem' %}
+        function capFor(dateStr) {
+            const list = P.kidem_tavanlari;
+            for (const [s, e, v] of list) if (dateStr >= s && dateStr <= e) return { v, exact: true };
+            if (dateStr > list[list.length - 1][1]) return { v: list[list.length - 1][2], exact: false };
+            return { v: list[0][2], exact: false };
+        }
+        function calc() {
+            const s = document.getElementById('k-start').value, e = document.getElementById('k-end').value;
+            const warn = document.getElementById('k-warn');
+            const msgs = [];
+            if (!s || !e || e <= s) {
+                warn.classList.remove('hidden'); warn.innerText = 'Çıkış tarihi giriş tarihinden sonra olmalıdır.';
+                return;
+            }
+            const days = Math.round((new Date(e) - new Date(s)) / 86400000);
+            const giydirilmis = val('k-brut') + val('k-extra');
+            const cap = capFor(e);
+            const base = Math.min(giydirilmis, cap.v);
+            const gross = base * days / 365;
+            const net = gross * (1 - P.damga);
+            const y = Math.floor(days / 365), rem = days - y * 365, mo = Math.floor(rem / 30), d = rem - mo * 30;
+            document.getElementById('k-dur').innerText = y + ' yıl ' + mo + ' ay ' + d + ' gün';
+            document.getElementById('k-cap').innerText = fmt(cap.v);
+            document.getElementById('k-gross').innerText = fmt(gross);
+            document.getElementById('k-net').innerText = fmt(net);
+            const months = days / 30.4375;
+            const weeks = months < 6 ? 2 : (months < 18 ? 4 : (months < 36 ? 6 : 8));
+            document.getElementById('i-weeks').innerText = weeks + ' hafta';
+            document.getElementById('i-gross').innerText = fmt(giydirilmis / 30 * weeks * 7);
+            if (days < 365) msgs.push('1 yıldan az çalışmada kıdem tazminatı hakkı doğmaz; gösterilen tutar yalnızca bilgi amaçlıdır.');
+            if (giydirilmis > cap.v) msgs.push('Ücretiniz tavanı aştığı için hesaplamada yıllık tavan tutarı kullanıldı.');
+            if (!cap.exact) msgs.push('Çıkış tarihiniz için tavan henüz tanımlı değil; en yakın dönemin tavanı kullanıldı.');
+            warn.classList.toggle('hidden', !msgs.length);
+            warn.innerText = msgs.join(' ');
+        }
+        ['k-start', 'k-end', 'k-brut', 'k-extra'].forEach(id => document.getElementById(id).addEventListener('input', calc));
+        calc();
+        {% endif %}
+
+        {% if tool == 'emekli' %}
+        function calc() {
+            const cur = val('e-current'), rate = val('e-rate'), floor = val('e-floor');
+            let nw = cur * (1 + rate / 100);
+            const note = document.getElementById('e-note');
+            let msg = '';
+            if (floor > 0 && nw < floor) {
+                msg = 'Zamlı aylığınız en düşük emekli aylığının altında kaldığı için, aradaki fark tamamlanarak ' + fmt(floor) + ' ödenir.';
+                nw = floor;
+            }
+            document.getElementById('e-new').innerText = fmt(nw);
+            document.getElementById('e-diff').innerText = '+' + fmt(nw - cur);
+            document.getElementById('e-six').innerText = fmt((nw - cur) * 6);
+            note.classList.toggle('hidden', !msg);
+            note.innerText = msg;
+        }
+        ['e-current', 'e-rate', 'e-floor'].forEach(id => document.getElementById(id).addEventListener('input', calc));
+        calc();
+        {% endif %}
+    </script>
+    {% endif %}
+</body>
+</html>

@@ -141,6 +141,31 @@ def process_single_news(item: dict) -> bool:
     print("💾 Haber veritabanına kaydedildi (tekrar paylaşılmayacak).")
     return True
 
+_COMMODITY_PATTERNS = [
+    # Şans oyunu sonuçları
+    r"say[ıi]sal loto", r"s[üu]per loto", r"[şs]ans topu", r"on numara.*(sonu[çc]|[çc]ekili[şs])", r"milli piyango.*(sonu[çc]|[çc]ekili[şs])",
+    r"loto.*sonu[çc]", r"[çc]ekili[şs] sonu[çc]lar[ıi]",
+    # Yayın / izleme rehberleri
+    r"hangi kanalda", r"saat ka[çc]ta.*(ma[çc]|kanal)", r"(ma[çc]|kanal).*saat ka[çc]ta", r"canl[ıi] izle", r"[şs]ifresiz",
+    r"nereden izlenir", r"yay[ıi]n ak[ıi][şs][ıi]",
+    # Burç / fal
+    r"bur[çc] yorum", r"g[üu]nl[üu]k bur[çc]", r"haftal[ıi]k bur[çc]",
+    # Rutin vakit ve fiyat listeleri (sitede kendi canlı sayfalarımız var)
+    r"namaz vakit", r"imsakiye", r"iftar saati", r"sahur saati",
+    r"alt[ıi]n fiyatlar[ıi].*(bug[üu]n|g[üu]ncel|canl[ıi])", r"(gram|[çc]eyrek) alt[ıi]n ka[çc] (tl|lira)",
+    r"(dolar|euro) ka[çc] (tl|lira)", r"d[öo]viz kurlar[ıi] bug[üu]n",
+    r"n[öo]bet[çc]i eczane", r"son depremler listesi", r"deprem mi oldu",
+]
+_COMMODITY_RE = __import__("re").compile("|".join(_COMMODITY_PATTERNS), __import__("re").I)
+
+def is_commodity_news(title: str) -> bool:
+    """Loto sonucu, maç yayın saati, burç, günlük altın listesi gibi her sitede aynı olan haberleri tespit eder."""
+    t = (title or "").replace("İ", "i").replace("I", "ı").lower()
+    # Hava durumu: rutin tahminler atlanır, resmi uyarılar (turuncu/kırmızı kod, fırtına, sel) haberdir
+    if "hava durumu" in t and not __import__("re").search(r"uyar|turuncu|k[ıi]rm[ıi]z[ıi]|f[ıi]rt[ıi]na|sel|kar ya[ğg][ıi][şs][ıi]|[çc]ığ", t):
+        return True
+    return bool(_COMMODITY_RE.search(t))
+
 def get_minutes_since_last_article() -> float:
     """
     Veritabanındaki en son yayınlanan OTONOM BOT haberinin üzerinden kaç dakika geçtiğini hesaplar.
@@ -205,6 +230,13 @@ def _run_bot_internal(max_items: int = 1, force: bool = False):
         return 0
 
     fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
+
+    # Her sitede birebir aynı olan, özgün değer katılamayan "sıradan" haberleri atla
+    # (yayın aralığı değişmez: bot sıradaki gerçek habere geçer)
+    _before = len(fresh_news)
+    fresh_news = [item for item in fresh_news if not is_commodity_news(item.get("title", ""))]
+    if _before != len(fresh_news):
+        print(f"🧹 [İçerik Filtresi] {_before - len(fresh_news)} sıradan haber (loto sonucu, maç yayın saati, burç vb.) atlandı.")
     if not fresh_news:
         print("ℹ️  Tüm haberler daha önce paylaşılmış. Yeni taze haber bekleniyor.")
         return 0

@@ -1370,6 +1370,15 @@
         }
         window.populateNobetciCities = populateNobetciCities;
 
+        function nobetciOfficialMessage(cityName) {
+            return '<div class="p-5 text-center text-xs text-slate-600 space-y-2">' +
+                '<p class="font-extrabold text-slate-900 text-sm">' + (cityName || 'Bu il') + ' için güncel nöbet listesine şu an ulaşılamıyor.</p>' +
+                '<p>Kapalı bir eczaneye gitmemeniz için tahmini liste göstermiyoruz. Bugünün resmi nöbetçi eczanelerini aşağıdan öğrenebilirsiniz:</p>' +
+                '<a href="https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama" target="_blank" rel="noopener" class="inline-block px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold">e-Devlet Nöbetçi Eczane Sorgulama →</a>' +
+                '<p class="text-[11px] text-slate-500">veya ilinizin Eczacı Odası internet sitesi</p>' +
+                '</div>';
+        }
+
         function loadNobetciCity(cityName) {
             var listEl = document.getElementById('nobetci-list');
             var titleEl = document.getElementById('nobetci-city-title');
@@ -1402,10 +1411,10 @@
                         if (badgeEl) badgeEl.innerText = '🟢 Canlı (' + CURRENT_NOBETCI_DATA.length + ' Eczane)';
                         renderNobetciList(CURRENT_NOBETCI_DATA);
                     } else {
-                        if (badgeEl) badgeEl.innerText = 'Nöbetçi Bilgisi';
+                        if (badgeEl) badgeEl.innerText = 'Resmi Kaynağa Bakın';
                         CURRENT_NOBETCI_DATA = [];
                         if (listEl) {
-                            listEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">' + cityName + ' için nöbetçi eczane kaydı bulunamadı. Lütfen birazdan tekrar deneyiniz.</div>';
+                            listEl.innerHTML = nobetciOfficialMessage(cityName);
                         }
                     }
                 })
@@ -1413,7 +1422,7 @@
                     console.error('Nobetci fetch err:', err);
                     if (badgeEl) badgeEl.innerText = 'Bağlantı Hatası';
                     if (listEl) {
-                        listEl.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">Eczane verisi yüklenirken hata oluştu. Lütfen sayfayı yenileyiniz.</div>';
+                        listEl.innerHTML = nobetciOfficialMessage(cityName);
                     }
                 });
         }
@@ -1423,7 +1432,9 @@
             var listEl = document.getElementById('nobetci-list');
             if (!listEl) return;
             if (!items || items.length === 0) {
-                listEl.innerHTML = '<div class="p-4 text-center text-slate-400 text-xs">Bu şehir için nöbetçi eczane listelenemedi. Lütfen tekrar deneyin.</div>';
+                listEl.innerHTML = (CURRENT_NOBETCI_DATA && CURRENT_NOBETCI_DATA.length > 0)
+                    ? '<div class="p-4 text-center text-slate-500 text-xs">Aramanıza uyan nöbetçi eczane yok.</div>'
+                    : nobetciOfficialMessage('');
                 return;
             }
             listEl.innerHTML = items.map(function(p) {
@@ -1454,7 +1465,7 @@
 
         function filterNobetci(query) {
             var q = (query || '').toLowerCase().trim();
-            var source = (CURRENT_NOBETCI_DATA && CURRENT_NOBETCI_DATA.length > 0) ? CURRENT_NOBETCI_DATA : SAMPLE_PHARMACIES;
+            var source = CURRENT_NOBETCI_DATA || [];  // Örnek/sahte eczane listesi ASLA gösterilmez
             if (!q) {
                 renderNobetciList(source);
                 return;

@@ -411,7 +411,9 @@ Sadece aşağıdaki HTML etiketlerini kullan ve HER ARA BAŞLIĞIN ALTINA EN AZ 
 <p class="text-slate-300 leading-relaxed mb-4">Kısa ve orta vadede günlük hayata, piyasaya veya kurumlara yansımalarını somut çerçevede değerlendiren ikinci paragraf (4-5 cümle).</p>
 <h3 class="text-xl font-bold text-white mt-6 mb-3">Bundan Sonra Ne Bekleniyor?</h3>
 <p class="text-slate-300 leading-relaxed mb-4">Takvimde öne çıkan kritik tarihleri, resmi süreçleri ve beklenen somut adımları anlatan kapanış paragrafı (4-5 cümle).</p>
-Ara başlıkları haberin konusuna göre özelleştir. Başka etiket, markdown veya kod bloğu kullanma.
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">Editoryal not (3-4 cümle): Bu gelişmenin okurun günlük hayatına, bütçesine, işine, sağlığına veya güvenliğine somut etkisi nedir; okur neye dikkat etmeli veya ne yapabilir? Kaynakta olmayan rakam veya iddia UYDURMA; etkisi henüz belirsizse bunu açıkça söyle. Genel geçer cümle kurma, bu habere özgü yaz.</p>
+Ara başlıkları haberin konusuna göre özelleştir; ancak son bölümün başlığı olan "Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?" ifadesini AYNEN koru. Başka etiket, markdown veya kod bloğu kullanma.
 """
 
     try:
