@@ -606,7 +606,7 @@
                     <span id="reaction-total-badge" class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200 self-start sm:self-auto">Canlı Okuyucu Nabzı</span>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <button type="button" onclick="voteArticleReaction('olumlu')" data-react="olumlu" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition flex flex-col items-center gap-1 cursor-pointer group">
+                    <button type="button" onclick="voteArticleReaction('olumlu')" data-react="olumlu" class="react-btn p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-red-400 transition flex flex-col items-center gap-1 cursor-pointer group">
                         <span class="text-2xl group-hover:scale-110 transition-transform">👍</span>
                         <span class="text-xs font-extrabold text-slate-800">Olumlu</span>
                         <span class="react-pct text-[11px] font-mono font-bold text-slate-500">-%</span>
@@ -645,7 +645,7 @@
                         const counts = Object.assign({}, baseCounts);
                         if (chosen && counts[chosen] !== undefined) counts[chosen] += 1;
                         const total = counts.olumlu + counts.sasirtici + counts.dusundurucu + counts.olumsuz;
-                        document.getElementById('reaction-total-badge').innerText = total + ' Okuyucu Oyu';
+                        // Sadece yüzdelik dağılım (% oran) gösterilir, kişi sayısı gösterilmez
                         box.querySelectorAll('.react-btn').forEach(btn => {
                             const key = btn.getAttribute('data-react');
                             const pct = Math.round((counts[key] / total) * 100);
