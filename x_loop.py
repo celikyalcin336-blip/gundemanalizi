@@ -42,7 +42,8 @@ HISTORY_FILE = os.path.join(BASE_DIR, "x_posted_history.json")
 STATUS_FILE = os.path.join(BASE_DIR, "x_bot_status.json")
 TR_TZ = timezone(timedelta(hours=3))
 
-START = time.time()
+START = float(os.getenv("X_LOOP_START") or time.time())
+os.environ["X_LOOP_START"] = str(START)  # yeniden başlatmada süre sınırı korunur
 
 
 def tr(ts: float) -> str:
@@ -63,23 +64,24 @@ def git(*args) -> subprocess.CompletedProcess:
     return subprocess.run(["git", *args], cwd=BASE_DIR, capture_output=True, text=True)
 
 
-def push_state(message: str):
-    """Geçmiş ve durum dosyasını repoya kaydeder (çakışmaya karşı 4 deneme)."""
+def push_state(message: str) -> bool:
+    """Geçmiş ve durum dosyasını repoya kaydeder (çakışmaya karşı 4 deneme). Başarılıysa True."""
     if not PUSH_ENABLED:
-        return
+        return True
     git("add", "x_posted_history.json", "x_bot_status.json")
     if git("diff", "--staged", "--quiet").returncode == 0:
-        return
+        return git("status", "-sb").stdout.find("ahead") == -1
     git("commit", "-m", f"{message} [skip ci]")
     for attempt in range(1, 5):
         git("pull", "--rebase", "--autostash", "-X", "theirs", "origin", "main")
         r = git("push", "origin", "HEAD:main")
         if r.returncode == 0:
             print(f"💾 Geçmiş repoya kaydedildi ({message}).")
-            return
+            return True
         print(f"⚠️ Push denemesi {attempt} başarısız: {r.stderr.strip()[:200]}")
         time.sleep(5 * attempt)
-    print("❌ Geçmiş push edilemedi! (Bir sonraki turda tekrar denenecek)")
+    print("❌ Geçmiş push edilemedi!")
+    return False
 
 
 def write_status(result: str, log_tail: str, next_ts: float):
@@ -157,11 +159,28 @@ def main():
         if time.time() > deadline:
             break
 
+        # Kendini güncelle: repoda bot kodu değiştiyse yeni kodla yeniden başla
+        if PUSH_ENABLED:
+            before = git("rev-parse", "HEAD:x_loop.py", "HEAD:run_x_cycle.py", "HEAD:x_poster.py").stdout
+            git("pull", "--rebase", "--autostash", "origin", "main")
+            after = git("rev-parse", "HEAD:x_loop.py", "HEAD:run_x_cycle.py", "HEAD:x_poster.py").stdout
+            if before and after and before != after:
+                print("🔄 Bot kodu güncellendi; yeni kodla yeniden başlatılıyor...")
+                sys.stdout.flush()
+                os.execv(sys.executable, [sys.executable, "-u", os.path.abspath(__file__)])
+            # Başka bir kaynak bu arada paylaşım yaptıysa zamanlamayı yeniden hesapla
+            if last_posted_ts() > last:
+                continue
+
         ok, log = run_one_cycle()
         if ok:
             next_ts = last_posted_ts() + INTERVAL_MIN * 60
             write_status("posted", log, next_ts)
-            push_state("chore: x posted (45dk döngüsü)")
+            if not push_state("chore: x posted (45dk döngüsü)"):
+                # GÜVENLİK: Paylaşım geçmişi kaydedilemediyse ASLA yeni tweet atma
+                # (aksi halde bir sonraki çalıştırma aynı haberi tekrar paylaşabilir).
+                print("🛑 Geçmiş kaydedilemedi; mükerrer paylaşımı önlemek için döngü durduruldu.")
+                sys.exit(1)
             continue
 
         retry_ts = time.time() + RETRY_MIN * 60

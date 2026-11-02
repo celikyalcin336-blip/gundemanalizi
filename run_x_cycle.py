@@ -210,6 +210,19 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
     return False, ""
 
 
+def is_placeholder_image(path: str) -> bool:
+    """Sitenin fotoğraf bulamayınca ürettiği 'sadece yazılı kırmızı kart' görselini tespit eder.
+    (Üstte düz kırmızı bant + ortası tek renk). Bu haberler gerçek fotoğrafı olmadığı için X'te paylaşılmaz."""
+    try:
+        from PIL import Image, ImageStat
+        im = Image.open(path).convert("RGB").resize((128, 72))
+        top = ImageStat.Stat(im.crop((0, 0, 128, 3))).mean
+        mid = ImageStat.Stat(im.crop((20, 30, 108, 55))).stddev
+        return top[0] > 170 and top[1] < 80 and top[2] < 80 and max(mid) < 18
+    except Exception:
+        return False
+
+
 def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
     now_str = time.strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now_str}] 🚀 [X Auto-Poster] Kontrol başlatılıyor...")
@@ -279,6 +292,12 @@ def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
 
         if not local_img or not os.path.exists(local_img):
             print(f"⏩ [Görsel Zorunlu] Görseli olmayan haber atlandı: {title[:40]}")
+            continue
+
+        if is_placeholder_image(local_img):
+            history.append({"slug": slug, "title": title, "status": "skipped", "reason": "Gerçek fotoğraf yok (yazılı kart)", "ts": time.time()})
+            save_history(history)
+            print(f"⏩ [Görsel Zorunlu] Gerçek fotoğrafı olmayan (yazılı kart) haber atlandı: {title[:40]}")
             continue
 
         attempts += 1
