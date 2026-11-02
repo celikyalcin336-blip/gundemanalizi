@@ -1031,6 +1031,13 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
             return [_row_to_dict(row) for row in cur.fetchall()]
 
 
+def get_sitemap_articles(limit: int = 500) -> List[Dict]:
+    """Site haritaları için: kalite (kelime sayısı) kontrolü yapılabilsin diye içerikle birlikte döner."""
+    with get_connection() as conn:
+        cur = conn.execute("SELECT id, slug, title, content, created_at FROM articles ORDER BY id DESC LIMIT ?", (limit,))
+        return [_row_to_dict(row) for row in cur.fetchall()]
+
+
 def search_articles(query: str, limit: int = 24, offset: int = 0) -> List[Dict]:
     """Tüm makaleler içinde başlık, özet ve içerikte gerçek SQL araması yapar."""
     if not query or not query.strip():

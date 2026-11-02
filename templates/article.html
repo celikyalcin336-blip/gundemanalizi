@@ -6,7 +6,7 @@
     <title>{{ article.title }} | Gündem Analizi</title>
     <meta name="description" content="{{ article.summary }}">
     <link rel="canonical" href="{{ canonical_url or ('https://xn--gndemanalizi-dlb.com.tr/haber/' ~ article.slug) }}">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    {% if noindex %}<meta name="robots" content="noindex, follow">{% else %}<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">{% endif %}
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
@@ -685,11 +685,11 @@
                 </div>
                 <div class="space-y-1">
                     <div class="font-extrabold text-slate-900 text-xs flex items-center gap-2">
-                        Gündem Analizi Doğruluk ve Yayın İlkeleri
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Teyitli İçerik</span>
+                        Kaynak ve Yayın Bilgisi
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        Bu haber; teyitli ajans bültenleri (AA, İHA vb.), resmi kamu kurum açıklamaları ve açık kaynaklar taranarak Gündem Analizi Haber Masası editörlerince bağımsızlık ve tarafsızlık ilkeleri doğrultusunda hazırlanmıştır.
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> tarafından yayımlanan bilgiler temel alınarak Gündem Analizi tarafından derlenmiş ve yeniden yazılmıştır.{% else %}Bu içerik Gündem Analizi tarafından hazırlanmıştır.{% endif %}
+                        Hata bildirimi ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">iletişim sayfamızı</a> kullanabilirsiniz.
                     </p>
                 </div>
             </div>

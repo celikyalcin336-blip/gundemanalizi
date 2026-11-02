@@ -59,6 +59,10 @@ def process_single_news(item: dict) -> bool:
     telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
     item_category = item.get("category")
     article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
+    if not article_data:
+        # AdSense kalite kuralı: yapay zeka özgün metin üretemediyse kopya/şablon haber yayınlanmaz
+        print(f"⏩ [Kalite Kalkanı] '{title[:50]}' için özgün metin üretilemedi; yayınlanmadı.")
+        return False
     category = article_data.get("category", "Gündem")
     print(f"   [Kategori: {category} | Telegram Metni Hazır]")
 

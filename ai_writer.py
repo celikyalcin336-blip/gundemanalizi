@@ -352,200 +352,95 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     elif category == "Ekonomi":
         category_guide = "Bu bir EKONOMİ & FİNANS haberidir. Rakamları, piyasa oranlarını ve vatandaşın bütçesine/cüzdanına yansımalarını somut verilerle açıkla."
 
-    if config.GEMINI_API_KEY:
-        try:
-            from google import genai
-            client = genai.Client(api_key=config.GEMINI_API_KEY)
-            prompt = f"""
-Sen 'Gündem Analizi' bağımsız haber portalının baş editörüsün.
-Aşağıdaki haber için Anadolu Ajansı, Reuters ve BBC Türkçe standartlarında; kapsamlı, doyurucu, derinlemesine açıklayıcı ve akıcı bir Türkçe haber makalesi yaz.
+    if not config.GEMINI_API_KEY:
+        print("❌ [Makale] GEMINI_API_KEY tanımlı değil. Kopya/şablon metin yayınlanmaz; haber atlandı.")
+        return None
+
+    source_text = (summary or "").strip()
+    if len(source_text.split()) < 40:
+        print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
+        return None
+
+    prompt = f"""
+Sen 'Gündem Analizi' adlı Türkçe haber sitesinin kıdemli editörüsün. Aşağıdaki kaynak haberden yola çıkarak
+okura gerçekten değer katan, ÖZGÜN cümlelerle yazılmış, kapsamlı bir haber-analiz metni hazırla.
 
 Haber Başlığı: {title}
-Haber Detayı ve Gelişmeler: {summary}
-Kaynak: {source}
 Kategori: {category}
-Özel Kategori Odak Noktası: {category_guide}
+Kategori Odağı: {category_guide}
+Kaynak Kuruluş: {source}
+Kaynak Metin:
+\"\"\"{source_text[:6000]}\"\"\"
 
-EDİTORYAL KURALLAR VE YAZIM İLKELERİ:
-1. UZUNLUK VE AÇIKLAYICILIK: Haber yüzeysel veya tekdüze kalmamalıdır. Olayın 'Kim, Ne, Nerede, Ne Zaman, Nasıl ve Neden' (5N1K) unsurlarını, sürecin arka planını, tarafların açıklamalarını, somut rakamları ve geleceğe dönük yansımalarını detaylandır.
-2. CÜMLE YAPISI VE DİL BİLGİSİ (ÇOK ÖNEMLİ):
-   - Metni uzatacağım diye cümleleri yapay şekilde uzatma, devrik veya karmaşık hale getirme!
-   - Her cümlenin öznesi, yüklemi ve mantıksal akışı tam, duru ve anlaşılır Türkçe dil bilgisi kurallarına uygun olmalıdır.
-   - Uzunluk gereksiz laf kalabalığıyla değil; konunun teknik, hukuki, ekonomik ve insani ayrıntılarını adım adım açıklayarak sağlanmalıdır.
-   - Tekrarlardan ve içi boş klişelerden kesinlikle kaçın.
-3. KESİNLİKLE YAPILMAYACAKLAR:
-   - ASLA 'Siz ne düşünüyorsunuz?', 'Yorumlarda buluşalım' gibi yapay sorular sorma.
-   - ASLA hashtag (#haber, #sondakika vb.) kullanma.
-   - ASLA SPK / borsa yasal uyarı kalıplarını metne dahil etme.
+KESİN KURALLAR:
+1. ÖZGÜNLÜK: Kaynak metinden cümle KOPYALAMA. Tüm bilgiyi kendi cümlelerinle, farklı bir kurgu ve akışla yeniden anlat.
+2. DOĞRULUK: Kaynakta OLMAYAN rakam, isim, tarih, alıntı veya iddia UYDURMA. Arka plan ve bağlam bölümünde yalnızca
+   genel kabul görmüş, doğrulanabilir bilgiler ver; emin olmadığın hiçbir bilgiyi yazma.
+3. UZUNLUK: Metin en az 450, ideal olarak 500-700 kelime olmalı. Uzunluğu laf kalabalığıyla değil; bağlam, arka plan,
+   etkiler ve okurun bilmesi gerekenlerle sağla.
+4. DİL: Sade, akıcı, dil bilgisi kurallarına uygun Türkçe. Klişe, abartı, tık tuzağı, hashtag, emoji ve okura soru sorma YOK.
+5. Her habere uyan genel geçer dolgu cümleleri ("gelişmeler yakından takip ediliyor", "kamuoyunun gündeminde" vb.) YAZMA.
+6. Yatırım tavsiyesi verme; sağlık konularında teşhis/tedavi önerme, uzman görüşüne yönlendir.
 
-İSTENEN ÇIKTI FORMATI:
-Lütfen yanıtını AYNEN şu iki bölüm halinde ver:
-
+ÇIKTI BİÇİMİ (aynen bu iki bölüm):
 [ÖZET]
-Haberin en can alıcı ayrıntılarını, sayılar ve somut bilgilerle özetleyen, 2-3 akıcı ve doyurucu cümleden oluşan editoryal özet.
+Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 
 [İÇERİK]
-HTML formatında yazılmış, en az 4-5 doyurucu paragraftan ve ara başlıklardan oluşan tam makale:
-<p class="lead font-medium text-lg text-slate-200 mb-6">
-[Giriş: Olayın başlangıcını ve ana gelişmeyi tüm boyutlarıyla anlatan güçlü paragraf]
-</p>
-
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları ve Sürecin İşleyişi</h3>
-<p class="text-slate-300 leading-relaxed mb-4">
-[Detaylar, yetkililerin/kurumların açıklamaları ve olay anına ilişkin bilgiler]
-</p>
-<p class="text-slate-300 leading-relaxed mb-4">
-[Rakamlar, teknik detaylar, yasal/mali boyut veya olayın geçmişe uzanan arka planı]
-</p>
-
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Sektörel ve Toplumsal Yansımaları</h3>
-<p class="text-slate-300 leading-relaxed mb-4">
-[Gelişmenin vatandaşa, piyasalara veya sektöre etkileri, uzman değerlendirmeleri]
-</p>
-
-<div class="p-5 rounded-xl bg-red-950/40 border border-red-800/40 my-6">
-    <h4 class="font-bold text-red-400 flex items-center gap-2 mb-2">
-        <span>🔴</span> GÜNDEM ANALİZİ DEĞERLENDİRMESİ
-    </h4>
-    <p class="text-slate-300 text-sm leading-relaxed">
-        [Sürecin geleceğine ve olası sonuçlarına dair editoryal tarafsız değerlendirme]
-    </p>
-</div>
+Sadece aşağıdaki HTML etiketlerini kullan:
+<p class="lead font-medium text-lg text-slate-200 mb-6">Haberin ana gelişmesini anlatan güçlü giriş paragrafı</p>
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Neler Oldu?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">...</p>  (1-2 paragraf)
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Arka Plan</h3>
+<p class="text-slate-300 leading-relaxed mb-4">...</p>
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Neden Önemli?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">...</p>  (okur, Türkiye, sektör veya taraflar açısından)
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Bundan Sonra Ne Olacak?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">...</p>  (yalnızca kaynakta belirtilen veya makul şekilde beklenen adımlar)
+Ara başlıkları konuya göre daha açıklayıcı hale getirebilirsin. Başka etiket, markdown veya kod bloğu kullanma.
 """
-            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
-                try:
-                    res = client.models.generate_content(
-                        model=m_name,
-                        contents=prompt
-                    )
-                    if res and res.text:
-                        raw_text = res.text.strip()
-                        gen_summary = summary if summary else title
-                        gen_content = raw_text
-                        if "[İÇERİK]" in raw_text:
-                            parts = raw_text.split("[İÇERİK]")
-                            extracted_sum = parts[0].replace("[ÖZET]", "").strip()
-                            if len(extracted_sum) > 30:
-                                gen_summary = extracted_sum
-                            gen_content = parts[1].strip()
-                        elif "[ÖZET]" in raw_text:
-                            gen_content = raw_text.replace("[ÖZET]", "").strip()
-                        
-                        # Markdown ```html temizliği
-                        gen_content = re.sub(r'^```html\s*', '', gen_content, flags=re.I)
-                        gen_content = re.sub(r'^```\s*', '', gen_content)
-                        gen_content = re.sub(r'\s*```$', '', gen_content)
 
-                        return {
-                            "title": title,
-                            "summary": gen_summary,
-                            "content": gen_content.strip(),
-                            "category": category
-                        }
-                except Exception:
-                    continue
+    try:
+        from google import genai
+        client = genai.Client(api_key=config.GEMINI_API_KEY)
+    except Exception as e:
+        print(f"❌ [Makale] Gemini istemcisi başlatılamadı: {e}")
+        return None
+
+    import content_quality
+    for m_name in ["gemini-2.5-flash", "gemini-2.0-flash"]:
+        try:
+            res = client.models.generate_content(model=m_name, contents=prompt)
+            raw_text = (res.text or "").strip() if res else ""
+            if not raw_text or "[İÇERİK]" not in raw_text:
+                print(f"⚠️ [Makale] {m_name} beklenen biçimde yanıt vermedi.")
+                continue
+            sum_part, content_part = raw_text.split("[İÇERİK]", 1)
+            gen_summary = sum_part.replace("[ÖZET]", "").strip()
+            gen_content = content_part.strip()
+            gen_content = re.sub(r'^```(?:html)?\s*', '', gen_content, flags=re.I)
+            gen_content = re.sub(r'\s*```$', '', gen_content).strip()
+            gen_content = content_quality.fix_brand_splits(gen_content)
+
+            words = content_quality.visible_word_count(gen_content)
+            if words < 350:
+                print(f"⚠️ [Makale] {m_name} metni kısa kaldı ({words} kelime), tekrar deneniyor.")
+                continue
+            if len(gen_summary) < 40:
+                gen_summary = content_quality._norm(gen_content).split(". ")[0][:300]
+            print(f"✅ [Makale] {m_name} ile {words} kelimelik özgün haber yazıldı.")
+            return {
+                "title": title,
+                "summary": gen_summary,
+                "content": gen_content,
+                "category": category,
+            }
         except Exception as e:
-            print(f"Gemini makale üretimi hatası: {e}")
-
-    # Fallback (Şablon Makale - Asla Metni İki Kez Tekrarlamaz, Zengin ve Profesyonel Paragraflar Üretir)
-    import re
-    raw_clean = summary.strip()
-    # Metni cümlelere ayır (Türkçe kısaltmaları ve noktalama işaretlerini gözeterek)
-    sentences = smart_sentence_split(raw_clean)
-    
-    # Başlıkla aynı olan, çöp soru olan veya yazar/menü içeren cümleleri filtrele
-    filtered = []
-    for s in sentences:
-        s_clean = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', s, flags=re.I).strip()
-        if not s_clean:
+            print(f"⚠️ [Makale] {m_name} hatası: {str(e)[:200]}")
             continue
-        if s_clean.lower() == title.lower() or title.lower() in s_clean.lower():
-            continue
-        if any(b in s_clean.lower() for b in ["son haberler", "kategoriler nasıl yapılır", "donanım yazılım", "ai ile özetle"]):
-            continue
-        if s_clean.endswith('?') and len(s_clean) < 55:
-            continue
-        filtered.append(s_clean)
 
-    if filtered:
-        lead_para = filtered[0]
-        remaining = filtered[1:]
-    else:
-        lead_para = raw_clean if raw_clean else title
-        remaining = []
-
-    body_paras_list = []
-    if remaining:
-        # Kalan gerçek haber cümlelerini ilk paragraflara koy
-        chunk1 = " ".join(remaining[:2])
-        body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk1}</p>')
-        if len(remaining) > 2:
-            chunk2 = " ".join(remaining[2:5])
-            body_paras_list.append(f'<p class="text-slate-300 leading-relaxed mb-4">{chunk2}</p>')
-
-    # Her haberin doyurucu, zengin ve en az 3-4 paragraflık gerçek bir haber makalesi olması için
-    # eğer gövdede az cümle varsa kategoriye özel derinlikli editoryal arka plan ekle (Asla 1 cümleyle bırakma!)
-    if len(body_paras_list) < 2:
-        cat_lower = category.lower()
-        if "eko" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde geniş yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler, fiyatlama dinamikleri ve yatırım trendleri üzerindeki etkilerin önümüzdeki süreçte belirginleşeceğini vurguluyor. Yüksek meblağlı işlemler ve piyasa hareketlilikleri, sektör temsilcileri tarafından yakından izleniyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Önümüzdeki günlerde sürecin resmiyet kazanması ve ilgili finansal adımların tamamlanmasıyla birlikte, sektörel göstergeler ve emsal değerler açısından piyasaların nasıl bir yön çizeceği ekonomi servisimiz tarafından takip edilmektedir.</p>')
-        elif "spor" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Spor kamuoyunda ve taraftarlar arasında büyük heyecan uyandıran gelişmeyle ilgili olarak kulüp yönetiminin resmi adımları bekleniyor. Teknik heyetin sezon planlaması ve kadro mühendisliği doğrultusunda atılacak bu adımın, takım içi dengelere ve önümüzdeki kritik maç takvimine doğrudan etki etmesi öngörülüyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Müsabaka takvimi ve resmi sözleşme süreçlerinde imzaların atılmasının ardından, tarafların önümüzdeki günlerde kapsamlı bir bilgilendirmeyle ayrıntıları paylaşması beklenirken, spor servisimiz gelişmeleri anbean aktaracaktır.</p>')
-        elif "tekno" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji dünyasında ve dijital ekosistemde dengeleri değiştirebilecek bu yenilik, geliştiriciler ve son kullanıcılar açısından önemli avantajlar barındırıyor. Yüksek işlem kapasitesi ve yeni nesil algoritmalarla donatılan sistemin, sektördeki küresel rekabeti farklı bir boyuta taşıyacağı vurgulanıyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji otoriteleri, yeni modelin yaygınlaşmasıyla birlikte dijital dönüşüm süreçlerinde hız ve verimlilik artışı yaşanacağına dikkat çekerken, küresel pazardaki entegrasyon takvimi merakla takip ediliyor.</p>')
-        elif "sağlık" in cat_lower or "saglik" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlık otoriteleri ve tıp uzmanları, doğru bilgilendirmenin ve erken farkındalığın hayati önem taşıdığına dikkat çekiyor. Benzer semptomlar veya sağlık göstergeleri karşısında vatandaşların vakit kaybetmeden uzman hekim kontrolünden geçmesinin önemine vurgu yapılıyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlıklı yaşam standartları ve koruyucu hekimlik kapsamında alınacak bireysel tedbirlerin, yaşam kalitesini doğrudan artıracağı belirtilirken, konuya ilişkin klinik değerlendirmeler yakından izleniyor.</p>')
-        elif "oto" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Otomotiv sektöründe dikkat çeken model ve fiyat dinamikleri, tüketici tercihlerini ve pazar dengelerini doğrudan şekillendiriyor. Segmentindeki güçlü rakipleri karşısında öne çıkan donanım ve mühendislik detayları, kullanıcı deneyimi açısından önemli yenilikler sunuyor.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Türkiye pazarındaki bulunabilirlik, satış koşulları ve bayi kampanyalarına dair resmi duyurular yakından takip edilirken, otomotiv masamız süreci okuyucularımıza aktarmaya devam edecektir.</p>')
-        elif "eğitim" in cat_lower or "egitim" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Öğrencileri, öğretmenleri ve velileri yakından ilgilendiren bu gelişmeyle ilgili Milli Eğitim Bakanlığı (MEB) ve ilgili resmi kurumların açıklamaları takip ediliyor. Takvimler, başvuru şartları ve sınav süreçlerine dair resmi duyurular anlık olarak eğitim servisimiz tarafından aktarılacaktır.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Eğitim camiasındaki güncel beklentiler ve başvuru takvimine dair resmi kılavuzlar yayınlandıkça detaylar anbean paylaşılacaktır.</p>')
-        elif "dünya" in cat_lower or "dunya" in cat_lower:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgesel ve uluslararası dengeleri yakından ilgilendiren olay sonrasında ilgili ülkelerin diplomatik temasları hız kazandı. Uluslararası gözlemciler ve diplomasi çevreleri sürecin seyrine ilişkin değerlendirmelerini sürdürürken, gelişmeler anlık olarak takip edilmektedir.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Bölgedeki aktörlerin atacağı yeni adımlar ve resmi zirvelerden çıkacak kararlar dünya masamız tarafından dikkatle izlenmektedir.</p>')
-        else:
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor. Sürecin yasal boyutu ve detayları anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
-            body_paras_list.append('<p class="text-slate-300 leading-relaxed mb-4">Konuya ilişkin kurumlar arası koordinasyon ve sahadaki yansımalar yakından izlenirken, yeni gelişmeler netleştikçe haberimiz güncellenecektir.</p>')
-
-    body_paras = "\n".join(body_paras_list)
-
-    eval_text = "Gelişmenin piyasalar ve kamuoyu üzerindeki yansımaları masamız tarafından yakından takip edilmektedir. Sürece dair resmi makamlardan gelecek yeni veriler anlık olarak aktarılacaktır."
-    if category == "Ekonomi":
-        eval_text = "Piyasalardaki fiyatlamalar, tüketici hakları ve makroekonomik dengeler açısından sürecin seyri ekonomi servisimiz tarafından yakından izlenmektedir."
-    elif category == "Eğitim":
-        eval_text = "Öğrenci, veli ve eğitim camiasını ilgilendiren resmi kılavuzlar ve takvim duyuruları eğitim masamız tarafından anlık olarak izlenmektedir."
-    elif category == "Spor":
-        eval_text = "Müsabaka takvimi ve spor kamuoyunun nabzı doğrultusunda kulüplerden gelecek resmi açıklamalar anlık olarak sayfalarımızda yer alacaktır."
-
-    content_html = f"""
-    <p class="lead font-medium text-lg text-slate-200 mb-6">
-        {lead_para}
-    </p>
-    
-    <h3 class="text-xl font-bold text-white mt-6 mb-3">Gelişmenin Ayrıntıları</h3>
-    {body_paras}
-
-    <div class="p-5 rounded-xl bg-red-950/40 border border-red-800/40 my-6">
-        <h4 class="font-bold text-red-400 flex items-center gap-2 mb-2">
-            <span>🔴</span> GÜNDEM ANALİZİ DEĞERLENDİRMESİ
-        </h4>
-        <p class="text-slate-300 text-sm leading-relaxed">
-            {eval_text}
-        </p>
-    </div>
-    """
-
-    return {
-        "title": title,
-        "summary": lead_para,
-        "content": content_html,
-        "category": category
-    }
+    print("❌ [Makale] Yapay zeka kaliteli metin üretemedi. Kopya/şablon metin yayınlanmaz; haber atlandı.")
+    return None
 
 if __name__ == "__main__":
     sample = generate_social_caption(

@@ -95,9 +95,16 @@ def sanitize_news_text(text: str) -> str:
     t = re.sub(r'^[A-ZÇĞİÖŞÜa-zçğıöşü\s]{3,35}\s+\d{1,2}\s+(?:Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık)\s+\d{4}\s*', '', t, flags=re.I)
 
     # 1. Yapışık kelimeleri ve noktalama bitişikliklerini ayır
+    #    (YouTube, iOS, iPhone, ChatGPT gibi marka adları korunur; aksi halde "You Tube" gibi bozuluyordu)
+    import content_quality
+    t, _brand_map = content_quality.protect_brands(t)
     t = re.sub(r'([a-zçğıöşü\)])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'([\.!?])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
+    t = content_quality.restore_brands(t, _brand_map)
+    # Tweet gömme kalıntıları (https://t.co/..., pic.twitter.com/...) haber metnine girmesin
+    t = re.sub(r'https?://t\.co/\S+', '', t)
+    t = re.sub(r'pic\.twitter\.com/\S+', '', t)
 
     # 2. Site buton, menü, SEO, borsa bandı ve telif çöplerini kaldır
     junk_patterns = [

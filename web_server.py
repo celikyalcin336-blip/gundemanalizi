@@ -1254,6 +1254,8 @@ def _process_viral_video_job(
         base_summary = summary or title
         ai_cap = ai_writer.generate_social_caption(title, base_summary, source or "Gündem Analizi Özel")
         article_data = ai_writer.generate_full_article(title, base_summary, source or "Gündem Analizi Özel")
+        if not article_data:
+            raise Exception("Yapay zeka özgün haber metni üretemedi (GEMINI_API_KEY / kaynak metin kontrol edin). Kopya metin yayınlanmadı.")
 
         # Sosyal medya metnine kaynak ekle (Hukuki güvence) - Tek seferlik ekleme garantisi
         clean_src = source.strip() if source else ""
@@ -1735,6 +1737,10 @@ async def article_detail(request: Request, slug: str):
     ad_settings = get_site_ad_settings()
     ad_mid = ad_settings.get("ad_slot_article_mid", "").strip() if ad_settings.get("ads_enabled") else ""
     raw_content = article.get("content", "")
+    # AdSense kalite: eski şablon/dolgu kalıntılarını gösterimde temizle, kısa haberleri Google dizininden çıkar
+    import content_quality
+    raw_content = content_quality.clean_article_html(raw_content)
+    is_thin_article = content_quality.visible_word_count(raw_content) < 300
 
     if ad_mid and "</p>" in raw_content:
         parts = raw_content.split("</p>")
@@ -1765,7 +1771,8 @@ async def article_detail(request: Request, slug: str):
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
             "weather_data": get_live_weather(),
-            "canonical_url": canonical_url
+            "canonical_url": canonical_url,
+            "noindex": is_thin_article
         }
     )
     if cache_key and resp.body:
@@ -1872,7 +1879,8 @@ async def sitemap_xsl():
 
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
-    articles = database.get_articles(limit=500)
+    import content_quality
+    articles = [a for a in database.get_sitemap_articles(limit=500) if not content_quality.is_thin(a.get("content") or "")]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
@@ -1899,7 +1907,8 @@ async def sitemap(request: Request):
 async def news_sitemap(request: Request):
     """Google Haberler (Google News & Top Stories) özel XML site haritası."""
     from xml.sax.saxutils import escape
-    articles = database.get_articles(limit=100)
+    import content_quality
+    articles = [a for a in database.get_sitemap_articles(limit=100) if not content_quality.is_thin(a.get("content") or "")]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
