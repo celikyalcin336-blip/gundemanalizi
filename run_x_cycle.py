@@ -10,6 +10,7 @@ import time
 import urllib.request
 import feedparser
 import requests
+import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
