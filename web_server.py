@@ -158,7 +158,7 @@ async def lifespan(app: FastAPI):
 
 import secrets as _secrets
 
-ADMIN_PIN = os.getenv("ADMIN_PIN", "1453").strip()
+ADMIN_PIN = os.getenv("ADMIN_PIN", "").strip()
 PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
 _PIN_FAILURES = {}
 
