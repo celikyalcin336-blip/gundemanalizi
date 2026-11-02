@@ -44,7 +44,7 @@
             <img src="/assets/logo.png" alt="Logo" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-red-600 shadow-lg">
             <h2 class="text-xl font-extrabold text-white mb-1">Yönetici Girişi</h2>
             <p class="text-xs text-slate-400 mb-6">Gündem Analizi Özel Yönetim & İstatistik Paneli</p>
-            <input id="pin-input" type="password" inputmode="numeric" placeholder="Yönetici Şifresi (PIN)" 
+            <input id="pin-input" type="password" placeholder="Yönetici Şifresi (PIN)" 
                 class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-brand-border text-center text-lg font-bold tracking-widest text-white focus:outline-none focus:border-red-500 mb-3"
                 onkeydown="if(event.key==='Enter') unlockPanel()">
             <p id="pin-error" class="hidden text-xs text-red-400 font-semibold mb-3">Hatalı şifre! Lütfen tekrar deneyin.</p>
@@ -1165,7 +1165,7 @@
             try {
                 const res = await fetch('/api/panel/verify-pin', {
                     method: 'POST',
-                    headers: { 'X-Admin-Pin': val }
+                    headers: { 'X-Admin-Pin': val, 'X-Manual-Login': '1' }
                 });
                 if (res.ok) {
                     isPinVerified = true;

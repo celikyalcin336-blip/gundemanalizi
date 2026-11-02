@@ -165,16 +165,19 @@ _PIN_FAILURES = {}
 def require_admin_pin(request: Request):
     client_ip = (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
     now_ts = time.time()
-    fails = [t for t in _PIN_FAILURES.get(client_ip, []) if now_ts - t < 900]
-    if len(fails) >= 5:
-        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! IP adresiniz 15 dakika süreyle kilitlendi.")
     pin = (request.headers.get("X-Admin-Pin") or request.query_params.get("pin") or "").strip()
-    if not ADMIN_PIN or not pin or not _secrets.compare_digest(pin, ADMIN_PIN):
+    # Doğru şifre girildiğinde her zaman kilidi aç ve içeri al
+    if ADMIN_PIN and pin and _secrets.compare_digest(pin, ADMIN_PIN):
+        _PIN_FAILURES.pop(client_ip, None)
+        return
+    fails = [t for t in _PIN_FAILURES.get(client_ip, []) if now_ts - t < 300]
+    if len(fails) >= 10:
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Lütfen 5 dakika bekleyip tekrar deneyin.")
+    # Yalnızca manuel giriş denemelerini say (arka plan sekmesi veya eski önbellek '1453' sorguları kilitlemesin)
+    if request.headers.get("X-Manual-Login") == "1" and pin != "1453":
         fails.append(now_ts)
         _PIN_FAILURES[client_ip] = fails
-        raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
-    if client_ip in _PIN_FAILURES:
-        _PIN_FAILURES.pop(client_ip, None)
+    raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
 
 app = FastAPI(
     title="Gündem Analizi Web Portalı",
