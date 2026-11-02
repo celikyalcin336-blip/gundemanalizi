@@ -633,7 +633,8 @@
                     const box = document.getElementById('reader-reaction-box');
                     if (!box) return;
                     const aid = parseInt(box.getAttribute('data-article-id') || '100', 10) || 100;
-                    const storageKey = 'ga_react_' + aid;
+                    const storageKey = 'ga_react_v2_' + aid;
+                    localStorage.removeItem('ga_react_' + aid);
                     const baseCounts = {
                         olumlu: 14 + (aid * 7) % 19,
                         sasirtici: 6 + (aid * 5) % 11,
@@ -645,20 +646,40 @@
                         const counts = Object.assign({}, baseCounts);
                         if (chosen && counts[chosen] !== undefined) counts[chosen] += 1;
                         const total = counts.olumlu + counts.sasirtici + counts.dusundurucu + counts.olumsuz;
-                        // Sadece yüzdelik dağılım (% oran) gösterilir, kişi sayısı gösterilmez
+                        const pcts = {
+                            olumlu: Math.round((counts.olumlu / total) * 100),
+                            sasirtici: Math.round((counts.sasirtici / total) * 100),
+                            dusundurucu: Math.round((counts.dusundurucu / total) * 100),
+                            olumsuz: Math.round((counts.olumsuz / total) * 100)
+                        };
+                        const diff = 100 - (pcts.olumlu + pcts.sasirtici + pcts.dusundurucu + pcts.olumsuz);
+                        if (diff !== 0) pcts.olumlu += diff;
+
                         box.querySelectorAll('.react-btn').forEach(btn => {
                             const key = btn.getAttribute('data-react');
-                            const pct = Math.round((counts[key] / total) * 100);
-                            btn.querySelector('.react-pct').innerText = '%' + pct;
-                            if (chosen === key) {
-                                btn.className = 'react-btn p-3 rounded-xl bg-red-50 border-2 border-red-600 transition flex flex-col items-center gap-1 cursor-pointer shadow-xs';
+                            const pctEl = btn.querySelector('.react-pct');
+                            pctEl.innerText = '%' + pcts[key];
+                            if (chosen) {
+                                btn.disabled = true;
+                                if (chosen === key) {
+                                    btn.className = 'react-btn p-3 rounded-xl bg-red-50 border-2 border-red-600 transition flex flex-col items-center gap-1 cursor-default shadow-xs';
+                                    pctEl.className = 'react-pct text-[11px] font-mono font-extrabold text-red-600';
+                                } else {
+                                    btn.className = 'react-btn p-3 rounded-xl bg-slate-50 border border-slate-200 transition flex flex-col items-center gap-1 cursor-default opacity-60';
+                                    pctEl.className = 'react-pct text-[11px] font-mono font-bold text-slate-500';
+                                }
                             }
                         });
                         if (chosen) {
-                            document.getElementById('reaction-subtitle').innerText = '✓ Oyunuz kaydedildi! Katılımınız için teşekkürler.';
+                            const sub = document.getElementById('reaction-subtitle');
+                            if (sub) {
+                                sub.innerText = '✓ Oyunuz kaydedildi! Her okuyucu yalnızca 1 kez oy kullanabilir.';
+                                sub.className = 'text-[11px] text-emerald-700 font-bold';
+                            }
                         }
                     }
                     window.voteArticleReaction = function(choice) {
+                        if (localStorage.getItem(storageKey)) return;
                         localStorage.setItem(storageKey, choice);
                         renderReactions();
                     };
