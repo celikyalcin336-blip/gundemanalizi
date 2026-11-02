@@ -145,6 +145,9 @@ def sleep_until(target_ts: float):
 def main():
     deadline = START + MAX_RUNTIME_MIN * 60
     print(f"🚀 [X 45dk Döngüsü] Başladı: {tr(START)} | Aralık: {INTERVAL_MIN} dk | Bitiş: {tr(deadline)}")
+    if not os.getenv("TWITTER_AUTH_TOKEN") or not os.getenv("TWITTER_CT0"):
+        print("🔑 Eski konteynerde TWITTER_AUTH_TOKEN/CT0 yok; yeni GitHub Secrets ile iş başlatılıyor...")
+        return
 
     while True:
         last = last_posted_ts()
