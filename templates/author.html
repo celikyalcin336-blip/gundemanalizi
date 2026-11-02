@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
@@ -27,91 +27,74 @@
     }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            red: '#dc2626',
-                            dark: '#0a0d14',
-                            card: '#121722',
-                            border: '#1f293d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
-    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <a href="/" class="flex items-center gap-3.5 group">
-                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-sm">
                 <div>
-                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
-                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
                     </span>
-                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                    <p class="text-[10px] font-semibold text-slate-500 tracking-wider uppercase">
                         Doğru Haber • Tarafsız Analiz
                     </p>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
-                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">← Ana Sayfa</a>
-                <a href="/kunye" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">Künye</a>
+            <div class="flex items-center gap-2.5">
+                <a href="/" class="text-xs font-bold text-slate-700 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50">← Ana Sayfa</a>
+                <a href="/kunye" class="text-xs font-bold text-slate-700 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50">Künye</a>
             </div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full space-y-8">
-        <div class="rounded-2xl border border-brand-border bg-brand-card p-6 sm:p-10 shadow-2xl">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-brand-border">
-                <div class="w-20 h-20 rounded-full bg-red-600/20 border-2 border-red-600 flex items-center justify-center text-2xl font-black text-red-400 shrink-0">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-md">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-slate-200">
+                <div class="w-20 h-20 rounded-full bg-red-50 border-2 border-red-600 flex items-center justify-center text-2xl font-black text-red-600 shrink-0">
                     YÇ
                 </div>
                 <div>
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-600/20 border border-red-600/40 text-red-400 text-xs font-bold mb-1">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-xs font-bold mb-1">
                         İmtiyaz Sahibi & Genel Yayın Yönetmeni
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Yalçın Çelik</h1>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-1">Gündem Analizi Sorumlu Yazı İşleri Müdürü ve Baş Editörü</p>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Yalçın Çelik</h1>
+                    <p class="text-slate-600 text-xs sm:text-sm font-medium mt-1">Gündem Analizi Sorumlu Yazı İşleri Müdürü ve Baş Editörü</p>
                 </div>
             </div>
 
-            <div class="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed pt-6">
+            <div class="space-y-4 text-slate-700 text-sm sm:text-base leading-relaxed pt-6">
                 <p>
                     <strong>Yalçın Çelik</strong>, bağımsız dijital haber ve analiz platformu <strong>Gündem Analizi</strong>'nin kurucusu, imtiyaz sahibi ve genel yayın yönetmenidir. Türkiye ve dünya gündemindeki gelişmelerin doğrulanabilir verilerle, tık tuzağından uzak ve bağlamıyla birlikte okura aktarılması sürecini yönetmektedir.
                 </p>
                 <p>
-                    Gündem, Ekonomi, Dünya, Teknoloji, Otomobil, Sağlık, Eğitim ve Spor kategorilerinde yayımlanan haber-analiz içeriklerinin <a href="/yayin-ilkeleri" class="text-red-400 underline font-semibold">Yayın İlkeleri</a>'ne uygunluğunu, kaynak şeffaflığını ve düzeltme süreçlerini doğrudan denetler.
+                    Gündem, Ekonomi, Dünya, Teknoloji, Otomobil, Sağlık, Eğitim ve Spor kategorilerinde yayımlanan haber-analiz içeriklerinin <a href="/yayin-ilkeleri" class="text-red-600 underline font-semibold">Yayın İlkeleri</a>'ne uygunluğunu, kaynak şeffaflığını ve düzeltme süreçlerini doğrudan denetler.
                 </p>
-                <div class="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-400">
-                    <span>📧 İletişim: <a href="mailto:iletisim@gundemanalizi.com.tr" class="text-red-400 hover:underline"><!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></a></span>
+                <div class="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-600 font-medium">
+                    <span>📧 İletişim: <a href="mailto:iletisim@gundemanalizi.com.tr" class="text-red-600 font-bold hover:underline"><!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></a></span>
                     <span>•</span>
-                    <a href="/kunye" class="text-red-400 hover:underline font-semibold">Resmi Künye Bilgileri →</a>
+                    <a href="/kunye" class="text-red-600 hover:underline font-bold">Resmi Künye Bilgileri →</a>
                     <span>•</span>
-                    <a href="/iletisim" class="text-red-400 hover:underline font-semibold">Doğrudan Mesaj Gönder →</a>
+                    <a href="/iletisim" class="text-red-600 hover:underline font-bold">Doğrudan Mesaj Gönder →</a>
                 </div>
             </div>
         </div>
 
-        <div class="rounded-2xl border border-brand-border bg-brand-card p-6 sm:p-8 shadow-xl">
-            <h2 class="text-lg sm:text-xl font-extrabold text-white mb-4">Son Yayımlanan Haber ve Analizler</h2>
-            <div class="divide-y divide-brand-border">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-md">
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Yalçın Çelik Editoryal Denetiminde Yayımlanan Son Haberler</h2>
+            <div class="divide-y divide-slate-200">
                 {% for a in articles %}
                 <a href="/haber/{{ a.slug }}" class="py-3.5 flex items-center justify-between gap-4 group block">
                     <div>
-                        <span class="text-[11px] font-bold text-red-400 uppercase">{{ a.category }}</span>
-                        <h3 class="text-sm sm:text-base font-bold text-slate-200 group-hover:text-red-400 transition">{{ a.title }}</h3>
+                        <span class="text-[11px] font-extrabold text-red-600 uppercase">{{ a.category }}</span>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-800 group-hover:text-red-600 transition">{{ a.title }}</h3>
                     </div>
                     <span class="text-xs text-slate-500 shrink-0">{{ (a.created_at or '')[:16] }}</span>
                 </a>
@@ -120,8 +103,8 @@
         </div>
     </main>
 
-    <footer class="border-t border-brand-border bg-brand-dark py-6 text-center text-xs text-slate-500">
-        <p>GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
+    <footer class="border-t border-slate-200 bg-slate-900 py-6 text-center text-xs text-slate-400">
+        <p class="text-slate-300 font-semibold">GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
     </footer>
     <script>lucide.createIcons();</script>
 </body>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
@@ -10,88 +10,72 @@
     <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/kullanim-sartlari">
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            red: '#dc2626',
-                            dark: '#0a0d14',
-                            card: '#121722',
-                            border: '#1f293d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
-    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <a href="/" class="flex items-center gap-3.5 group">
-                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-sm">
                 <div>
-                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
-                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
                     </span>
-                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                    <p class="text-[10px] font-semibold text-slate-500 tracking-wider uppercase">
                         Doğru Haber • Tarafsız Analiz
                     </p>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
-                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+            <div class="flex items-center gap-2.5">
+                <a href="/" class="text-xs font-bold text-slate-700 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 transition">
                     ← Ana Sayfa
                 </a>
-                <a href="/iletisim" class="hidden sm:inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs px-3 py-2 rounded-xl border border-brand-border transition">
+                <a href="/iletisim" class="hidden sm:inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-3 py-2 rounded-xl border border-slate-300 transition">
                     İletişim
                 </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
                 </a>
             </div>
         </div>
     </header>
 
-    <nav class="bg-slate-900/70 border-b border-brand-border">
-        <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-300">
-            <a href="/hakkimizda" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Hakkımızda</a>
-            <a href="/kunye" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Künye</a>
-            <a href="/yayin-ilkeleri" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Yayın İlkeleri</a>
-            <a href="/iletisim" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">İletişim & Düzeltme</a>
-            <a href="/gizlilik-politikasi" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Gizlilik Politikası</a>
-            <a href="/cerez-politikasi" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Çerez Politikası</a>
-            <a href="/kullanim-sartlari" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Kullanım Şartları</a>
+    <nav class="bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700">
+            <a href="/hakkimizda" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Hakkımızda</a>
+            <a href="/kunye" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Künye</a>
+            <a href="/yazar/yalcin-celik" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Yayın Yönetmeni</a>
+            <a href="/yayin-ilkeleri" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Yayın İlkeleri</a>
+            <a href="/iletisim" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">İletişim & Düzeltme</a>
+            <a href="/gizlilik-politikasi" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Gizlilik Politikası</a>
+            <a href="/cerez-politikasi" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Çerez Politikası</a>
+            <a href="/kullanim-sartlari" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Kullanım Şartları</a>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full">
-        <div class="rounded-2xl border border-brand-border bg-brand-card p-6 sm:p-10 shadow-2xl">
-            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-brand-border">
-                <img src="/assets/logo.png" alt="Gündem Analizi Logo" class="w-14 h-14 rounded-full border-2 border-red-600">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-md">
+            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-200">
+                <img src="/assets/logo.png" alt="Gündem Analizi Logo" class="w-14 h-14 rounded-full border-2 border-red-600 shadow-xs">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Kullanım Şartları</h1>
-                    <p class="text-red-400 text-xs sm:text-sm font-semibold uppercase tracking-wide mt-1">Yasal Sorumluluk Sınırları ve Telif İlkeleri</p>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Kullanım Şartları</h1>
+                    <p class="text-red-600 text-xs sm:text-sm font-bold uppercase tracking-wide mt-1">Yasal Sorumluluk Sınırları ve Telif İlkeleri</p>
                 </div>
             </div>
 
-            <div class="space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
+            <div class="space-y-6 text-slate-700 text-sm sm:text-base leading-relaxed">
 
-                <p class="text-xs text-slate-400">Son Güncelleme: 2 Kasım 2026 • Site Kullanım Koşulları, Telif Hakları ve Sorumluluk Sınırları</p>
+                <p class="text-xs text-slate-500 font-semibold">Son Güncelleme: 2 Kasım 2026 • Site Kullanım Koşulları, FSEK Madde 36 Basın Serbestisi ve Sorumluluk Sınırları</p>
                 <p>
-                    <strong>Gündem Analizi</strong> (<a href="https://gündemanalizi.com.tr" class="text-red-400 hover:underline">gündemanalizi.com.tr</a>) internet sitesine erişim sağlayan ve siteyi kullanan tüm ziyaretçiler aşağıdaki kullanım şartlarını kabul etmiş sayılır.
+                    <strong>Gündem Analizi</strong> (<a href="https://gündemanalizi.com.tr" class="text-red-600 hover:underline font-semibold">gündemanalizi.com.tr</a>) internet sitesine erişim sağlayan ve siteyi kullanan tüm ziyaretçiler aşağıdaki kullanım şartlarını kabul etmiş sayılır.
                 </p>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 1. Bilgilendirme Amacı ve Sorumluluk Sınırı
                 </h2>
                 <ul class="list-disc list-inside space-y-2 pl-2">
@@ -100,31 +84,33 @@
                     <li><strong>Sağlık İçerikleri:</strong> Sağlık kategorisindeki yazılar hekim muayenesi, teşhis veya tedavi yerine geçmez.</li>
                 </ul>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
-                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 2. Fikri Mülkiyet ve Kaynak Gösterme Kuralları
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 2. Fikri Mülkiyet, FSEK Madde 36 ve Kaynak Gösterme Kuralları
                 </h2>
                 <p>
-                    Gündem Analizi'nde yayımlanan özgün haber-analiz metinleri, sayfa tasarımı ve logolar 5846 sayılı Fikir ve Sanat Eserleri Kanunu kapsamında korunmaktadır. İçeriklerimiz, "Gündem Analizi" adı açıkça belirtilerek ve ilgili habere aktif, doğrudan tıklanabilir bağlantı (link) verilerek kısmen alıntılanabilir; kaynak gösterilmeksizin tam metin kopyalanamaz.
+                    Gündem Analizi'nde yayımlanan özgün haber-analiz metinleri, sayfa tasarımı ve logolar <strong>5846 sayılı Fikir ve Sanat Eserleri Kanunu (FSEK)</strong> kapsamında korunmaktadır. Kamuya açık günlük havadis ve haberler FSEK Madde 36 uyarınca birincil kaynak kuruluş adı açıkça belirtilerek özgün analiz formatında derlenmektedir.
                 </p>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
-                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 3. Uyar-Kaldır Prensibi ve Telif Başvuruları
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
+                    <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 3. Uyar-Kaldır Prensibi ve Telif Başvuruları (24 Saat Güvencesi)
                 </h2>
                 <p>
-                    Sitemizde yer alan herhangi bir haber veya görselin telif haklarınızı ya da kişilik haklarınızı ihlal ettiğini düşünüyorsanız, kanıtlayıcı bilgilerle birlikte <a href="/iletisim" class="text-red-400 underline font-semibold">İletişim ve Düzeltme Formu</a> üzerinden veya <strong><!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></strong> adresinden bize ulaşabilirsiniz. Başvurular en geç 24 saat içinde incelenerek sonuçlandırılır.
+                    Sitemizde yer alan herhangi bir haber, alıntı veya görselin telif haklarınızı ya da kişilik haklarınızı ihlal ettiğini düşünüyorsanız, ilgili bağlantıyla birlikte <a href="/iletisim" class="text-red-600 underline font-bold">İletişim ve Düzeltme Formu</a> üzerinden veya <strong><!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></strong> adresinden bize ulaşabilirsiniz. Uyar-Kaldır prensibi gereği tüm hak sahibi başvuruları en geç <strong>24 saat</strong> içinde incelenerek ilgili görsel veya içerik derhal yayından kaldırılır ya da düzeltilir.
                 </p>
 
             </div>
         </div>
     </main>
 
-    <footer class="border-t border-brand-border bg-brand-dark py-6 text-center text-xs text-slate-400">
+    <footer class="border-t border-slate-200 bg-slate-900 py-6 text-center text-xs text-slate-400">
         <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
+            <p class="text-slate-300 font-semibold">GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
             <div class="flex flex-wrap items-center justify-center gap-3">
                 <a href="/hakkimizda" class="hover:text-white">Hakkımızda</a>
                 <span>•</span>
                 <a href="/kunye" class="hover:text-white">Künye</a>
+                <span>•</span>
+                <a href="/yazar/yalcin-celik" class="hover:text-white">Yalçın Çelik</a>
                 <span>•</span>
                 <a href="/yayin-ilkeleri" class="hover:text-white">Yayın İlkeleri</a>
                 <span>•</span>

@@ -1137,9 +1137,15 @@
     <script>
         lucide.createIcons();
         let lastStudioArticleId = null;
-        let isPinVerified = false;
+        const SERVER_AUTHED = {{ 'true' if panel_authed else 'false' }};
+        let isPinVerified = SERVER_AUTHED;
 
         async function checkAuth() {
+            if (SERVER_AUTHED) {
+                document.getElementById('pin-modal').classList.add('hidden');
+                fetchLiveAnalytics();
+                return;
+            }
             const savedPin = (localStorage.getItem('ga_admin_pin') || '').trim();
             if (!savedPin) return;
             try {
@@ -1148,9 +1154,7 @@
                     headers: { 'X-Admin-Pin': savedPin }
                 });
                 if (res.ok) {
-                    isPinVerified = true;
-                    document.getElementById('pin-modal').classList.add('hidden');
-                    fetchLiveAnalytics();
+                    window.location.reload();
                 } else {
                     localStorage.removeItem('ga_admin_pin');
                 }
@@ -1168,11 +1172,9 @@
                     headers: { 'X-Admin-Pin': val, 'X-Manual-Login': '1' }
                 });
                 if (res.ok) {
-                    isPinVerified = true;
                     localStorage.setItem('ga_admin_pin', val);
                     errEl.classList.add('hidden');
-                    document.getElementById('pin-modal').classList.add('hidden');
-                    fetchLiveAnalytics();
+                    window.location.reload();
                 } else {
                     const d = await res.json().catch(() => ({}));
                     errEl.textContent = d.detail || 'Hatalı şifre! Lütfen tekrar deneyin.';
@@ -1183,8 +1185,9 @@
             }
         }
 
-        function lockPanel() {
+        async function lockPanel() {
             localStorage.removeItem('ga_admin_pin');
+            try { await fetch('/api/panel/logout', { method: 'POST' }); } catch (e) {}
             window.location.reload();
         }
 

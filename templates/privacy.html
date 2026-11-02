@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
@@ -10,128 +10,114 @@
     <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/gizlilik-politikasi">
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            red: '#dc2626',
-                            dark: '#0a0d14',
-                            card: '#121722',
-                            border: '#1f293d'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0a0d14; color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
-    <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-50">
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
             <a href="/" class="flex items-center gap-3.5 group">
-                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-md">
+                <img src="/assets/logo.png" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-sm">
                 <div>
-                    <span class="text-xl font-black tracking-tight text-white flex items-center gap-1">
-                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
                     </span>
-                    <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">
+                    <p class="text-[10px] font-semibold text-slate-500 tracking-wider uppercase">
                         Doğru Haber • Tarafsız Analiz
                     </p>
                 </div>
             </a>
-            <div class="flex items-center gap-3">
-                <a href="/" class="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-brand-border">
+            <div class="flex items-center gap-2.5">
+                <a href="/" class="text-xs font-bold text-slate-700 hover:text-red-600 px-3 py-1.5 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 transition">
                     ← Ana Sayfa
                 </a>
-                <a href="/iletisim" class="hidden sm:inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs px-3 py-2 rounded-xl border border-brand-border transition">
+                <a href="/iletisim" class="hidden sm:inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-3 py-2 rounded-xl border border-slate-300 transition">
                     İletişim
                 </a>
-                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md transition">
+                <a href="https://t.me/gundemanalizi" target="_blank" class="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-sm transition">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
                 </a>
             </div>
         </div>
     </header>
 
-    <nav class="bg-slate-900/70 border-b border-brand-border">
-        <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-300">
-            <a href="/hakkimizda" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Hakkımızda</a>
-            <a href="/kunye" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Künye</a>
-            <a href="/yayin-ilkeleri" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Yayın İlkeleri</a>
-            <a href="/iletisim" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">İletişim & Düzeltme</a>
-            <a href="/gizlilik-politikasi" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Gizlilik Politikası</a>
-            <a href="/cerez-politikasi" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Çerez Politikası</a>
-            <a href="/kullanim-sartlari" class="px-3 py-1 rounded-lg hover:bg-slate-800 transition">Kullanım Şartları</a>
+    <nav class="bg-white border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700">
+            <a href="/hakkimizda" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Hakkımızda</a>
+            <a href="/kunye" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Künye</a>
+            <a href="/yazar/yalcin-celik" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Yayın Yönetmeni</a>
+            <a href="/yayin-ilkeleri" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Yayın İlkeleri</a>
+            <a href="/iletisim" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">İletişim & Düzeltme</a>
+            <a href="/gizlilik-politikasi" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Gizlilik Politikası</a>
+            <a href="/cerez-politikasi" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Çerez Politikası</a>
+            <a href="/kullanim-sartlari" class="px-3 py-1 rounded-lg hover:bg-red-50 hover:text-red-600 transition">Kullanım Şartları</a>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto px-4 py-10 flex-1 w-full">
-        <div class="rounded-2xl border border-brand-border bg-brand-card p-6 sm:p-10 shadow-2xl">
-            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-brand-border">
-                <img src="/assets/logo.png" alt="Gündem Analizi Logo" class="w-14 h-14 rounded-full border-2 border-red-600">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-md">
+            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-200">
+                <img src="/assets/logo.png" alt="Gündem Analizi Logo" class="w-14 h-14 rounded-full border-2 border-red-600 shadow-xs">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Gizlilik Politikası</h1>
-                    <p class="text-red-400 text-xs sm:text-sm font-semibold uppercase tracking-wide mt-1">Kişisel Verilerin Korunması (KVKK & GDPR)</p>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Gizlilik Politikası</h1>
+                    <p class="text-red-600 text-xs sm:text-sm font-bold uppercase tracking-wide mt-1">Kişisel Verilerin Korunması (KVKK & GDPR)</p>
                 </div>
             </div>
 
-            <div class="space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
+            <div class="space-y-6 text-slate-700 text-sm sm:text-base leading-relaxed">
 
-                <p class="text-xs text-slate-400">Son Güncelleme: 2 Kasım 2026 • 6698 Sayılı KVKK ve GDPR Aydınlatma Metni</p>
+                <p class="text-xs text-slate-500 font-semibold">Son Güncelleme: 2 Kasım 2026 • 6698 Sayılı KVKK ve GDPR Aydınlatma Metni</p>
                 <p>
-                    <strong>Gündem Analizi</strong> (<a href="https://gündemanalizi.com.tr" class="text-red-400 hover:underline">gündemanalizi.com.tr</a>) olarak ziyaretçilerimizin kişisel verilerinin korunmasına, gizliliğine ve güvenliğine en üst düzeyde önem veriyoruz. İşbu Gizlilik Politikası, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) ve Avrupa Birliği Genel Veri Koruma Tüzüğü (“GDPR”) kapsamında hangi verilerin hangi amaçlarla işlendiğini açıklar.
+                    <strong>Gündem Analizi</strong> (<a href="https://gündemanalizi.com.tr" class="text-red-600 hover:underline font-semibold">gündemanalizi.com.tr</a>) olarak ziyaretçilerimizin kişisel verilerinin korunmasına, gizliliğine ve güvenliğine en üst düzeyde önem veriyoruz. İşbu Gizlilik Politikası, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) ve Avrupa Birliği Genel Veri Koruma Tüzüğü (“GDPR”) kapsamında hangi verilerin hangi amaçlarla işlendiğini açıklar.
                 </p>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 1. Veri Sorumlusu
                 </h2>
                 <p>
                     KVKK uyarınca veri sorumlusu, Gündem Analizi İmtiyaz Sahibi ve Genel Yayın Yönetmeni <strong>Yalçın Çelik</strong>'tir. İletişim: <strong><!--email_off-->iletisim@gundemanalizi.com.tr<!--/email_off--></strong>.
                 </p>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 2. Toplanan Veriler ve İşleme Amaçları
                 </h2>
                 <ul class="list-disc list-inside space-y-2 pl-2">
                     <li><strong>Ziyaret ve Trafik Günlükleri:</strong> Sitemizi ziyaret ettiğinizde IP adresiniz, tarayıcı sürümünüz, işletim sisteminiz, yönlendiren sayfa ve ziyaret saatiniz; bilgi güvenliği süreçlerinin yürütülmesi, kötüye kullanımın önlenmesi ve anonim trafik istatistiklerinin oluşturulması amacıyla işlenir.</li>
-                    <li><strong>İletişim ve İhbar Formu Verileri:</strong> <a href="/iletisim" class="text-red-400 underline">İletişim</a> veya ihbar kanallarımız üzerinden kendi isteğinizle paylaştığınız ad, e-posta ve mesaj içerikleri yalnızca başvurunuzun incelenmesi ve yanıtlanması amacıyla kullanılır; üçüncü kişilerle paylaşılmaz.</li>
-                    <li><strong>Reklam ve Analitik Verileri:</strong> Google AdSense reklam gösterimleri ve çerez tercihleri hakkında ayrıntılı bilgi için <a href="/cerez-politikasi" class="text-red-400 underline font-semibold">Çerez Politikası</a> sayfamızı inceleyebilirsiniz.</li>
+                    <li><strong>İletişim ve İhbar Formu Verileri:</strong> <a href="/iletisim" class="text-red-600 underline font-semibold">İletişim</a> veya ihbar kanallarımız üzerinden kendi isteğinizle paylaştığınız ad, e-posta ve mesaj içerikleri yalnızca başvurunuzun incelenmesi ve yanıtlanması amacıyla kullanılır; üçüncü kişilerle paylaşılmaz.</li>
+                    <li><strong>Reklam ve Analitik Verileri:</strong> Google AdSense reklam gösterimleri ve çerez tercihleri hakkında ayrıntılı bilgi için <a href="/cerez-politikasi" class="text-red-600 underline font-semibold">Çerez Politikası</a> sayfamızı inceleyebilirsiniz.</li>
                 </ul>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 3. Verilerin Saklanması ve Güvenliği
                 </h2>
                 <p>
                     Sunucu iletişimi uçtan uca SSL/TLS (HTTPS) şifrelemesi ile korunmaktadır. Kişisel verileriniz yasal saklama süreleri sonunda silinir, yok edilir veya anonim hale getirilir.
                 </p>
 
-                <h2 class="text-xl font-bold text-white flex items-center gap-2 pt-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 pt-2">
                     <span class="w-2.5 h-2.5 bg-red-600 rounded-sm"></span> 4. KVKK Madde 11 Kapsamındaki Haklarınız
                 </h2>
                 <p>
-                    Veri sahibi olarak; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, amacına uygun kullanılıp kullanılmadığını öğrenme, eksik/yanlış işlenmişse düzeltilmesini ve silinmesini isteme haklarına sahipsiniz. Taleplerinizi <a href="/iletisim" class="text-red-400 underline font-semibold">İletişim Formu</a> üzerinden bize iletebilirsiniz.
+                    Veri sahibi olarak; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, amacına uygun kullanılıp kullanılmadığını öğrenme, eksik/yanlış işlenmişse düzeltilmesini ve silinmesini isteme haklarına sahipsiniz. Taleplerinizi <a href="/iletisim" class="text-red-600 underline font-bold">İletişim Formu</a> üzerinden bize iletebilirsiniz.
                 </p>
 
             </div>
         </div>
     </main>
 
-    <footer class="border-t border-brand-border bg-brand-dark py-6 text-center text-xs text-slate-400">
+    <footer class="border-t border-slate-200 bg-slate-900 py-6 text-center text-xs text-slate-400">
         <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
+            <p class="text-slate-300 font-semibold">GÜNDEM ANALİZİ © 2026 • Tüm Hakları Saklıdır</p>
             <div class="flex flex-wrap items-center justify-center gap-3">
                 <a href="/hakkimizda" class="hover:text-white">Hakkımızda</a>
                 <span>•</span>
                 <a href="/kunye" class="hover:text-white">Künye</a>
+                <span>•</span>
+                <a href="/yazar/yalcin-celik" class="hover:text-white">Yalçın Çelik</a>
                 <span>•</span>
                 <a href="/yayin-ilkeleri" class="hover:text-white">Yayın İlkeleri</a>
                 <span>•</span>

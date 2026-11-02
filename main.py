@@ -55,16 +55,17 @@ def process_single_news(item: dict) -> bool:
     scraped_body = article_details.get("body", "")
     summary = scraped_body if (scraped_body and len(scraped_body) > len(raw_summary)) else raw_summary
 
-    # Telegram ve Web Makalesi Metinleri (Gereksiz ekstra AI çağrısı kaldırıldı, hız 2 katına çıkarıldı)
-    telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
+    # Web Makalesi ve Özgün Başlık Üretimi
     item_category = item.get("category")
     article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
     if not article_data:
         # AdSense kalite kuralı: yapay zeka özgün metin üretemediyse kopya/şablon haber yayınlanmaz
         print(f"⏩ [Kalite Kalkanı] '{title[:50]}' için özgün metin üretilemedi; yayınlanmadı.")
         return False
+    final_title = article_data.get("title") or title
     category = article_data.get("category", "Gündem")
-    print(f"   [Kategori: {category} | Telegram Metni Hazır]")
+    telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
+    print(f"   [Kategori: {category} | Özgün Başlık & Telegram Metni Hazır]")
 
     # 2. Kristal Netliğinde Görsel Üretimi
     print("🎨 Yüksek çözünürlüklü haber görseli hazırlanıyor...")
@@ -76,7 +77,7 @@ def process_single_news(item: dict) -> bool:
     visual_path = image_generator.create_news_visual(
         candidate_urls=candidate_images,
         output_filename=img_filename,
-        title=title,
+        title=final_title,
         category=category
     )
     print(f"   [Görsel Hazırlandı: {visual_path} | Aday Görsel Sayısı: {len(candidate_images)}]")

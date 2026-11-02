@@ -996,14 +996,25 @@ async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
     """Kategori bazlı haber akışı rotası (/kategori/saglik, /kategori/Sağlık vb.)"""
     return await home(request=request, kategori=kategori_adi, sayfa=sayfa)
 
+def _panel_cookie_token() -> str:
+    if not ADMIN_PIN:
+        return ""
+    import hashlib
+    return hashlib.sha256(f"ga_panel_v1_{ADMIN_PIN}".encode("utf-8")).hexdigest()
+
 @app.get("/panel", response_class=HTMLResponse)
 @app.get(f"/{PANEL_SECRET_SLUG}", response_class=HTMLResponse)
 @app.get("/yonetim-71453", response_class=HTMLResponse)
 async def admin_panel(request: Request):
-    try:
-        stats = database.get_dashboard_summary() or {}
-    except Exception as e:
-        print(f"⚠️ Panel özet verisi çekme hatası: {e}")
+    tok = _panel_cookie_token()
+    is_authed = bool(tok and request.cookies.get("ga_panel_auth") == tok)
+    if is_authed:
+        try:
+            stats = database.get_dashboard_summary() or {}
+        except Exception as e:
+            print(f"⚠️ Panel özet verisi çekme hatası: {e}")
+            stats = {}
+    else:
         stats = {}
 
     stats["gemini_active"] = bool(config.GEMINI_API_KEY)
@@ -1056,23 +1067,38 @@ async def admin_panel(request: Request):
         if not a.get("created_at"):
             a["created_at"] = "-"
 
-    try:
-        ad_settings = get_site_ad_settings()
-    except Exception:
+    if is_authed:
+        try:
+            ad_settings = get_site_ad_settings()
+        except Exception:
+            ad_settings = {}
+    else:
+        stats["total_articles"] = 0
         ad_settings = {}
 
     response = templates.TemplateResponse(
         request=request,
         name="panel.html",
-        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG, "ad_settings": ad_settings}
+        context={"stats": stats, "panel_slug": PANEL_SECRET_SLUG, "ad_settings": ad_settings, "panel_authed": is_authed}
     )
-    response.set_cookie(key="ga_admin", value="1", max_age=3600*24*30, httponly=False)
+    if is_authed:
+        response.set_cookie(key="ga_admin", value="1", max_age=3600*24*30, httponly=False)
     return response
 
 @app.post("/api/panel/verify-pin")
 async def panel_verify_pin(request: Request):
     require_admin_pin(request)
-    return {"ok": True}
+    resp = JSONResponse({"ok": True})
+    tok = _panel_cookie_token()
+    if tok:
+        resp.set_cookie(key="ga_panel_auth", value=tok, max_age=3600*24*30, httponly=True, samesite="lax", path="/")
+    return resp
+
+@app.post("/api/panel/logout")
+async def panel_logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie(key="ga_panel_auth", path="/")
+    return resp
 
 @app.post("/api/panel/fetch-now")
 async def panel_fetch_now(request: Request):
@@ -1465,7 +1491,7 @@ async def pwa_manifest():
         "name": "Gündem Analizi Yönetim Paneli",
         "short_name": "GA Panel",
         "description": "Gündem Analizi Canlı Haber ve Sosyal Medya Yönetim Stüdyosu",
-        "start_url": f"/{PANEL_SECRET_SLUG}",
+        "start_url": "/",
         "display": "standalone",
         "background_color": "#0a0d14",
         "theme_color": "#dc2626",
@@ -1549,14 +1575,27 @@ async def save_panel_ad_settings(request: Request):
             database.set_setting(k, str(data[k]))
     return {"ok": True, "message": "Reklam ve Google ayarları başarıyla kaydedildi!"}
 
+_IHBAR_RATE_LIMIT = {}
+
 @app.post("/api/ihbar")
 async def submit_ihbar(
+    request: Request,
     message: str = Form(...),
     contact: str = Form(""),
     media_file: UploadFile = File(None)
 ):
-    if not message or len(message.strip()) < 5:
-        raise HTTPException(status_code=400, detail="Lütfen ihbar detayını yazın.")
+    client_ip = (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
+    now_ts = time.time()
+    recent_ihbar = [t for t in _IHBAR_RATE_LIMIT.get(client_ip, []) if now_ts - t < 900]
+    if len(recent_ihbar) >= 3:
+        raise HTTPException(status_code=429, detail="Çok fazla ihbar gönderildi. Lütfen 15 dakika sonra tekrar deneyin.")
+    if not message or len(message.strip()) < 5 or len(message) > 3000:
+        raise HTTPException(status_code=400, detail="Lütfen ihbar detayını yazın (5-3000 karakter).")
+    cl = int(request.headers.get("content-length") or 0)
+    if cl > 16 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Dosya boyutu en fazla 15 MB olabilir.")
+    recent_ihbar.append(now_ts)
+    _IHBAR_RATE_LIMIT[client_ip] = recent_ihbar
 
     import hashlib
     import telegram_notifier
@@ -1567,8 +1606,11 @@ async def submit_ihbar(
 
     if media_file and media_file.filename:
         fname = media_file.filename.lower()
-        content = await media_file.read()
-        if len(content) <= 50 * 1024 * 1024:  # Maks 50 MB
+        allowed_exts = (".mp4", ".mov", ".webm", ".jpg", ".jpeg", ".png", ".webp")
+        if not any(fname.endswith(ext) for ext in allowed_exts):
+            raise HTTPException(status_code=400, detail="Yalnızca fotoğraf (.jpg, .png, .webp) veya video (.mp4, .mov, .webm) yüklenebilir.")
+        content = await media_file.read(15 * 1024 * 1024 + 1)
+        if len(content) <= 15 * 1024 * 1024:  # Maks 15 MB
             if any(fname.endswith(ext) for ext in (".mp4", ".mov", ".webm", ".mkv", ".avi")) or (media_file.content_type or "").startswith("video"):
                 out_name = f"ihbar_{ihbar_id}.mp4"
                 saved_path = os.path.join(OUTPUT_DIR, out_name)
@@ -1953,7 +1995,6 @@ async def sitemap(request: Request):
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
     xml.append(f'  <url><loc>{base_url}/son-dakika</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>1.0</priority></url>')
@@ -1982,7 +2023,6 @@ async def news_sitemap(request: Request):
     articles = [a for a in database.get_sitemap_articles(limit=100) if not content_quality.is_thin(a.get("content") or "")]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">')
     for a in articles:
         raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
@@ -2012,7 +2052,6 @@ async def video_sitemap(request: Request):
     articles = database.get_articles(limit=100)
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml.append('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>')
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
     for a in articles:
         content_lower = (a.get("content") or "").lower()

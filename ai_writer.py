@@ -390,7 +390,10 @@ KESİN KURALLAR:
 5. Her habere uyan genel geçer dolgu cümleleri ("gelişmeler yakından takip ediliyor", "kamuoyunun gündeminde" vb.) YAZMA.
 6. Yatırım tavsiyesi verme; sağlık konularında teşhis/tedavi önerme, uzman görüşüne yönlendir.
 
-ÇIKTI BİÇİMİ (aynen bu iki bölüm):
+ÇIKTI BİÇİMİ (aynen bu üç bölüm):
+[BAŞLIK]
+Kaynak başlıkla kelimesi kelimesine aynı OLMAYAN, olayın gerçekliğini ve anlamını %100 koruyan, tık tuzağı içermeyen, 6-12 kelimelik tamamen özgün ve güçlü Türkçe haber başlığı.
+
 [ÖZET]
 Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 
@@ -435,8 +438,18 @@ Ara başlıkları haberin konusuna göre özelleştir. Başka etiket, markdown v
             if not raw_text or "[İÇERİK]" not in raw_text:
                 print(f"⚠️ [Makale] {m_name} beklenen biçimde yanıt vermedi.")
                 continue
-            sum_part, content_part = raw_text.split("[İÇERİK]", 1)
-            gen_summary = sum_part.replace("[ÖZET]", "").strip()
+            head_and_sum, content_part = raw_text.split("[İÇERİK]", 1)
+            gen_title = title
+            if "[ÖZET]" in head_and_sum:
+                t_part, s_part = head_and_sum.split("[ÖZET]", 1)
+                cand_title = t_part.replace("[BAŞLIK]", "").strip().strip('"#* \'')
+                cand_title = content_quality.fix_brand_splits(re.sub(r'\s+', ' ', cand_title))
+                cand_title = cand_title.splitlines()[0].strip()
+                if 15 <= len(cand_title) <= 130:
+                    gen_title = cand_title
+                gen_summary = s_part.strip()
+            else:
+                gen_summary = head_and_sum.replace("[BAŞLIK]", "").strip()
             gen_content = content_part.strip()
             gen_content = re.sub(r'^```(?:html)?\s*', '', gen_content, flags=re.I)
             gen_content = re.sub(r'\s*```$', '', gen_content).strip()
@@ -448,9 +461,9 @@ Ara başlıkları haberin konusuna göre özelleştir. Başka etiket, markdown v
                 continue
             if len(gen_summary) < 40:
                 gen_summary = content_quality._norm(gen_content).split(". ")[0][:300]
-            print(f"✅ [Makale] {m_name} ile {words} kelimelik özgün haber yazıldı.")
+            print(f"✅ [Makale] {m_name} ile {words} kelimelik özgün haber yazıldı. Başlık: {gen_title}")
             return {
-                "title": title,
+                "title": gen_title,
                 "summary": gen_summary,
                 "content": gen_content,
                 "category": category,
