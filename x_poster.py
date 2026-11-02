@@ -340,12 +340,22 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                     break
                 page.wait_for_timeout(1000)
 
-            # Güvenli gönderim: Editor'e odaklanıp Ctrl+Enter kısayolu ve dispatchEvent click
-            # (Twitter modal backdrop'ının click'i engellemesini / timeout vermesini önler)
+            # Güvenli gönderim: JS Evaluate click + Control+Enter + dispatchEvent
             sent = False
             try:
+                page.evaluate('''() => {
+                    const btn = document.querySelector('button[data-testid="tweetButton"]') || document.querySelector('button[data-testid="tweetButtonInline"]');
+                    if (btn) btn.click();
+                }''')
+                sent = True
+            except Exception:
+                pass
+
+            page.wait_for_timeout(1000)
+
+            try:
                 editor.first.focus()
-                page.wait_for_timeout(500)
+                page.wait_for_timeout(300)
                 page.keyboard.press("Control+Enter")
                 sent = True
             except Exception:
