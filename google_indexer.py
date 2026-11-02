@@ -16,20 +16,19 @@ from typing import Optional
 _cached_access_token = None
 _token_expiry = 0
 
-_DEFAULT_B64_CREDS = (
-    "eyJjbGllbnRfaWQiOiAiMzA4ODM4NDExMzY0LXU3NXE2Mm91bG9qcTYxNDdtYm00cTNwODk5ZjNpODlhLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwg"
-    "ImNsaWVudF9zZWNyZXQiOiAiR09DU1BYLThzdWpSTkdiY2RPc3FOdUhkS0Nfam9hZS1fQ2giLCAicmVmcmVzaF90b2tlbiI6ICIxLy8wM1NDc0JGZ1Zuak50"
-    "Q2dZSUFSQUFHQU1TTndGLUw5SXJQZ0tCSWVEeXBFeW1uZFFOeWVQdlp1dEUxNTVEMVpHdmszb0VmT25vd0VBSF9oRHRUdUttYW1qZDZacXdNUG9lZzRrIn0="
-)
+import config  # .env yüklemesini garanti eder
 
 def get_credentials() -> Optional[dict]:
-    """Google Indexing API kimlik bilgilerini env, dosya veya kalici cloud yedeğinden yukler."""
+    """Google Indexing API kimlik bilgilerini GOOGLE_INDEXING_TOKEN ortam değişkeninden veya yerel dosyadan yükler."""
     env_token = os.getenv("GOOGLE_INDEXING_TOKEN", "").strip()
     if env_token:
         try:
             return json.loads(env_token)
         except Exception:
-            pass
+            try:
+                return json.loads(base64.b64decode(env_token).decode("utf-8"))
+            except Exception:
+                pass
 
     token_file = os.path.join(os.path.dirname(__file__), "google_indexing_token.json")
     if os.path.exists(token_file):
@@ -39,10 +38,7 @@ def get_credentials() -> Optional[dict]:
         except Exception:
             pass
 
-    try:
-        return json.loads(base64.b64decode(_DEFAULT_B64_CREDS).decode("utf-8"))
-    except Exception:
-        return None
+    return None
 
 def get_access_token() -> Optional[str]:
     """Gerektiginde kalici refresh_token kullanarak 1 saatlik taze access_token uretir."""

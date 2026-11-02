@@ -8,14 +8,8 @@ try:
 except Exception:
     pass
 
-# Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Ters Dizilim Koruması - GitGuardian Taramasına Takılmaz)
-_META_REV = "kSGU3SVFhQMb7jmorVbSAZadYjBZe9zAWsasUQSHs1BFBZC9e9r5fkzq9G2sHY7BZaLXAZgkkDUekiqqKk1iNqWYsTwFNAchgVdJf0CZipHlLKc9GHXavrXILgB3o0KWNFw9sUUTcFMAbhtKGKiVBUgEoi7Y3mic1xSdtBZEBTEj2TwzFAZYjlOUs92SBEw5aXWb6VGAE"
-_DEFAULT_META_TOKEN = _META_REV[::-1].strip()
-_env_meta = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
-if not _env_meta or len(_env_meta) != len(_DEFAULT_META_TOKEN) or not _env_meta.startswith("EAGV6bWXa5wEBS"):
-    META_PAGE_ACCESS_TOKEN = _DEFAULT_META_TOKEN
-else:
-    META_PAGE_ACCESS_TOKEN = _env_meta
+# Meta (Facebook & Instagram Reels & Hikayeler) Ayarları (Ortam değişkeninden okunur)
+META_PAGE_ACCESS_TOKEN = os.getenv("META_PAGE_ACCESS_TOKEN", "").strip()
 
 FACEBOOK_PAGE_ID = os.getenv("FACEBOOK_PAGE_ID", "").strip() or "1237983366054395"  # Gündem Analizi Facebook Sayfası (688+ Takipçi)
 INSTAGRAM_ACCOUNT_ID = os.getenv("INSTAGRAM_ACCOUNT_ID", "").strip() or "17841437413417808"  # @gundem_analiz Instagram Hesabı
@@ -32,20 +26,14 @@ FACEBOOK_URL = "https://www.facebook.com/gundemanalizi"
 X_URL = "https://x.com/gndmanalizi"
 X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Saatte 1 tweet (Tam saat başı kilit tamponu: 45 dk)
 
-# Telegram Bildirim Ayarları (Ters Dizilim Koruması - GitGuardian Taramasına Takılmaz)
-_TG_REV = "gMHGRwxTePfwpWM2UVi8NnsBO7c5msALFAA:1182922888"
-_DEFAULT_TG_TOKEN = _TG_REV[::-1].strip()
-_env_tg = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-if not _env_tg or "AAHo" in _env_tg:
-    TELEGRAM_BOT_TOKEN = _DEFAULT_TG_TOKEN
-else:
-    TELEGRAM_BOT_TOKEN = _env_tg
+# Telegram Bildirim Ayarları (Ortam değişkeninden okunur)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003631115657").strip() or "-1003631115657"
 TELEGRAM_ADMIN_ID = os.getenv("TELEGRAM_ADMIN_ID", "1934709259")  # Yalçın Çelik Özel Chat
 
 # Marka ve Web Sitesi Bilgisi
 BRAND_NAME = "GÜNDEM ANALİZİ"
-SITE_URL = os.getenv("SITE_URL", "https://www.gündemanalizi.com.tr")
+SITE_URL = "https://xn--gndemanalizi-dlb.com.tr"
 # Instagram gibi servislerin videoyu indirebilmesi için ASCII (punycode) adres
 PUBLIC_MEDIA_BASE = os.getenv("PUBLIC_MEDIA_BASE", "https://xn--gndemanalizi-dlb.com.tr")
 

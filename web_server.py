@@ -991,10 +991,14 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             pass
     return resp
 
-@app.api_route("/kategori/{kategori_adi}", methods=["GET", "HEAD"], response_class=HTMLResponse)
+@app.api_route("/kategori/{kategori_adi}", methods=["GET", "HEAD"])
 async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
-    """Kategori bazlı haber akışı rotası (/kategori/saglik, /kategori/Sağlık vb.)"""
-    return await home(request=request, kategori=kategori_adi, sayfa=sayfa)
+    """Kategori bazlı haber akışı rotası: Tekil canonical URL (/?kategori=...) yapısına 301 yönlendirir."""
+    import urllib.parse
+    from fastapi.responses import RedirectResponse
+    norm_kat = database.normalize_category_name(kategori_adi) or kategori_adi
+    target = f"/?kategori={urllib.parse.quote(norm_kat)}" + (f"&sayfa={sayfa}" if sayfa > 1 else "")
+    return RedirectResponse(url=target, status_code=301)
 
 def _panel_cookie_token() -> str:
     if not ADMIN_PIN:
@@ -2160,13 +2164,25 @@ async def video_sitemap(request: Request):
     from xml.sax.saxutils import escape
     articles = database.get_articles(limit=100)
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
-    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
+    vid_articles = []
     for a in articles:
         content_lower = (a.get("content") or "").lower()
-        # Sadece sayfasında gerçekten video veya mp4 barındıran haberleri video haritasına ekle (Google hatasını önler)
-        if "<video" not in content_lower and ".mp4" not in content_lower and "iframe" not in content_lower:
-            continue
+        if "<video" in content_lower or ".mp4" in content_lower or "iframe" in content_lower:
+            vid_articles.append(a)
+    if _is_human_browser_request(request):
+        rows = [
+            {"label": a.get("title", ""), "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"}
+            for a in vid_articles
+        ]
+        return _render_pretty_sitemap_html(
+            "Gündem Analizi - Video Site Haritası",
+            "Bu XML video site haritası, Google Video arama botlarının video barındıran haberlerimizi tarayabilmesi için dinamik olarak üretilmektedir.",
+            rows,
+            "/video-sitemap.xml"
+        )
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">')
+    for a in vid_articles:
         raw_dt = (a.get("created_at") or "").strip().replace(" ", "T")
         if len(raw_dt) == 16:
             raw_dt += ":00+03:00"
@@ -2194,26 +2210,35 @@ async def video_sitemap(request: Request):
 @app.get("/rss.xml")
 async def rss_feed(request: Request):
     from xml.sax.saxutils import escape
-    articles = database.get_articles(limit=30)
-    host = request.headers.get("host", "xn--gndemanalizi-dlb.com.tr")
-    base_url = f"https://{host}"
+    from email.utils import format_datetime
+    import content_quality
+    articles = [a for a in database.get_sitemap_articles(limit=50) if not content_quality.is_thin(a.get("content") or "")][:30]
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
     items_xml = []
     for a in articles:
         img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
         img_url = f"{base_url}/images/{img_name}" if img_name else f"{base_url}/assets/logo.png"
+        raw_dt = (a.get("created_at") or "").strip()
+        try:
+            dt_obj = datetime.strptime(raw_dt[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone(timedelta(hours=3)))
+            pub_date = format_datetime(dt_obj)
+        except Exception:
+            pub_date = format_datetime(datetime.now(timezone(timedelta(hours=3))))
         items_xml.append(f"""    <item>
       <title>{escape(a["title"])}</title>
       <link>{base_url}/haber/{a["slug"]}</link>
-      <guid>{base_url}/haber/{a["slug"]}</guid>
+      <guid isPermaLink="true">{base_url}/haber/{a["slug"]}</guid>
+      <pubDate>{pub_date}</pubDate>
       <description>{escape(a.get("summary") or a["title"])}</description>
       <category>{escape(a.get("category") or "Gündem")}</category>
       <enclosure url="{img_url}" type="image/jpeg"/>
     </item>""")
     rss = f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
     <link>{base_url}/</link>
+    <atom:link href="{base_url}/rss.xml" rel="self" type="application/rss+xml"/>
     <description>Türkiye ve dünyadan son dakika gelişmeleri ve tarafsız analizler.</description>
     <language>tr-TR</language>
 {chr(10).join(items_xml)}
