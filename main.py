@@ -83,13 +83,13 @@ def process_single_news(item: dict) -> bool:
 
     # 2.5. HASSAS 13.5 DAKİKA NİŞANGAHI (En Fazla 15 Dk Garantisi):
     # Haber 10. dakikada önceden hazırlanır; 13.5. dakikada yayına basılır, en geç 14. dakikada kanallara düşer!
-    TARGET_MINUTES = 13.5
+    TARGET_MINUTES = 28.5
     while True:
         mins_now = get_minutes_since_last_article()
         if mins_now >= TARGET_MINUTES:
             break
         wait_sec = min(10.0, max(1.0, (TARGET_MINUTES - mins_now) * 60.0))
-        print(f"⏱️ [15 Dk Kuralı] Haber hazır! 13.5. dk hedefi için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
+        print(f"⏱️ [30 Dk Kuralı] Haber hazır! 28.5. dk hedefi için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
         time.sleep(wait_sec)
 
     # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
@@ -189,7 +189,7 @@ def run_bot(max_items: int = 1, force: bool = False):
 def _run_bot_internal(max_items: int = 1, force: bool = False):
     if not force:
         # En fazla 15 dk kuralı: Hazırlığa 10.0. dakikada başlar, 13.5. dakikada yayına basar!
-        prep_start_minute = 10.0
+        prep_start_minute = 25.0
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < prep_start_minute:
             remaining = round(prep_start_minute - minutes_passed, 1)

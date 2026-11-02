@@ -1782,26 +1782,78 @@ async def article_detail(request: Request, slug: str):
             pass
     return resp
 
+_CONTACT_RATE_LIMIT = {}
+
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
-@app.get("/kunye", response_class=HTMLResponse)
 async def about_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
+
+@app.get("/kunye", response_class=HTMLResponse)
+async def kunye_page(request: Request):
+    return templates.TemplateResponse(request=request, name="kunye.html", context={})
+
+@app.get("/yayin-ilkeleri", response_class=HTMLResponse)
+async def editorial_policy_page(request: Request):
+    return templates.TemplateResponse(request=request, name="editorial_policy.html", context={})
 
 @app.get("/privacy", response_class=HTMLResponse)
 @app.get("/gizlilik-politikasi", response_class=HTMLResponse)
 @app.get("/gizlilik", response_class=HTMLResponse)
-@app.get("/cerez-politikasi", response_class=HTMLResponse)
-@app.get("/cookies", response_class=HTMLResponse)
-@app.get("/kullanim-sartlari", response_class=HTMLResponse)
-@app.get("/terms", response_class=HTMLResponse)
 async def privacy_page(request: Request):
     return templates.TemplateResponse(request=request, name="privacy.html", context={})
+
+@app.get("/cerez-politikasi", response_class=HTMLResponse)
+@app.get("/cookies", response_class=HTMLResponse)
+async def cookies_page(request: Request):
+    return templates.TemplateResponse(request=request, name="cookies.html", context={})
+
+@app.get("/kullanim-sartlari", response_class=HTMLResponse)
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    return templates.TemplateResponse(request=request, name="terms.html", context={})
 
 @app.get("/contact", response_class=HTMLResponse)
 @app.get("/iletisim", response_class=HTMLResponse)
 async def contact_page(request: Request):
-    return templates.TemplateResponse(request=request, name="about.html", context={})
+    return templates.TemplateResponse(request=request, name="contact.html", context={})
+
+@app.post("/api/contact")
+async def api_contact_submit(request: Request):
+    client_ip = (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
+    now_ts = time.time()
+    recent = [t for t in _CONTACT_RATE_LIMIT.get(client_ip, []) if now_ts - t < 900]
+    if len(recent) >= 5:
+        return JSONResponse({"ok": False, "error": "Çok fazla talep gönderildi. Lütfen 15 dakika sonra tekrar deneyiniz."}, status_code=429)
+    try:
+        data = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Geçersiz istek biçimi."}, status_code=400)
+    name = (data.get("name") or "").strip()[:100]
+    email = (data.get("email") or "").strip()[:120]
+    subject = (data.get("subject") or "Genel İletişim").strip()[:100]
+    article_url = (data.get("article_url") or "").strip()[:300]
+    message = (data.get("message") or "").strip()[:2000]
+    if len(name) < 2 or "@" not in email or len(message) < 10:
+        return JSONResponse({"ok": False, "error": "Lütfen ad, geçerli e-posta ve en az 10 karakterlik mesaj giriniz."}, status_code=400)
+    recent.append(now_ts)
+    _CONTACT_RATE_LIMIT[client_ip] = recent
+    msg_text = (
+        f"📩 [KURUMSAL İLETİŞİM / DÜZELTME FORMU]\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"👤 Ad Soyad: {name}\n"
+        f"📧 E-posta: {email}\n"
+        f"📌 Konu: {subject}\n"
+        + (f"🔗 Haber: {article_url}\n" if article_url else "")
+        + f"🌐 IP: {client_ip}\n\n"
+        f"💬 Mesaj:\n{message}"
+    )
+    try:
+        import telegram_notifier
+        await asyncio.to_thread(telegram_notifier.send_admin_ihbar, msg_text)
+    except Exception as e:
+        print(f"İletişim formu Telegram iletim hatası: {e}")
+    return JSONResponse({"ok": True})
 
 @app.get("/api/articles")
 async def api_articles(limit: int = 10):
@@ -1894,6 +1946,7 @@ async def sitemap(request: Request):
         xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/yayin-ilkeleri</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
     xml.append(f'  <url><loc>{base_url}/kullanim-sartlari</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')

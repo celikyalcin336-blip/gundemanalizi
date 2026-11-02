@@ -28,7 +28,11 @@ def generate_telegram_post(title: str, summary: str, source: str) -> str:
     if config.GEMINI_API_KEY:
         try:
             from google import genai
-            client = genai.Client(api_key=config.GEMINI_API_KEY)
+            from google.genai import types as genai_types
+            client = genai.Client(
+                api_key=config.GEMINI_API_KEY,
+                http_options=genai_types.HttpOptions(timeout=25000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+            )
             prompt = f"""
 Sen Türkiye'nin en popüler haber kanallarının uzman baş editörüsün.
 Aşağıdaki haber için Telegram takipçilerine olayın arka planını, nedenlerini, perde arkasını ve ayrıntılarını net şekilde aktaran, DOYURUCU VE EN AZ 3-4 MADDELİ bir haber metni hazırla.
@@ -52,7 +56,7 @@ Maddeler: KESİNLİKLE EN AZ 3, EN FAZLA 4 ADET DOYURUCU MADDE (— ile başlaya
 6. Cümleleri dil bilgisi hatası olmadan, duru ve kusursuz Türkçe ile yaz.
 7. Yalnızca doğrudan paylaşılacak nihai metni yaz.
 """
-            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            for m_name in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"]:
                 try:
                     res = client.models.generate_content(model=m_name, contents=prompt)
                     if res and res.text:
@@ -151,7 +155,11 @@ def generate_social_caption(title: str, summary: str, source: str) -> dict:
     if config.GEMINI_API_KEY:
         try:
             from google import genai
-            client = genai.Client(api_key=config.GEMINI_API_KEY)
+            from google.genai import types as genai_types
+            client = genai.Client(
+                api_key=config.GEMINI_API_KEY,
+                http_options=genai_types.HttpOptions(timeout=25000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+            )
             
             prompt = f"""
 Sen saygın ve profesyonel bir ulusal haber ajansının (Gündem Analizi) kıdemli baş editörüsün.
@@ -171,7 +179,7 @@ UYULMASI ZORUNLU KURALLAR:
 8. Yalnızca doğrudan yayınlanacak nihai basın metnini yaz.
 """
             # Model denemesi (önce 2.5-flash, sonra 2.0-flash, sonra 1.5-flash)
-            for m_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            for m_name in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"]:
                 try:
                     response = client.models.generate_content(
                         model=m_name,
@@ -387,28 +395,40 @@ KESİN KURALLAR:
 Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 
 [İÇERİK]
-Sadece aşağıdaki HTML etiketlerini kullan:
-<p class="lead font-medium text-lg text-slate-200 mb-6">Haberin ana gelişmesini anlatan güçlü giriş paragrafı</p>
+Sadece aşağıdaki HTML etiketlerini kullan ve HER ARA BAŞLIĞIN ALTINA EN AZ 2 DOLU PARAGRAF (her paragraf 4-5 cümle) yazarak toplamda EN AZ 450-600 KELİME üret:
+<p class="lead font-medium text-lg text-slate-200 mb-6">Haberin ana gelişmesini tüm temel unsurlarıyla (ne, nerede, ne zaman, kim, neden) anlatan kapsamlı giriş paragrafı (4-5 cümle)</p>
 <h3 class="text-xl font-bold text-white mt-6 mb-3">Neler Oldu?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">...</p>  (1-2 paragraf)
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Arka Plan</h3>
-<p class="text-slate-300 leading-relaxed mb-4">...</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Neden Önemli?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">...</p>  (okur, Türkiye, sektör veya taraflar açısından)
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Bundan Sonra Ne Olacak?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">...</p>  (yalnızca kaynakta belirtilen veya makul şekilde beklenen adımlar)
-Ara başlıkları konuya göre daha açıklayıcı hale getirebilirsin. Başka etiket, markdown veya kod bloğu kullanma.
+<p class="text-slate-300 leading-relaxed mb-4">Olayın gelişimini ve kaynaktaki tüm somut ayrıntıları aktaran birinci paragraf (4-5 cümle).</p>
+<p class="text-slate-300 leading-relaxed mb-4">Tarafların açıklamalarını, teknik veya hukuki detayları ve sahadaki durumu aktaran ikinci paragraf (4-5 cümle).</p>
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Arka Plan ve Sürecin Geçmişi</h3>
+<p class="text-slate-300 leading-relaxed mb-4">Bu gelişmeye zemin hazırlayan önceki olayları ve konunun tarihsel/sektörel bağlamını anlatan birinci paragraf (4-5 cümle).</p>
+<p class="text-slate-300 leading-relaxed mb-4">Konuyla ilgili mevcut kuralları, standartları veya daha önce atılan adımları açıklayan ikinci paragraf (4-5 cümle).</p>
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Neden Önemli ve Etkileri Neler?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">Gelişmenin vatandaşlar, ekonomi, ilgili sektör veya uluslararası dengeler açısından neden kritik olduğunu açıklayan birinci paragraf (4-5 cümle).</p>
+<p class="text-slate-300 leading-relaxed mb-4">Kısa ve orta vadede günlük hayata, piyasaya veya kurumlara yansımalarını somut çerçevede değerlendiren ikinci paragraf (4-5 cümle).</p>
+<h3 class="text-xl font-bold text-white mt-6 mb-3">Bundan Sonra Ne Bekleniyor?</h3>
+<p class="text-slate-300 leading-relaxed mb-4">Takvimde öne çıkan kritik tarihleri, resmi süreçleri ve beklenen somut adımları anlatan kapanış paragrafı (4-5 cümle).</p>
+Ara başlıkları haberin konusuna göre özelleştir. Başka etiket, markdown veya kod bloğu kullanma.
 """
 
     try:
         from google import genai
-        client = genai.Client(api_key=config.GEMINI_API_KEY)
+        from google.genai import types as genai_types
+        client = genai.Client(
+            api_key=config.GEMINI_API_KEY,
+            http_options=genai_types.HttpOptions(timeout=40000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+        )
     except Exception as e:
         print(f"❌ [Makale] Gemini istemcisi başlatılamadı: {e}")
         return None
 
     import content_quality
-    for m_name in ["gemini-2.5-flash", "gemini-2.0-flash"]:
+    # Bir model yoğun/kotası dolu olursa sıradakine geçilir (ücretsiz kotalar model bazında ayrıdır)
+    model_chain = [m.strip() for m in os.getenv(
+        "GEMINI_ARTICLE_MODELS",
+        "gemini-flash-lite-latest,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.5-flash,gemini-flash-latest,gemini-3.8-flash"
+    ).split(",") if m.strip()]
+    for m_name in model_chain:
         try:
             res = client.models.generate_content(model=m_name, contents=prompt)
             raw_text = (res.text or "").strip() if res else ""

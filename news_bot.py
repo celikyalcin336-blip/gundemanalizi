@@ -48,7 +48,7 @@ if sys.stdout.encoding != "utf-8":
 # ----------------------------------------------------------------------------
 # AYARLAR
 # ----------------------------------------------------------------------------
-INTERVAL_SEC = 900          # Tam 15 dakika
+INTERVAL_SEC = 1800         # Tam 30 dakika
 PREP_LEAD_SEC = 180         # Yayın saatinden 3 dk önce hazırlığa başla
 LATE_TOLERANCE_SEC = 60     # Bu kadar gecikirse yeni yayın saati baz alınır
 FEED_TIMEOUT_SEC = 10       # Her RSS kaynağı için en fazla bekleme
@@ -321,6 +321,8 @@ def _prepare(item: dict) -> dict:
 
     telegram_caption = ai_writer.generate_telegram_post(title, summary, source)
     article = ai_writer.generate_full_article(title, summary, source, force_category=item.get("category"))
+    if not article:
+        raise ValueError("Özgün makale üretilemedi (kaynak yetersiz veya AI yanıt vermedi)")
     category = article.get("category") or item.get("category") or "Gündem"
 
     images = list(details.get("images", []) or [])

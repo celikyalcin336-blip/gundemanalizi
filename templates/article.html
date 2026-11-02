@@ -684,12 +684,14 @@
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
                 <div class="space-y-1">
-                    <div class="font-extrabold text-slate-900 text-xs flex items-center gap-2">
-                        Kaynak ve Yayın Bilgisi
+                    <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center gap-2">
+                        <span>Kaynak ve Yayın Bilgisi</span>
+                        <span class="text-slate-400">•</span>
+                        <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/kunye" class="text-red-600 hover:underline">Yalçın Çelik</a></span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
                         {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> tarafından yayımlanan bilgiler temel alınarak Gündem Analizi tarafından derlenmiş ve yeniden yazılmıştır.{% else %}Bu içerik Gündem Analizi tarafından hazırlanmıştır.{% endif %}
-                        Hata bildirimi ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">iletişim sayfamızı</a> kullanabilirsiniz.
+                        <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> gereği maddi hata bildirimi ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>
             </div>
@@ -859,7 +861,11 @@
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p>GÜNDEM ANALİZİ © 2026 • Doğru Haber • Tarafsız Analiz</p>
                         <div class="flex items-center gap-3 sm:gap-4 text-slate-600 flex-wrap justify-center font-medium">
-                <a href="/hakkimizda" class="hover:text-red-600 transition">Hakkımızda & Künye</a>
+                <a href="/hakkimizda" class="hover:text-red-600 transition">Hakkımızda</a>
+                <span>•</span>
+                <a href="/kunye" class="hover:text-red-600 transition">Künye</a>
+                <span>•</span>
+                <a href="/yayin-ilkeleri" class="hover:text-red-600 transition">Yayın İlkeleri</a>
                 <span>•</span>
                 <a href="/gizlilik-politikasi" class="hover:text-red-600 transition">Gizlilik Politikası</a>
                 <span>•</span>
