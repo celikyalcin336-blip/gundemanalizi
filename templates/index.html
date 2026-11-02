@@ -60,6 +60,57 @@
     <meta name="twitter:title" content="Gündem Analizi | Doğru Haber • Tarafsız Analiz">
     <meta name="twitter:description" content="Türkiye ve dünyadan tarafsız, bağımsız ve son dakika haber analizleri.">
     <meta name="twitter:image" content="https://xn--gndemanalizi-dlb.com.tr/assets/logo.png">
+    <!-- Google News, Knowledge Graph & Site Arama Şeması (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "NewsMediaOrganization",
+          "@id": "https://xn--gndemanalizi-dlb.com.tr/#organization",
+          "name": "Gündem Analizi",
+          "url": "https://xn--gndemanalizi-dlb.com.tr/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://xn--gndemanalizi-dlb.com.tr/assets/logo.png",
+            "width": 512,
+            "height": 512
+          },
+          "founder": {
+            "@type": "Person",
+            "name": "Yalçın Çelik",
+            "jobTitle": "İmtiyaz Sahibi ve Genel Yayın Yönetmeni",
+            "url": "https://xn--gndemanalizi-dlb.com.tr/yazar/yalcin-celik"
+          },
+          "publishingPrinciples": "https://xn--gndemanalizi-dlb.com.tr/yayin-ilkeleri",
+          "masthead": "https://xn--gndemanalizi-dlb.com.tr/kunye",
+          "correctionsPolicy": "https://xn--gndemanalizi-dlb.com.tr/iletisim",
+          "sameAs": [
+            "https://x.com/gndmanalizi",
+            "https://t.me/gundemanalizi",
+            "https://www.instagram.com/gundem_analiz/",
+            "https://www.facebook.com/gundemanalizi",
+            "https://www.tiktok.com/@gundemanalizi"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://xn--gndemanalizi-dlb.com.tr/#website",
+          "url": "https://xn--gndemanalizi-dlb.com.tr/",
+          "name": "Gündem Analizi",
+          "publisher": {
+            "@id": "https://xn--gndemanalizi-dlb.com.tr/#organization"
+          },
+          "inLanguage": "tr-TR",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://xn--gndemanalizi-dlb.com.tr/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
 
 
 
@@ -292,6 +343,7 @@
     {% if not active_category and not search_query %}
         <!-- 5. BİRİNCİ SAYFA / SÜREKLİ MANŞET: 1..14 NUMARALI DOKUNMATİK KAYAN SLIDER + 2 SICAK KART -->
         <section>
+            <h1 class="sr-only">Gündem Analizi — Son Dakika Haberler ve Güncel Türkiye Analizleri</h1>
             {% set slider_list = slider_articles if (slider_articles and slider_articles|length > 0) else articles %}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 <!-- SOL / ORTA (8 KOLON): 1..14 NUMARALI MANŞET SLIDER -->
