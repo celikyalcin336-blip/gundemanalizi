@@ -257,36 +257,29 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                 {"name": "ct0", "value": TWITTER_CT0, "domain": ".x.com", "path": "/", "secure": True, "httpOnly": False}
             ])
             page = context.new_page()
-                        # 🛡️ CANLI PROFİL ÇİFT PAYLAŞIM KALKANI
-            if title:
-                try:
-                    page.goto("https://x.com/gndmanalizi", wait_until="domcontentloaded", timeout=20000)
-                    page.wait_for_timeout(2500)
-                    tweet_elements = page.locator("article[data-testid='tweet']").all_text_contents()
-                    
-                    def _clean(s: str) -> str:
-                        s = s.lower().replace("ı", "i").replace("ğ", "g").replace("ü", "u").replace("ş", "s").replace("ö", "o").replace("ç", "c")
-                        return re.sub(r'[^a-z0-9]', '', s)
-                    
-                    norm_cand = _clean(title)
-                    cand_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', title.lower()) if len(w) >= 4]
+                        # 🛡️ CANLI PROFİL ÇİFT PAYLAŞIM KALKANI (Hem Metin Hem Başlık Taraması)
+            try:
+                page.goto("https://x.com/gndmanalizi", wait_until="domcontentloaded", timeout=20000)
+                page.wait_for_timeout(2500)
+                tweet_elements = page.locator("article[data-testid='tweet']").all_text_contents()
 
-                    for tw_text in tweet_elements[:6]:
-                        norm_tw = _clean(tw_text)
-                        if norm_cand and (norm_cand in norm_tw or (len(norm_cand) > 18 and norm_cand[:25] in norm_tw)):
-                            print(f"🛑 [Canlı Kalkan] '{title[:35]}...' haberi @gndmanalizi canlı profilinde zaten var!")
-                            browser.close()
-                            return {"status": "already_posted", "reason": "Haber canlı profilde mevcut"}
-                        if cand_words:
-                            tw_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', tw_text.lower()) if len(w) >= 4]
-                            if tw_words:
-                                common = set(cand_words) & set(tw_words)
-                                if len(common) / max(len(cand_words), 1) >= 0.7:
-                                    print(f"🛑 [Canlı Kalkan] '{title[:35]}...' kelime benzerliğiyle tespit edildi!")
-                                    browser.close()
-                                    return {"status": "already_posted", "reason": "Haber canlı profilde mevcut"}
-                except Exception as e:
-                    print(f"⚠️ Canlı profil kontrol uyarısı: {e}")
+                def _clean(s: str) -> str:
+                    s = s.lower().replace("ı", "i").replace("ğ", "g").replace("ü", "u").replace("ş", "s").replace("ö", "o").replace("ç", "c")
+                    return re.sub(r'[^a-z0-9]', '', s)
+
+                clean_body = _clean(text)
+                body_prefix = clean_body[:35] if clean_body else ""
+                clean_title = _clean(title) if title else ""
+                title_prefix = clean_title[:30] if clean_title else ""
+
+                for tw_text in tweet_elements[:6]:
+                    norm_tw = _clean(tw_text)
+                    if (body_prefix and len(body_prefix) >= 15 and body_prefix in norm_tw) or                        (clean_body and len(clean_body) > 30 and clean_body[:40] in norm_tw) or                        (clean_title and len(clean_title) >= 15 and clean_title in norm_tw) or                        (title_prefix and len(title_prefix) >= 15 and title_prefix in norm_tw):
+                        print(f"🛑 [Canlı Kalkan] Bu haber veya metin @gndmanalizi canlı profilinde zaten tespit edildi: {title or text[:30]}")
+                        browser.close()
+                        return {"status": "already_posted", "reason": "Haber canlı profilde mevcut"}
+            except Exception as e:
+                print(f"⚠️ Canlı profil kontrol uyarısı: {e}")
 
             page.goto("https://x.com/compose/post", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(3000)
