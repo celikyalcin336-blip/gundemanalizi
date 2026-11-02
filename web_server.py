@@ -1988,12 +1988,110 @@ async def sitemap_xsl():
         content = f.read()
     return HTMLResponse(content=content, media_type="application/xml")
 
+def _is_human_browser_request(request: Request) -> bool:
+    if request.query_params.get("raw") == "1" or request.query_params.get("format") == "xml":
+        return False
+    ua = (request.headers.get("user-agent") or "").lower()
+    accept = (request.headers.get("accept") or "").lower()
+    if any(b in ua for b in ("bot", "google", "bing", "yandex", "slurp", "duckduck", "baidu", "crawler", "spider", "curl", "python", " lighthouse", " inspection")):
+        return False
+    return "text/html" in accept and "mozilla" in ua
+
+def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_path: str) -> HTMLResponse:
+    rows_html = []
+    for i, r in enumerate(rows, 1):
+        rows_html.append(f"""
+        <tr class="hover:bg-slate-800/60 transition border-b border-slate-800/80">
+            <td class="py-3.5 px-4 text-xs font-bold text-slate-400">{i}</td>
+            <td class="py-3.5 px-4">
+                <div class="text-xs sm:text-sm font-bold text-white mb-0.5">{r.get('label', '')}</div>
+                <a href="{r['loc']}" target="_blank" class="text-xs text-sky-400 hover:underline break-all">{r['loc']}</a>
+            </td>
+            <td class="py-3.5 px-4 text-xs text-slate-300 whitespace-nowrap">{r.get('date', '-')}</td>
+            <td class="py-3.5 px-4 text-right"><span class="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">{r.get('prio', '0.8')}</span></td>
+        </tr>""")
+    html_str = f"""<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title} | Gündem Analizi</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body {{ font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }}
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+    <div class="max-w-5xl mx-auto space-y-6">
+        <div class="rounded-2xl bg-[#111827] border border-slate-800 p-6 sm:p-8 shadow-2xl">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">{title}</h1>
+            <p class="text-xs sm:text-sm text-slate-400 mb-5">{subtitle}</p>
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow transition">← Gündem Analizi Anasayfasına Dön</a>
+                <a href="{raw_xml_path}?raw=1" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">Ham XML Kodunu Gör</a>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
+                <div class="text-2xl font-black text-white">{len(rows)}</div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Toplam İndeksli Bağlantı</div>
+            </div>
+            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
+                <div class="text-2xl font-black text-emerald-400">CANLI</div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Google News & SEO Durumu</div>
+            </div>
+            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
+                <div class="text-2xl font-black text-white">UTF-8 / XML</div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Protokol Uyumluluğu</div>
+            </div>
+        </div>
+        <div class="rounded-2xl bg-[#111827] border border-slate-800 overflow-hidden shadow-2xl">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 bg-slate-900/70 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                        <th class="py-3.5 px-4 w-12">#</th>
+                        <th class="py-3.5 px-4">Sayfa / Haber Başlığı & Bağlantısı</th>
+                        <th class="py-3.5 px-4">Yayın Tarihi</th>
+                        <th class="py-3.5 px-4 text-right">Öncelik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {''.join(rows_html)}
+                </tbody>
+            </table>
+        </div>
+        <p class="text-center text-xs text-slate-500 pt-2">© 2026 Gündem Analizi - Doğru Haber, Tarafsız Analiz. Tüm Hakları Saklıdır.</p>
+    </div>
+</body>
+</html>"""
+    return HTMLResponse(content=html_str)
+
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
     import content_quality
     articles = [a for a in database.get_sitemap_articles(limit=500) if not content_quality.is_thin(a.get("content") or "")]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
+    if _is_human_browser_request(request):
+        rows = [
+            {"label": "Ana Sayfa", "loc": f"{base_url}/", "date": today_iso, "prio": "1.0"},
+            {"label": "Son Dakika Haberleri", "loc": f"{base_url}/son-dakika", "date": today_iso, "prio": "1.0"},
+            {"label": "Hakkımızda", "loc": f"{base_url}/hakkimizda", "date": today_iso, "prio": "0.5"},
+            {"label": "Künye (Medya Künyesi)", "loc": f"{base_url}/kunye", "date": today_iso, "prio": "0.5"},
+            {"label": "Yayın İlkeleri", "loc": f"{base_url}/yayin-ilkeleri", "date": today_iso, "prio": "0.5"},
+            {"label": "Yalçın Çelik — Genel Yayın Yönetmeni", "loc": f"{base_url}/yazar/yalcin-celik", "date": today_iso, "prio": "0.6"},
+            {"label": "İletişim & Düzeltme", "loc": f"{base_url}/iletisim", "date": today_iso, "prio": "0.5"},
+        ]
+        for a in articles:
+            rows.append({"label": a.get("title", ""), "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"})
+        return _render_pretty_sitemap_html(
+            "Gündem Analizi - Canlı Site Haritası",
+            "Bu XML site haritası, Google, Yandex ve Bing botlarının sitemizdeki sayfaları ve özgün haberleri anında tarayabilmesi için dinamik olarak üretilmektedir.",
+            rows,
+            "/sitemap.xml"
+        )
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
@@ -2022,6 +2120,17 @@ async def news_sitemap(request: Request):
     import content_quality
     articles = [a for a in database.get_sitemap_articles(limit=100) if not content_quality.is_thin(a.get("content") or "")]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
+    if _is_human_browser_request(request):
+        rows = [
+            {"label": a.get("title", ""), "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"}
+            for a in articles
+        ]
+        return _render_pretty_sitemap_html(
+            "Gündem Analizi - Canlı Site Haritası",
+            "Bu XML site haritası, Google News, Yandex ve Bing botlarının en son haberlerimizi anında tarayabilmesi için dinamik olarak üretilmektedir.",
+            rows,
+            "/news-sitemap.xml"
+        )
     xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">')
     for a in articles:
