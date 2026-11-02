@@ -107,32 +107,86 @@ def get_latest_articles_pool() -> list:
     return articles
 
 
-def normalize_title(t: str) -> str:
+def normalize_text_loose(t: str) -> str:
     if not t:
         return ""
     t = t.lower().replace("ı", "i").replace("ğ", "g").replace("ü", "u").replace("ş", "s").replace("ö", "o").replace("ç", "c")
-    return re.sub(r'[^a-z0-9]', '', t)
+    return re.sub(r'[^a-z0-9\s]', ' ', t)
 
 
-def is_duplicate_title(candidate: str, history_titles: list) -> bool:
-    if not candidate:
-        return True
-    c_norm = normalize_title(candidate)
-    c_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', candidate.lower()) if len(w) >= 4]
+def extract_key_entities(text: str) -> set:
+    """Metindeki özel isimleri ve kilit kurum/kişi adlarını çıkarır."""
+    if not text:
+        return set()
+    proper_nouns = re.findall(r'\b[A-ZÇĞİÖŞÜ][a-zçğıöşü]{3,}\b', text)
+    acronyms = re.findall(r'\b[A-ZÇĞİÖŞÜ]{2,}\b', text)
+    res = set(p.lower() for p in proper_nouns + acronyms)
+    common_stops = {"turkiye", "bakan", "baskani", "haber", "bugun", "resmi", "karar", "sayisi", "yeni", "donem"}
+    return res - common_stops
 
-    for h_title in history_titles:
-        if not h_title:
+
+def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_slug: str, history: list) -> tuple:
+    """
+    Haberin başlığı tamamen farklı olsa bile; içerik, özet, kişi ve kurum adlarını
+    tarayarak aynı olayın ikinci kez paylaşılmasını %100 engeller.
+    """
+    cand_norm_title = normalize_text_loose(candidate_title)
+    cand_title_words = set(w for w in cand_norm_title.split() if len(w) >= 4)
+    cand_entities = extract_key_entities(candidate_title + " " + candidate_summary)
+    cand_norm_summary = normalize_text_loose(candidate_summary)[:200]
+    cand_sum_words = set(w for w in cand_norm_summary.split() if len(w) >= 4)
+
+    for h in history:
+        if not isinstance(h, dict):
             continue
-        h_norm = normalize_title(h_title)
-        if c_norm == h_norm or (len(c_norm) > 20 and c_norm in h_norm) or (len(h_norm) > 20 and h_norm in c_norm):
-            return True
-        if c_words:
-            h_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', h_title.lower()) if len(w) >= 4]
-            if h_words:
-                common = set(c_words) & set(h_words)
-                if len(common) / max(len(c_words), 1) >= 0.7:
-                    return True
-    return False
+        h_slug = h.get("slug", "")
+        h_title = h.get("title", "")
+        h_summary = h.get("summary", "")
+
+        # 1. Birebir Slug veya Başlık Eşleşmesi
+        if candidate_slug and candidate_slug == h_slug:
+            return True, f"Birebir slug eşleşmesi: {h_slug}"
+        
+        h_norm_title = normalize_text_loose(h_title)
+        if cand_norm_title and h_norm_title:
+            if cand_norm_title == h_norm_title:
+                return True, f"Birebir başlık eşleşmesi: {h_title[:35]}"
+            if len(cand_norm_title) > 20 and cand_norm_title in h_norm_title:
+                return True, f"Başlık içerme: {h_title[:35]}"
+            if len(h_norm_title) > 20 and h_norm_title in cand_norm_title:
+                return True, f"Başlık içerme: {h_title[:35]}"
+
+        # 2. Başlık Kelime Benzerliği (%70+)
+        if cand_title_words:
+            h_title_words = set(w for w in h_norm_title.split() if len(w) >= 4)
+            if h_title_words:
+                common = cand_title_words & h_title_words
+                if len(common) / max(len(cand_title_words), 1) >= 0.7:
+                    return True, f"Başlık kelime benzerliği ({len(common)} kelime): {h_title[:35]}"
+
+        # 3. İÇERİK & ÖZET BENZERLİĞİ (Farklı başlıkla aynı haber tekrar gelirse!)
+        if h_summary and candidate_summary:
+            import difflib
+            h_norm_summary = normalize_text_loose(h_summary)[:200]
+            ratio = difflib.SequenceMatcher(None, cand_norm_summary, h_norm_summary).ratio()
+            if ratio >= 0.45:
+                return True, f"Özet/İçerik benzerliği (%{int(ratio*100)} aynı metin): {h_title[:35]}"
+
+            h_sum_words = set(w for w in h_norm_summary.split() if len(w) >= 4)
+            if cand_sum_words and h_sum_words:
+                sum_common = cand_sum_words & h_sum_words
+                if len(sum_common) >= 7 and len(sum_common) / max(len(cand_sum_words), 1) >= 0.45:
+                    return True, f"Özet ortak terimleri ({len(sum_common)} kelime): {h_title[:35]}"
+
+        # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Örn: Muhsin Atcı + SPK + MASAK)
+        h_entities = extract_key_entities(h_title + " " + h_summary)
+        if cand_entities and h_entities:
+            common_ent = cand_entities & h_entities
+            if len(common_ent) >= 3:
+                return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:3])}): {h_title[:35]}"
+
+    return False, ""
+
 
 def run_cycle(force: bool = False) -> bool:
     now_str = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -172,7 +226,10 @@ def run_cycle(force: bool = False) -> bool:
         slug = art.get("slug", "")
         site_url = art.get("site_url", "")
 
-        if not title or slug in posted_slugs or title in posted_titles or is_duplicate_title(title, posted_titles):
+        dup, dup_reason = is_duplicate_story(title, summary, slug, history)
+        if not title or dup:
+            if dup:
+                print(f"⏩ [Mükerrer Haber Kalkanı] Atlandı: {title[:35]}... ({dup_reason})")
             continue
 
         worthy, w_reason = x_poster.is_worthy_for_x(title, summary, category)
@@ -209,6 +266,7 @@ def run_cycle(force: bool = False) -> bool:
             history.append({
                 "slug": slug,
                 "title": title,
+                "summary": summary[:250],
                 "status": "posted",
                 "url": res.get("url"),
                 "ts": time.time()
