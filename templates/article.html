@@ -829,7 +829,7 @@
                         <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> tarafından yayımlanan bilgiler temel alınarak Gündem Analizi tarafından derlenmiş ve yeniden yazılmıştır.{% else %}Bu içerik Gündem Analizi tarafından hazırlanmıştır.{% endif %}
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> tarafından yayımlanan bilgiler temel alınarak Gündem Analizi tarafından <strong>yapay zekâ desteğiyle</strong> derlenmiş ve yeniden yazılmıştır.{% else %}Bu içerik Gündem Analizi tarafından hazırlanmıştır.{% endif %}
                         <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> gereği maddi hata bildirimi ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>

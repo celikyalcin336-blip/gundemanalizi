@@ -163,6 +163,9 @@ async def lifespan(app: FastAPI):
     threading.Thread(target=keep_alive_background_worker, daemon=True).start()
     # 7/24 Nobetci Sistem Bekcisi
     threading.Thread(target=system_health_watchdog_worker, daemon=True).start()
+    # Eski kısa haberleri (hiçbirini silmeden) yavaşça özgün metinle yeniden yazan arşiv yenileyici
+    import archive_rewriter
+    threading.Thread(target=archive_rewriter.background_worker, daemon=True).start()
     yield
 
 import secrets as _secrets
@@ -248,9 +251,26 @@ async def global_exception_handler(request: Request, exc: Exception):
         </head><body><h1>⚡ Sistem Optimize Ediliyor</h1><p>Sunucu önbelleği yenileniyor, sayfa birkaç saniye içinde otomatik açılacak...</p><a href="/">Yenile</a></body></html>"""
     )
 
+_PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), interest-cohort=()"
+_CSP_REPORT_ONLY = (
+    "default-src 'self' https: data: blob:; "
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; "
+    "style-src 'self' 'unsafe-inline' https:; "
+    "img-src 'self' https: data: blob:; "
+    "font-src 'self' https: data:; "
+    "connect-src 'self' https:; "
+    "frame-src 'self' https:; "
+    "frame-ancestors 'self';"
+)
+
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
+    if path == "/kullanim-kosullari":
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/kullanim-sartlari", status_code=301)
+    if request.method == "HEAD":
+        request.scope["method"] = "GET"
 
     # Cloudflare'i atlayıp doğrudan Render adresinden (*.onrender.com) gelen istekleri ana alan adına yönlendir.
     # (Bu yol açık kalırsa IP başlıkları taklit edilip hız sınırları atlatılabilir; ayrıca kopya içerik oluşur.)
@@ -274,6 +294,8 @@ async def track_visitors_middleware(request: Request, call_next):
         resp.headers["X-Frame-Options"] = "SAMEORIGIN"
         resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
+        resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
         return resp
 
     # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
@@ -288,6 +310,7 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith("/assets") or
         path.startswith("/images") or
         path.startswith("/.well-known") or
+        path.startswith("/sitemap") or
         path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/video-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
     )
     if not (is_api_or_admin or is_static_or_system):
@@ -364,6 +387,8 @@ async def track_visitors_middleware(request: Request, call_next):
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
     resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
+    resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
     if not (is_api_or_admin or is_static_or_system) and not bot_type and not request.cookies.get("ga_vis"):
         try:
             resp.set_cookie("ga_vis", "1", max_age=31536000, httponly=True, samesite="lax", path="/")
@@ -457,10 +482,10 @@ async def serve_image(filename: str, request: Request):
             "Vary": "Accept"
         })
 
-    # 3. Resim bulunamadıysa ASLA önbelleğe (cache) alma, anlık yedek dön
+    # 3. Resim bulunamadıysa: görsel yer tutucu (logo) gösterilir ama durum kodu 404 olur (soft-404 önlemi)
     fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
     if os.path.exists(fallback_logo):
-        return FileResponse(fallback_logo, headers={
+        return FileResponse(fallback_logo, status_code=404, headers={
             "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
             "CDN-Cache-Control": "no-store",
             "Cloudflare-CDN-Cache-Control": "no-store"
@@ -988,10 +1013,13 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         else:
             articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
             total_count = database.get_articles_total_count(category=norm_kategori)
-        if norm_kategori:
-            canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(norm_kategori)}"
+        # Sayfalı listelerde her sayfa kendini canonical gösterir (Google arşive 2., 3. ... sayfalardan ulaşabilsin)
+        if norm_kategori == "Son Dakika":
+            canonical_url = f"{config.SITE_URL}/son-dakika" + (f"?sayfa={page}" if page > 1 else "")
+        elif norm_kategori:
+            canonical_url = f"{config.SITE_URL}/?kategori={urllib.parse.quote(norm_kategori)}" + (f"&sayfa={page}" if page > 1 else "")
         else:
-            canonical_url = f"{config.SITE_URL}/"
+            canonical_url = f"{config.SITE_URL}/" + (f"?sayfa={page}" if page > 1 else "")
 
     total_pages = max(1, math.ceil(total_count / limit))
     widgets = get_cached_category_widgets()
@@ -1726,6 +1754,26 @@ async def submit_ihbar(
     threading.Thread(target=_bg_send, daemon=True).start()
     return {"ok": True, "message": "İhbarınız ve medyanız Haber Merkezimize başarıyla iletildi! Teşekkür ederiz."}
 
+def summary_highlights(content: str, summary: str, title: str) -> list:
+    """'Haberin Önemli Noktaları' maddelerini, haber gövdesinde GÖRÜNMEYEN özgün özetten üretir.
+    Gövdede birebir geçen cümleler alınmaz (sayfa içi kopya içerik olmasın); 2'den az madde kalırsa kutu gizlenir."""
+    import html as _h
+    body_txt = re.sub(r"\s+", " ", _h.unescape(re.sub(r"<[^>]+>", " ", content or ""))).lower()
+    out = []
+    for s in smart_sentence_split(_h.unescape(summary or "").strip()):
+        s = s.strip()
+        if len(s) < 35 or s.lower() == (title or "").lower():
+            continue
+        key = re.sub(r"\s+", " ", s.lower())
+        if key[:70] in body_txt:
+            continue
+        if s not in out:
+            out.append(s)
+        if len(out) >= 3:
+            break
+    return out if len(out) >= 2 else []
+
+
 def extract_clean_highlights(content: str, summary: str, title: str) -> list:
     """Haberin içinden tam, anlamlı ve kesilmemiş 2-3 adet madde/özet çıkarır. Lead paragrafı birebir tekrarlamaz."""
     import re, html
@@ -1875,7 +1923,7 @@ async def article_detail(request: Request, slug: str):
     reading_time_min = max(1, round(word_count / 140))
 
     # Kesilmeyen tam özet maddeleri
-    highlights = extract_clean_highlights(article.get("content", ""), article.get("summary", ""), article.get("title", ""))
+    highlights = summary_highlights(article.get("content", ""), article.get("summary", ""), article.get("title", ""))
 
     ad_settings = get_site_ad_settings()
     ad_mid = ad_settings.get("ad_slot_article_mid", "").strip() if ad_settings.get("ads_enabled") else ""
@@ -1885,6 +1933,12 @@ async def article_detail(request: Request, slug: str):
     import html as _html_mod
     raw_content = content_quality.clean_article_html(raw_content)
     is_thin_article = content_quality.visible_word_count(raw_content) < 300
+    # Loto/burç/maç saati gibi rutin "emtia" haberler sitede kalır ama Google dizinine alınmaz
+    try:
+        if main.is_commodity_news(article.get("title", "")):
+            is_thin_article = True
+    except Exception:
+        pass
 
     # "Gündem Analizi Notu" bölümünü öne çıkan editoryal kutuya al (yeni makalelerde yapay zeka bu bölümü yazar)
     raw_content = re.sub(
@@ -2177,7 +2231,14 @@ async def api_articles(limit: int = 10):
         limit = 10
     rows = database.get_articles(limit=limit)
     keep = ("id", "slug", "title", "summary", "category", "image_path", "source", "created_at")
-    return [{k: r.get(k) for k in keep} for r in rows]
+    out = []
+    for r in rows:
+        d = {k: r.get(k) for k in keep}
+        # Sunucu klasör yolunu (/opt/render/...) dışarıya gösterme; yalnızca herkese açık görsel adresi
+        img = (d.get("image_path") or "").replace("\\", "/").split("/")[-1]
+        d["image_path"] = f"/images/{img}" if img else ""
+        out.append(d)
+    return out
 
 _REACT_SEEN = {}      # (ip+tarayıcı+haber) özeti -> zaman
 _REACT_IP_RATE = {}   # ip -> [zamanlar]
@@ -2228,6 +2289,13 @@ async def api_add_reaction(request: Request):
 async def api_stats(request: Request):
     require_admin_pin(request)
     return database.get_storage_stats()
+
+@app.get("/api/archive-progress")
+async def api_archive_progress(request: Request):
+    """Arşiv yenileyicinin ilerlemesi (yalnızca yönetici)."""
+    require_admin_pin(request)
+    import archive_rewriter
+    return await asyncio.to_thread(archive_rewriter.get_progress)
 
 @app.get("/api/db-status")
 async def api_db_status(request: Request):
@@ -2374,58 +2442,132 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
 </html>"""
     return HTMLResponse(content=html_str)
 
+# ==================== SİTE HARİTASI (SINIRSIZ, ÖNBELLEKLİ) ====================
+_SITEMAP_CHUNK = 1000                      # her alt haritada en fazla 1000 haber (Google sınırı 50.000)
+_SITEMAP_TTL = 900                         # 15 dakikada bir tazelenir
+_INDEX_MEMO = {}                           # id -> {"slug","created_at","len","ok"}
+_INDEX_CACHE = {"ts": 0, "rows": []}
+_INDEX_LOCK = threading.Lock()
+
+
+def _indexable_articles() -> list:
+    """noindex OLMAYAN (zayıf olmayan) tüm haberleri en yeniden eskiye döner.
+    İçerik yalnızca yeni/değişmiş haberler için okunur; böylece arşiv büyüse de veritabanı yorulmaz."""
+    import content_quality
+    now = time.time()
+    if _INDEX_CACHE["rows"] and now - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
+        return _INDEX_CACHE["rows"]
+    with _INDEX_LOCK:
+        if _INDEX_CACHE["rows"] and time.time() - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
+            return _INDEX_CACHE["rows"]
+        with database.get_connection() as conn:
+            meta = [dict(r) for r in conn.execute(
+                "SELECT id, slug, title, created_at, LENGTH(content) AS clen FROM articles ORDER BY id DESC"
+            ).fetchall()]
+        changed = [m["id"] for m in meta
+                   if m["id"] not in _INDEX_MEMO or _INDEX_MEMO[m["id"]]["len"] != (m["clen"] or 0)]
+        for i in range(0, len(changed), 100):
+            batch = changed[i:i + 100]
+            marks = ",".join("?" * len(batch))
+            with database.get_connection() as conn:
+                for r in conn.execute(f"SELECT id, content FROM articles WHERE id IN ({marks})", tuple(batch)).fetchall():
+                    r = dict(r)
+                    _INDEX_MEMO[r["id"]] = {"len": len(r["content"] or ""), "ok": not content_quality.is_thin(r["content"] or "")}
+        rows = []
+        live_ids = set()
+        for m in meta:
+            live_ids.add(m["id"])
+            memo = _INDEX_MEMO.get(m["id"])
+            try:
+                commodity = main.is_commodity_news(m.get("title") or "")
+            except Exception:
+                commodity = False
+            if memo and memo["ok"] and not commodity:
+                d = database._row_to_dict({"id": m["id"], "slug": m["slug"], "created_at": m["created_at"]})
+                rows.append(d)
+        for k in list(_INDEX_MEMO.keys()):
+            if k not in live_ids:
+                _INDEX_MEMO.pop(k, None)
+        _INDEX_CACHE["rows"] = rows
+        _INDEX_CACHE["ts"] = time.time()
+        return rows
+
+
+_STATIC_SITEMAP_PAGES = [
+    ("/", "hourly", "1.0", "Ana Sayfa"),
+    ("/son-dakika", "always", "1.0", "Son Dakika Haberleri"),
+    ("/piyasalar", "hourly", "0.9", "Canlı Piyasalar & Döviz/Altın Çevirici"),
+    ("/son-depremler", "always", "0.9", "Son Depremler — Canlı Liste ve Harita"),
+    ("/hesaplama", "monthly", "0.8", "Hesaplama Araçları"),
+    ("/hesaplama/maas", "monthly", "0.8", "Brüt–Net Maaş Hesaplama"),
+    ("/hesaplama/kidem-tazminati", "monthly", "0.8", "Kıdem Tazminatı Hesaplama"),
+    ("/hesaplama/emekli-zammi", "monthly", "0.8", "Emekli Zammı Hesaplama"),
+    ("/hakkimizda", "monthly", "0.5", "Hakkımızda"),
+    ("/kunye", "monthly", "0.5", "Künye (Medya Künyesi)"),
+    ("/yayin-ilkeleri", "monthly", "0.5", "Yayın İlkeleri"),
+    ("/yazar/yalcin-celik", "weekly", "0.6", "Yalçın Çelik — Genel Yayın Yönetmeni"),
+    ("/iletisim", "monthly", "0.5", "İletişim & Düzeltme"),
+    ("/gizlilik-politikasi", "monthly", "0.5", "Gizlilik Politikası"),
+    ("/kullanim-sartlari", "monthly", "0.5", "Kullanım Şartları"),
+    ("/cerez-politikasi", "monthly", "0.5", "Çerez Politikası"),
+]
+_SITEMAP_CATEGORIES = ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş")
+
+
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
-    import content_quality
-    articles = [a for a in database.get_sitemap_articles(limit=500) if not content_quality.is_thin(a.get("content") or "")]
+    """Site haritası dizini: sabit sayfalar + 1000'erlik haber parçaları (sınırsız büyür)."""
+    import math
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
+    articles = await asyncio.to_thread(_indexable_articles)
     if _is_human_browser_request(request):
-        rows = [
-            {"label": "Ana Sayfa", "loc": f"{base_url}/", "date": today_iso, "prio": "1.0"},
-            {"label": "Son Dakika Haberleri", "loc": f"{base_url}/son-dakika", "date": today_iso, "prio": "1.0"},
-            {"label": "Canlı Piyasalar & Döviz/Altın Çevirici", "loc": f"{base_url}/piyasalar", "date": today_iso, "prio": "0.9"},
-            {"label": "Son Depremler — Canlı Liste ve Harita", "loc": f"{base_url}/son-depremler", "date": today_iso, "prio": "0.9"},
-            {"label": "Hesaplama Araçları", "loc": f"{base_url}/hesaplama", "date": today_iso, "prio": "0.8"},
-            {"label": "Brüt–Net Maaş Hesaplama", "loc": f"{base_url}/hesaplama/maas", "date": today_iso, "prio": "0.8"},
-            {"label": "Kıdem Tazminatı Hesaplama", "loc": f"{base_url}/hesaplama/kidem-tazminati", "date": today_iso, "prio": "0.8"},
-            {"label": "Emekli Zammı Hesaplama", "loc": f"{base_url}/hesaplama/emekli-zammi", "date": today_iso, "prio": "0.8"},
-            {"label": "Hakkımızda", "loc": f"{base_url}/hakkimizda", "date": today_iso, "prio": "0.5"},
-            {"label": "Künye (Medya Künyesi)", "loc": f"{base_url}/kunye", "date": today_iso, "prio": "0.5"},
-            {"label": "Yayın İlkeleri", "loc": f"{base_url}/yayin-ilkeleri", "date": today_iso, "prio": "0.5"},
-            {"label": "Yalçın Çelik — Genel Yayın Yönetmeni", "loc": f"{base_url}/yazar/yalcin-celik", "date": today_iso, "prio": "0.6"},
-            {"label": "İletişim & Düzeltme", "loc": f"{base_url}/iletisim", "date": today_iso, "prio": "0.5"},
-        ]
-        for a in articles:
-            rows.append({"label": a.get("title", ""), "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"})
+        rows = [{"label": lbl, "loc": f"{base_url}{p}", "date": today_iso, "prio": pr} for p, _cf, pr, lbl in _STATIC_SITEMAP_PAGES]
+        for a in articles[:300]:
+            rows.append({"label": "", "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"})
         return _render_pretty_sitemap_html(
             "Gündem Analizi - Canlı Site Haritası",
-            "Bu XML site haritası, Google, Yandex ve Bing botlarının sitemizdeki sayfaları ve özgün haberleri anında tarayabilmesi için dinamik olarak üretilmektedir.",
+            f"Bu XML site haritası, Google, Yandex ve Bing botlarının sitemizdeki sayfaları ve özgün haberleri anında tarayabilmesi için dinamik olarak üretilmektedir. Toplam {len(articles)} haber indekslenebilir durumda.",
             rows,
             "/sitemap.xml"
         )
-    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-    xml.append(f'  <url><loc>{base_url}/</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/son-dakika</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>1.0</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/piyasalar</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/son-depremler</loc><lastmod>{today_iso}</lastmod><changefreq>always</changefreq><priority>0.9</priority></url>')
-    for _p in ("/hesaplama", "/hesaplama/maas", "/hesaplama/kidem-tazminati", "/hesaplama/emekli-zammi"):
-        xml.append(f'  <url><loc>{base_url}{_p}</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>')
+    chunks = max(1, math.ceil(len(articles) / _SITEMAP_CHUNK))
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    xml.append(f'  <sitemap><loc>{base_url}/sitemap-sayfalar.xml</loc><lastmod>{today_iso}</lastmod></sitemap>')
+    for n in range(1, chunks + 1):
+        part = articles[(n - 1) * _SITEMAP_CHUNK:n * _SITEMAP_CHUNK]
+        last = (part[0].get("created_at") or today_iso)[:10] if part else today_iso
+        xml.append(f'  <sitemap><loc>{base_url}/sitemap-haber-{n}.xml</loc><lastmod>{last}</lastmod></sitemap>')
+    xml.append('</sitemapindex>')
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+
+
+@app.get("/sitemap-sayfalar.xml")
+async def sitemap_pages():
     import urllib.parse
-    for cat in ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş"):
-        cat_enc = urllib.parse.quote(cat)
-        xml.append(f'  <url><loc>{base_url}/?kategori={cat_enc}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/hakkimizda</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/kunye</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/yayin-ilkeleri</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/yazar/yalcin-celik</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/iletisim</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/gizlilik-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/kullanim-sartlari</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/cerez-politikasi</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>')
-    for a in articles:
-        xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{a["created_at"][:10]}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>')
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
+    today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for p, cf, pr, _lbl in _STATIC_SITEMAP_PAGES:
+        xml.append(f'  <url><loc>{base_url}{p}</loc><lastmod>{today_iso}</lastmod><changefreq>{cf}</changefreq><priority>{pr}</priority></url>')
+    for cat in _SITEMAP_CATEGORIES:
+        xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+    xml.append('</urlset>')
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+
+
+@app.get("/sitemap-haber-{n}.xml")
+async def sitemap_articles_chunk(n: int):
+    if n < 1:
+        raise HTTPException(status_code=404)
+    base_url = "https://xn--gndemanalizi-dlb.com.tr"
+    articles = await asyncio.to_thread(_indexable_articles)
+    part = articles[(n - 1) * _SITEMAP_CHUNK:n * _SITEMAP_CHUNK]
+    if not part and n > 1:
+        raise HTTPException(status_code=404)
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for a in part:
+        xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{(a.get("created_at") or "")[:10]}</lastmod></url>')
     xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml")
 
@@ -2434,7 +2576,17 @@ async def news_sitemap(request: Request):
     """Google Haberler (Google News & Top Stories) özel XML site haritası."""
     from xml.sax.saxutils import escape
     import content_quality
-    articles = [a for a in database.get_sitemap_articles(limit=100) if not content_quality.is_thin(a.get("content") or "")]
+    # Google Haberler kuralı: yalnızca son 48 saatte yayımlanan haberler
+    cutoff = (datetime.now(timezone(timedelta(hours=3))) - timedelta(hours=48)).strftime("%Y-%m-%d %H:%M:%S")
+    articles = [a for a in (await asyncio.to_thread(_indexable_articles))[:300] if (a.get("created_at") or "") >= cutoff]
+    by_id = {}
+    if articles:
+        ids = [a["id"] for a in articles]
+        with database.get_connection() as conn:
+            for r in conn.execute(f"SELECT id, title FROM articles WHERE id IN ({','.join('?' * len(ids))})", tuple(ids)).fetchall():
+                by_id[dict(r)["id"]] = dict(r)["title"]
+    for a in articles:
+        a["title"] = by_id.get(a["id"], "")
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     if _is_human_browser_request(request):
         rows = [
