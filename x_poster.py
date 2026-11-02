@@ -206,6 +206,56 @@ def format_x_tweet(title: str, summary: str, site_url: str = "", category: str =
     return tweet.strip()
 
 
+def fetch_full_article_text(site_url: str) -> str:
+    """Haberin TAM metnini sitedeki haber sayfasından (article-body) paragraf paragraf çeker.
+    Sitenin otomatik 'GÜNDEM ANALİZİ DEĞERLENDİRMESİ' kutusu ve alt başlıklar alınmaz."""
+    if not site_url:
+        return ""
+    try:
+        import html as _html
+        resp = requests.get(site_url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        if resp.status_code != 200:
+            return ""
+        page = resp.text
+        start = page.find("article-body")
+        if start < 0:
+            return ""
+        seg = page[start:]
+        for stop in ("GÜNDEM ANALİZİ DEĞERLENDİRMESİ", "SIRADAKİ HABER", "<!-- SIRADAK"):
+            k = seg.find(stop)
+            if k > 0:
+                seg = seg[:k]
+        paras = []
+        for raw in re.findall(r"<p[^>]*>(.*?)</p>", seg, re.S):
+            t = _html.unescape(re.sub(r"<[^>]+>", "", raw))
+            t = re.sub(r"\s+", " ", t).strip()
+            if len(t) >= 25 and t not in paras:
+                paras.append(t)
+        return "\n\n".join(paras)
+    except Exception as e:
+        print(f"⚠️ Tam haber metni alınamadı: {e}")
+        return ""
+
+
+def format_x_long_post(title: str, full_text: str, category: str = "Gündem", max_chars: int = 3500) -> str:
+    """Mavi tik (X Premium) için haberi TAM anlatan uzun gönderi metni:
+    Başlık + haberin tüm paragrafları + etiketler. Paragraflar asla ortadan kesilmez."""
+    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor", "Dünya", "Sağlık") else "#Gündem"
+    tags = f"{cat_tag} #SonDakika #Haber"
+    clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', title.strip()).strip()
+    paras = [strip_all_urls(p).strip() for p in full_text.split("\n\n")]
+    paras = [p for p in paras if p and p.lower() != clean_title.lower()]
+    out = []
+    used = len(clean_title) + len(tags) + 10
+    for p in paras:
+        if used + len(p) + 2 > max_chars:
+            break
+        out.append(p)
+        used += len(p) + 2
+    body = "\n\n".join(out)
+    return f"🔴 {clean_title}\n\n{body}\n\n{tags}".strip()
+
+
 def strip_all_urls(text: str) -> str:
     """X algoritması için tweet metnindeki tüm linkleri tamamen temizler."""
     if not text:
@@ -224,7 +274,7 @@ def strip_all_urls(text: str) -> str:
     return text.strip()
 
 
-def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: str = "") -> dict:
+def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: str = "", fallback_text: str = "") -> dict:
     """
     Playwright Chromium motoruyla X'te (%100 ücretsiz) tweet yayınlar.
     Görsel ve video eklerini destekler.
@@ -358,6 +408,24 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: st
                     break
                 page.wait_for_timeout(1000)
 
+            # Uzun gönderi kabul edilmediyse (buton pasif kaldıysa) kısa metne düş
+            try:
+                still_dis = (post_btn.get_attribute("aria-disabled") if post_btn.count() else "true") == "true"
+            except Exception:
+                still_dis = False
+            if still_dis and fallback_text and len(text) > 280:
+                print("⚠️ Uzun gönderi kabul edilmedi, kısa metinle devam ediliyor.")
+                editor.first.click()
+                page.keyboard.press("Control+A")
+                page.keyboard.press("Delete")
+                editor.first.fill(strip_all_urls(fallback_text))
+                page.wait_for_timeout(1500)
+                for _ in range(10):
+                    aria_dis = post_btn.get_attribute("aria-disabled") if post_btn.count() else "true"
+                    if aria_dis != "true":
+                        break
+                    page.wait_for_timeout(1000)
+
             # Güvenli gönderim: JS Evaluate click + Control+Enter + dispatchEvent
             sent = False
             try:
@@ -448,13 +516,15 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     except Exception as e:
         print(f"⚠️ X editoryal kart oluşturma istisnası: {e}")
 
-    # 4. Tweet Metnini Hazırla (Cevap ve detay odaklı ferah metin)
-    tweet_text = format_x_tweet(title, summary, site_url, category)
+    # 4. Tweet Metnini Hazırla: haberin TAM metni (mavi tik uzun gönderi); alınamazsa kısa özet
+    short_text = format_x_tweet(title, summary, site_url, category)
+    full_text = fetch_full_article_text(site_url)
+    tweet_text = format_x_long_post(title, full_text, category) if len(full_text) > len(summary or "") else short_text
 
     # 5. Playwright ile Tweeti Gönder
     if not final_media or not os.path.exists(final_media):
         return {"status": "error", "reason": "Görsel üretilemedi - görselsiz tweet atılmaz"}
-    res = post_tweet_playwright(tweet_text, media_path=final_media, title=title)
+    res = post_tweet_playwright(tweet_text, media_path=final_media, title=title, fallback_text=short_text)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
         return {"status": "success", "url": "https://x.com/gndmanalizi"}
