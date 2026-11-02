@@ -106,6 +106,33 @@ def get_latest_articles_pool() -> list:
     return articles
 
 
+def normalize_title(t: str) -> str:
+    if not t:
+        return ""
+    t = t.lower().replace("ı", "i").replace("ğ", "g").replace("ü", "u").replace("ş", "s").replace("ö", "o").replace("ç", "c")
+    return re.sub(r'[^a-z0-9]', '', t)
+
+
+def is_duplicate_title(candidate: str, history_titles: list) -> bool:
+    if not candidate:
+        return True
+    c_norm = normalize_title(candidate)
+    c_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', candidate.lower()) if len(w) >= 4]
+
+    for h_title in history_titles:
+        if not h_title:
+            continue
+        h_norm = normalize_title(h_title)
+        if c_norm == h_norm or (len(c_norm) > 20 and c_norm in h_norm) or (len(h_norm) > 20 and h_norm in c_norm):
+            return True
+        if c_words:
+            h_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', h_title.lower()) if len(w) >= 4]
+            if h_words:
+                common = set(c_words) & set(h_words)
+                if len(common) / max(len(c_words), 1) >= 0.7:
+                    return True
+    return False
+
 def run_cycle(force: bool = False) -> bool:
     now_str = time.strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{now_str}] 🚀 [X Auto-Poster] Kontrol başlatılıyor...")
@@ -144,7 +171,7 @@ def run_cycle(force: bool = False) -> bool:
         slug = art.get("slug", "")
         site_url = art.get("site_url", "")
 
-        if not title or slug in posted_slugs or title in posted_titles:
+        if not title or slug in posted_slugs or title in posted_titles or is_duplicate_title(title, posted_titles):
             continue
 
         worthy, w_reason = x_poster.is_worthy_for_x(title, summary, category)
@@ -188,6 +215,17 @@ def run_cycle(force: bool = False) -> bool:
             save_history(history)
             print(f"🎉 [X Auto-Poster] Başarıyla tweetlendi: {title}")
             return True
+        elif res.get("status") == "already_posted":
+            history.append({
+                "slug": slug,
+                "title": title,
+                "status": "posted",
+                "url": res.get("url", "https://x.com/gndmanalizi"),
+                "ts": time.time()
+            })
+            save_history(history)
+            print(f"🛡️ [X Auto-Poster] Canlı profilde zaten tespit edildi, mükerrer önlendi: {title}")
+            continue
         else:
             print(f"⚠️ Paylaşım hatası ({res}), sıradaki haber deneniyor...")
             continue

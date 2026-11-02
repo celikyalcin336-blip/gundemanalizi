@@ -217,7 +217,7 @@ def strip_all_urls(text: str) -> str:
     return text.strip()
 
 
-def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
+def post_tweet_playwright(text: str, media_path: Optional[str] = None, title: str = "") -> dict:
     """
     Playwright Chromium motoruyla X'te (%100 ücretsiz) tweet yayınlar.
     Görsel ve video eklerini destekler.
@@ -257,6 +257,37 @@ def post_tweet_playwright(text: str, media_path: Optional[str] = None) -> dict:
                 {"name": "ct0", "value": TWITTER_CT0, "domain": ".x.com", "path": "/", "secure": True, "httpOnly": False}
             ])
             page = context.new_page()
+                        # 🛡️ CANLI PROFİL ÇİFT PAYLAŞIM KALKANI
+            if title:
+                try:
+                    page.goto("https://x.com/gndmanalizi", wait_until="domcontentloaded", timeout=20000)
+                    page.wait_for_timeout(2500)
+                    tweet_elements = page.locator("article[data-testid='tweet']").all_text_contents()
+                    
+                    def _clean(s: str) -> str:
+                        s = s.lower().replace("ı", "i").replace("ğ", "g").replace("ü", "u").replace("ş", "s").replace("ö", "o").replace("ç", "c")
+                        return re.sub(r'[^a-z0-9]', '', s)
+                    
+                    norm_cand = _clean(title)
+                    cand_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', title.lower()) if len(w) >= 4]
+
+                    for tw_text in tweet_elements[:6]:
+                        norm_tw = _clean(tw_text)
+                        if norm_cand and (norm_cand in norm_tw or (len(norm_cand) > 18 and norm_cand[:25] in norm_tw)):
+                            print(f"🛑 [Canlı Kalkan] '{title[:35]}...' haberi @gndmanalizi canlı profilinde zaten var!")
+                            browser.close()
+                            return {"status": "already_posted", "reason": "Haber canlı profilde mevcut"}
+                        if cand_words:
+                            tw_words = [w for w in re.findall(r'[a-z0-9çğıöşü]+', tw_text.lower()) if len(w) >= 4]
+                            if tw_words:
+                                common = set(cand_words) & set(tw_words)
+                                if len(common) / max(len(cand_words), 1) >= 0.7:
+                                    print(f"🛑 [Canlı Kalkan] '{title[:35]}...' kelime benzerliğiyle tespit edildi!")
+                                    browser.close()
+                                    return {"status": "already_posted", "reason": "Haber canlı profilde mevcut"}
+                except Exception as e:
+                    print(f"⚠️ Canlı profil kontrol uyarısı: {e}")
+
             page.goto("https://x.com/compose/post", wait_until="domcontentloaded", timeout=30000)
             page.wait_for_timeout(3000)
 
@@ -386,7 +417,7 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     tweet_text = format_x_tweet(title, summary, site_url, category)
 
     # 5. Playwright ile Tweeti Gönder
-    res = post_tweet_playwright(tweet_text, media_path=final_media)
+    res = post_tweet_playwright(tweet_text, media_path=final_media, title=title)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
         return {"status": "success", "url": "https://x.com/gndmanalizi"}
