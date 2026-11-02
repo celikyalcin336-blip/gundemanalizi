@@ -16,3 +16,10 @@ data/*.db
 output/
 scratch/
 *.log
+
+# Tarayici oturum profilleri (cerez/oturum icerir - ASLA repoya girmemeli)
+tiktok_profile/
+*_profile/
+bulletin_publish_log.json
+reels_schedule_state.json
+used_bulletin_stories.json
