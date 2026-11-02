@@ -178,12 +178,25 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
                 if len(sum_common) >= 7 and len(sum_common) / max(len(cand_sum_words), 1) >= 0.45:
                     return True, f"Özet ortak terimleri ({len(sum_common)} kelime): {h_title[:35]}"
 
-        # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Örn: Muhsin Atcı + SPK + MASAK)
+        # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Örn: Muhsin Atcı + SPK veya Conceiçao + Fenerbahçe)
         h_entities = extract_key_entities(h_title + " " + h_summary)
         if cand_entities and h_entities:
             common_ent = cand_entities & h_entities
-            if len(common_ent) >= 3:
-                return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:3])}): {h_title[:35]}"
+            if len(common_ent) >= 2:
+                return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:2])}): {h_title[:35]}"
+
+        # 5. SPOR KULÜBÜ KORUMASI: Son 6 saatte aynı kulüp hakkında haber paylaşıldıysa mükerrer say
+        MAJOR_CLUBS = ["fenerbahce", "galatasaray", "besiktas", "trabzonspor"]
+        cand_lower = cand_norm_title.lower()
+        h_lower = h_norm_title.lower()
+        for club in MAJOR_CLUBS:
+            if club in cand_lower and club in h_lower:
+                try:
+                    h_ts = float(h.get("ts", 0))
+                    if time.time() - h_ts < 21600:  # 6 saat kilit
+                        return True, f"Aynı kulüp ({club.title()}) son 6 saatte paylaşıldı: {h_title[:35]}"
+                except Exception:
+                    pass
 
     return False, ""
 
