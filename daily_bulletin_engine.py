@@ -163,7 +163,7 @@ def fetch_stories_for_bulletin() -> list:
     live_articles = []
     try:
         req = urllib.request.Request(
-            "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=250",
+            "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=100",
             headers={"User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as resp:

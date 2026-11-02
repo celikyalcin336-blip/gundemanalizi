@@ -301,6 +301,20 @@ def init_db():
     if USE_PG:
         _migrate_from_sqlite_if_empty()
 
+    # Gerçek okuyucu tepkileri (Okuyucu Nabzı) tablosu
+    try:
+        with get_connection() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS article_reactions (
+                    article_id INTEGER NOT NULL,
+                    choice TEXT NOT NULL,
+                    cnt INTEGER DEFAULT 0,
+                    PRIMARY KEY (article_id, choice)
+                )
+            """)
+    except Exception as e:
+        print(f"article_reactions tablo hatası: {e}")
+
     # Arka plan API sorgu kayıtlarını (döviz kurları vb.) ziyaretçi geçmişinden temizle
     try:
         with get_connection() as conn:
@@ -1607,3 +1621,41 @@ def get_dashboard_summary() -> Dict:
     _DASHBOARD_CACHE["data"] = res
     _DASHBOARD_CACHE["ts"] = time.time()
     return res
+
+
+# ========================================================
+# 📊 OKUYUCU NABZI — GERÇEK OYLAR
+# ========================================================
+REACTION_CHOICES = ("olumlu", "sasirtici", "dusundurucu", "olumsuz")
+
+
+def get_reactions(article_id: int) -> Dict:
+    """Bir haberin gerçek tepki sayılarını döner."""
+    counts = {c: 0 for c in REACTION_CHOICES}
+    try:
+        with get_connection() as conn:
+            rows = conn.execute(
+                "SELECT choice, cnt FROM article_reactions WHERE article_id = ?", (int(article_id),)
+            ).fetchall()
+            for r in rows:
+                if r["choice"] in counts:
+                    counts[r["choice"]] = int(r["cnt"] or 0)
+    except Exception as e:
+        print(f"get_reactions hatası: {e}")
+    return counts
+
+
+def add_reaction(article_id: int, choice: str) -> bool:
+    """Bir habere gerçek tepki oyu ekler."""
+    if choice not in REACTION_CHOICES:
+        return False
+    try:
+        with get_connection() as conn:
+            conn.execute("""
+                INSERT INTO article_reactions (article_id, choice, cnt) VALUES (?, ?, 1)
+                ON CONFLICT (article_id, choice) DO UPDATE SET cnt = article_reactions.cnt + 1
+            """, (int(article_id), choice))
+        return True
+    except Exception as e:
+        print(f"add_reaction hatası: {e}")
+        return False

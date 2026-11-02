@@ -632,58 +632,69 @@
                 (function() {
                     const box = document.getElementById('reader-reaction-box');
                     if (!box) return;
-                    const aid = parseInt(box.getAttribute('data-article-id') || '100', 10) || 100;
-                    const storageKey = 'ga_react_v2_' + aid;
-                    localStorage.removeItem('ga_react_' + aid);
-                    const baseCounts = {
-                        olumlu: 14 + (aid * 7) % 19,
-                        sasirtici: 6 + (aid * 5) % 11,
-                        dusundurucu: 8 + (aid * 3) % 13,
-                        olumsuz: 4 + (aid * 11) % 9
-                    };
-                    function renderReactions() {
-                        const chosen = localStorage.getItem(storageKey);
-                        const counts = Object.assign({}, baseCounts);
-                        if (chosen && counts[chosen] !== undefined) counts[chosen] += 1;
-                        const total = counts.olumlu + counts.sasirtici + counts.dusundurucu + counts.olumsuz;
-                        const pcts = {
-                            olumlu: Math.round((counts.olumlu / total) * 100),
-                            sasirtici: Math.round((counts.sasirtici / total) * 100),
-                            dusundurucu: Math.round((counts.dusundurucu / total) * 100),
-                            olumsuz: Math.round((counts.olumsuz / total) * 100)
-                        };
-                        const diff = 100 - (pcts.olumlu + pcts.sasirtici + pcts.dusundurucu + pcts.olumsuz);
-                        if (diff !== 0) pcts.olumlu += diff;
+                    const aid = parseInt(box.getAttribute('data-article-id') || '0', 10) || 0;
+                    if (!aid) return;
+                    const storageKey = 'ga_react_v3_' + aid;
+                    const MIN_VOTES_TO_SHOW = 10; // Az oyda yanıltıcı yüzde (ör. 1 oy = %100) gösterilmez
+                    const sub = document.getElementById('reaction-subtitle');
+                    const btns = box.querySelectorAll('.react-btn');
+                    btns.forEach(b => { const p = b.querySelector('.react-pct'); if (p) p.innerText = ''; });
 
-                        box.querySelectorAll('.react-btn').forEach(btn => {
+                    function lockAndRender(chosen, counts) {
+                        const total = counts ? Object.values(counts).reduce((a, b) => a + (b || 0), 0) : 0;
+                        const showPct = total >= MIN_VOTES_TO_SHOW;
+                        let pcts = {};
+                        if (showPct) {
+                            let sum = 0, maxKey = null;
+                            Object.keys(counts).forEach(k => {
+                                pcts[k] = Math.round((counts[k] / total) * 100);
+                                sum += pcts[k];
+                                if (maxKey === null || counts[k] > counts[maxKey]) maxKey = k;
+                            });
+                            if (maxKey && sum !== 100) pcts[maxKey] += (100 - sum);
+                        }
+                        btns.forEach(btn => {
                             const key = btn.getAttribute('data-react');
                             const pctEl = btn.querySelector('.react-pct');
-                            pctEl.innerText = '%' + pcts[key];
-                            if (chosen) {
-                                btn.disabled = true;
-                                if (chosen === key) {
-                                    btn.className = 'react-btn p-3 rounded-xl bg-red-50 border-2 border-red-600 transition flex flex-col items-center gap-1 cursor-default shadow-xs';
-                                    pctEl.className = 'react-pct text-[11px] font-mono font-extrabold text-red-600';
-                                } else {
-                                    btn.className = 'react-btn p-3 rounded-xl bg-slate-50 border border-slate-200 transition flex flex-col items-center gap-1 cursor-default opacity-60';
-                                    pctEl.className = 'react-pct text-[11px] font-mono font-bold text-slate-500';
-                                }
+                            btn.disabled = true;
+                            if (chosen === key) {
+                                btn.className = 'react-btn p-3 rounded-xl bg-red-50 border-2 border-red-600 transition flex flex-col items-center gap-1 cursor-default shadow-xs';
+                                pctEl.className = 'react-pct text-[11px] font-mono font-extrabold text-red-600';
+                            } else {
+                                btn.className = 'react-btn p-3 rounded-xl bg-slate-50 border border-slate-200 transition flex flex-col items-center gap-1 cursor-default opacity-60';
+                                pctEl.className = 'react-pct text-[11px] font-mono font-bold text-slate-500';
                             }
+                            pctEl.innerText = showPct ? ('%' + (pcts[key] || 0)) : '';
                         });
-                        if (chosen) {
-                            const sub = document.getElementById('reaction-subtitle');
-                            if (sub) {
-                                sub.innerText = '✓ Oyunuz kaydedildi! Her okuyucu yalnızca 1 kez oy kullanabilir.';
-                                sub.className = 'text-[11px] text-emerald-700 font-bold';
-                            }
+                        if (sub) {
+                            sub.className = 'text-[11px] text-emerald-700 font-bold';
+                            sub.innerText = showPct
+                                ? '✓ Oyunuz kaydedildi! Yüzdeler gerçek okuyucu oylarıdır.'
+                                : '✓ Oyunuz kaydedildi! Sonuçlar yeterli oy toplanınca burada görünecek.';
                         }
                     }
+
+                    function loadResults(chosen) {
+                        fetch('/api/react/' + aid).then(r => r.json()).then(d => {
+                            lockAndRender(chosen, (d && d.counts) || null);
+                        }).catch(() => lockAndRender(chosen, null));
+                    }
+
                     window.voteArticleReaction = function(choice) {
                         if (localStorage.getItem(storageKey)) return;
                         localStorage.setItem(storageKey, choice);
-                        renderReactions();
+                        lockAndRender(choice, null);
+                        fetch('/api/react', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ article_id: aid, choice: choice })
+                        }).then(r => r.json()).then(d => {
+                            lockAndRender(choice, (d && d.counts) || null);
+                        }).catch(() => {});
                     };
-                    renderReactions();
+
+                    const already = localStorage.getItem(storageKey);
+                    if (already) loadResults(already);
                 })();
             </script>
 

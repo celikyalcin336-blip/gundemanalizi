@@ -169,23 +169,43 @@ import secrets as _secrets
 
 ADMIN_PIN = os.getenv("ADMIN_PIN", "").strip()
 PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
-_PIN_FAILURES = {}
+_PIN_FAILURES = {}          # ip -> [(ts, pin_hash), ...]
+_PANEL_SESSIONS = {}        # rastgele oturum anahtarı -> bitiş zamanı
+_PIN_LOCK_SECONDS = 900     # 15 dakika
+_PIN_MAX_DISTINCT_FAILS = 5 # 15 dk içinde 5 FARKLI yanlış PIN = kilit
+
+def _client_ip(request: Request) -> str:
+    return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
 
 def require_admin_pin(request: Request):
-    client_ip = (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
+    """
+    Kaba kuvvet (brute-force) korumalı PIN kontrolü.
+    - Her yanlış deneme sayılır (başlık atlatılarak sınırsız deneme yapılamaz).
+    - Aynı eski PIN'i tekrar tekrar gönderen arka plan sekmesi tek deneme sayılır (sahibi kilitlenmez);
+      kilit yalnızca 15 dk içinde 5 FARKLI yanlış PIN denendiğinde devreye girer.
+    - Kilitliyken doğru PIN de reddedilir (aksi hâlde kilit anlamsız olur).
+    - PIN yalnızca başlıktan kabul edilir (URL'deki ?pin= loglara düştüğü için kapatıldı).
+    """
+    import hashlib
+    client_ip = _client_ip(request)
     now_ts = time.time()
-    pin = (request.headers.get("X-Admin-Pin") or request.query_params.get("pin") or "").strip()
-    # Doğru şifre girildiğinde her zaman kilidi aç ve içeri al
+    pin = (request.headers.get("X-Admin-Pin") or "").strip()
+
+    history = [(t, h) for (t, h) in _PIN_FAILURES.get(client_ip, []) if now_ts - t < _PIN_LOCK_SECONDS]
+    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS:
+        _PIN_FAILURES[client_ip] = history
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Lütfen 15 dakika bekleyip tekrar deneyin.")
+
     if ADMIN_PIN and pin and _secrets.compare_digest(pin, ADMIN_PIN):
         _PIN_FAILURES.pop(client_ip, None)
         return
-    fails = [t for t in _PIN_FAILURES.get(client_ip, []) if now_ts - t < 300]
-    if len(fails) >= 10:
-        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Lütfen 5 dakika bekleyip tekrar deneyin.")
-    # Yalnızca manuel giriş denemelerini say (arka plan sekmesi veya eski önbellek '1453' sorguları kilitlemesin)
-    if request.headers.get("X-Manual-Login") == "1" and pin != "1453":
-        fails.append(now_ts)
-        _PIN_FAILURES[client_ip] = fails
+
+    if pin:
+        history.append((now_ts, hashlib.sha256(pin.encode("utf-8")).hexdigest()[:16]))
+        _PIN_FAILURES[client_ip] = history[-50:]
+        if len(_PIN_FAILURES) > 5000:
+            for ip_key in [k for k, v in _PIN_FAILURES.items() if not v or now_ts - v[-1][0] > _PIN_LOCK_SECONDS]:
+                _PIN_FAILURES.pop(ip_key, None)
     raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
 
 app = FastAPI(
@@ -219,7 +239,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     print(f"🔥 [KRİTİK HATA] {request.url.path}: {exc}")
     traceback.print_exc()
     if request.url.path.startswith("/api/"):
-        return JSONResponse(status_code=500, content={"ok": False, "error": str(exc)})
+        return JSONResponse(status_code=500, content={"ok": False, "error": "Sunucu hatası, lütfen tekrar deneyin."})
     return HTMLResponse(
         status_code=500,
         content="""<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>Sistem Güncelleniyor | Gündem Analizi</title>
@@ -231,6 +251,14 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
     path = request.url.path
+
+    # Cloudflare'i atlayıp doğrudan Render adresinden (*.onrender.com) gelen istekleri ana alan adına yönlendir.
+    # (Bu yol açık kalırsa IP başlıkları taklit edilip hız sınırları atlatılabilir; ayrıca kopya içerik oluşur.)
+    _host = (request.headers.get("host") or "").split(":")[0].lower()
+    if _host.endswith(".onrender.com") and path != "/health" and not path.startswith("/images"):
+        from fastapi.responses import RedirectResponse
+        _target = config.SITE_URL.rstrip("/") + path + (("?" + request.url.query) if request.url.query else "")
+        return RedirectResponse(url=_target, status_code=301)
 
     # Güvenlik Kalkanı: Kötü niyetli otomatik bot taramalarını (.git, .env, wp-login, phpmyadmin vb.) anında engelle
     is_malicious_probe = any(path.startswith(p) or p in path for p in [
@@ -1009,18 +1037,25 @@ async def category_page(request: Request, kategori_adi: str, sayfa: int = 1):
     target = f"/?kategori={urllib.parse.quote(norm_kat)}" + (f"&sayfa={sayfa}" if sayfa > 1 else "")
     return RedirectResponse(url=target, status_code=301)
 
-def _panel_cookie_token() -> str:
+def _new_panel_session() -> str:
+    """Her girişte tahmin edilemez, rastgele bir oturum anahtarı üretir (PIN'den türetilmez)."""
     if not ADMIN_PIN:
         return ""
-    import hashlib
-    return hashlib.sha256(f"ga_panel_v1_{ADMIN_PIN}".encode("utf-8")).hexdigest()
+    now_ts = time.time()
+    for k in [k for k, exp in _PANEL_SESSIONS.items() if exp < now_ts]:
+        _PANEL_SESSIONS.pop(k, None)
+    tok = _secrets.token_urlsafe(32)
+    _PANEL_SESSIONS[tok] = now_ts + 3600 * 24 * 30
+    return tok
+
+def _is_panel_session_valid(tok: str) -> bool:
+    return bool(ADMIN_PIN and tok and _PANEL_SESSIONS.get(tok, 0) > time.time())
 
 @app.get("/panel", response_class=HTMLResponse)
 @app.get(f"/{PANEL_SECRET_SLUG}", response_class=HTMLResponse)
 @app.get("/yonetim-71453", response_class=HTMLResponse)
 async def admin_panel(request: Request):
-    tok = _panel_cookie_token()
-    is_authed = bool(tok and request.cookies.get("ga_panel_auth") == tok)
+    is_authed = _is_panel_session_valid(request.cookies.get("ga_panel_auth", ""))
     if is_authed:
         try:
             stats = database.get_dashboard_summary() or {}
@@ -1102,13 +1137,14 @@ async def admin_panel(request: Request):
 async def panel_verify_pin(request: Request):
     require_admin_pin(request)
     resp = JSONResponse({"ok": True})
-    tok = _panel_cookie_token()
+    tok = _new_panel_session()
     if tok:
-        resp.set_cookie(key="ga_panel_auth", value=tok, max_age=3600*24*30, httponly=True, samesite="lax", path="/")
+        resp.set_cookie(key="ga_panel_auth", value=tok, max_age=3600*24*30, httponly=True, secure=True, samesite="lax", path="/")
     return resp
 
 @app.post("/api/panel/logout")
-async def panel_logout():
+async def panel_logout(request: Request):
+    _PANEL_SESSIONS.pop(request.cookies.get("ga_panel_auth", ""), None)
     resp = JSONResponse({"ok": True})
     resp.delete_cookie(key="ga_panel_auth", path="/")
     return resp
@@ -1612,7 +1648,7 @@ async def submit_ihbar(
 
     import hashlib
     import telegram_notifier
-    ihbar_id = hashlib.md5(f"{message}_{time.time()}".encode("utf-8")).hexdigest()[:8]
+    ihbar_id = _secrets.token_hex(12)  # Tahmin edilemez dosya adı (dışarıdan bulunamaz)
     saved_path = ""
     media_type = ""
     studio_link_line = ""
@@ -1623,8 +1659,33 @@ async def submit_ihbar(
         if not any(fname.endswith(ext) for ext in allowed_exts):
             raise HTTPException(status_code=400, detail="Yalnızca fotoğraf (.jpg, .png, .webp) veya video (.mp4, .mov, .webm) yüklenebilir.")
         content = await media_file.read(15 * 1024 * 1024 + 1)
-        if len(content) <= 15 * 1024 * 1024:  # Maks 15 MB
-            if any(fname.endswith(ext) for ext in (".mp4", ".mov", ".webm", ".mkv", ".avi")) or (media_file.content_type or "").startswith("video"):
+        if len(content) > 15 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="Dosya boyutu en fazla 15 MB olabilir.")
+        is_video_ext = fname.endswith((".mp4", ".mov", ".webm"))
+        if is_video_ext:
+            # Gerçek video mu? (uzantıya değil dosyanın içeriğine bakılır)
+            if not (content[4:8] == b"ftyp" or content[:4] == b"\x1a\x45\xdf\xa3"):
+                raise HTTPException(status_code=400, detail="Geçersiz video dosyası.")
+        else:
+            # Gerçek resim mi? Pillow ile doğrula ve temiz JPEG olarak yeniden kaydet
+            # (gizli kod/çift format temizlenir, ihbarcının GPS/EXIF konum bilgisi silinir)
+            try:
+                from io import BytesIO
+                from PIL import Image
+                with Image.open(BytesIO(content)) as probe:
+                    probe.verify()
+                with Image.open(BytesIO(content)) as im:
+                    im = im.convert("RGB")
+                    im.thumbnail((2400, 2400))
+                    buf = BytesIO()
+                    im.save(buf, format="JPEG", quality=88)
+                    content = buf.getvalue()
+            except HTTPException:
+                raise
+            except Exception:
+                raise HTTPException(status_code=400, detail="Geçersiz resim dosyası.")
+        if content:
+            if is_video_ext:
                 out_name = f"ihbar_{ihbar_id}.mp4"
                 saved_path = os.path.join(OUTPUT_DIR, out_name)
                 media_type = "video"
@@ -1967,7 +2028,59 @@ async def api_contact_submit(request: Request):
 
 @app.get("/api/articles")
 async def api_articles(limit: int = 10):
-    return database.get_articles(limit=limit)
+    # Arşivin tek istekte kopyalanmasını ve sunucunun yorulmasını önle (X botu 40, bülten 100 kullanır)
+    try:
+        limit = max(1, min(int(limit), 100))
+    except Exception:
+        limit = 10
+    rows = database.get_articles(limit=limit)
+    keep = ("id", "slug", "title", "summary", "category", "image_path", "source", "created_at")
+    return [{k: r.get(k) for k in keep} for r in rows]
+
+_REACT_SEEN = {}      # (ip+tarayıcı+haber) özeti -> zaman
+_REACT_IP_RATE = {}   # ip -> [zamanlar]
+
+@app.get("/api/react/{article_id}")
+async def api_get_reactions(article_id: int):
+    counts = await asyncio.to_thread(database.get_reactions, article_id)
+    return {"ok": True, "counts": counts}
+
+@app.post("/api/react")
+async def api_add_reaction(request: Request):
+    """Okuyucu Nabzı: gerçek oy kaydı. Aynı kişi aynı habere bir kez oy verebilir."""
+    import hashlib
+    try:
+        body = await request.json()
+        aid = int(body.get("article_id") or 0)
+        choice = str(body.get("choice") or "").strip()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Geçersiz istek")
+    if aid <= 0 or choice not in database.REACTION_CHOICES:
+        raise HTTPException(status_code=400, detail="Geçersiz istek")
+
+    ip = _client_ip(request)
+    now_ts = time.time()
+    recent = [t for t in _REACT_IP_RATE.get(ip, []) if now_ts - t < 600]
+    if len(recent) >= 30:
+        raise HTTPException(status_code=429, detail="Çok fazla istek")
+
+    key = hashlib.sha256(f"{ip}|{request.headers.get('user-agent', '')[:80]}|{aid}".encode("utf-8")).hexdigest()[:24]
+    duplicate = key in _REACT_SEEN
+    if not duplicate:
+        art = await asyncio.to_thread(database.get_article_by_id, aid)
+        if not art:
+            raise HTTPException(status_code=404, detail="Haber bulunamadı")
+        await asyncio.to_thread(database.add_reaction, aid, choice)
+        _REACT_SEEN[key] = now_ts
+        recent.append(now_ts)
+        _REACT_IP_RATE[ip] = recent
+        if len(_REACT_SEEN) > 100000:
+            for k in [k for k, t in _REACT_SEEN.items() if now_ts - t > 86400 * 3]:
+                _REACT_SEEN.pop(k, None)
+        if len(_REACT_IP_RATE) > 20000:
+            _REACT_IP_RATE.clear()
+    counts = await asyncio.to_thread(database.get_reactions, aid)
+    return {"ok": True, "duplicate": duplicate, "counts": counts}
 
 @app.get("/api/stats")
 async def api_stats(request: Request):
