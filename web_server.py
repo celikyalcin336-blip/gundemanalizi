@@ -2030,7 +2030,7 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
             <p class="text-xs sm:text-sm text-slate-400 mb-5">{subtitle}</p>
             <div class="flex flex-wrap items-center gap-3">
                 <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow transition">← Gündem Analizi Anasayfasına Dön</a>
-                <a href="{raw_xml_path}?raw=1" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">Ham XML Kodunu Gör</a>
+
             </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
