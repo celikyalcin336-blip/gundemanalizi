@@ -987,5 +987,28 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793708419.9010444
+  },
+  {
+    "slug": "anadolu-efes-izmir-deparini-ikinci-yarida-baslatarak-kazandi",
+    "title": "Anadolu Efes İzmir Deparını İkinci Yarıda Başlatarak Kazandı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1793711120.6817584
+  },
+  {
+    "slug": "kayserispor-evinde-oynadigi-mucadelede-muglasporu-farkli-gecti",
+    "title": "Kayserispor Evinde Oynadığı Mücadelede Muğlaspor'u Farklı Geçti",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1793711120.7039068
+  },
+  {
+    "slug": "tesla-turkiye-sarj-agi-yatirimlarini-akdeniz-bolgesine-tasidi",
+    "title": "Tesla Türkiye Şarj Ağı Yatırımlarını Akdeniz Bölgesine Taşıdı",
+    "summary": "Elektrikli araç üreticisi Tesla, Türkiye genelindeki şarj altyapısını genişletme hamleleri kapsamında Antalya Konyaaltı'nda yeni bir Supercharger istasyonunu devreye soktu. Bölgedeki elektrikli otomobil sahiplerine hızlı ve erişilebilir enerji ikmali",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "note": "uncertain",
+    "ts": 1793711150.090521
   }
 ]
