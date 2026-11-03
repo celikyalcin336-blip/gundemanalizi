@@ -160,6 +160,47 @@ def clean_team_name(name: str) -> str:
             words.append(first + rest)
     return " ".join(words)
 
+_HT_PHARM_RE = re.compile(
+    r'<p[^>]*class="[^"]*text-gray-500[^"]*"[^>]*>\s*([^<]+?)\s*</p>\s*'
+    r'<p[^>]*class="[^"]*font-bold[^"]*"[^>]*>\s*([^<]+?)\s*</p>.*?'
+    r'Adres:\s*</span>\s*([^<]+?)\s*</p>.*?'
+    r'Telefon:\s*</span>\s*([^<]+?)\s*</p>',
+    re.S,
+)
+
+def _parse_haberturk_pharmacies(html: str, city: str, shift: Dict) -> List[Dict]:
+    """haberturk.com/nobetci-eczaneler/{slug} sayfasından 81 il canlı nöbetçi eczaneleri ayrıştırır."""
+    import html as html_mod
+    results = []
+    if not html:
+        return results
+    seen = set()
+    for loc_raw, name_raw, addr_raw, phone_raw in _HT_PHARM_RE.findall(html):
+        name = html_mod.unescape(name_raw or "").strip()
+        if not name:
+            continue
+        if "eczane" not in name.lower():
+            name += " Eczanesi"
+        loc = html_mod.unescape(loc_raw or "").strip()
+        district = loc.split("/", 1)[-1].strip() if "/" in loc else (loc or city.capitalize())
+        address = re.sub(r"\s+", " ", html_mod.unescape(addr_raw or "")).strip()
+        phone = html_mod.unescape(phone_raw or "").strip()
+        key = (name.lower(), district.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        results.append({
+            "name": name,
+            "city": city.capitalize(),
+            "district": district,
+            "address": address or "Merkez",
+            "phone": phone or "Belirtilmedi",
+            "status": shift["status_text"],
+            "hours": shift["hours_text"],
+            "is_now_open": shift["is_now_open"],
+        })
+    return results
+
 def _parse_eczaneler_html(html: str, city: str, shift: Dict) -> List[Dict]:
     """eczaneler.gen.tr HTML çıktısını ayrıştırıp nöbetçi eczane listesi döndürür."""
     results = []
@@ -244,24 +285,37 @@ def get_live_pharmacies(city: str = "istanbul") -> List[Dict]:
     if cached and cached.get("date") == shift_date_str and (now - cached["ts"]) < 900 and cached.get("data") is not None:
         return cached["data"]
 
-    target_url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
     results = []
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "tr-TR,tr;q=0.9",
+    }
+
+    # 1. Birincil Kaynak: Habertürk 81 İl Canlı Nöbetçi Eczaneler (Cloudflare engeli olmadan bulut sunucularda çalışır)
     try:
-        req = urllib.request.Request(
-            target_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                "Accept-Language": "tr-TR,tr;q=0.9",
-            },
-        )
-        with urllib.request.urlopen(req, timeout=2, context=_SSL_CTX) as r:
-            html = r.read().decode("utf-8", errors="ignore")
-            parsed = _parse_eczaneler_html(html, city, shift)
-            if parsed:
-                results = parsed
+        ht_url = f"https://www.haberturk.com/nobetci-eczaneler/{slug}"
+        req_ht = urllib.request.Request(ht_url, headers=headers)
+        with urllib.request.urlopen(req_ht, timeout=5, context=_SSL_CTX) as r:
+            html_ht = r.read().decode("utf-8", errors="ignore")
+            parsed_ht = _parse_haberturk_pharmacies(html_ht, city, shift)
+            if parsed_ht:
+                results = parsed_ht
     except Exception:
         pass
+
+    # 2. İkincil Yedek Kaynak: eczaneler.gen.tr
+    if not results:
+        try:
+            target_url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
+            req = urllib.request.Request(target_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=3, context=_SSL_CTX) as r:
+                html = r.read().decode("utf-8", errors="ignore")
+                parsed = _parse_eczaneler_html(html, city, shift)
+                if parsed:
+                    results = parsed
+        except Exception:
+            pass
 
     # ÖNEMLİ: Canlı nöbet listesi alınamazsa ASLA tahmini/rastgele liste gösterilmez.
     # Negatif sonucu da 15 dk önbellekle ki kullanıcı her tıkladığında beklemesin, anında e-Devlet/Harita ekranı açılsın.

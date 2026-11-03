@@ -150,6 +150,7 @@ def _warmup_turbo_cache():
         _ls = __import__("live_services")
         _ls.get_live_superlig()
         _ls.get_live_prayer_times()
+        _ls.get_live_pharmacies("istanbul")
         print("⚡ [Turbo Cache] Kategori, site haritası ve canlı servis önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")

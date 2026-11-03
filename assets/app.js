@@ -814,22 +814,20 @@
         function switchAstroTab(tabKey) {
             currentAstroPeriod = tabKey;
 
-            // Tüm sekme buton stillerini sıfırla
             var tabs = document.querySelectorAll('.astro-period-tab');
             tabs.forEach(function(t) {
-                t.classList.remove('bg-purple-600', 'text-white');
+                t.classList.remove('bg-purple-600', 'text-white', 'bg-slate-800/90', 'text-slate-300');
                 if (!t.id.includes('uyum') && !t.id.includes('yukselen')) {
-                    t.classList.add('bg-slate-800/90', 'text-slate-300');
+                    t.classList.add('bg-slate-100', 'text-slate-700');
                 }
             });
 
             var activeTabBtn = document.getElementById('astro-tab-' + tabKey);
             if (activeTabBtn) {
-                activeTabBtn.classList.remove('bg-slate-800/90', 'text-slate-300');
+                activeTabBtn.classList.remove('bg-slate-100', 'text-slate-700', 'bg-slate-800/90', 'text-slate-300');
                 activeTabBtn.classList.add('bg-purple-600', 'text-white');
             }
 
-            // Panelleri yönet
             var viewContent = document.getElementById('astro-view-content');
             var viewCompat = document.getElementById('astro-view-compatibility');
             var viewRising = document.getElementById('astro-view-rising');
@@ -861,7 +859,14 @@
         }
         window.switchAstroTab = switchAstroTab;
 
-        // PERİYOT METİNLERİNİ DOLDURMA
+        var ASTRO_TR_MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        var ASTRO_TR_DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+
+        function formatTrDateFull(dt) {
+            return dt.getDate() + ' ' + ASTRO_TR_MONTHS[dt.getMonth()] + ' ' + dt.getFullYear() + ' ' + ASTRO_TR_DAYS[dt.getDay()];
+        }
+
+        // PERİYOT METİNLERİNİ DOLDURMA (Bugün, Dün, Yarın, Haftalık, Aylık Gerçek Tarihli)
         function renderAstroPeriodContent(periodKey) {
             var data = ZODIAC_99LVL_DATA[currentAstroSign] || ZODIAC_99LVL_DATA['Koç'];
             var pData = data[periodKey] || data['bugun'];
@@ -873,20 +878,23 @@
             var hEl = document.getElementById('astro-text-health');
             var luckyBox = document.getElementById('astro-lucky-box');
 
+            var now = new Date();
             if (periodKey === 'bugun') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '✨ <strong>' + currentAstroSign + ' Burcu</strong> • Genel Karakter ve Eğilimler';
+                if (dateTitleEl) dateTitleEl.innerHTML = '📅 <strong>' + formatTrDateFull(now) + '</strong> • ' + currentAstroSign + ' Burcu Günlük Yorumu';
                 if (luckyBox) luckyBox.style.display = 'grid';
             } else if (periodKey === 'dun') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '💼 <strong>' + currentAstroSign + ' Burcu</strong> • İş, Kariyer ve Karar Alma Tarzı';
+                var yest = new Date(now.getTime() - 86400000);
+                if (dateTitleEl) dateTitleEl.innerHTML = '⏪ <strong>' + formatTrDateFull(yest) + '</strong> • ' + currentAstroSign + ' Burcu Dünün Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'yarin') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '🧭 <strong>' + currentAstroSign + ' Burcu</strong> • Sosyal İlişkiler ve İletişim Rehberi';
+                var tom = new Date(now.getTime() + 86400000);
+                if (dateTitleEl) dateTitleEl.innerHTML = '⏩ <strong>' + formatTrDateFull(tom) + '</strong> • ' + currentAstroSign + ' Burcu Yarının Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'haftalik') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '📆 <strong>' + currentAstroSign + ' Burcu</strong> • Doğal Enerji ve Yaşam Ritmi';
+                if (dateTitleEl) dateTitleEl.innerHTML = '📆 <strong>Bu Hafta (' + ASTRO_TR_MONTHS[now.getMonth()] + ' ' + now.getFullYear() + ')</strong> • ' + currentAstroSign + ' Burcu Haftalık Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'aylik') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '🌙 <strong>' + currentAstroSign + ' Burcu</strong> • Uzun Vadeli Hedef ve Derin Analiz';
+                if (dateTitleEl) dateTitleEl.innerHTML = '🌙 <strong>' + ASTRO_TR_MONTHS[now.getMonth()] + ' ' + now.getFullYear() + '</strong> • ' + currentAstroSign + ' Burcu Aylık Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             }
 
@@ -1290,16 +1298,16 @@
             var now = new Date();
             var curMins = now.getHours() * 60 + now.getMinutes();
             var prayers = [
-                { name: "İmsak", time: times.imsak },
-                { name: "Güneş", time: times.gunes },
-                { name: "Öğle", time: times.ogle },
-                { name: "İkindi", time: times.ikindi },
-                { name: "Akşam", time: times.aksam },
-                { name: "Yatsı", time: times.yatsi }
+                { key: "imsak", name: "Sabah Ezanı (İmsak)", shortName: "İmsak", time: times.imsak },
+                { key: "gunes", name: "Güneş (Sabah Çıkışı)", shortName: "Güneş", time: times.gunes },
+                { key: "ogle", name: "Öğle Ezanı", shortName: "Öğle", time: times.ogle },
+                { key: "ikindi", name: "İkindi Ezanı", shortName: "İkindi", time: times.ikindi },
+                { key: "aksam", name: "Akşam Ezanı (İftar)", shortName: "Akşam", time: times.aksam },
+                { key: "yatsi", name: "Yatsı Ezanı", shortName: "Yatsı", time: times.yatsi }
             ];
             var next = prayers.find(function(p) { return p.time > curMins; });
             if (!next) next = prayers[0];
-            return { next: next, times: times };
+            return { next: next, times: times, prayers: prayers };
         }
 
         function populateNamazCities() {
@@ -1351,7 +1359,7 @@
                 var next = info.next;
 
                 var diffMins = next.time - curMins;
-                if (diffMins < 0) diffMins += 24 * 60;
+                if (diffMins <= 0) diffMins += 24 * 60;
                 var diffSecs = 60 - curSecs;
                 if (diffSecs === 60) diffSecs = 0;
                 else diffMins -= 1;
@@ -1364,8 +1372,51 @@
                 var pad = function(n) { return (n < 10 ? '0' : '') + n; };
                 var countdownEl = document.getElementById('next-prayer-countdown');
                 var nextNameEl = document.getElementById('next-prayer-name');
+                var subNoteEl = document.getElementById('next-prayer-subnote');
                 if (countdownEl) countdownEl.innerText = pad(h) + ':' + pad(m) + ':' + pad(s);
                 if (nextNameEl) nextNameEl.innerText = next.name;
+                if (subNoteEl) {
+                    subNoteEl.innerText = (h > 0 ? (h + ' saat ' + m + ' dakika ') : (m + ' dakika ')) + s + ' saniye sonra (' + formatMins(next.time) + ')';
+                }
+
+                // Her bir ezan kartının altına kaç saat/dk kaldığını veya okunduğunu yaz
+                (info.prayers || []).forEach(function(p) {
+                    var remEl = document.getElementById('rem-' + p.key);
+                    var cardEl = document.getElementById('card-' + p.key);
+                    var pDiff = p.time - curMins;
+                    var isNext = (p.key === next.key);
+
+                    if (cardEl) {
+                        if (isNext) {
+                            cardEl.className = 'p-3 rounded-xl bg-amber-50 border-2 border-amber-400 shadow-xs transition';
+                        } else {
+                            cardEl.className = 'p-3 rounded-xl bg-slate-50 border border-slate-200 transition';
+                        }
+                    }
+
+                    if (remEl) {
+                        if (pDiff > 0) {
+                            var ph = Math.floor(pDiff / 60);
+                            var pm = pDiff % 60;
+                            var txt = ph > 0 ? ('⏳ ' + ph + ' sa ' + pm + ' dk kaldı') : ('⏳ ' + pm + ' dk kaldı');
+                            remEl.innerText = txt;
+                            remEl.className = isNext
+                                ? 'text-[10px] font-extrabold text-white bg-amber-600 px-2 py-0.5 rounded-full inline-block shadow-2xs'
+                                : 'text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full inline-block';
+                        } else {
+                            var tomDiff = pDiff + 24 * 60;
+                            var th = Math.floor(tomDiff / 60);
+                            var tm = tomDiff % 60;
+                            if (isNext) {
+                                remEl.innerText = '⏳ ' + th + ' sa ' + tm + ' dk kaldı';
+                                remEl.className = 'text-[10px] font-extrabold text-white bg-amber-600 px-2 py-0.5 rounded-full inline-block shadow-2xs';
+                            } else {
+                                remEl.innerText = '✓ Okundu';
+                                remEl.className = 'text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block';
+                            }
+                        }
+                    }
+                });
             }
             if (prayerCountdownTimer) clearInterval(prayerCountdownTimer);
             prayerCountdownTimer = setInterval(tick, 1000);
@@ -1475,12 +1526,12 @@
         }
         window.loadNobetciCity = loadNobetciCity;
 
-                function renderNobetciList(items) {
+        function renderNobetciList(items) {
             var listEl = document.getElementById('nobetci-list');
             if (!listEl) return;
             if (!items || items.length === 0) {
                 listEl.innerHTML = (CURRENT_NOBETCI_DATA && CURRENT_NOBETCI_DATA.length > 0)
-                    ? '<div class="p-4 text-center text-slate-500 text-xs">Aramanıza uyan nöbetçi eczane yok.</div>'
+                    ? '<div class="p-4 text-center text-slate-500 text-xs">Aramanıza uyan nöbetçi eczane bulunamadı.</div>'
                     : nobetciOfficialMessage('');
                 return;
             }
@@ -1489,21 +1540,26 @@
                 var isNowOpen = p.is_now_open;
                 var badgeText = p.hours || "18:30 - 08:30 (Sabaha Kadar Açık)";
                 var statusText = p.status || (isNowOpen ? "🟢 ŞU AN AÇIK" : "Akşam Nöbetçisi (18:30)");
-                var badgeClass = isNowOpen ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" : "bg-blue-500/20 text-blue-300 border-blue-500/40";
+                var badgeClass = isNowOpen
+                    ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    : "bg-blue-100 text-blue-800 border-blue-300";
+                var mapQuery = encodeURIComponent((p.name || '') + ' ' + (p.district || '') + ' ' + (p.city || '') + ' ' + (p.address || ''));
+                var mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + mapQuery;
 
                 return '<div class="p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-white transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">' +
                     '<div class="min-w-0 flex-1 space-y-1">' +
                         '<div class="flex items-center gap-2 flex-wrap">' +
                             '<span class="font-extrabold text-slate-900 text-xs">' + p.name + '</span>' +
-                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">' + (p.district || p.city) + '</span>' +
-                            '<span class="text-[10px] px-2 py-0.5 rounded font-semibold border ' + badgeClass + '">' + statusText + '</span>' +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">📍 ' + (p.district || p.city) + '</span>' +
+                            '<span class="text-[10px] px-2 py-0.5 rounded font-bold border ' + badgeClass + '">' + statusText + '</span>' +
                         '</div>' +
-                        '<div class="text-[11px] text-slate-700 leading-snug">' + (p.address || '') + '</div>' +
-                        '<div class="text-[10px] text-amber-700 font-semibold flex items-center gap-1">🕒 Nöbet Saatleri: ' + badgeText + '</div>' +
+                        '<div class="text-[11px] text-slate-700 font-medium leading-snug">' + (p.address || '') + '</div>' +
+                        '<div class="text-[10px] text-amber-800 font-semibold flex items-center gap-1">🕒 ' + badgeText + '</div>' +
                     '</div>' +
-                    '<div class="shrink-0 flex items-center gap-2">' +
-                        (phoneClean ? '<a href="tel:' + phoneClean + '" class="w-full sm:w-auto text-center px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition shadow cursor-pointer">' +
-                            '📞 ' + (p.phone || 'Hemen Ara') +
+                    '<div class="shrink-0 flex items-center gap-1.5">' +
+                        '<a href="' + mapUrl + '" target="_blank" rel="noopener" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-[11px] flex items-center justify-center gap-1 transition shadow-2xs cursor-pointer">🗺️ Harita</a>' +
+                        (phoneClean ? '<a href="tel:' + phoneClean + '" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition shadow-2xs cursor-pointer">' +
+                            '📞 ' + (p.phone || 'Ara') +
                         '</a>' : '') +
                     '</div>' +
                 '</div>';

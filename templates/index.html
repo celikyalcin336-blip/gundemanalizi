@@ -21,7 +21,7 @@
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <link rel="stylesheet" href="/assets/style.min.css">
     <script src="/assets/lucide.min.js" defer></script>
-    <script src="/assets/app.js?v=20261103" defer></script>
+    <script src="/assets/app.js?v=20261103_v5" defer></script>
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
@@ -1545,7 +1545,7 @@
                 <!-- Hızlı Burç Seçim Dropdown -->
                 <div class="flex items-center gap-2">
                     <label for="astro-sign-select" class="text-[11px] text-slate-700 font-bold shrink-0">Burç Değiştir:</label>
-                    <select id="astro-sign-select" onchange="window.switchAstroSign(this.value)" class="bg-slate-900 border border-purple-500/40 text-purple-200 text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
+                    <select id="astro-sign-select" onchange="window.switchAstroSign(this.value)" class="bg-purple-50 border border-purple-300 text-purple-900 text-xs font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
                         <option value="Koç">♈ Koç (21 Mar - 20 Nis)</option>
                         <option value="Boğa">♉ Boğa (21 Nis - 20 May)</option>
                         <option value="İkizler">♊ İkizler (21 May - 21 Haz)</option>
@@ -1562,106 +1562,106 @@
                 </div>
             </div>
 
-            <!-- Hürriyet / CNN Türk Standardı: Burç Kimlik Şeridi (Motto, Gezegen, Element, Nitelik) -->
-            <div class="p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-slate-900 to-indigo-950/40 border border-purple-500/30 space-y-2">
+            <!-- Burç Kimlik Şeridi (Motto, Gezegen, Element, Nitelik) -->
+            <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 space-y-2.5">
                 <div class="flex items-center gap-2 text-xs">
-                    <span class="text-amber-400 font-bold shrink-0">✨ Mottosu:</span>
-                    <span id="astro-motto" class="italic text-purple-200 font-medium">"Yeter ki hevesim kırılmasın, başladığım işi bitiririm!"</span>
+                    <span class="text-purple-800 font-extrabold shrink-0">✨ Mottosu:</span>
+                    <span id="astro-motto" class="italic text-slate-800 font-semibold">"Yeter ki hevesim kırılmasın, başladığım işi bitiririm!"</span>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-slate-400 block font-medium">Yönetici Gezegen</span>
-                        <strong id="astro-planet" class="text-white font-bold">Mars</strong>
+                    <div class="p-2 rounded-xl bg-white border border-purple-200 text-center shadow-2xs">
+                        <span class="text-slate-500 block font-semibold">Yönetici Gezegen</span>
+                        <strong id="astro-planet" class="text-slate-900 font-extrabold">Mars</strong>
                     </div>
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-slate-400 block font-medium">Element</span>
-                        <strong id="astro-element" class="text-amber-400 font-bold">Ateş</strong>
+                    <div class="p-2 rounded-xl bg-white border border-purple-200 text-center shadow-2xs">
+                        <span class="text-slate-500 block font-semibold">Element</span>
+                        <strong id="astro-element" class="text-amber-700 font-extrabold">Ateş</strong>
                     </div>
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-slate-400 block font-medium">Nitelik</span>
-                        <strong id="astro-quality" class="text-cyan-400 font-bold">Öncü</strong>
+                    <div class="p-2 rounded-xl bg-white border border-purple-200 text-center shadow-2xs">
+                        <span class="text-slate-500 block font-semibold">Nitelik</span>
+                        <strong id="astro-quality" class="text-sky-700 font-extrabold">Öncü</strong>
                     </div>
-                    <div class="p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                        <span class="text-slate-400 block font-medium">Uğurlu Taş / Gün</span>
-                        <strong id="astro-stone" class="text-purple-300 font-bold">Pırlanta (Salı)</strong>
+                    <div class="p-2 rounded-xl bg-white border border-purple-200 text-center shadow-2xs">
+                        <span class="text-slate-500 block font-semibold">Uğurlu Taş / Gün</span>
+                        <strong id="astro-stone" class="text-purple-800 font-extrabold">Pırlanta (Salı)</strong>
                     </div>
                 </div>
             </div>
 
-            <!-- 99 LVL ASTROLOJİ REHBERİ & ARAÇ SEKMELERİ -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none border-b border-slate-800">
+            <!-- ZAMAN & ARAÇ SEKMELERİ (Bugün, Dün, Yarın, Haftalık, Aylık, Uyum, Yükselen) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 text-xs font-bold scrollbar-none border-b border-slate-200">
                 <button type="button" onclick="window.switchAstroTab('bugun')" id="astro-tab-bugun" class="astro-period-tab px-3.5 py-2 rounded-xl bg-purple-600 text-white shrink-0 transition shadow-sm cursor-pointer">
-                    ✨ Karakter
+                    📅 Bugün
                 </button>
-                <button type="button" onclick="window.switchAstroTab('dun')" id="astro-tab-dun" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    💼 İş & Kariyer
+                <button type="button" onclick="window.switchAstroTab('dun')" id="astro-tab-dun" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 transition cursor-pointer">
+                    ⏪ Dün
                 </button>
-                <button type="button" onclick="window.switchAstroTab('yarin')" id="astro-tab-yarin" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    🧭 İletişim
+                <button type="button" onclick="window.switchAstroTab('yarin')" id="astro-tab-yarin" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 transition cursor-pointer">
+                    ⏩ Yarın
                 </button>
-                <button type="button" onclick="window.switchAstroTab('haftalik')" id="astro-tab-haftalik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    📆 Yaşam Ritmi
+                <button type="button" onclick="window.switchAstroTab('haftalik')" id="astro-tab-haftalik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 transition cursor-pointer">
+                    📆 Haftalık Yorum
                 </button>
-                <button type="button" onclick="window.switchAstroTab('aylik')" id="astro-tab-aylik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    🌙 Derin Analiz
+                <button type="button" onclick="window.switchAstroTab('aylik')" id="astro-tab-aylik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 shrink-0 transition cursor-pointer">
+                    🌙 Aylık Yorum
                 </button>
-                <button type="button" onclick="window.switchAstroTab('uyum')" id="astro-tab-uyum" class="astro-period-tab px-3.5 py-2 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 hover:text-white shrink-0 transition cursor-pointer">
+                <button type="button" onclick="window.switchAstroTab('uyum')" id="astro-tab-uyum" class="astro-period-tab px-3.5 py-2 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 hover:bg-rose-100 shrink-0 transition cursor-pointer">
                     ❤️ Burç Uyumu
                 </button>
-                <button type="button" onclick="window.switchAstroTab('yukselen')" id="astro-tab-yukselen" class="astro-period-tab px-3.5 py-2 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 hover:text-white shrink-0 transition cursor-pointer">
+                <button type="button" onclick="window.switchAstroTab('yukselen')" id="astro-tab-yukselen" class="astro-period-tab px-3.5 py-2 rounded-xl bg-indigo-50 border border-indigo-300 text-indigo-700 hover:bg-indigo-100 shrink-0 transition cursor-pointer">
                     ☀️ Yükselen Hesapla
                 </button>
             </div>
 
-            <!-- PANEL 1: KARAKTER / KARİYER / İLETİŞİM / YAŞAM RİTMİ / DERİN ANALİZ ALANI -->
-            <div id="astro-view-content" class="space-y-3 text-xs leading-relaxed text-slate-200">
-                <!-- Aktif Bölüm Başlığı -->
-                <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs">
-                    <span id="astro-period-title">✨ <strong id="astro-period-date">Genel Karakter ve Eğilimler</strong></span>
-                    <span class="text-amber-400 font-bold">✨ Astroloji Rehberi</span>
+            <!-- PANEL 1: GÜNLÜK / DÜN / YARIN / HAFTALIK / AYLIK YORUM ALANI -->
+            <div id="astro-view-content" class="space-y-3 text-xs leading-relaxed text-slate-800">
+                <!-- Aktif Zaman Başlığı -->
+                <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-purple-100 border border-purple-300 text-purple-950 text-xs">
+                    <span id="astro-period-title" class="font-bold">📅 <strong id="astro-period-date">Bugün</strong> Günlük Yorumu</span>
+                    <span class="text-purple-800 font-extrabold">✨ Astroloji Masası</span>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-                    <span id="astro-title-general" class="text-amber-400 font-black text-sm block mb-1">🌟 Gökyüzü Enerjisi & Günlük Tavsiye</span>
-                    <p id="astro-text-general" class="text-slate-300 leading-relaxed"></p>
+                <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
+                    <span id="astro-title-general" class="text-amber-800 font-black text-sm block mb-1">🌟 Gökyüzü Enerjisi & Günün Tavsiyesi</span>
+                    <p id="astro-text-general" class="text-slate-800 font-medium leading-relaxed"></p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                        <span id="astro-title-love" class="text-rose-400 font-black text-xs block mb-1">💖 Aşk & İkili İlişkiler</span>
-                        <p id="astro-text-love" class="text-slate-300 leading-normal"></p>
+                    <div class="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200">
+                        <span id="astro-title-love" class="text-rose-800 font-black text-xs block mb-1">💖 Aşk & İkili İlişkiler</span>
+                        <p id="astro-text-love" class="text-slate-800 font-medium leading-normal"></p>
                     </div>
-                    <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                        <span id="astro-title-money" class="text-emerald-400 font-black text-xs block mb-1">💼 Kariyer & Maddi Durum</span>
-                        <p id="astro-text-money" class="text-slate-300 leading-normal"></p>
+                    <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+                        <span id="astro-title-money" class="text-emerald-800 font-black text-xs block mb-1">💼 İş, Kariyer & Maddi Durum</span>
+                        <p id="astro-text-money" class="text-slate-800 font-medium leading-normal"></p>
                     </div>
                 </div>
 
-                <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800">
-                    <span id="astro-title-health" class="text-sky-400 font-black text-xs block mb-1">🌿 Sağlık & Zindelik</span>
-                    <p id="astro-text-health" class="text-slate-300 leading-normal"></p>
+                <div class="p-3.5 rounded-2xl bg-sky-50/70 border border-sky-200">
+                    <span id="astro-title-health" class="text-sky-800 font-black text-xs block mb-1">🌿 Sağlık, Enerji & Zindelik</span>
+                    <p id="astro-text-health" class="text-slate-800 font-medium leading-normal"></p>
                 </div>
 
                 <!-- Şanslı Rakam & Renk -->
                 <div id="astro-lucky-box" class="grid grid-cols-2 gap-3 pt-1">
-                    <div class="p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-center">
+                    <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                         <span class="text-[10px] text-slate-500 block font-bold">Günün Şanslı Sayısı</span>
-                        <span id="astro-lucky-num" class="text-base font-black text-amber-400">7</span>
+                        <span id="astro-lucky-num" class="text-base font-black text-amber-700">7</span>
                     </div>
-                    <div class="p-2.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-center">
+                    <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                         <span class="text-[10px] text-slate-500 block font-bold">Günün Uğurlu Rengi</span>
-                        <span id="astro-lucky-color" class="text-xs font-black text-purple-300">Mor / Gece Mavisi</span>
+                        <span id="astro-lucky-color" class="text-xs font-black text-purple-800">Mor / Gece Mavisi</span>
                     </div>
                 </div>
 
                 <!-- Sosyal Paylaşım Çubuğu -->
-                <div class="pt-2 flex items-center justify-between gap-2 border-t border-slate-800">
-                    <span class="text-[11px] text-slate-400 font-semibold">Bu burcu arkadaşınla paylaş:</span>
+                <div class="pt-2 flex items-center justify-between gap-2 border-t border-slate-200">
+                    <span class="text-[11px] text-slate-600 font-semibold">Bu burcu arkadaşınla paylaş:</span>
                     <div class="flex items-center gap-1.5">
                         <button type="button" onclick="window.shareAstroWhatsApp()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1 transition shadow-sm cursor-pointer">
                             <span>💬 WhatsApp</span>
                         </button>
-                        <button type="button" onclick="window.copyAstroLink()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-[11px] transition cursor-pointer">
+                        <button type="button" onclick="window.copyAstroLink()" class="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-[11px] transition cursor-pointer">
                             <span>🔗 Kopyala</span>
                         </button>
                     </div>
@@ -1670,15 +1670,15 @@
 
             <!-- PANEL 2: ❤️ BURÇ UYUMU HESAPLAYICI -->
             <div id="astro-view-compatibility" style="display: none;" class="space-y-4 text-xs">
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-950/40 via-purple-950/30 to-rose-950/40 border border-rose-500/40 text-center space-y-1.5">
-                    <h4 class="text-base font-black text-rose-300">❤️ 12 Burç Aşk & İlişki Uyumu Analizi</h4>
-                    <p class="text-slate-300 text-xs">Senin ve partnerinin burcunu seç, aşk, iletişim ve tutku uyumunu anında öğren!</p>
+                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-center space-y-1.5">
+                    <h4 class="text-base font-black text-rose-800">❤️ 12 Burç Aşk & İlişki Uyumu Analizi</h4>
+                    <p class="text-slate-700 text-xs font-medium">Senin ve partnerinin burcunu seç, aşk, iletişim ve tutku uyumunu anında öğren!</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 mb-1">Senin Burcun:</label>
-                        <select id="compat-sign-a" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold text-xs cursor-pointer">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Senin Burcun:</label>
+                        <select id="compat-sign-a" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs cursor-pointer">
                             <option value="Koç">♈ Koç</option>
                             <option value="Boğa">♉ Boğa</option>
                             <option value="İkizler">♊ İkizler</option>
@@ -1694,8 +1694,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 mb-1">Partnerinin Burcu:</label>
-                        <select id="compat-sign-b" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold text-xs cursor-pointer">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Partnerinin Burcu:</label>
+                        <select id="compat-sign-b" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs cursor-pointer">
                             <option value="Terazi">♎ Terazi</option>
                             <option value="Koç">♈ Koç</option>
                             <option value="Boğa">♉ Boğa</option>
@@ -1718,44 +1718,44 @@
                 </div>
 
                 <!-- Sonuç Kutusu -->
-                <div id="compat-result-box" class="p-4 rounded-2xl bg-slate-900 border border-purple-500/40 space-y-3">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span id="compat-names" class="text-sm font-black text-white">Koç & Terazi Uyumu</span>
-                        <span id="compat-total-badge" class="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 font-black text-xs">Genel Uyum: %88</span>
+                <div id="compat-result-box" class="p-4 rounded-2xl bg-white border border-purple-200 space-y-3 shadow-xs">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                        <span id="compat-names" class="text-sm font-black text-slate-900">Koç & Terazi Uyumu</span>
+                        <span id="compat-total-badge" class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-black text-xs">Genel Uyum: %88</span>
                     </div>
 
                     <div class="space-y-2">
                         <div>
                             <div class="flex justify-between text-[11px] mb-1 font-semibold">
-                                <span class="text-rose-400">Aşk & Romantizm</span>
-                                <span id="compat-love-score" class="text-white font-bold">%90</span>
+                                <span class="text-rose-700">Aşk & Romantizm</span>
+                                <span id="compat-love-score" class="text-slate-900 font-bold">%90</span>
                             </div>
-                            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                                 <div id="compat-love-bar" class="bg-rose-500 h-2 rounded-full" style="width: 90%"></div>
                             </div>
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-1 font-semibold">
-                                <span class="text-cyan-400">Zihinsel Uyum & İletişim</span>
-                                <span id="compat-comm-score" class="text-white font-bold">%82</span>
+                                <span class="text-sky-700">Zihinsel Uyum & İletişim</span>
+                                <span id="compat-comm-score" class="text-slate-900 font-bold">%82</span>
                             </div>
-                            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                                <div id="compat-comm-bar" class="bg-cyan-500 h-2 rounded-full" style="width: 82%"></div>
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div id="compat-comm-bar" class="bg-sky-500 h-2 rounded-full" style="width: 82%"></div>
                             </div>
                         </div>
                         <div>
                             <div class="flex justify-between text-[11px] mb-1 font-semibold">
-                                <span class="text-amber-400">Tutku & Çekim Gücü</span>
-                                <span id="compat-passion-score" class="text-white font-bold">%94</span>
+                                <span class="text-amber-700">Tutku & Çekim Gücü</span>
+                                <span id="compat-passion-score" class="text-slate-900 font-bold">%94</span>
                             </div>
-                            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                                 <div id="compat-passion-bar" class="bg-amber-500 h-2 rounded-full" style="width: 94%"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
-                        <p id="compat-desc" class="text-slate-300 leading-relaxed text-xs">
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <p id="compat-desc" class="text-slate-800 font-medium leading-relaxed text-xs">
                             Zıt kutupların birbirini çekmesi gibi, bu ikili birbirinde olmayan yönleri tamamlar. Tutkulu ve heyecan dolu bir ilişki dinamiği vardır.
                         </p>
                     </div>
@@ -1764,15 +1764,15 @@
 
             <!-- PANEL 3: ☀️ YÜKSELEN BURÇ HESAPLAYICI -->
             <div id="astro-view-rising" style="display: none;" class="space-y-4 text-xs">
-                <div class="p-4 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-indigo-950/40 border border-indigo-500/40 text-center space-y-1.5">
-                    <h4 class="text-base font-black text-indigo-300">☀️ Yükselen Burç Hesaplama</h4>
-                    <p class="text-slate-300 text-xs">Doğum saatinizi seçerek dış dünyaya yansıttığınız asıl burcunuzu ve auranızı öğrenin!</p>
+                <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 text-center space-y-1.5">
+                    <h4 class="text-base font-black text-indigo-900">☀️ Yükselen Burç Hesaplama</h4>
+                    <p class="text-slate-700 text-xs font-medium">Doğum saatinizi seçerek dış dünyaya yansıttığınız asıl burcunuzu ve auranızı öğrenin!</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 mb-1">Güneş (Öz) Burcunuz:</label>
-                        <select id="rising-sun-sign" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold text-xs cursor-pointer">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Güneş (Öz) Burcunuz:</label>
+                        <select id="rising-sun-sign" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs cursor-pointer">
                             <option value="Koç">♈ Koç</option>
                             <option value="Boğa">♉ Boğa</option>
                             <option value="İkizler">♊ İkizler</option>
@@ -1788,8 +1788,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 mb-1">Doğum Saati Aralığınız:</label>
-                        <select id="rising-birth-time" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold text-xs cursor-pointer">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Doğum Saati Aralığınız:</label>
+                        <select id="rising-birth-time" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold text-xs cursor-pointer">
                             <option value="0">05:00 - 07:00 (Gündoğumu)</option>
                             <option value="1">07:00 - 09:00 (Sabah)</option>
                             <option value="2">09:00 - 11:00 (Kuşluk)</option>
@@ -1812,16 +1812,16 @@
                 </div>
 
                 <!-- Yükselen Sonuç Kutusu -->
-                <div id="rising-result-box" class="p-4 rounded-2xl bg-slate-900 border border-indigo-500/40 space-y-2.5">
+                <div id="rising-result-box" class="p-4 rounded-2xl bg-white border border-indigo-200 space-y-2.5 shadow-xs">
                     <div class="flex items-center gap-3">
-                        <span id="rising-symbol" class="text-3xl text-indigo-400">♎</span>
+                        <span id="rising-symbol" class="text-3xl text-indigo-700">♎</span>
                         <div>
-                            <span class="text-[11px] text-indigo-300 font-bold block">Hesaplanan Yükselen Burcunuz:</span>
-                            <strong id="rising-name" class="text-base font-black text-white">Terazi Yükselen</strong>
+                            <span class="text-[11px] text-indigo-700 font-bold block">Hesaplanan Yükselen Burcunuz:</span>
+                            <strong id="rising-name" class="text-base font-black text-slate-900">Terazi Yükselen</strong>
                         </div>
                     </div>
-                    <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
-                        <p id="rising-desc" class="text-slate-300 leading-relaxed text-xs">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <p id="rising-desc" class="text-slate-800 font-medium leading-relaxed text-xs">
                             Yükselen burcunuz, insanların sizinle tanıştıklarında ilk hissettikleri auranızı ve fiziksel duruşunuzu temsil eder. Hayata bakış açınızı ve ilk tepkilerinizi belirler.
                         </p>
                     </div>
@@ -1861,38 +1861,45 @@
                 </select>
             </div>
 
-            <!-- 6 Vakit Kartları -->
+            <!-- 6 Ezan & Namaz Vakti Kartları (Her Vakte Kalan Süre Gösterimli) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-center">
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-imsak">
-                    <span class="text-[11px] text-slate-400 block font-bold">İmsak</span>
-                    <span id="time-imsak" class="text-lg font-black text-slate-900">05:46</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-imsak">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">İmsak (Sabah Ezanı)</span>
+                    <span id="time-imsak" class="text-lg font-black text-slate-900 block my-0.5">06:04</span>
+                    <span id="rem-imsak" class="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-gunes">
-                    <span class="text-[11px] text-slate-400 block font-bold">Güneş</span>
-                    <span id="time-gunes" class="text-lg font-black text-slate-900">07:11</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-gunes">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">Güneş (Sabah Çıkışı)</span>
+                    <span id="time-gunes" class="text-lg font-black text-slate-900 block my-0.5">07:30</span>
+                    <span id="rem-gunes" class="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-ogle">
-                    <span class="text-[11px] text-slate-400 block font-bold">Öğle</span>
-                    <span id="time-ogle" class="text-lg font-black text-slate-900">12:54</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-ogle">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">Öğle Ezanı</span>
+                    <span id="time-ogle" class="text-lg font-black text-slate-900 block my-0.5">12:53</span>
+                    <span id="rem-ogle" class="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-ikindi">
-                    <span class="text-[11px] text-slate-400 block font-bold">İkindi</span>
-                    <span id="time-ikindi" class="text-lg font-black text-slate-900">15:53</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-ikindi">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">İkindi Ezanı</span>
+                    <span id="time-ikindi" class="text-lg font-black text-slate-900 block my-0.5">15:39</span>
+                    <span id="rem-ikindi" class="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-aksam">
-                    <span class="text-[11px] text-slate-400 block font-bold">Akşam (İftar)</span>
-                    <span id="time-aksam" class="text-lg font-black text-slate-900">18:25</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-aksam">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">Akşam Ezanı (İftar)</span>
+                    <span id="time-aksam" class="text-lg font-black text-slate-900 block my-0.5">18:05</span>
+                    <span id="rem-aksam" class="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200" id="card-yatsi">
-                    <span class="text-[11px] text-slate-400 block font-bold">Yatsı</span>
-                    <span id="time-yatsi" class="text-lg font-black text-slate-900">19:44</span>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 transition" id="card-yatsi">
+                    <span class="text-[11px] text-slate-700 block font-extrabold">Yatsı Ezanı</span>
+                    <span id="time-yatsi" class="text-lg font-black text-slate-900 block my-0.5">19:26</span>
+                    <span id="rem-yatsi" class="text-[10px] font-bold text-slate-600 bg-slate-200/70 px-2 py-0.5 rounded-full inline-block">Hesaplanıyor...</span>
                 </div>
             </div>
 
-            <!-- Sıradaki Vakte Kalan Süre -->
-            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center">
-                <span class="text-xs text-slate-700 block font-bold"><span id="next-prayer-name">Yatsı</span> Vaktine Kalan Süre</span>
-                <span id="next-prayer-countdown" class="text-xl font-black text-amber-700 font-mono tracking-wider">--:--:--</span>
+            <!-- Sıradaki Ezana Kalan Canlı Süre -->
+            <div class="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-300 text-center space-y-0.5 shadow-2xs">
+                <span class="text-xs text-slate-800 block font-extrabold">🕌 Sıradaki: <span id="next-prayer-name" class="text-amber-800">Sabah Ezanı (İmsak)</span> Vaktine Kalan Süre</span>
+                <span id="next-prayer-countdown" class="text-2xl font-black text-amber-700 font-mono tracking-wider block">--:--:--</span>
+                <span id="next-prayer-subnote" class="text-[11px] text-slate-600 block font-medium">Diyanet İşleri Başkanlığı canlı vakit hesaplaması</span>
             </div>
 
             <div class="pt-2 flex justify-end">
@@ -1924,14 +1931,14 @@
                 <div>
                     <label class="block text-[11px] font-bold text-slate-700 mb-1">📍 Şehir (81 İl):</label>
                     <select id="nobetci-city-select" onchange="window.loadNobetciCity(this.value)" 
-                            class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 transition">
+                            class="w-full bg-slate-50 border border-slate-300 text-slate-900 font-bold rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 focus:bg-white transition">
                         <!-- Populated with 81 cities -->
                     </select>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-700 mb-1">🔍 İlçe / Eczane Ara:</label>
-                    <input type="text" id="nobetci-search" oninput="window.filterNobetci(this.value)" placeholder="Eczane veya ilçe yaz..." 
-                           class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 transition">
+                    <input type="text" id="nobetci-search" oninput="window.filterNobetci(this.value)" placeholder="Eczane veya ilçe yaz (örn: Kadıköy, Çankaya)..." 
+                           class="w-full bg-slate-50 border border-slate-300 text-slate-900 font-semibold rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 focus:bg-white transition placeholder:text-slate-400">
                 </div>
             </div>
 
