@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% set cur_week = (superlig.week if superlig and superlig.week else 11) %}
+    {% set standings = (superlig.standings if superlig and superlig.standings else []) %}
+    {% set leader = (standings[0] if standings|length > 0 else {'team': 'Galatasaray', 'p': 28, 'o': 10, 'av': '+18'}) %}
+    {% set runner = (standings[1] if standings|length > 1 else {'team': 'Samsunspor', 'p': 25, 'o': 11, 'av': '+11'}) %}
+    {% set third = (standings[2] if standings|length > 2 else {'team': 'Fenerbahçe', 'p': 23, 'o': 10, 'av': '+13'}) %}
+    <title>Trendyol Süper Lig Puan Durumu ve Fikstür ({{ cur_week }}. Hafta Canlı Tablo) | Gündem Analizi</title>
+    <meta name="description" content="Canlı Trendyol Süper Lig puan durumu, {{ cur_week }}. hafta maç sonuçları, iç saha ve deplasman sıralaması ile 34 haftalık tam fikstür. 1. {{ leader.team }} ({{ leader.p }} P), 2. {{ runner.team }} ({{ runner.p }} P), 3. {{ third.team }} ({{ third.p }} P) güncel TFF verileri.">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/super-lig-puan-durumu">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Trendyol Süper Lig Canlı Puan Durumu ve 34 Haftalık Fikstür ({{ cur_week }}. Hafta)">
+    <meta property="og:description" content="TFF resmi verileriyle anlık Süper Lig puan tablosu (Genel, İç Saha, Deplasman) ve {{ cur_week }}. hafta maç programı.">
+    <meta property="og:url" content="https://xn--gndemanalizi-dlb.com.tr/super-lig-puan-durumu">
+    <meta property="og:site_name" content="Gündem Analizi">
+
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu -->
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+
+    <!-- Yapısal Veri (BreadcrumbList + FAQPage) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://xn--gndemanalizi-dlb.com.tr/" },
+            { "@type": "ListItem", "position": 2, "name": "Spor Haberleri", "item": "https://xn--gndemanalizi-dlb.com.tr/?kategori=Spor" },
+            { "@type": "ListItem", "position": 3, "name": "Süper Lig Puan Durumu ve Fikstür", "item": "https://xn--gndemanalizi-dlb.com.tr/super-lig-puan-durumu" }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Süper Lig'de lider kim ve kaç puanı var?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Trendyol Süper Lig {{ cur_week }}. hafta itibarıyla {{ leader.team }}, oynadığı {{ leader.o }} maçta topladığı {{ leader.p }} puan ve {{ leader.av }} averajla liderlik koltuğunda yer almaktadır. Onu {{ runner.p }} puanla {{ runner.team }} ve {{ third.p }} puanla {{ third.team }} takip etmektedir."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Süper Lig {{ cur_week }}. hafta maçları nelerdir?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Trendyol Süper Lig {{ cur_week }}. hafta programında {% for m in (superlig.matches or []) %}{{ m.home }} - {{ m.away }}{% if m.played and m.score %} ({{ m.score }}){% elif m.date %} ({{ m.date }}{% if m.time %} {{ m.time }}{% endif %}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %} karşılaşmaları yer almaktadır."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Süper Lig'de kaç takım Avrupa kupalarına gider ve kaç takım küme düşer?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Süper Lig'i 1. sırada tamamlayan şampiyon takım ve 2. sıradaki takım UEFA Şampiyonlar Ligi'ne, 3. sıradaki takım UEFA Avrupa Ligi'ne, 4. sıradaki takım ise UEFA Konferans Ligi elemelerine katılır. Puan tablosunun son 3 sırasında (16, 17 ve 18. sıra) yer alan takımlar alt lige düşer."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Süper Lig puan durumunda eşitlik halinde sıralama nasıl belirlenir?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "TFF Müsabaka Statüsü uyarınca sezon sonunda iki veya daha fazla takımın puan eşitliği halinde öncelikle takımların kendi aralarında oynadıkları maçlardaki puan üstünlüğüne (ikili averaj), ardından ikili averajda gol farkına, eşitlik bozulmazsa genel averaja ve daha fazla gol atmış olmaya bakılır."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <script src="/assets/lucide.min.js" defer></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-xs" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 block leading-none">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        Spor &amp; Canlı Veri Merkezi
+                    </span>
+                </div>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="#fikstur" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 transition hidden sm:inline-flex">
+                    📅 34 Haftalık Fikstür
+                </a>
+                <a href="/?kategori=Spor" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition hidden sm:inline-flex">
+                    ⚽ Spor Haberleri
+                </a>
+                <a href="/" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-xs text-white transition shadow-sm">
+                    ← Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full space-y-8">
+        <!-- Breadcrumb & Ana Başlık -->
+        <div class="border-b border-slate-200 pb-6">
+            <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-red-600 transition">Ana Sayfa</a>
+                <span>/</span>
+                <a href="/?kategori=Spor" class="hover:text-red-600 transition">Spor</a>
+                <span>/</span>
+                <span class="text-red-600 font-bold">Süper Lig Puan Durumu ve Fikstür</span>
+            </nav>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        🏆 Trendyol Süper Lig Puan Durumu ve Fikstür ({{ cur_week }}. Hafta)
+                    </h1>
+                    <p class="text-slate-600 text-xs sm:text-sm mt-1.5">
+                        Türkiye Futbol Federasyonu (TFF) resmi verileriyle anlık 18 takım genel, iç saha ve deplasman puan cetveli ile 1–34. hafta maç sonuçları.
+                    </p>
+                </div>
+                <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold self-start shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+                    <span>TFF Canlı Veri • {{ updated_at }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. ÖZET KARTLAR (LİDER, HAFTA, ŞAMPİYONLAR LİGİ, DÜŞME HATTI) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-wider block">Lig Lideri</span>
+                    <div class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ leader.team }}</div>
+                    <span class="text-xs font-bold text-slate-500">{{ leader.o }} Maç • {{ leader.av }} Averaj</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-black text-red-600 font-mono">{{ leader.p }}</span>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase">Puan</span>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold text-amber-600 uppercase tracking-wider block">En Yakın Takipçi</span>
+                    <div class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ runner.team }}</div>
+                    <span class="text-xs font-bold text-slate-500">{{ runner.o }} Maç • {{ runner.av }} Averaj</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-black text-slate-900 font-mono">{{ runner.p }}</span>
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase">Puan</span>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-wider block">Aktif Fikstür Haftası</span>
+                    <div class="text-base sm:text-lg font-black text-slate-900 mt-0.5">{{ cur_week }}. Hafta</div>
+                    <span class="text-xs font-bold text-slate-500">Toplam 34 Hafta • 306 Maç</span>
+                </div>
+                <span class="text-2xl p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">⚽</span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold text-sky-600 uppercase tracking-wider block">Avrupa &amp; Küme Hattı</span>
+                    <div class="text-sm font-black text-slate-900 mt-0.5">İlk 4 Avrupa Kupaları</div>
+                    <span class="text-xs font-bold text-rose-600">Son 3 Takım (16-18) Düşer</span>
+                </div>
+                <span class="text-2xl p-2.5 rounded-xl bg-sky-50 border border-sky-200">🏆</span>
+            </div>
+        </section>
+
+        <!-- 2. TAM PUAN DURUMU TABLOSU (18 TAKIM - GENEL / İÇ SAHA / DEPLASMAN) -->
+        <section class="rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-[11px] font-extrabold text-red-600 uppercase tracking-wider block">Resmi Lig Cetveli</span>
+                    <h2 id="full-standings-title" class="text-lg sm:text-2xl font-black text-slate-900">
+                        Süper Lig Genel Puan Durumu (18 Takım)
+                    </h2>
+                </div>
+                <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs font-bold self-start sm:self-auto">
+                    <button type="button" id="full-tab-genel" onclick="switchFullStandings('genel')" class="px-4 py-2 rounded-lg bg-red-600 text-white font-black transition cursor-pointer shadow-xs">
+                        Genel Sıralama
+                    </button>
+                    <button type="button" id="full-tab-icsaha" onclick="switchFullStandings('icsaha')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">
+                        İç Saha (Ev)
+                    </button>
+                    <button type="button" id="full-tab-deplasman" onclick="switchFullStandings('deplasman')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">
+                        Deplasman (Dış)
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                            <th class="py-3.5 pl-4 pr-2 w-12">#</th>
+                            <th class="py-3.5 px-3">Takım</th>
+                            <th class="py-3.5 px-2 text-center" title="Oynanan Maç">O</th>
+                            <th class="py-3.5 px-2 text-center" title="Galibiyet">G</th>
+                            <th class="py-3.5 px-2 text-center" title="Beraberlik">B</th>
+                            <th class="py-3.5 px-2 text-center" title="Mağlubiyet">M</th>
+                            <th class="py-3.5 px-2 text-center hidden sm:table-cell" title="Atılan Gol">A</th>
+                            <th class="py-3.5 px-2 text-center hidden sm:table-cell" title="Yenen Gol">Y</th>
+                            <th class="py-3.5 px-2 text-center" title="Averaj">AV</th>
+                            <th class="py-3.5 px-3 text-right font-black text-slate-900" title="Toplam Puan">P</th>
+                            <th class="py-3.5 pl-2 pr-4 text-right hidden md:table-cell">Bölge / Kupa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-standings-tbody" class="divide-y divide-slate-100">
+                        {% for t in standings %}
+                        {% set zone_border = 'border-l-4 border-l-emerald-500 bg-emerald-50/20' if t.rank <= 2 else ('border-l-4 border-l-sky-500' if t.rank == 3 else ('border-l-4 border-l-indigo-500' if t.rank == 4 else ('border-l-4 border-l-rose-500 bg-rose-50/20' if t.rank >= 16 else 'border-l-4 border-l-transparent'))) %}
+                        <tr class="hover:bg-slate-50 transition {{ zone_border }}">
+                            <td class="py-3 pl-4 pr-2 font-black {{ 'text-emerald-700' if t.rank <= 2 else ('text-sky-700' if t.rank <= 4 else ('text-rose-600' if t.rank >= 16 else 'text-slate-500')) }}">
+                                {{ t.rank }}
+                            </td>
+                            <td class="py-3 px-3 font-extrabold text-slate-900">
+                                {{ t.team }}
+                            </td>
+                            <td class="py-3 px-2 text-center font-semibold text-slate-700">{{ t.o }}</td>
+                            <td class="py-3 px-2 text-center font-semibold text-emerald-700">{{ t.g }}</td>
+                            <td class="py-3 px-2 text-center font-semibold text-amber-700">{{ t.b }}</td>
+                            <td class="py-3 px-2 text-center font-semibold text-rose-700">{{ t.m }}</td>
+                            <td class="py-3 px-2 text-center text-slate-600 hidden sm:table-cell">{{ t.a if t.a is defined else '-' }}</td>
+                            <td class="py-3 px-2 text-center text-slate-600 hidden sm:table-cell">{{ t.y if t.y is defined else '-' }}</td>
+                            <td class="py-3 px-2 text-center font-mono font-bold {{ 'text-emerald-600' if (t.av|string).startswith('+') else ('text-rose-600' if (t.av|string).startswith('-') else 'text-slate-600') }}">
+                                {{ t.av }}
+                            </td>
+                            <td class="py-3 px-3 text-right font-black text-base text-slate-900 font-mono">
+                                {{ t.p }}
+                            </td>
+                            <td class="py-3 pl-2 pr-4 text-right hidden md:table-cell">
+                                {% if t.rank <= 2 %}
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🏆 Şampiyonlar Ligi</span>
+                                {% elif t.rank == 3 %}
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-200">🇪🇺 Avrupa Ligi</span>
+                                {% elif t.rank == 4 %}
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-200">🌍 Konferans Ligi</span>
+                                {% elif t.rank >= 16 %}
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200">🔻 Düşme Hattı</span>
+                                {% else %}
+                                <span class="text-[11px] text-slate-400 font-medium">Süper Lig</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Renk Açıklamaları (Lejant) -->
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs font-semibold text-slate-600">
+                <div class="flex flex-wrap items-center gap-4">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-emerald-500 inline-block"></span> 1–2. Sıra: UEFA Şampiyonlar Ligi</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-sky-500 inline-block"></span> 3. Sıra: UEFA Avrupa Ligi</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-indigo-500 inline-block"></span> 4. Sıra: UEFA Konferans Ligi</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-xs bg-rose-500 inline-block"></span> 16–18. Sıra: Alt Lige Düşme Hattı</span>
+                </div>
+                <span class="text-[11px] text-slate-500">Kaynak: TFF Resmi Veritabanı</span>
+            </div>
+        </section>
+
+        <!-- 3. 34 HAFTALIK TAM FİKSTÜR VE MAÇ SONUÇLARI MOTORU -->
+        <section id="fikstur" class="rounded-2xl bg-white border border-slate-200 shadow-sm p-5 sm:p-6 space-y-5 scroll-mt-20">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                    <span class="text-[11px] font-extrabold text-red-600 uppercase tracking-wider block">Tüm Sezon Maç Programı</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900">
+                        📅 Süper Lig 1–34. Hafta Fikstür ve Maç Sonuçları
+                    </h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="stepFullFixtureWeek(-1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition cursor-pointer">
+                        ‹ Önceki Hafta
+                    </button>
+                    <select id="full-week-select" onchange="selectFullFixtureWeek(this.value)" aria-label="Hafta Seçin"
+                            class="px-3.5 py-2 rounded-xl bg-slate-900 text-white font-extrabold text-xs border border-slate-700 focus:outline-none focus:border-red-500 cursor-pointer">
+                        {% for w in range(1, 35) %}
+                        <option value="{{ w }}" {% if w == cur_week %}selected{% endif %}>
+                            {{ w }}. Hafta {% if w == cur_week %}(Güncel Hafta){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="stepFullFixtureWeek(1)" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition cursor-pointer">
+                        Sonraki Hafta ›
+                    </button>
+                    <button type="button" onclick="selectFullFixtureWeek({{ cur_week }})" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs transition cursor-pointer shadow-xs">
+                        Güncel Hafta ({{ cur_week }})
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hızlı Hafta Şeridi (1..34 Kaydırılabilir) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 no-scrollbar">
+                {% for w in range(1, 35) %}
+                <button type="button" id="week-pill-{{ w }}" onclick="selectFullFixtureWeek({{ w }})"
+                        class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer {{ 'bg-red-600 text-white border-red-600 font-black shadow-xs' if w == cur_week else 'bg-slate-50 text-slate-700 border-slate-200 hover:border-red-400' }}">
+                    {{ w }}. Hafta
+                </button>
+                {% endfor %}
+            </div>
+
+            <!-- Seçili Haftanın Maç Kartları -->
+            <div id="full-fixture-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {% for m in (superlig.matches or []) %}
+                {% set is_big = ('Galatasaray' in m.home or 'Fenerbahçe' in m.home or 'Beşiktaş' in m.home or 'Trabzon' in m.home or 'Galatasaray' in m.away or 'Fenerbahçe' in m.away or 'Beşiktaş' in m.away or 'Trabzon' in m.away) %}
+                <div class="p-4 rounded-xl border {{ 'bg-red-50/40 border-red-200' if is_big else 'bg-slate-50 border-slate-200' }} flex items-center justify-between gap-3">
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">{{ m.home }}</div>
+                        <div class="text-xs sm:text-sm font-extrabold text-slate-700 truncate mt-1">{{ m.away }}</div>
+                    </div>
+                    {% if m.played and m.score %}
+                    <div class="text-right shrink-0">
+                        <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-mono font-black text-sm shadow-xs">{{ m.score }}</span>
+                        <span class="block text-[10px] font-bold text-emerald-700 mt-1">Maç Sonucu</span>
+                    </div>
+                    {% else %}
+                    <div class="text-right shrink-0">
+                        <span class="inline-block px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 font-mono font-bold text-xs">{{ m.date or 'Tarih Bekleniyor' }}</span>
+                        <span class="block text-[11px] font-extrabold text-red-600 mt-1">{{ m.time or 'Saat Açıklanacak' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- 4. SÜPER LİG STATÜSÜ, AVERAJ KURALLARI VE SIKÇA SORULAN SORULAR (SEO & REHBER) -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                    <span>📘</span> Trendyol Süper Lig Avrupa Kupaları ve Küme Düşme Statüsü
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Türkiye Futbol Federasyonu (TFF) tarafından düzenlenen Trendyol Süper Lig, 18 takımın çift devreli lig usulüne göre 34 hafta boyunca mücadele ettiği Türkiye'nin en üst düzey profesyonel futbol ligidir. Her takım sezon boyunca 17 iç saha ve 17 deplasman olmak üzere toplam 34 karşılaşmaya çıkar.
+                </p>
+                <ul class="text-xs sm:text-sm text-slate-700 space-y-2 pt-1">
+                    <li><strong>🏆 Şampiyonlar Ligi:</strong> Sezonu 1. sırada tamamlayan şampiyon doğrudan (veya play-off turundan), 2. sıradaki takım ise UEFA Şampiyonlar Ligi eleme turlarından katılım hakkı kazanır.</li>
+                    <li><strong>🇪🇺 Avrupa ve Konferans Ligi:</strong> Ligi 3. sırada bitiren takım UEFA Avrupa Ligi elemelerine, 4. sırada bitiren takım ise UEFA Konferans Ligi elemelerine katılır.</li>
+                    <li><strong>🔻 Alt Lige Düşme:</strong> 34. hafta sonunda puan cetvelinin son 3 basamağında (16, 17 ve 18. sırada) yer alan 3 takım doğrudan TFF 1. Lig'e düşer.</li>
+                </ul>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
+                <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                    <span>⚖️</span> Puan Eşitliği ve İkili Averaj Kuralları Nasıl İşler?
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Lig devam ederken haftalık puan durumu tablolarında eşit puana sahip takımlar genel gol averajına (Atılan Gol – Yenen Gol) göre sıralanır. Sezon sonunda ise TFF Müsabaka Statüsü gereğince sırasıyla şu kriterler uygulanır:
+                </p>
+                <ol class="text-xs sm:text-sm text-slate-700 space-y-1.5 list-decimal list-inside pt-1">
+                    <li>Puanı eşit olan takımların kendi aralarında oynadıkları maçlarda topladıkları puan üstünlüğü (<strong>İkili Averaj Puanı</strong>).</li>
+                    <li>Kendi aralarındaki maçlarda gol averajı (deplasman golü kuralı uygulanmaz).</li>
+                    <li>Genel puan cetvelindeki gol averajı üstünlüğü (<strong>AV</strong>).</li>
+                    <li>Genel puan cetvelinde daha fazla gol atmış olmak (<strong>A</strong>).</li>
+                </ol>
+                <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-100">
+                    * Sayfamızdaki İç Saha ve Deplasman puan tabloları, TFF'de tescil edilmiş resmi maç skorlarından matematiksel olarak anlık hesaplanmaktadır.
+                </p>
+            </div>
+        </section>
+
+        <!-- 5. GÜNCEL SPOR VE FUTBOL HABERLERİ -->
+        <section class="pt-4 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-6 bg-red-600 rounded-sm"></span>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                        SON DAKİKA SPOR VE SÜPER LİG HABERLERİ
+                    </h2>
+                </div>
+                <a href="/?kategori=Spor" class="text-xs font-bold text-red-600 hover:underline">Tüm Spor Haberleri →</a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {% for a in articles %}
+                <a href="/haber/{{ a.slug }}" class="group rounded-2xl bg-white border border-slate-200 hover:border-red-400 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+                    <div class="h-44 bg-slate-100 overflow-hidden relative">
+                        {% if a.image_path %}
+                        <img src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ a.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        {% else %}
+                        <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-6">
+                        {% endif %}
+                        <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded bg-red-600 text-white text-[10px] font-extrabold uppercase">{{ a.category }}</span>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-red-600 transition line-clamp-2 leading-snug">{{ a.title }}</h3>
+                            <p class="text-xs text-slate-600 line-clamp-2 mt-1.5 leading-relaxed">{{ a.summary }}</p>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                            <span>{{ (a.created_at or '')[:16] }}</span>
+                            <span class="text-red-600 font-bold">Haberi Oku →</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-6 text-center text-xs text-slate-600 mt-10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span>© 2026 Gündem Analizi • Doğru Haber, Tarafsız Analiz.</span>
+            <div class="flex flex-wrap items-center justify-center gap-3 font-semibold">
+                <a href="/hakkimizda" class="hover:text-red-600">Hakkımızda</a>
+                <span>•</span>
+                <a href="/kunye" class="hover:text-red-600">Künye</a>
+                <span>•</span>
+                <a href="/yayin-ilkeleri" class="hover:text-red-600">Yayın İlkeleri</a>
+                <span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-red-600">Gizlilik</a>
+                <span>•</span>
+                <a href="/iletisim" class="hover:text-red-600">İletişim</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SUPERLIG_DATA = {{ superlig | tojson }};
+        let activeFullWeek = parseInt(SUPERLIG_DATA.week, 10) || 11;
+
+        function getZoneBadge(rank) {
+            if (rank <= 2) return '<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🏆 Şampiyonlar Ligi</span>';
+            if (rank === 3) return '<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-200">🇪🇺 Avrupa Ligi</span>';
+            if (rank === 4) return '<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-indigo-100 text-indigo-800 border border-indigo-200">🌍 Konferans Ligi</span>';
+            if (rank >= 16) return '<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200">🔻 Düşme Hattı</span>';
+            return '<span class="text-[11px] text-slate-400 font-medium">Süper Lig</span>';
+        }
+
+        function switchFullStandings(type) {
+            const map = {
+                genel: { list: SUPERLIG_DATA.standings || [], title: 'Süper Lig Genel Puan Durumu (18 Takım)' },
+                icsaha: { list: SUPERLIG_DATA.standings_icsaha || [], title: 'Süper Lig İç Saha (Ev) Puan Durumu' },
+                deplasman: { list: SUPERLIG_DATA.standings_deplasman || [], title: 'Süper Lig Deplasman (Dış Saha) Puan Durumu' }
+            };
+            const target = map[type] || map.genel;
+            const titleEl = document.getElementById('full-standings-title');
+            if (titleEl) titleEl.innerText = target.title;
+
+            ['genel', 'icsaha', 'deplasman'].forEach(function(k) {
+                const btn = document.getElementById('full-tab-' + k);
+                if (btn) {
+                    btn.className = (k === type)
+                        ? 'px-4 py-2 rounded-lg bg-red-600 text-white font-black transition cursor-pointer shadow-xs'
+                        : 'px-4 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+                }
+            });
+
+            const tbody = document.getElementById('full-standings-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = target.list.map(function(t) {
+                const r = t.rank;
+                const zoneBorder = r <= 2 ? 'border-l-4 border-l-emerald-500 bg-emerald-50/20'
+                    : (r === 3 ? 'border-l-4 border-l-sky-500'
+                    : (r === 4 ? 'border-l-4 border-l-indigo-500'
+                    : (r >= 16 ? 'border-l-4 border-l-rose-500 bg-rose-50/20' : 'border-l-4 border-l-transparent')));
+                const rankColor = r <= 2 ? 'text-emerald-700' : (r <= 4 ? 'text-sky-700' : (r >= 16 ? 'text-rose-600' : 'text-slate-500'));
+                const avStr = String(t.av || '0');
+                const avColor = avStr.indexOf('+') === 0 ? 'text-emerald-600' : (avStr.indexOf('-') === 0 ? 'text-rose-600' : 'text-slate-600');
+                return '<tr class="hover:bg-slate-50 transition ' + zoneBorder + '">' +
+                    '<td class="py-3 pl-4 pr-2 font-black ' + rankColor + '">' + r + '</td>' +
+                    '<td class="py-3 px-3 font-extrabold text-slate-900">' + t.team + '</td>' +
+                    '<td class="py-3 px-2 text-center font-semibold text-slate-700">' + t.o + '</td>' +
+                    '<td class="py-3 px-2 text-center font-semibold text-emerald-700">' + t.g + '</td>' +
+                    '<td class="py-3 px-2 text-center font-semibold text-amber-700">' + t.b + '</td>' +
+                    '<td class="py-3 px-2 text-center font-semibold text-rose-700">' + t.m + '</td>' +
+                    '<td class="py-3 px-2 text-center text-slate-600 hidden sm:table-cell">' + (t.a !== undefined ? t.a : '-') + '</td>' +
+                    '<td class="py-3 px-2 text-center text-slate-600 hidden sm:table-cell">' + (t.y !== undefined ? t.y : '-') + '</td>' +
+                    '<td class="py-3 px-2 text-center font-mono font-bold ' + avColor + '">' + avStr + '</td>' +
+                    '<td class="py-3 px-3 text-right font-black text-base text-slate-900 font-mono">' + t.p + '</td>' +
+                    '<td class="py-3 pl-2 pr-4 text-right hidden md:table-cell">' + getZoneBadge(r) + '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        function isDerbyOrBig(m) {
+            const h = (m && m.home) || '';
+            const a = (m && m.away) || '';
+            return h.includes('Galatasaray') || h.includes('Fenerbahçe') || h.includes('Beşiktaş') || h.includes('Trabzon') ||
+                   a.includes('Galatasaray') || a.includes('Fenerbahçe') || a.includes('Beşiktaş') || a.includes('Trabzon');
+        }
+
+        function selectFullFixtureWeek(w) {
+            w = parseInt(w, 10) || 1;
+            if (w < 1) w = 34;
+            if (w > 34) w = 1;
+            activeFullWeek = w;
+
+            const sel = document.getElementById('full-week-select');
+            if (sel) sel.value = String(w);
+
+            for (let i = 1; i <= 34; i++) {
+                const pill = document.getElementById('week-pill-' + i);
+                if (pill) {
+                    pill.className = (i === w)
+                        ? 'shrink-0 px-3 py-1.5 rounded-lg text-xs font-black border transition cursor-pointer bg-red-600 text-white border-red-600 shadow-xs'
+                        : 'shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition cursor-pointer bg-slate-50 text-slate-700 border-slate-200 hover:border-red-400';
+                }
+            }
+
+            const weeksObj = SUPERLIG_DATA.weeks || {};
+            const matches = weeksObj[String(w)] || weeksObj[w] || [];
+            const grid = document.getElementById('full-fixture-grid');
+            if (!grid) return;
+
+            grid.innerHTML = matches.map(function(m) {
+                const big = isDerbyOrBig(m);
+                const cardCls = big ? 'bg-red-50/40 border-red-200' : 'bg-slate-50 border-slate-200';
+                let rightHtml = '';
+                if (m.played && m.score) {
+                    rightHtml = '<div class="text-right shrink-0">' +
+                        '<span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-mono font-black text-sm shadow-xs">' + m.score + '</span>' +
+                        '<span class="block text-[10px] font-bold text-emerald-700 mt-1">Maç Sonucu</span>' +
+                    '</div>';
+                } else {
+                    rightHtml = '<div class="text-right shrink-0">' +
+                        '<span class="inline-block px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 font-mono font-bold text-xs">' + (m.date || 'Tarih Bekleniyor') + '</span>' +
+                        '<span class="block text-[11px] font-extrabold text-red-600 mt-1">' + (m.time || 'Saat Açıklanacak') + '</span>' +
+                    '</div>';
+                }
+                return '<div class="p-4 rounded-xl border ' + cardCls + ' flex items-center justify-between gap-3">' +
+                    '<div class="min-w-0 flex-1">' +
+                        '<div class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">' + m.home + '</div>' +
+                        '<div class="text-xs sm:text-sm font-extrabold text-slate-700 truncate mt-1">' + m.away + '</div>' +
+                    '</div>' +
+                    rightHtml +
+                '</div>';
+            }).join('');
+        }
+
+        function stepFullFixtureWeek(delta) {
+            selectFullFixtureWeek(activeFullWeek + delta);
+        }
+    </script>
+</body>
+</html>

@@ -1070,14 +1070,128 @@
             ]
         };
 
+        // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (9, 10, 11. HAFTA GEÇİŞLERİ)
+        // =====================================================================
+        var FIXTURES_DATA = {
+            9: {
+                title: "9. Hafta Maçları",
+                matches: [
+                    { home: "Antalyaspor", away: "Galatasaray", date: "19 Eki • 19:00", badge: "bg-red-500/20 text-red-400 border-red-500/30", highlight: true },
+                    { home: "Trabzonspor", away: "Başakşehir", date: "19 Eki • 16:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+                    { home: "Fenerbahçe", away: "Samsunspor", date: "20 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", highlight: true },
+                    { home: "Beşiktaş", away: "Konyaspor", date: "20 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
+                ]
+            },
+            10: {
+                title: "10. Hafta (Derbi Haftası)",
+                matches: [
+                    { home: "Galatasaray", away: "Beşiktaş", date: "28 Eki • 20:00", badge: "bg-red-600/30 text-red-300 border-red-500/50", highlight: true },
+                    { home: "Fenerbahçe", away: "Bodrum FK", date: "27 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+                    { home: "Göztepe", away: "Trabzonspor", date: "26 Eki • 19:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+                    { home: "Kasımpaşa", away: "Samsunspor", date: "26 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
+                ]
+            },
+            11: {
+                title: "11. Hafta (Süper Lig)",
+                matches: [
+                    { home: "Trabzonspor", away: "Fenerbahçe", date: "3 Kas • 19:00", badge: "bg-amber-500/30 text-amber-300 border-amber-500/50", highlight: true },
+                    { home: "Beşiktaş", away: "Kasımpaşa", date: "2 Kas • 19:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" },
+                    { home: "Samsunspor", away: "Antalyaspor", date: "4 Kas • 20:00", badge: "bg-red-500/20 text-red-400 border-red-500/30" },
+                    { home: "Galatasaray", away: "BAY (Maçı Yok)", date: "Haftalık Dinlenme", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
+                ]
+            }
+        };
+
+        var currentFixtureWeek = 9;
+
+        function renderFixtures(week) {
+            currentFixtureWeek = week;
+            var data = FIXTURES_DATA[week] || FIXTURES_DATA[9];
+            var titleEl = document.getElementById('fixture-week-badge');
+            var listEl = document.getElementById('fixture-matches-list') || document.getElementById('fixtures-matches-list');
+
+            if (titleEl) titleEl.innerText = week + '. Hafta';
+
+            [9, 10, 11].forEach(function(w) {
+                var btn = document.getElementById('tab-week-' + w);
+                if (btn) {
+                    if (w === week) {
+                        btn.className = 'flex-1 py-1 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-xs text-xs';
+                    } else {
+                        btn.className = 'flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer text-xs';
+                    }
+                }
+            });
+
+            if (!listEl) return;
+            listEl.innerHTML = data.matches.map(function(m) {
+                var isHigh = m.highlight;
+                var boxCls = isHigh ? 'bg-red-50/50 border-red-200 hover:border-red-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300';
+                var textCls = isHigh ? 'text-red-700 font-extrabold' : 'text-slate-900 font-bold';
+                var badgeCls = isHigh ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-200 text-slate-800 border-slate-300';
+                return '<div class="p-2.5 rounded-xl border ' + boxCls + ' flex items-center justify-between transition hover:bg-white shadow-xs">' +
+                    '<span class="text-xs sm:text-sm ' + textCls + '">' + m.home + ' - ' + m.away + '</span>' +
+                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + badgeCls + '">' + m.date + '</span>' +
+                '</div>';
+            }).join('');
+        }
+                // Canlı TFF Süper Lig Verisi Çekici
+        function fetchLiveSuperlig() {
+            fetch('/api/superlig')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.success) {
+                        if (data.standings && data.standings.length > 0) {
+                            STANDINGS_DATA.genel = data.standings;
+                            switchStandings('genel');
+                        }
+                        if (data.matches && data.matches.length > 0) {
+                            var w = data.week || 10;
+                            currentFixtureWeek = w;
+                            FIXTURES_DATA[w] = {
+                                title: w + '. Hafta Maçları (Canlı TFF)',
+                                matches: data.matches.map(function(m) {
+                                    var dtStr = (m.date || '') + (m.time ? ' • ' + m.time : '');
+                                    return {
+                                        home: m.home,
+                                        away: m.away,
+                                        date: dtStr || 'Gelecek Maç',
+                                        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                                        highlight: (m.home.includes('Galatasaray') || m.home.includes('Fenerbahçe') || m.home.includes('Beşiktaş') || m.home.includes('Trabzon') ||
+                                                    m.away.includes('Galatasaray') || m.away.includes('Fenerbahçe') || m.away.includes('Beşiktaş') || m.away.includes('Trabzon'))
+                                    };
+                                })
+                            };
+                            renderFixtures(w);
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Superlig fetch err:', err);
+                });
+        }
+        window.fetchLiveSuperlig = fetchLiveSuperlig;
+
+        window.renderFixtures = renderFixtures;
+        window.setFixtureWeek = function(w) { renderFixtures(w); };
+        window.changeFixtureWeek = function(delta) {
+            var next = currentFixtureWeek + delta;
+            if (next < 9) next = 11;
+            if (next > 11) next = 9;
+            renderFixtures(next);
+        };
+====
+        var currentStandingsTab = 'genel';
+
         function switchStandings(type) {
-            var list = STANDINGS_DATA[type] || STANDINGS_DATA.genel;
+            currentStandingsTab = type || 'genel';
+            var list = (STANDINGS_DATA[currentStandingsTab] || STANDINGS_DATA.genel || []).slice(0, 10);
             var tbody = document.getElementById('standings-table-body');
             var label = document.getElementById('standings-status-label');
 
             if (label) {
-                if (type === 'icsaha') label.innerText = 'İç Saha Sıralaması';
-                else if (type === 'deplasman') label.innerText = 'Deplasman Sıralaması';
+                if (currentStandingsTab === 'icsaha') label.innerText = 'İç Saha Sıralaması';
+                else if (currentStandingsTab === 'deplasman') label.innerText = 'Deplasman Sıralaması';
                 else label.innerText = 'Genel Sıralama';
             }
 
@@ -1085,7 +1199,7 @@
             tabs.forEach(function(t) {
                 var btn = document.getElementById('tab-standings-' + t);
                 if (btn) {
-                    if (t === type) {
+                    if (t === currentStandingsTab) {
                         btn.className = 'flex-1 py-1.5 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-sm';
                     } else {
                         btn.className = 'flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer';
@@ -1095,12 +1209,13 @@
 
             if (!tbody) return;
             tbody.innerHTML = list.map(function(t) {
+                var avStr = String(t.av || '0');
                 return '<tr class="hover:bg-slate-50 transition border-b border-slate-100">' +
                     '<td class="py-1.5 font-bold ' + (t.lead ? 'text-red-600' : 'text-slate-500') + '">' + t.rank + '</td>' +
-                    '<td class="py-1.5 font-bold text-slate-900 truncate max-w-[120px]">' + t.team + '</td>' +
+                    '<td class="py-1.5 font-bold text-slate-900 truncate max-w-[130px]">' + t.team + '</td>' +
                     '<td class="py-1.5 text-center text-slate-600">' + t.o + '</td>' +
                     '<td class="py-1.5 text-center text-slate-600">' + t.g + '</td>' +
-                    '<td class="py-1.5 text-center ' + (t.av.startsWith('+') ? 'text-emerald-600 font-semibold' : 'text-slate-600') + '">' + t.av + '</td>' +
+                    '<td class="py-1.5 text-center ' + (avStr.indexOf('+') === 0 ? 'text-emerald-600 font-semibold' : 'text-slate-600') + '">' + avStr + '</td>' +
                     '<td class="py-1.5 text-right font-black text-slate-900">' + t.p + '</td>' +
                 '</tr>';
             }).join('');
@@ -1108,6 +1223,136 @@
         window.switchStandings = switchStandings;
 
         // =====================================================================
+        // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (1-34. HAFTA CANLI TFF GEÇİŞLERİ)
+        // =====================================================================
+        var FIXTURES_DATA = {};
+        var activeSuperligWeek = 11;
+        var currentFixtureWeek = 11;
+
+        function isBigClubMatch(m) {
+            var h = (m && m.home) || '';
+            var a = (m && m.away) || '';
+            return (h.indexOf('Galatasaray') !== -1 || h.indexOf('Fenerbahçe') !== -1 || h.indexOf('Beşiktaş') !== -1 || h.indexOf('Trabzon') !== -1 ||
+                    a.indexOf('Galatasaray') !== -1 || a.indexOf('Fenerbahçe') !== -1 || a.indexOf('Beşiktaş') !== -1 || a.indexOf('Trabzon') !== -1);
+        }
+
+        function renderFixtures(week) {
+            week = parseInt(week, 10) || activeSuperligWeek || 11;
+            if (week < 1) week = 34;
+            if (week > 34) week = 1;
+            currentFixtureWeek = week;
+
+            var data = FIXTURES_DATA[week] || FIXTURES_DATA[activeSuperligWeek];
+            var titleEl = document.getElementById('fixture-week-badge');
+            var quickTabsEl = document.getElementById('fixture-quick-tabs');
+            var listEl = document.getElementById('fixture-matches-list') || document.getElementById('fixtures-matches-list');
+
+            if (titleEl) titleEl.innerText = week + '. Hafta';
+
+            if (quickTabsEl) {
+                var centerW = week;
+                if (centerW <= 1) centerW = 2;
+                if (centerW >= 34) centerW = 33;
+                var tabWeeks = [centerW - 1, centerW, centerW + 1];
+                quickTabsEl.innerHTML = tabWeeks.map(function(w) {
+                    var isSel = (w === week);
+                    var cls = isSel
+                        ? 'flex-1 py-1 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-xs text-xs'
+                        : 'flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer text-xs';
+                    var lbl = w + '. Hafta' + (w === activeSuperligWeek ? ' (Güncel)' : '');
+                    return '<button type="button" id="tab-week-' + w + '" onclick="setFixtureWeek(' + w + ')" class="' + cls + '">' + lbl + '</button>';
+                }).join('');
+            }
+
+            if (!listEl || !data || !data.matches) return;
+            listEl.innerHTML = data.matches.slice(0, 9).map(function(m) {
+                var isHigh = m.highlight;
+                var boxCls = isHigh ? 'bg-red-50/50 border-red-200 hover:border-red-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300';
+                var textCls = isHigh ? 'text-red-700 font-extrabold' : 'text-slate-900 font-bold';
+                var badgeCls = m.played
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300 font-black'
+                    : (isHigh ? 'bg-red-100 text-red-700 border-red-200 font-bold' : 'bg-slate-200 text-slate-800 border-slate-300 font-bold');
+                return '<div class="p-2 rounded-xl border ' + boxCls + ' flex items-center justify-between transition hover:bg-white shadow-xs">' +
+                    '<span class="text-xs ' + textCls + ' truncate pr-2">' + m.home + ' - ' + m.away + '</span>' +
+                    '<span class="text-[10px] font-mono px-2 py-0.5 rounded border shrink-0 ' + badgeCls + '">' + m.date + '</span>' +
+                '</div>';
+            }).join('');
+        }
+
+        // Canlı TFF Süper Lig Verisi Çekici
+        function fetchLiveSuperlig() {
+            fetch('/api/superlig')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.success) {
+                        if (data.standings && data.standings.length > 0) {
+                            STANDINGS_DATA.genel = data.standings;
+                        }
+                        if (data.standings_icsaha && data.standings_icsaha.length > 0) {
+                            STANDINGS_DATA.icsaha = data.standings_icsaha;
+                        }
+                        if (data.standings_deplasman && data.standings_deplasman.length > 0) {
+                            STANDINGS_DATA.deplasman = data.standings_deplasman;
+                        }
+                        switchStandings(currentStandingsTab || 'genel');
+
+                        var w = parseInt(data.week, 10) || 11;
+                        activeSuperligWeek = w;
+                        currentFixtureWeek = w;
+
+                        if (data.weeks) {
+                            Object.keys(data.weeks).forEach(function(wk) {
+                                var wkNum = parseInt(wk, 10);
+                                var arr = data.weeks[wk] || [];
+                                FIXTURES_DATA[wkNum] = {
+                                    title: wkNum + '. Hafta Maçları',
+                                    matches: arr.map(function(m) {
+                                        var played = !!(m.played && m.score);
+                                        var dtStr = played ? m.score : ((m.date || '') + (m.time ? ' • ' + m.time : ''));
+                                        return {
+                                            home: m.home,
+                                            away: m.away,
+                                            date: dtStr || 'Programlanacak',
+                                            played: played,
+                                            highlight: isBigClubMatch(m)
+                                        };
+                                    })
+                                };
+                            });
+                        } else if (data.matches && data.matches.length > 0) {
+                            FIXTURES_DATA[w] = {
+                                title: w + '. Hafta Maçları',
+                                matches: data.matches.map(function(m) {
+                                    var played = !!(m.played && m.score);
+                                    var dtStr = played ? m.score : ((m.date || '') + (m.time ? ' • ' + m.time : ''));
+                                    return {
+                                        home: m.home,
+                                        away: m.away,
+                                        date: dtStr || 'Programlanacak',
+                                        played: played,
+                                        highlight: isBigClubMatch(m)
+                                    };
+                                })
+                            };
+                        }
+                        renderFixtures(w);
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Superlig fetch err:', err);
+                });
+        }
+        window.fetchLiveSuperlig = fetchLiveSuperlig;
+
+        window.renderFixtures = renderFixtures;
+        window.setFixtureWeek = function(w) { renderFixtures(w); };
+        window.changeFixtureWeek = function(delta) {
+            var next = currentFixtureWeek + delta;
+            if (next < 1) next = 34;
+            if (next > 34) next = 1;
+            renderFixtures(next);
+        };
+====
         // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (9, 10, 11. HAFTA GEÇİŞLERİ)
         // =====================================================================
         var FIXTURES_DATA = {
@@ -1758,6 +2003,10 @@
 
             var btnDeprem = document.getElementById('btn-open-deprem');
             if (btnDeprem) btnDeprem.addEventListener('click', openDepremModal);
+
+            if (document.getElementById('standings-table-body')) {
+                fetchLiveSuperlig();
+            }
         }
 
         if (document.readyState === 'loading') {

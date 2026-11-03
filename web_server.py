@@ -145,7 +145,7 @@ def _warmup_turbo_cache():
     try:
         get_cached_category_widgets()
         database.get_articles(limit=24)
-        database.get_articles_total_count()
+        database.get_articles_total_count(); __import__("live_services").get_live_superlig()
         print("⚡ [Turbo Cache] Kategori ve ana sayfa önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
@@ -1042,6 +1042,8 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     health_articles = widgets["health_articles"]
     education_articles = widgets["education_articles"]
 
+    import live_services
+    superlig_data = await asyncio.to_thread(live_services.get_live_superlig)
     resp = templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -1061,6 +1063,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             "ad_settings": get_site_ad_settings(),
             "market_rates": get_market_rates()["rates"],
             "weather_data": get_live_weather(),
+            "superlig_data": superlig_data,
             "canonical_url": canonical_url,
             "current_page": page,
             "total_pages": total_pages,
@@ -1982,6 +1985,32 @@ async def article_detail(request: Request, slug: str):
         except Exception as _e:
             print(f"Ekonomi piyasa kutusu atlandı: {_e}")
 
+    # Spor haberlerinde sayfanın açıldığı andaki canlı Süper Lig İlk 5 Puan Durumu kutusunu göster (özgün katma değer + iç bağlantı)
+    if (article.get("category") or "") == "Spor":
+        try:
+            import live_services
+            _sl = await asyncio.to_thread(live_services.get_live_superlig)
+            _top5 = (_sl.get("standings") or [])[:5]
+            if _top5:
+                _rows_html = "".join(
+                    f'<div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs">'
+                    f'<span class="font-extrabold text-slate-900 truncate">{int(t.get("rank") or 0)}. {_html_mod.escape(str(t.get("team") or ""))}</span>'
+                    f'<span class="font-mono font-black text-red-600 shrink-0 ml-2">{int(t.get("p") or 0)} P</span>'
+                    f'</div>'
+                    for t in _top5
+                )
+                raw_content += (
+                    '<div class="not-prose my-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">'
+                    '<div class="flex items-center justify-between mb-3">'
+                    f'<span class="text-xs font-black text-slate-900 uppercase tracking-wide">🏆 Süper Lig Canlı Puan Durumu ({int(_sl.get("week") or 11)}. Hafta)</span>'
+                    '<a href="/super-lig-puan-durumu" class="text-[11px] font-bold text-red-600 hover:underline">18 takım tam tablo &amp; fikstür →</a>'
+                    '</div>'
+                    f'<div class="grid grid-cols-1 sm:grid-cols-5 gap-2">{_rows_html}</div>'
+                    '</div>'
+                )
+        except Exception as _e:
+            print(f"Spor puan durumu kutusu atlandı: {_e}")
+
     # 3. alt başlığın hemen üstüne tek satırlık şık "İlginizi Çekebilir" iç bağlantısı (SEO & Sayfa Görüntüleme Artırıcı)
     if related_articles and raw_content.count("<h3") >= 3:
         rel_pick = related_articles[-1]
@@ -2060,6 +2089,33 @@ async def markets_page(request: Request):
             "articles": eco_articles[:12],
         }
     )
+
+@app.api_route("/super-lig-puan-durumu", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def superlig_page(request: Request):
+    """Canlı Trendyol Süper Lig Puan Durumu (Genel / İç Saha / Deplasman) ve 34 Haftalık Tam Fikstür Sayfası."""
+    import live_services
+    superlig = await asyncio.to_thread(live_services.get_live_superlig)
+    widgets = get_cached_category_widgets()
+    sport_articles = widgets.get("sports_articles") or database.get_articles(limit=9, category="Spor")
+    if len(sport_articles) < 6:
+        sport_articles = database.get_articles(limit=9, category="Spor") or database.get_articles(limit=9)
+    return templates.TemplateResponse(
+        request=request,
+        name="superlig.html",
+        context={
+            "superlig": superlig,
+            "articles": sport_articles[:9],
+            "updated_at": datetime.now(timezone(timedelta(hours=3))).strftime("%d.%m.%Y %H:%M"),
+        },
+    )
+
+
+@app.api_route("/puan-durumu", methods=["GET", "HEAD"])
+@app.api_route("/super-lig-fikstur", methods=["GET", "HEAD"])
+async def superlig_redirect():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/super-lig-puan-durumu", status_code=301)
+
 
 @app.get("/son-depremler", response_class=HTMLResponse)
 async def earthquakes_page(request: Request):
@@ -2500,6 +2556,7 @@ _STATIC_SITEMAP_PAGES = [
     ("/", "hourly", "1.0", "Ana Sayfa"),
     ("/son-dakika", "always", "1.0", "Son Dakika Haberleri"),
     ("/piyasalar", "hourly", "0.9", "Canlı Piyasalar & Döviz/Altın Çevirici"),
+    ("/super-lig-puan-durumu", "hourly", "0.9", "Trendyol Süper Lig Canlı Puan Durumu ve 34 Haftalık Fikstür"),
     ("/son-depremler", "always", "0.9", "Son Depremler — Canlı Liste ve Harita"),
     ("/hesaplama", "monthly", "0.8", "Hesaplama Araçları"),
     ("/hesaplama/maas", "monthly", "0.8", "Brüt–Net Maaş Hesaplama"),
