@@ -577,6 +577,12 @@ def post_article_to_x(title: str, summary: str, site_url: str, image_path: Optio
     res = post_tweet_playwright(tweet_text, media_path=final_media, title=title, fallback_text=short_text)
     if res.get("status") == "success":
         print(f"✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi")
+        if site_url:
+            try:
+                import google_indexer
+                google_indexer.notify_google_indexing(site_url)
+            except Exception:
+                pass
         return {"status": "success", "url": "https://x.com/gndmanalizi"}
 
     return res

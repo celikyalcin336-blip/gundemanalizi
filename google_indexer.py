@@ -38,6 +38,18 @@ def get_credentials() -> Optional[dict]:
         except Exception:
             pass
 
+    # PC kapalıyken Render bulut sunucusunun PostgreSQL system_settings tablosundan okuması için:
+    try:
+        import database
+        db_token = (database.get_setting("google_indexing_token_b64", "") or "").strip()
+        if db_token:
+            try:
+                return json.loads(db_token)
+            except Exception:
+                return json.loads(base64.b64decode(db_token).decode("utf-8"))
+    except Exception:
+        pass
+
     return None
 
 def get_access_token() -> Optional[str]:
