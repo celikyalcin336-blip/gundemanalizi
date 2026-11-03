@@ -956,17 +956,20 @@ def get_cached_category_widgets() -> dict:
     if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 180:
         return _CATEGORY_WIDGETS_CACHE
 
+    def _clean_vitrin(items, cap):
+        return [a for a in items if not main.is_commodity_news(a.get("title", ""))][:cap]
+
     try:
         data = {
-            "breaking_news": database.get_articles(limit=10),
-            "trending_articles": database.get_trending_articles(limit=10),
-            "gundem_articles": database.get_articles(limit=5, category="Gündem"),
-            "auto_articles": database.get_articles(limit=5, category="Otomobil"),
-            "tech_articles": database.get_articles(limit=5, category="Teknoloji"),
-            "economy_articles": database.get_articles(limit=5, category="Ekonomi"),
-            "sports_articles": database.get_articles(limit=5, category="Spor"),
-            "health_articles": database.get_articles(limit=5, category="Sağlık"),
-            "education_articles": database.get_articles(limit=5, category="Eğitim"),
+            "breaking_news": _clean_vitrin(database.get_articles(limit=14), 10),
+            "trending_articles": _clean_vitrin(database.get_trending_articles(limit=14), 10),
+            "gundem_articles": _clean_vitrin(database.get_articles(limit=8, category="Gündem"), 5),
+            "auto_articles": _clean_vitrin(database.get_articles(limit=8, category="Otomobil"), 5),
+            "tech_articles": _clean_vitrin(database.get_articles(limit=8, category="Teknoloji"), 5),
+            "economy_articles": _clean_vitrin(database.get_articles(limit=8, category="Ekonomi"), 5),
+            "sports_articles": _clean_vitrin(database.get_articles(limit=8, category="Spor"), 5),
+            "health_articles": _clean_vitrin(database.get_articles(limit=8, category="Sağlık"), 5),
+            "education_articles": _clean_vitrin(database.get_articles(limit=8, category="Eğitim"), 5),
         }
         if data["breaking_news"]:
             _CATEGORY_WIDGETS_CACHE = data
@@ -1008,10 +1011,10 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         canonical_url = f"{config.SITE_URL}/?q={urllib.parse.quote(search_kw)}"
     else:
         if norm_kategori == "Son Dakika":
-            articles = database.get_articles(limit=limit, offset=offset)
+            articles = [a for a in database.get_articles(limit=limit + 4, offset=offset) if not main.is_commodity_news(a.get("title", ""))][:limit]
             total_count = database.get_articles_total_count()
         else:
-            articles = database.get_articles(limit=limit, category=norm_kategori, offset=offset)
+            articles = [a for a in database.get_articles(limit=limit + 4, category=norm_kategori, offset=offset) if not main.is_commodity_news(a.get("title", ""))][:limit]
             total_count = database.get_articles_total_count(category=norm_kategori)
         # Sayfalı listelerde her sayfa kendini canonical gösterir (Google arşive 2., 3. ... sayfalardan ulaşabilsin)
         if norm_kategori == "Son Dakika":

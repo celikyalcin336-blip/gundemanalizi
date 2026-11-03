@@ -365,7 +365,7 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         return None
 
     source_text = (summary or "").strip()
-    if len(source_text.split()) < 40:
+    if len(source_text.split()) < 28:
         print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
         return None
 

@@ -25,8 +25,8 @@ import traceback
 
 import database
 
-REWRITE_INTERVAL_SEC = int(os.getenv("ARCHIVE_REWRITE_INTERVAL", "300"))
-MIN_SOURCE_WORDS = 150
+REWRITE_INTERVAL_SEC = int(os.getenv("ARCHIVE_REWRITE_INTERVAL", "120"))
+MIN_SOURCE_WORDS = 30
 _COLUMNS_READY = False
 
 
@@ -144,7 +144,9 @@ def rewrite_one(dry_run: bool = False) -> str:
             except Exception:
                 scraped = ""
         existing = content_quality._norm(content_quality.clean_article_html(art.get("content") or ""))
-        source_text = scraped if len(scraped.split()) > len(existing.split()) else existing
+        summary_clean = content_quality._norm(art.get("summary") or "")
+        combined_local = f"{title}. {summary_clean} {existing}".strip() if summary_clean not in existing else f"{title}. {existing}".strip()
+        source_text = scraped if len(scraped.split()) > len(combined_local.split()) else combined_local
 
         if len(source_text.split()) < MIN_SOURCE_WORDS:
             print(f"⏩ [Arşiv] #{aid} kaynak metin yetersiz ({len(source_text.split())} kelime), uydurma riski nedeniyle dokunulmadı: {title[:60]}")
@@ -200,8 +202,9 @@ def background_worker():
     try:
         ensure_columns()
         # Yarım kalmış (sunucu yeniden başlarken kesilmiş) işleri tekrar kuyruğa al
+        # Yarım kalmış veya önceki yüksek (150 kelime) eşiğe takılmış haberleri tekrar kuyruğa al
         with database.get_connection() as conn:
-            conn.execute("UPDATE articles SET rewrite_status = NULL WHERE rewrite_status = 'working'")
+            conn.execute("UPDATE articles SET rewrite_status = NULL WHERE rewrite_status IN ('working', 'skip_src')")
     except Exception as e:
         print(f"⚠️ [Arşiv] Başlangıç hatası: {e}")
     print(f"🗂️ [Arşiv] Eski haber yenileyici aktif ({REWRITE_INTERVAL_SEC} sn'de 1 haber).")
