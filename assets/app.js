@@ -873,28 +873,20 @@
             var hEl = document.getElementById('astro-text-health');
             var luckyBox = document.getElementById('astro-lucky-box');
 
-            var now = new Date();
-            var options = { day: 'numeric', month: 'long', year: 'numeric' };
-
             if (periodKey === 'bugun') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '📅 <strong>' + now.toLocaleDateString('tr-TR', options) + '</strong> Günlük Yorumu';
+                if (dateTitleEl) dateTitleEl.innerHTML = '✨ <strong>' + currentAstroSign + ' Burcu</strong> • Genel Karakter ve Eğilimler';
                 if (luckyBox) luckyBox.style.display = 'grid';
             } else if (periodKey === 'dun') {
-                var yesterday = new Date(now);
-                yesterday.setDate(now.getDate() - 1);
-                if (dateTitleEl) dateTitleEl.innerHTML = '⏪ <strong>' + yesterday.toLocaleDateString('tr-TR', options) + '</strong> Dünün Analizi';
+                if (dateTitleEl) dateTitleEl.innerHTML = '💼 <strong>' + currentAstroSign + ' Burcu</strong> • İş, Kariyer ve Karar Alma Tarzı';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'yarin') {
-                var tomorrow = new Date(now);
-                tomorrow.setDate(now.getDate() + 1);
-                if (dateTitleEl) dateTitleEl.innerHTML = '⏩ <strong>' + tomorrow.toLocaleDateString('tr-TR', options) + '</strong> Yarının Gökyüzü Rehberi';
+                if (dateTitleEl) dateTitleEl.innerHTML = '🧭 <strong>' + currentAstroSign + ' Burcu</strong> • Sosyal İlişkiler ve İletişim Rehberi';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'haftalik') {
-                if (dateTitleEl) dateTitleEl.innerHTML = '📆 <strong>Haftalık Gökyüzü Rehberi</strong> (Bu Hafta)';
+                if (dateTitleEl) dateTitleEl.innerHTML = '📆 <strong>' + currentAstroSign + ' Burcu</strong> • Doğal Enerji ve Yaşam Ritmi';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'aylik') {
-                var monthStr = now.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-                if (dateTitleEl) dateTitleEl.innerHTML = '🌙 <strong>' + monthStr + '</strong> Aylık Burç Döngüsü';
+                if (dateTitleEl) dateTitleEl.innerHTML = '🌙 <strong>' + currentAstroSign + ' Burcu</strong> • Uzun Vadeli Hedef ve Derin Analiz';
                 if (luckyBox) luckyBox.style.display = 'none';
             }
 
@@ -1070,117 +1062,6 @@
             ]
         };
 
-        // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (9, 10, 11. HAFTA GEÇİŞLERİ)
-        // =====================================================================
-        var FIXTURES_DATA = {
-            9: {
-                title: "9. Hafta Maçları",
-                matches: [
-                    { home: "Antalyaspor", away: "Galatasaray", date: "19 Eki • 19:00", badge: "bg-red-500/20 text-red-400 border-red-500/30", highlight: true },
-                    { home: "Trabzonspor", away: "Başakşehir", date: "19 Eki • 16:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-                    { home: "Fenerbahçe", away: "Samsunspor", date: "20 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", highlight: true },
-                    { home: "Beşiktaş", away: "Konyaspor", date: "20 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
-                ]
-            },
-            10: {
-                title: "10. Hafta (Derbi Haftası)",
-                matches: [
-                    { home: "Galatasaray", away: "Beşiktaş", date: "28 Eki • 20:00", badge: "bg-red-600/30 text-red-300 border-red-500/50", highlight: true },
-                    { home: "Fenerbahçe", away: "Bodrum FK", date: "27 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-                    { home: "Göztepe", away: "Trabzonspor", date: "26 Eki • 19:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-                    { home: "Kasımpaşa", away: "Samsunspor", date: "26 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
-                ]
-            },
-            11: {
-                title: "11. Hafta (Süper Lig)",
-                matches: [
-                    { home: "Trabzonspor", away: "Fenerbahçe", date: "3 Kas • 19:00", badge: "bg-amber-500/30 text-amber-300 border-amber-500/50", highlight: true },
-                    { home: "Beşiktaş", away: "Kasımpaşa", date: "2 Kas • 19:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" },
-                    { home: "Samsunspor", away: "Antalyaspor", date: "4 Kas • 20:00", badge: "bg-red-500/20 text-red-400 border-red-500/30" },
-                    { home: "Galatasaray", away: "BAY (Maçı Yok)", date: "Haftalık Dinlenme", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
-                ]
-            }
-        };
-
-        var currentFixtureWeek = 9;
-
-        function renderFixtures(week) {
-            currentFixtureWeek = week;
-            var data = FIXTURES_DATA[week] || FIXTURES_DATA[9];
-            var titleEl = document.getElementById('fixture-week-badge');
-            var listEl = document.getElementById('fixture-matches-list') || document.getElementById('fixtures-matches-list');
-
-            if (titleEl) titleEl.innerText = week + '. Hafta';
-
-            [9, 10, 11].forEach(function(w) {
-                var btn = document.getElementById('tab-week-' + w);
-                if (btn) {
-                    if (w === week) {
-                        btn.className = 'flex-1 py-1 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-xs text-xs';
-                    } else {
-                        btn.className = 'flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer text-xs';
-                    }
-                }
-            });
-
-            if (!listEl) return;
-            listEl.innerHTML = data.matches.map(function(m) {
-                var isHigh = m.highlight;
-                var boxCls = isHigh ? 'bg-red-50/50 border-red-200 hover:border-red-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300';
-                var textCls = isHigh ? 'text-red-700 font-extrabold' : 'text-slate-900 font-bold';
-                var badgeCls = isHigh ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-200 text-slate-800 border-slate-300';
-                return '<div class="p-2.5 rounded-xl border ' + boxCls + ' flex items-center justify-between transition hover:bg-white shadow-xs">' +
-                    '<span class="text-xs sm:text-sm ' + textCls + '">' + m.home + ' - ' + m.away + '</span>' +
-                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + badgeCls + '">' + m.date + '</span>' +
-                '</div>';
-            }).join('');
-        }
-                // Canlı TFF Süper Lig Verisi Çekici
-        function fetchLiveSuperlig() {
-            fetch('/api/superlig')
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    if (data && data.success) {
-                        if (data.standings && data.standings.length > 0) {
-                            STANDINGS_DATA.genel = data.standings;
-                            switchStandings('genel');
-                        }
-                        if (data.matches && data.matches.length > 0) {
-                            var w = data.week || 10;
-                            currentFixtureWeek = w;
-                            FIXTURES_DATA[w] = {
-                                title: w + '. Hafta Maçları (Canlı TFF)',
-                                matches: data.matches.map(function(m) {
-                                    var dtStr = (m.date || '') + (m.time ? ' • ' + m.time : '');
-                                    return {
-                                        home: m.home,
-                                        away: m.away,
-                                        date: dtStr || 'Gelecek Maç',
-                                        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-                                        highlight: (m.home.includes('Galatasaray') || m.home.includes('Fenerbahçe') || m.home.includes('Beşiktaş') || m.home.includes('Trabzon') ||
-                                                    m.away.includes('Galatasaray') || m.away.includes('Fenerbahçe') || m.away.includes('Beşiktaş') || m.away.includes('Trabzon'))
-                                    };
-                                })
-                            };
-                            renderFixtures(w);
-                        }
-                    }
-                })
-                .catch(function(err) {
-                    console.error('Superlig fetch err:', err);
-                });
-        }
-        window.fetchLiveSuperlig = fetchLiveSuperlig;
-
-        window.renderFixtures = renderFixtures;
-        window.setFixtureWeek = function(w) { renderFixtures(w); };
-        window.changeFixtureWeek = function(delta) {
-            var next = currentFixtureWeek + delta;
-            if (next < 9) next = 11;
-            if (next > 11) next = 9;
-            renderFixtures(next);
-        };
-====
         var currentStandingsTab = 'genel';
 
         function switchStandings(type) {
@@ -1352,117 +1233,6 @@
             if (next > 34) next = 1;
             renderFixtures(next);
         };
-====
-        // 4. HAFTALIK FİKSTÜR & MAÇ PROGRAMI (9, 10, 11. HAFTA GEÇİŞLERİ)
-        // =====================================================================
-        var FIXTURES_DATA = {
-            9: {
-                title: "9. Hafta Maçları",
-                matches: [
-                    { home: "Antalyaspor", away: "Galatasaray", date: "19 Eki • 19:00", badge: "bg-red-500/20 text-red-400 border-red-500/30", highlight: true },
-                    { home: "Trabzonspor", away: "Başakşehir", date: "19 Eki • 16:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-                    { home: "Fenerbahçe", away: "Samsunspor", date: "20 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", highlight: true },
-                    { home: "Beşiktaş", away: "Konyaspor", date: "20 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
-                ]
-            },
-            10: {
-                title: "10. Hafta (Derbi Haftası)",
-                matches: [
-                    { home: "Galatasaray", away: "Beşiktaş", date: "28 Eki • 20:00", badge: "bg-red-600/30 text-red-300 border-red-500/50", highlight: true },
-                    { home: "Fenerbahçe", away: "Bodrum FK", date: "27 Eki • 19:00", badge: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-                    { home: "Göztepe", away: "Trabzonspor", date: "26 Eki • 19:00", badge: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-                    { home: "Kasımpaşa", away: "Samsunspor", date: "26 Eki • 16:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" }
-                ]
-            },
-            11: {
-                title: "11. Hafta (Süper Lig)",
-                matches: [
-                    { home: "Trabzonspor", away: "Fenerbahçe", date: "3 Kas • 19:00", badge: "bg-amber-500/30 text-amber-300 border-amber-500/50", highlight: true },
-                    { home: "Beşiktaş", away: "Kasımpaşa", date: "2 Kas • 19:00", badge: "bg-slate-500/20 text-slate-300 border-slate-500/30" },
-                    { home: "Samsunspor", away: "Antalyaspor", date: "4 Kas • 20:00", badge: "bg-red-500/20 text-red-400 border-red-500/30" },
-                    { home: "Galatasaray", away: "BAY (Maçı Yok)", date: "Haftalık Dinlenme", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
-                ]
-            }
-        };
-
-        var currentFixtureWeek = 9;
-
-        function renderFixtures(week) {
-            currentFixtureWeek = week;
-            var data = FIXTURES_DATA[week] || FIXTURES_DATA[9];
-            var titleEl = document.getElementById('fixture-week-badge');
-            var listEl = document.getElementById('fixture-matches-list') || document.getElementById('fixtures-matches-list');
-
-            if (titleEl) titleEl.innerText = week + '. Hafta';
-
-            [9, 10, 11].forEach(function(w) {
-                var btn = document.getElementById('tab-week-' + w);
-                if (btn) {
-                    if (w === week) {
-                        btn.className = 'flex-1 py-1 rounded-lg bg-red-600 text-white font-black text-center transition cursor-pointer shadow-xs text-xs';
-                    } else {
-                        btn.className = 'flex-1 py-1 rounded-lg text-slate-600 hover:text-slate-900 text-center transition cursor-pointer text-xs';
-                    }
-                }
-            });
-
-            if (!listEl) return;
-            listEl.innerHTML = data.matches.map(function(m) {
-                var isHigh = m.highlight;
-                var boxCls = isHigh ? 'bg-red-50/50 border-red-200 hover:border-red-400' : 'bg-slate-50 border-slate-200 hover:border-slate-300';
-                var textCls = isHigh ? 'text-red-700 font-extrabold' : 'text-slate-900 font-bold';
-                var badgeCls = isHigh ? 'bg-red-100 text-red-700 border-red-200' : 'bg-slate-200 text-slate-800 border-slate-300';
-                return '<div class="p-2.5 rounded-xl border ' + boxCls + ' flex items-center justify-between transition hover:bg-white shadow-xs">' +
-                    '<span class="text-xs sm:text-sm ' + textCls + '">' + m.home + ' - ' + m.away + '</span>' +
-                    '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ' + badgeCls + '">' + m.date + '</span>' +
-                '</div>';
-            }).join('');
-        }
-                // Canlı TFF Süper Lig Verisi Çekici
-        function fetchLiveSuperlig() {
-            fetch('/api/superlig')
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    if (data && data.success) {
-                        if (data.standings && data.standings.length > 0) {
-                            STANDINGS_DATA.genel = data.standings;
-                            switchStandings('genel');
-                        }
-                        if (data.matches && data.matches.length > 0) {
-                            var w = data.week || 10;
-                            currentFixtureWeek = w;
-                            FIXTURES_DATA[w] = {
-                                title: w + '. Hafta Maçları (Canlı TFF)',
-                                matches: data.matches.map(function(m) {
-                                    var dtStr = (m.date || '') + (m.time ? ' • ' + m.time : '');
-                                    return {
-                                        home: m.home,
-                                        away: m.away,
-                                        date: dtStr || 'Gelecek Maç',
-                                        badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-                                        highlight: (m.home.includes('Galatasaray') || m.home.includes('Fenerbahçe') || m.home.includes('Beşiktaş') || m.home.includes('Trabzon') ||
-                                                    m.away.includes('Galatasaray') || m.away.includes('Fenerbahçe') || m.away.includes('Beşiktaş') || m.away.includes('Trabzon'))
-                                    };
-                                })
-                            };
-                            renderFixtures(w);
-                        }
-                    }
-                })
-                .catch(function(err) {
-                    console.error('Superlig fetch err:', err);
-                });
-        }
-        window.fetchLiveSuperlig = fetchLiveSuperlig;
-
-        window.renderFixtures = renderFixtures;
-        window.setFixtureWeek = function(w) { renderFixtures(w); };
-        window.changeFixtureWeek = function(delta) {
-            var next = currentFixtureWeek + delta;
-            if (next < 9) next = 11;
-            if (next > 11) next = 9;
-            renderFixtures(next);
-        };
 
         // =====================================================================
         // 5. 81 İL CANLI NAMAZ VAKTİ MOTORU & DİYANET HESAPLAMASI
@@ -1487,13 +1257,15 @@
         };
 
         var BASE_TIMES = {
-            imsak: 346,  // 05:46
-            gunes: 431,  // 07:11
+            imsak: 362,  // 06:02
+            gunes: 448,  // 07:28
             ogle: 774,   // 12:54
-            ikindi: 953, // 15:53
-            aksam: 1105, // 18:25
-            yatsi: 1184  // 19:44
+            ikindi: 935, // 15:35
+            aksam: 1078, // 17:58
+            yatsi: 1158  // 19:18
         };
+        var currentNamazCity = 'İstanbul';
+        var prayerCountdownTimer = null;
 
         function formatMins(m) {
             var h = Math.floor(m / 60) % 24;
@@ -1513,6 +1285,23 @@
             };
         }
 
+        function getNextPrayerForCity(cityName) {
+            var times = calculateTimesForCity(cityName || currentNamazCity || 'İstanbul');
+            var now = new Date();
+            var curMins = now.getHours() * 60 + now.getMinutes();
+            var prayers = [
+                { name: "İmsak", time: times.imsak },
+                { name: "Güneş", time: times.gunes },
+                { name: "Öğle", time: times.ogle },
+                { name: "İkindi", time: times.ikindi },
+                { name: "Akşam", time: times.aksam },
+                { name: "Yatsı", time: times.yatsi }
+            ];
+            var next = prayers.find(function(p) { return p.time > curMins; });
+            if (!next) next = prayers[0];
+            return { next: next, times: times };
+        }
+
         function populateNamazCities() {
             var sel = document.getElementById('namaz-city-select');
             if (!sel || sel.options.length > 0) return;
@@ -1529,11 +1318,13 @@
         }
 
         function updateNamazModal(cityName) {
-            var times = calculateTimesForCity(cityName);
+            currentNamazCity = cityName || 'İstanbul';
+            var info = getNextPrayerForCity(currentNamazCity);
+            var times = info.times;
             var titleEl = document.getElementById('namaz-modal-city-title');
             var cardCity = document.getElementById('card-city-name');
-            if (titleEl) titleEl.innerText = cityName;
-            if (cardCity) cardCity.innerText = cityName;
+            if (titleEl) titleEl.innerText = currentNamazCity;
+            if (cardCity) cardCity.innerText = currentNamazCity;
 
             ['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'].forEach(function(k) {
                 var el = document.getElementById('time-' + k);
@@ -1541,8 +1332,8 @@
             });
 
             var liveCard = document.getElementById('live-namaz-vakti');
-            if (liveCard) {
-                liveCard.innerText = 'Yatsı ' + formatMins(times.yatsi);
+            if (liveCard && info.next) {
+                liveCard.innerText = info.next.name + ' ' + formatMins(info.next.time);
             }
         }
 
@@ -1551,30 +1342,20 @@
         }
         window.onNamazCityChange = onNamazCityChange;
 
-        // Geri Sayım Sayacı (Sıradaki Vakte Kalan Süre)
         function startPrayerCountdown() {
             function tick() {
                 var now = new Date();
                 var curMins = now.getHours() * 60 + now.getMinutes();
                 var curSecs = now.getSeconds();
-
-                var prayers = [
-                    { name: "İmsak", time: BASE_TIMES.imsak },
-                    { name: "Güneş", time: BASE_TIMES.gunes },
-                    { name: "Öğle", time: BASE_TIMES.ogle },
-                    { name: "İkindi", time: BASE_TIMES.ikindi },
-                    { name: "Akşam (İftar)", time: BASE_TIMES.aksam },
-                    { name: "Yatsı", time: BASE_TIMES.yatsi }
-                ];
-
-                var next = prayers.find(function(p) { return p.time > curMins; });
-                if (!next) next = prayers[0];
+                var info = getNextPrayerForCity(currentNamazCity);
+                var next = info.next;
 
                 var diffMins = next.time - curMins;
                 if (diffMins < 0) diffMins += 24 * 60;
                 var diffSecs = 60 - curSecs;
                 if (diffSecs === 60) diffSecs = 0;
                 else diffMins -= 1;
+                if (diffMins < 0) diffMins += 24 * 60;
 
                 var h = Math.floor(diffMins / 60);
                 var m = diffMins % 60;
@@ -1586,8 +1367,25 @@
                 if (countdownEl) countdownEl.innerText = pad(h) + ':' + pad(m) + ':' + pad(s);
                 if (nextNameEl) nextNameEl.innerText = next.name;
             }
-            setInterval(tick, 1000);
+            if (prayerCountdownTimer) clearInterval(prayerCountdownTimer);
+            prayerCountdownTimer = setInterval(tick, 1000);
             tick();
+        }
+
+        function fetchLivePrayerTimes() {
+            fetch('/api/namaz-vakitleri')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.ok && data.base_mins) {
+                        BASE_TIMES = data.base_mins;
+                    }
+                    updateNamazModal(currentNamazCity || 'İstanbul');
+                    startPrayerCountdown();
+                })
+                .catch(function() {
+                    updateNamazModal(currentNamazCity || 'İstanbul');
+                    startPrayerCountdown();
+                });
         }
 
         // =====================================================================
@@ -1616,11 +1414,15 @@
         window.populateNobetciCities = populateNobetciCities;
 
         function nobetciOfficialMessage(cityName) {
-            return '<div class="p-5 text-center text-xs text-slate-600 space-y-2">' +
-                '<p class="font-extrabold text-slate-900 text-sm">' + (cityName || 'Bu il') + ' için güncel nöbet listesine şu an ulaşılamıyor.</p>' +
-                '<p>Kapalı bir eczaneye gitmemeniz için tahmini liste göstermiyoruz. Bugünün resmi nöbetçi eczanelerini aşağıdan öğrenebilirsiniz:</p>' +
-                '<a href="https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama" target="_blank" rel="noopener" class="inline-block px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold">e-Devlet Nöbetçi Eczane Sorgulama →</a>' +
-                '<p class="text-[11px] text-slate-500">veya ilinizin Eczacı Odası internet sitesi</p>' +
+            var cname = cityName || 'İstanbul';
+            var mapsUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(cname + ' nöbetçi eczane');
+            return '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-700 space-y-3">' +
+                '<p class="font-extrabold text-slate-900 text-sm">📍 ' + cname + ' Resmi Nöbetçi Eczane Sorgulama</p>' +
+                '<p class="leading-relaxed">Sağlık güvenliğiniz için tahmini veya eski liste göstermiyoruz. <strong>' + cname + '</strong> ilindeki şu an açık resmi nöbetçi eczaneleri haritadan veya e-Devlet kapısından anında görüntüleyebilirsiniz:</p>' +
+                '<div class="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">' +
+                    '<a href="https://www.turkiye.gov.tr/saglik-titck-nobetci-eczane-sorgulama" target="_blank" rel="noopener" class="w-full sm:w-auto inline-block px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold shadow-xs transition">🏛️ e-Devlet Resmi Sorgulama →</a>' +
+                    '<a href="' + mapsUrl + '" target="_blank" rel="noopener" class="w-full sm:w-auto inline-block px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 font-extrabold shadow-xs transition">🗺️ Google Haritalar\'da Gör →</a>' +
+                '</div>' +
                 '</div>';
         }
 
@@ -1696,8 +1498,8 @@
                             '<span class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">' + (p.district || p.city) + '</span>' +
                             '<span class="text-[10px] px-2 py-0.5 rounded font-semibold border ' + badgeClass + '">' + statusText + '</span>' +
                         '</div>' +
-                        '<div class="text-[11px] text-slate-300 leading-snug">' + (p.address || '') + '</div>' +
-                        '<div class="text-[10px] text-amber-400/90 font-medium flex items-center gap-1">🕒 Nöbet Saatleri: ' + badgeText + '</div>' +
+                        '<div class="text-[11px] text-slate-700 leading-snug">' + (p.address || '') + '</div>' +
+                        '<div class="text-[10px] text-amber-700 font-semibold flex items-center gap-1">🕒 Nöbet Saatleri: ' + badgeText + '</div>' +
                     '</div>' +
                     '<div class="shrink-0 flex items-center gap-2">' +
                         (phoneClean ? '<a href="tel:' + phoneClean + '" class="w-full sm:w-auto text-center px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1 transition shadow cursor-pointer">' +
@@ -2006,6 +1808,9 @@
 
             if (document.getElementById('standings-table-body')) {
                 fetchLiveSuperlig();
+            }
+            if (document.getElementById('live-namaz-vakti') || document.getElementById('namaz-modal')) {
+                fetchLivePrayerTimes();
             }
         }
 

@@ -240,44 +240,33 @@ def get_live_pharmacies(city: str = "istanbul") -> List[Dict]:
             item["is_now_open"] = shift["is_now_open"]
         return cached["data"]
 
-    target_url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
-    candidate_urls = [
-        target_url,
-        f"https://api.codetabs.com/v1/proxy?quest={target_url}",
-        f"https://api.allorigins.win/raw?url={target_url}",
-    ]
-
-    results = []
-    for fetch_url in candidate_urls:
-        try:
-            req = urllib.request.Request(
-                fetch_url,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                    "Accept-Language": "tr-TR,tr;q=0.9"
-                }
-            )
-            with urllib.request.urlopen(req, timeout=5, context=_SSL_CTX) as r:
-                html = r.read().decode("utf-8", errors="ignore")
-                parsed = _parse_eczaneler_html(html, city, shift)
-                if parsed:
-                    results = parsed
-                    break
-        except Exception as e:
-            print(f"⚠️ Canlı eczane kazıma uyarısı ({city} - {fetch_url[:45]}): {e}")
-
-    # ÖNEMLİ: Canlı nöbet listesi alınamazsa ASLA tahmini/rastgele liste gösterilmez.
-    # (Gece kapalı bir eczaneye yönlendirilen okur gerçek zarar görür.) Boş liste dönülür;
-    # arayüz okuru e-Devlet / Eczacı Odası resmi sorgulamasına yönlendirir.
-
-    if results:
-        _PHARMACY_CACHE[slug] = {"data": results, "ts": now, "date": shift_date_str}
-        return results
-    elif cached and cached.get("data"):
+    # Eğer son 15 dakika içinde denendi ve kaynak Cloudflare engeli verdiyse kullanıcıyı 10 sn bekletme, anında dön
+    if cached and cached.get("date") == shift_date_str and (now - cached["ts"]) < 900 and cached.get("data") is not None:
         return cached["data"]
 
-    return []
+    target_url = f"https://www.eczaneler.gen.tr/nobetci-{slug}"
+    results = []
+    try:
+        req = urllib.request.Request(
+            target_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "tr-TR,tr;q=0.9",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=2, context=_SSL_CTX) as r:
+            html = r.read().decode("utf-8", errors="ignore")
+            parsed = _parse_eczaneler_html(html, city, shift)
+            if parsed:
+                results = parsed
+    except Exception:
+        pass
+
+    # ÖNEMLİ: Canlı nöbet listesi alınamazsa ASLA tahmini/rastgele liste gösterilmez.
+    # Negatif sonucu da 15 dk önbellekle ki kullanıcı her tıkladığında beklemesin, anında e-Devlet/Harita ekranı açılsın.
+    _PHARMACY_CACHE[slug] = {"data": results, "ts": now, "date": shift_date_str}
+    return results
 
 _MONTH_TR = {
     "01": "Oca", "02": "Şub", "03": "Mar", "04": "Nis", "05": "May", "06": "Haz",
@@ -501,3 +490,59 @@ def get_live_superlig() -> Dict:
         pass
 
     return {"success": False, "week": current_week, "standings": [], "standings_icsaha": [], "standings_deplasman": [], "matches": [], "weeks": {}, "updated_at": int(now)}
+
+
+_PRAYER_CACHE: Dict[str, object] = {"date": "", "data": None}
+
+
+def _hhmm_to_mins(val: str, default_mins: int) -> int:
+    m = re.search(r"(\d{1,2}):(\d{2})", str(val or ""))
+    if not m:
+        return default_mins
+    return int(m.group(1)) * 60 + int(m.group(2))
+
+
+def get_live_prayer_times() -> Dict:
+    """
+    T.C. Diyanet İşleri Başkanlığı hesaplama metoduyla (method=13) İstanbul'un
+    bugünkü gerçek namaz vakitlerini çeker ve gün boyunca RAM'de saklar.
+    """
+    tz_tr = timezone(timedelta(hours=3))
+    today_str = datetime.now(tz_tr).strftime("%Y-%m-%d")
+    if _PRAYER_CACHE.get("date") == today_str and _PRAYER_CACHE.get("data"):
+        return _PRAYER_CACHE["data"]  # type: ignore
+
+    default_base = {
+        "imsak": 362,   # 06:02
+        "gunes": 448,   # 07:28
+        "ogle": 774,    # 12:54
+        "ikindi": 935,  # 15:35
+        "aksam": 1078,  # 17:58
+        "yatsi": 1158,  # 19:18
+    }
+    try:
+        url = "https://api.aladhan.com/v1/timingsByCity?city=Istanbul&country=Turkey&method=13"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=4, context=_SSL_CTX) as r:
+            payload = json.loads(r.read().decode("utf-8", errors="ignore"))
+            timings = (payload.get("data") or {}).get("timings") or {}
+            if timings:
+                base = {
+                    "imsak": _hhmm_to_mins(timings.get("Fajr"), default_base["imsak"]),
+                    "gunes": _hhmm_to_mins(timings.get("Sunrise"), default_base["gunes"]),
+                    "ogle": _hhmm_to_mins(timings.get("Dhuhr"), default_base["ogle"]),
+                    "ikindi": _hhmm_to_mins(timings.get("Asr"), default_base["ikindi"]),
+                    "aksam": _hhmm_to_mins(timings.get("Maghrib"), default_base["aksam"]),
+                    "yatsi": _hhmm_to_mins(timings.get("Isha"), default_base["yatsi"]),
+                }
+                res = {"ok": True, "date": today_str, "base_mins": base}
+                _PRAYER_CACHE["date"] = today_str
+                _PRAYER_CACHE["data"] = res
+                return res
+    except Exception as e:
+        print(f"⚠️ Canlı namaz vakti çekme uyarısı: {e}")
+
+    res = {"ok": True, "date": today_str, "base_mins": default_base}
+    _PRAYER_CACHE["date"] = today_str
+    _PRAYER_CACHE["data"] = res
+    return res

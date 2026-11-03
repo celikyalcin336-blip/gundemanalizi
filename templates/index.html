@@ -1588,22 +1588,22 @@
                 </div>
             </div>
 
-            <!-- 99 LVL ZAMAN & ARAÇ SEKMELERİ (Bugün, Dün, Yarın, Haftalık, Aylık, Uyum, Yükselen) -->
+            <!-- 99 LVL ASTROLOJİ REHBERİ & ARAÇ SEKMELERİ -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none border-b border-slate-800">
                 <button type="button" onclick="window.switchAstroTab('bugun')" id="astro-tab-bugun" class="astro-period-tab px-3.5 py-2 rounded-xl bg-purple-600 text-white shrink-0 transition shadow-sm cursor-pointer">
-                    📅 Bugün
+                    ✨ Karakter
                 </button>
                 <button type="button" onclick="window.switchAstroTab('dun')" id="astro-tab-dun" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    ⏪ Dün
+                    💼 İş & Kariyer
                 </button>
                 <button type="button" onclick="window.switchAstroTab('yarin')" id="astro-tab-yarin" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    ⏩ Yarın
+                    🧭 İletişim
                 </button>
                 <button type="button" onclick="window.switchAstroTab('haftalik')" id="astro-tab-haftalik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    📆 Haftalık Yorum
+                    📆 Yaşam Ritmi
                 </button>
                 <button type="button" onclick="window.switchAstroTab('aylik')" id="astro-tab-aylik" class="astro-period-tab px-3.5 py-2 rounded-xl bg-slate-800/90 text-slate-300 hover:text-white shrink-0 transition cursor-pointer">
-                    🌙 Aylık Yorum
+                    🌙 Derin Analiz
                 </button>
                 <button type="button" onclick="window.switchAstroTab('uyum')" id="astro-tab-uyum" class="astro-period-tab px-3.5 py-2 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 hover:text-white shrink-0 transition cursor-pointer">
                     ❤️ Burç Uyumu
@@ -1613,12 +1613,12 @@
                 </button>
             </div>
 
-            <!-- PANEL 1: GÜNLÜK / DÜN / YARIN / HAFTALIK / AYLIK YORUM ALANI -->
+            <!-- PANEL 1: KARAKTER / KARİYER / İLETİŞİM / YAŞAM RİTMİ / DERİN ANALİZ ALANI -->
             <div id="astro-view-content" class="space-y-3 text-xs leading-relaxed text-slate-200">
-                <!-- Aktif Zaman Başlığı -->
+                <!-- Aktif Bölüm Başlığı -->
                 <div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs">
-                    <span id="astro-period-title">📅 <strong id="astro-period-date">Bugün</strong> Günlük Yorumu</span>
-                    <span class="text-amber-400 font-bold">✨ Astroloji Masası</span>
+                    <span id="astro-period-title">✨ <strong id="astro-period-date">Genel Karakter ve Eğilimler</strong></span>
+                    <span class="text-amber-400 font-bold">✨ Astroloji Rehberi</span>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800">
@@ -1890,9 +1890,9 @@
             </div>
 
             <!-- Sıradaki Vakte Kalan Süre -->
-            <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-center">
-                <span class="text-xs text-slate-300 block font-semibold"><span id="next-prayer-name">Yatsı</span> Vaktine Kalan Süre</span>
-                <span id="next-prayer-countdown" class="text-xl font-black text-amber-400 font-mono tracking-wider">--:--:--</span>
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center">
+                <span class="text-xs text-slate-700 block font-bold"><span id="next-prayer-name">Yatsı</span> Vaktine Kalan Süre</span>
+                <span id="next-prayer-countdown" class="text-xl font-black text-amber-700 font-mono tracking-wider">--:--:--</span>
             </div>
 
             <div class="pt-2 flex justify-end">
@@ -1936,16 +1936,16 @@
             </div>
 
             <!-- Bilgi ve Güncelleme Şeridi -->
-            <div id="nobetci-status-bar" class="flex items-center justify-between text-[11px] text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-800">
-                <span id="nobetci-city-title" class="font-bold text-emerald-400">İstanbul Nöbetçi Eczaneleri</span>
-                <span id="nobetci-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">🟢 Canlı Veri</span>
+            <div id="nobetci-status-bar" class="flex items-center justify-between text-[11px] text-slate-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                <span id="nobetci-city-title" class="font-bold text-emerald-800">İstanbul Nöbetçi Eczaneleri</span>
+                <span id="nobetci-badge" class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold">🟢 Canlı Veri</span>
             </div>
 
             <!-- Mesai ve Nöbet Çalışma Saatleri Bilgilendirmesi -->
-            <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-[11px] text-blue-200 flex items-start gap-2.5">
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-[11px] text-slate-700 flex items-start gap-2.5">
                 <span class="text-base shrink-0">⏰</span>
                 <div class="leading-relaxed">
-                    <strong class="text-blue-300 font-bold block mb-0.5">Eczane Mesai & Nöbet Bilgisi:</strong>
+                    <strong class="text-blue-900 font-bold block mb-0.5">Eczane Mesai & Nöbet Bilgisi:</strong>
                     Gündüz mesaisi (08:30 - 18:30) boyunca bölgenizdeki <strong>tüm eczaneler</strong> açıktır. 
                     Saat <strong>18:30</strong>'dan itibaren aşağıda listelenen nöbetçi eczaneler sabaha kadar kesintisiz (08:30) hizmet vermektedir.
                 </div>

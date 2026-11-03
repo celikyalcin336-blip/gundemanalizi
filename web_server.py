@@ -140,13 +140,17 @@ def system_health_watchdog_worker():
         time.sleep(600)
 
 def _warmup_turbo_cache():
-    """Sunucu ayağa kalkar kalkmaz ana sayfayı ve popüler kategorileri RAM'e hafifçe yükler."""
+    """Sunucu ayağa kalkar kalkmaz ana sayfayı, site haritasını ve canlı servisleri RAM'e hafifçe yükler."""
     time.sleep(5)
     try:
         get_cached_category_widgets()
         database.get_articles(limit=24)
-        database.get_articles_total_count(); __import__("live_services").get_live_superlig()
-        print("⚡ [Turbo Cache] Kategori ve ana sayfa önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
+        database.get_articles_total_count()
+        _indexable_articles()
+        _ls = __import__("live_services")
+        _ls.get_live_superlig()
+        _ls.get_live_prayer_times()
+        print("⚡ [Turbo Cache] Kategori, site haritası ve canlı servis önbelleği RAM'e başarıyla yüklendi (0 ms hazır).")
     except Exception as e:
         print(f"Önbellek ısınma hatası: {e}")
 
@@ -884,6 +888,13 @@ async def api_superlig():
     """TFF Resmi Trendyol Süper Lig Canlı Puan Durumu ve Gelecek Maçlar API'si."""
     import live_services
     data = await asyncio.to_thread(live_services.get_live_superlig)
+    return JSONResponse(data)
+
+@app.get("/api/namaz-vakitleri")
+async def api_namaz_vakitleri():
+    """T.C. Diyanet İşleri Başkanlığı (Method 13) Günlük Canlı Namaz Vakitleri API'si."""
+    import live_services
+    data = await asyncio.to_thread(live_services.get_live_prayer_times)
     return JSONResponse(data)
 
 @app.get("/son-dakika", response_class=HTMLResponse)
