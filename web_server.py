@@ -2674,14 +2674,14 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
     rows_html = []
     for i, r in enumerate(rows, 1):
         rows_html.append(f"""
-        <tr class="hover:bg-slate-800/60 transition border-b border-slate-800/80">
-            <td class="py-3.5 px-4 text-xs font-bold text-slate-400">{i}</td>
+        <tr class="hover:bg-slate-50 transition border-b border-slate-200">
+            <td class="py-3.5 px-4 text-xs font-extrabold text-slate-700">{i}</td>
             <td class="py-3.5 px-4">
-                <div class="text-xs sm:text-sm font-bold text-white mb-0.5">{r.get('label', '')}</div>
-                <a href="{r['loc']}" target="_blank" class="text-xs text-sky-400 hover:underline break-all">{r['loc']}</a>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-900 mb-0.5">{r.get('label', '')}</div>
+                <a href="{r['loc']}" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-red-600 hover:underline break-all">{r['loc']}</a>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-300 whitespace-nowrap">{r.get('date', '-')}</td>
-            <td class="py-3.5 px-4 text-right"><span class="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200">{r.get('prio', '0.8')}</span></td>
+            <td class="py-3.5 px-4 text-xs font-semibold text-slate-600 whitespace-nowrap">{r.get('date', '-')}</td>
+            <td class="py-3.5 px-4 text-right"><span class="px-2.5 py-1 rounded-md bg-slate-900 text-xs font-bold text-white">{r.get('prio', '0.8')}</span></td>
         </tr>""")
     html_str = f"""<!DOCTYPE html>
 <html lang="tr">
@@ -2693,41 +2693,40 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
     <link rel="stylesheet" href="/assets/style.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body {{ font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }}
+        body {{ font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }}
     </style>
 </head>
 <body class="min-h-screen py-10 px-4">
     <div class="max-w-5xl mx-auto space-y-6">
-        <div class="rounded-2xl bg-[#111827] border border-slate-800 p-6 sm:p-8 shadow-2xl">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">{title}</h1>
-            <p class="text-xs sm:text-sm text-slate-400 mb-5">{subtitle}</p>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-md">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">{title}</h1>
+            <p class="text-xs sm:text-sm text-slate-600 mb-5">{subtitle}</p>
             <div class="flex flex-wrap items-center gap-3">
                 <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow transition">← Gündem Analizi Anasayfasına Dön</a>
-
             </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
-                <div class="text-2xl font-black text-white">{len(rows)}</div>
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Toplam İndeksli Bağlantı</div>
+            <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+                <div class="text-2xl font-black text-slate-900">{len(rows)}</div>
+                <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-1">Toplam İndeksli Bağlantı</div>
             </div>
-            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
-                <div class="text-2xl font-black text-emerald-400">CANLI</div>
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Google News & SEO Durumu</div>
+            <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+                <div class="text-2xl font-black text-emerald-600">CANLI</div>
+                <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-1">Google News &amp; SEO Durumu</div>
             </div>
-            <div class="rounded-2xl bg-[#111827] border border-slate-800 p-5">
-                <div class="text-2xl font-black text-white">UTF-8 / XML</div>
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1">Protokol Uyumluluğu</div>
+            <div class="rounded-2xl bg-white border border-slate-200 p-5 shadow-xs">
+                <div class="text-2xl font-black text-slate-900">UTF-8 / XML</div>
+                <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-1">Protokol Uyumluluğu</div>
             </div>
         </div>
-        <div class="rounded-2xl bg-[#111827] border border-slate-800 overflow-hidden shadow-2xl">
+        <div class="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-md">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-slate-800 bg-slate-900/70 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                        <th class="py-3.5 px-4 w-12">#</th>
-                        <th class="py-3.5 px-4">Sayfa / Haber Başlığı & Bağlantısı</th>
-                        <th class="py-3.5 px-4">Yayın Tarihi</th>
-                        <th class="py-3.5 px-4 text-right">Öncelik</th>
+                    <tr class="border-b border-slate-200 bg-slate-800 text-[11px] font-extrabold text-white uppercase tracking-wider">
+                        <th class="py-3.5 px-4 w-12 text-white">#</th>
+                        <th class="py-3.5 px-4 text-white">Sayfa / Haber Başlığı &amp; Bağlantısı</th>
+                        <th class="py-3.5 px-4 text-white">Yayın Tarihi</th>
+                        <th class="py-3.5 px-4 text-right text-white">Öncelik</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2735,7 +2734,7 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
                 </tbody>
             </table>
         </div>
-        <p class="text-center text-xs text-slate-500 pt-2">© 2026 Gündem Analizi - Doğru Haber, Tarafsız Analiz. Tüm Hakları Saklıdır.</p>
+        <p class="text-center text-xs text-slate-600 pt-2">© 2026 Gündem Analizi - Doğru Haber, Tarafsız Analiz. Tüm Hakları Saklıdır.</p>
     </div>
 </body>
 </html>"""
