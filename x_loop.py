@@ -145,8 +145,8 @@ def sleep_until(target_ts: float):
 def main():
     deadline = START + MAX_RUNTIME_MIN * 60
     print(f"🚀 [X 45dk Döngüsü] Başladı: {tr(START)} | Aralık: {INTERVAL_MIN} dk | Bitiş: {tr(deadline)}")
-    if not os.getenv("TWITTER_AUTH_TOKEN") or not os.getenv("TWITTER_CT0"):
-        print("🔑 Eski konteynerde TWITTER_AUTH_TOKEN/CT0 yok; yeni GitHub Secrets ile iş başlatılıyor...")
+    if not os.getenv("TWITTER_AUTH_TOKEN") or not os.getenv("TWITTER_CT0") or os.getenv("TWITTER_AUTH_TOKEN", "").startswith("2a76b6"):
+        print("🔑 Eski konteynerde güncel TWITTER_AUTH_TOKEN/CT0 yok; yeni GitHub Secrets ile iş başlatılıyor...")
         return
 
     while True:
@@ -192,6 +192,9 @@ def main():
         retry_ts = time.time() + RETRY_MIN * 60
         write_status("no_post", log, retry_ts)
         push_state("chore: x bot status")
+        if "Tweet metin kutusu bulunamadı" in log:
+            print("🔑 Oturum çerezi yenilenmiş; taze GitHub Secrets anahtarlarını yüklemek için bu iş sonlandırılıyor...")
+            break
         if retry_ts > deadline:
             break
         print(f"🔁 Paylaşım yapılamadı, {RETRY_MIN} dk sonra tekrar denenecek ({tr(retry_ts)}).")
