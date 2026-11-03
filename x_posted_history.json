@@ -892,5 +892,20 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1793678491.8252392
+  },
+  {
+    "slug": "denizli-baskete-abdli-forvet",
+    "title": "Denizli Basket’e ABD’li forvet",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1793681192.999158
+  },
+  {
+    "slug": "trabzonspor-basketbolda-troy-caupain-ile-yollar-ayrildi",
+    "title": "Trabzonspor Basketbol'da Troy Caupain ile yollar ayrıldı",
+    "summary": "Trabzonspor Basketbol Kulübü, kadrosunda yer alan ABD'li oyuncu Troy Caupain ile anlaşmalı olarak yollarını ayırdığını duyurdu. Bordo-mavili yönetim, tecrübeli basketbolcuya kulübe yaptığı katkılardan ötürü teşekkür ederek ilerleyen kariyerinde başar",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1793681212.189694
   }
 ]
