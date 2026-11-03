@@ -204,9 +204,35 @@ def format_x_tweet(title: str, summary: str, site_url: str = "", category: str =
     return tweet.strip()
 
 
+_UI_NOISE_PATTERNS = (
+    "doğru haber",
+    "tarafsız analiz",
+    "haberi sesli dinle",
+    "sesli olarak dinlemek için",
+    "oynat'a basın",
+    "tek tıkla tepkinizi seçin",
+    "okuyucu nabzına katılın",
+    "bu gelişme hakkında ne düşünüyorsunuz",
+    "kaynak ve yayın bilgisi",
+    "yayın ilkelerimiz çerçevesinde",
+    "maddi hata bildirimi",
+    "gündemi istediğiniz kanaldan takip edin",
+    "7/24 haber & video ihbar",
+    "çerez ve gizlilik",
+    "gündem analizi ©",
+)
+
+
+def _is_ui_noise_paragraph(text: str) -> bool:
+    low = (text or "").strip().lower()
+    if not low:
+        return True
+    return any(pat in low for pat in _UI_NOISE_PATTERNS)
+
+
 def fetch_full_article_text(site_url: str) -> str:
     """Haberin TAM metnini sitedeki haber sayfasından (article-body) paragraf paragraf çeker.
-    Sitenin otomatik 'GÜNDEM ANALİZİ DEĞERLENDİRMESİ' kutusu ve alt başlıklar alınmaz."""
+    Sitenin üst bar, sesli okuma kutusu, tepki anketi ve alt kutuları kesinlikle alınmaz."""
     if not site_url:
         return ""
     try:
@@ -215,19 +241,45 @@ def fetch_full_article_text(site_url: str) -> str:
         if resp.status_code != 200:
             return ""
         page = resp.text
-        start = page.find("article-body")
-        if start < 0:
-            return ""
-        seg = page[start:]
-        for stop in ("GÜNDEM ANALİZİ DEĞERLENDİRMESİ", "SIRADAKİ HABER", "<!-- SIRADAK"):
+
+        # 1) Öncelikle açık ARTICLE_BODY_START / ARTICLE_BODY_END işaretçilerini kontrol et
+        s_marker = page.find("<!-- ARTICLE_BODY_START -->")
+        e_marker = page.find("<!-- ARTICLE_BODY_END -->")
+        if s_marker >= 0 and e_marker > s_marker:
+            seg = page[s_marker + len("<!-- ARTICLE_BODY_START -->"):e_marker]
+        else:
+            # 2) <style> içindeki .article-body seçicisini ATLA; doğrudan <div class="... article-body"> etiketini bul
+            m = re.search(r'<div[^>]*class="[^"]*\barticle-body\b[^"]*"[^>]*>', page, re.I)
+            if m:
+                seg = page[m.end():]
+            else:
+                start = page.rfind("article-body")
+                if start < 0:
+                    return ""
+                seg = page[start:]
+
+        for stop in (
+            "<!-- ARTICLE_BODY_END -->",
+            'id="reader-reaction-box"',
+            "OKUYUCU TEPKİ",
+            "Bu Gelişme Hakkında Ne Düşünüyorsunuz",
+            "GÜNDEM ANALİZİ DEĞERLENDİRMESİ",
+            "SIRADAKİ HABER",
+            "<!-- SIRADAK",
+            "Kaynak ve Yayın Bilgisi",
+            "Haber Kaynağı:",
+            "Gündemi İstediğiniz Kanaldan Takip Edin",
+            "</article>",
+        ):
             k = seg.find(stop)
             if k > 0:
                 seg = seg[:k]
+
         paras = []
         for raw in re.findall(r"<p[^>]*>(.*?)</p>", seg, re.S):
             t = _html.unescape(re.sub(r"<[^>]+>", "", raw))
             t = re.sub(r"\s+", " ", t).strip()
-            if len(t) >= 25 and t not in paras:
+            if len(t) >= 25 and not _is_ui_noise_paragraph(t) and t not in paras:
                 paras.append(t)
         return "\n\n".join(paras)
     except Exception as e:

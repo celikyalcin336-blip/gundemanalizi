@@ -320,12 +320,10 @@
         html.a11y-xlarge {
             font-size: 135% !important;
         }
-        html.a11y-large .article-body,
         html.a11y-large article p {
             font-size: 1.22rem !important;
             line-height: 1.9 !important;
         }
-        html.a11y-xlarge .article-body,
         html.a11y-xlarge article p {
             font-size: 1.4rem !important;
             line-height: 1.95 !important;
@@ -642,8 +640,11 @@
 
             <!-- Makale İçeriği -->
             <div class="text-slate-800 text-base sm:text-lg leading-relaxed font-normal article-body">
+                <!-- ARTICLE_BODY_START -->
                 {{ article.content | safe }}
+                <!-- ARTICLE_BODY_END -->
             </div>
+            <!-- SIRADAKİ BÖLÜM: OKUYUCU TEPKİ ANKETİ -->
 
             <!-- 📊 OKUYUCU TEPKİ & NABIZ ANKETİ (Üyeliksiz Tek Tıkla Etkileşim) -->
             <div id="reader-reaction-box" data-article-id="{{ article.id or 100 }}" class="mt-8 p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
