@@ -1105,29 +1105,19 @@
         // =====================================================================
         var STANDINGS_DATA = {
             genel: [
-                { rank: 1, team: "🦁 Galatasaray", o: 8, g: 7, b: 1, m: 0, av: "+16", p: 22, lead: true },
-                { rank: 2, team: "🟡 Fenerbahçe", o: 8, g: 6, b: 1, m: 1, av: "+14", p: 19 },
-                { rank: 3, team: "🔴 Samsunspor", o: 8, g: 6, b: 0, m: 2, av: "+8", p: 18 },
-                { rank: 4, team: "🦅 Beşiktaş", o: 8, g: 5, b: 2, m: 1, av: "+7", p: 17 },
-                { rank: 5, team: "🌊 Trabzonspor", o: 8, g: 4, b: 3, m: 1, av: "+5", p: 15 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 8, g: 3, b: 3, m: 2, av: "+3", p: 12 }
+                { rank: 1, team: "Galatasaray", o: 10, g: 8, b: 1, m: 1, av: "+11", p: 25, lead: true },
+                { rank: 2, team: "Amed SK", o: 10, g: 7, b: 2, m: 1, av: "+14", p: 23 },
+                { rank: 3, team: "Trabzonspor", o: 10, g: 7, b: 1, m: 2, av: "+16", p: 22 },
+                { rank: 4, team: "Beşiktaş", o: 10, g: 6, b: 1, m: 3, av: "+8", p: 19 },
+                { rank: 5, team: "Kasımpaşa", o: 10, g: 4, b: 5, m: 1, av: "+4", p: 17 },
+                { rank: 6, team: "Fenerbahçe", o: 10, g: 5, b: 1, m: 4, av: "+14", p: 16 },
+                { rank: 7, team: "Çorum FK", o: 10, g: 5, b: 1, m: 4, av: "+5", p: 16 },
+                { rank: 8, team: "Kocaelispor", o: 10, g: 5, b: 1, m: 4, av: "+2", p: 16 },
+                { rank: 9, team: "Göztepe", o: 10, g: 4, b: 3, m: 3, av: "+4", p: 15 },
+                { rank: 10, team: "Başakşehir", o: 10, g: 4, b: 2, m: 4, av: "+1", p: 14 }
             ],
-            icsaha: [
-                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 4, b: 0, m: 0, av: "+10", p: 12, lead: true },
-                { rank: 2, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 1, m: 0, av: "+8", p: 10 },
-                { rank: 3, team: "🦅 Beşiktaş", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10 },
-                { rank: 4, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
-                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 2, m: 0, av: "+3", p: 8 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 }
-            ],
-            deplasman: [
-                { rank: 1, team: "🦁 Galatasaray", o: 4, g: 3, b: 1, m: 0, av: "+6", p: 10, lead: true },
-                { rank: 2, team: "🔴 Samsunspor", o: 4, g: 3, b: 0, m: 1, av: "+4", p: 9 },
-                { rank: 3, team: "🟡 Fenerbahçe", o: 4, g: 3, b: 0, m: 1, av: "+6", p: 9 },
-                { rank: 4, team: "🦅 Beşiktaş", o: 4, g: 2, b: 1, m: 1, av: "+1", p: 7 },
-                { rank: 5, team: "🌊 Trabzonspor", o: 4, g: 2, b: 1, m: 1, av: "+2", p: 7 },
-                { rank: 6, team: "🟣 Eyüpspor", o: 4, g: 1, b: 2, m: 1, av: "+1", p: 5 }
-            ]
+            icsaha: [],
+            deplasman: []
         };
 
         var currentStandingsTab = 'genel';

@@ -1003,20 +1003,35 @@ def get_cached_category_widgets() -> dict:
     if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 180:
         return _CATEGORY_WIDGETS_CACHE
 
+    import content_quality
     def _clean_vitrin(items, cap):
-        return [a for a in items if not main.is_commodity_news(a.get("title", ""))][:cap]
+        rich = [
+            a for a in items
+            if not main.is_commodity_news(a.get("title", ""))
+            and not content_quality.is_thin(a.get("content") or "")
+        ]
+        if len(rich) >= cap:
+            return rich[:cap]
+        non_comm = [a for a in items if not main.is_commodity_news(a.get("title", ""))]
+        return (rich + [a for a in non_comm if a not in rich])[:cap]
 
     try:
+        # Otomatik kategori düzeltmesi: Sayısal Loto vb. şans oyunları yanlışlıkla Spor'a düştüyse Gündem yap
+        try:
+            with database.get_connection() as _c:
+                _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Spor' AND (LOWER(title) LIKE '%loto%' OR LOWER(title) LIKE '%piyango%' OR LOWER(title) LIKE '%şans topu%' OR LOWER(title) LIKE '%on numara%')")
+        except Exception:
+            pass
         data = {
-            "breaking_news": _clean_vitrin(database.get_articles(limit=14), 10),
-            "trending_articles": _clean_vitrin(database.get_trending_articles(limit=14), 10),
-            "gundem_articles": _clean_vitrin(database.get_articles(limit=8, category="Gündem"), 5),
-            "auto_articles": _clean_vitrin(database.get_articles(limit=8, category="Otomobil"), 5),
-            "tech_articles": _clean_vitrin(database.get_articles(limit=8, category="Teknoloji"), 5),
-            "economy_articles": _clean_vitrin(database.get_articles(limit=8, category="Ekonomi"), 5),
-            "sports_articles": _clean_vitrin(database.get_articles(limit=8, category="Spor"), 5),
-            "health_articles": _clean_vitrin(database.get_articles(limit=8, category="Sağlık"), 5),
-            "education_articles": _clean_vitrin(database.get_articles(limit=8, category="Eğitim"), 5),
+            "breaking_news": _clean_vitrin(database.get_articles(limit=28), 14),
+            "trending_articles": _clean_vitrin(database.get_trending_articles(limit=24), 10),
+            "gundem_articles": _clean_vitrin(database.get_articles(limit=16, category="Gündem"), 5),
+            "auto_articles": _clean_vitrin(database.get_articles(limit=16, category="Otomobil"), 5),
+            "tech_articles": _clean_vitrin(database.get_articles(limit=16, category="Teknoloji"), 5),
+            "economy_articles": _clean_vitrin(database.get_articles(limit=16, category="Ekonomi"), 5),
+            "sports_articles": _clean_vitrin(database.get_articles(limit=16, category="Spor"), 5),
+            "health_articles": _clean_vitrin(database.get_articles(limit=16, category="Sağlık"), 5),
+            "education_articles": _clean_vitrin(database.get_articles(limit=16, category="Eğitim"), 5),
         }
         if data["breaking_news"]:
             _CATEGORY_WIDGETS_CACHE = data
@@ -1058,11 +1073,21 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         # Arama sonuç sayfaları asla ayrı canonical oluşturmaz (SEO Zehirleme / Search Spam Koruması)
         canonical_url = f"{config.SITE_URL}/"
     else:
+        import content_quality
+        def _prefer_rich(pool, cap):
+            non_c = [a for a in pool if not main.is_commodity_news(a.get("title", ""))]
+            if page == 1:
+                rich = [a for a in non_c if not content_quality.is_thin(a.get("content") or "")]
+                if len(rich) >= cap:
+                    return rich[:cap]
+                return (rich + [a for a in non_c if a not in rich])[:cap]
+            return non_c[:cap]
+
         if norm_kategori == "Son Dakika":
-            articles = [a for a in database.get_articles(limit=limit + 4, offset=offset) if not main.is_commodity_news(a.get("title", ""))][:limit]
+            articles = _prefer_rich(database.get_articles(limit=limit + 16, offset=offset), limit)
             total_count = database.get_articles_total_count()
         else:
-            articles = [a for a in database.get_articles(limit=limit + 4, category=norm_kategori, offset=offset) if not main.is_commodity_news(a.get("title", ""))][:limit]
+            articles = _prefer_rich(database.get_articles(limit=limit + 16, category=norm_kategori, offset=offset), limit)
             total_count = database.get_articles_total_count(category=norm_kategori)
         # Sayfalı listelerde her sayfa kendini canonical gösterir (Google arşive 2., 3. ... sayfalardan ulaşabilsin)
         if norm_kategori == "Son Dakika":
@@ -1994,13 +2019,78 @@ async def article_detail(request: Request, slug: str):
     except Exception:
         pass
 
-    # "Gündem Analizi Notu" bölümünü öne çıkan editoryal kutuya al (yeni makalelerde yapay zeka bu bölümü yazar)
+    # Eski/yeni makalelerdeki tekdüze "Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?" şablon başlığını
+    # ve kalıp kapanış cümlelerini kategoriye ve haber ID'sine göre doğal gazetecilik başlıklarıyla çeşitlendir
+    _NATURAL_SUBHEADS = {
+        "Ekonomi": [
+            "Piyasa Dengeleri ve Ekonomik Görünüm",
+            "Sektörel Yansımalar ve Bütçe Etkisi",
+            "Finansal Perspektif ve Önümüzdeki Dönem",
+            "Reel Sektör ve Tüketici Açısından Tablo",
+        ],
+        "Teknoloji": [
+            "Teknolojik Dönüşüm ve Kullanıcı Deneyimi",
+            "Sektörel Rekabet ve Yeni Standartlar",
+            "Dijital Ekosistemde Beklenen Yansımalar",
+            "Donanım ve Yazılım Dünyasında Yeni Safha",
+        ],
+        "Otomobil": [
+            "Otomotiv Pazarında Rekabet ve Beklentiler",
+            "Sürücü Deneyimi ve Sektörel Yansımalar",
+            "Piyasa Koşulları ve Model Stratejisi",
+            "Mobilite Dünyasında Öne Çıkan Detaylar",
+        ],
+        "Spor": [
+            "Saha İçi Dengeler ve Teknik Değerlendirme",
+            "Sezon Yürüyüşünde Kritik Viraj",
+            "Takım Performansı ve Rekabet Tablosu",
+            "Spor Kamuoyunda Yansımalar ve Beklentiler",
+        ],
+        "Sağlık": [
+            "Klinik Değerlendirme ve Koruyucu Önlemler",
+            "Toplum Sağlığı Açısından Öne Çıkan Noktalar",
+            "Uzman Yaklaşımı ve Günlük Yaşam Etkisi",
+            "Tıbbi Süreçler ve Dikkat Edilmesi Gerekenler",
+        ],
+        "Eğitim": [
+            "Akademik Takvim ve Öğrenciler İçin Rehber",
+            "Eğitim Süreçlerinde Yeni Dönem",
+            "Adaylar ve Veliler Açısından Önemli Noktalar",
+            "Kurumsal Uygulama ve Takvim Detayları",
+        ],
+        "Dünya": [
+            "Uluslararası Dengeler ve Diplomatik Tablo",
+            "Bölgesel Güvenlik ve Jeopolitik Yansımalar",
+            "Küresel Siyasette Olası Senaryolar",
+            "Diplomatik Trafik ve Sahadaki Gerçekler",
+        ],
+        "Gündem": [
+            "Kamuoyu Yansımaları ve Sürecin Çerçevesi",
+            "Sahadaki Durum ve İdari Süreç",
+            "Toplumsal Etkiler ve Beklenen Adımlar",
+            "Resmi Süreç ve Öne Çıkan Ayrıntılar",
+        ],
+    }
+    _cat_heads = _NATURAL_SUBHEADS.get(category, _NATURAL_SUBHEADS["Gündem"])
+    _chosen_head = _cat_heads[(article_id or 0) % len(_cat_heads)]
     raw_content = re.sub(
-        r'(<h3[^>]*>\s*Gündem Analizi Notu[^<]*</h3>\s*(?:<p[^>]*>.*?</p>\s*){1,2})',
-        lambda _m: ('<div class="ga-analiz-notu not-prose my-8 p-5 sm:p-6 rounded-2xl bg-amber-50 border-l-4 border-amber-500 border-y border-r border-amber-200">'
-                    '<style>.ga-analiz-notu h3{color:#92400e!important;margin-top:0!important;font-size:1.05rem!important}.ga-analiz-notu p{color:#1e293b!important;margin-bottom:0!important}</style>'
-                    + _m.group(1) + '</div>'),
-        raw_content, count=1, flags=re.I | re.S,
+        r'<h3([^>]*)>\s*Gündem Analizi Notu[^<]*</h3>',
+        lambda _m: f'<h3{_m.group(1)}>{_chosen_head}</h3>',
+        raw_content,
+        flags=re.I,
+    )
+    # Tekdüze yapay zeka kapanış kalıplarını ("en doğru yaklaşım olacaktır" vb.) doğal cümlelerle yumuşat
+    raw_content = re.sub(
+        r'\ben doğru yaklaşım olacaktır\.',
+        'önem taşımaktadır.',
+        raw_content,
+        flags=re.I,
+    )
+    raw_content = re.sub(
+        r'\ben doğru korunma yöntemidir\.',
+        'belirleyici olacaktır.',
+        raw_content,
+        flags=re.I,
     )
 
     # Ekonomi haberlerinde sayfanın açıldığı andaki canlı piyasa verilerini göster (bizim verimiz → özgün katma değer)
@@ -2033,8 +2123,8 @@ async def article_detail(request: Request, slug: str):
         except Exception as _e:
             print(f"Ekonomi piyasa kutusu atlandı: {_e}")
 
-    # Spor haberlerinde sayfanın açıldığı andaki canlı Süper Lig İlk 5 Puan Durumu kutusunu göster (özgün katma değer + iç bağlantı)
-    if (article.get("category") or "") == "Spor":
+    # Spor haberlerinde sayfanın açıldığı andaki canlı Süper Lig İlk 5 Puan Durumu kutusunu göster (şans oyunları/emtia hariç)
+    if (article.get("category") or "") == "Spor" and not is_thin_article and not main.is_commodity_news(article.get("title", "")):
         try:
             import live_services
             _sl = await asyncio.to_thread(live_services.get_live_superlig)
@@ -2619,7 +2709,7 @@ _STATIC_SITEMAP_PAGES = [
     ("/kullanim-sartlari", "monthly", "0.5", "Kullanım Şartları"),
     ("/cerez-politikasi", "monthly", "0.5", "Çerez Politikası"),
 ]
-_SITEMAP_CATEGORIES = ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor", "Asayiş")
+_SITEMAP_CATEGORIES = ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Spor")
 
 
 @app.get("/sitemap.xml")
@@ -2659,6 +2749,11 @@ async def sitemap_pages():
     for p, cf, pr, _lbl in _STATIC_SITEMAP_PAGES:
         xml.append(f'  <url><loc>{base_url}{p}</loc><lastmod>{today_iso}</lastmod><changefreq>{cf}</changefreq><priority>{pr}</priority></url>')
     for cat in _SITEMAP_CATEGORIES:
+        try:
+            if database.get_articles_total_count(category=cat) < 3:
+                continue
+        except Exception:
+            pass
         xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml")

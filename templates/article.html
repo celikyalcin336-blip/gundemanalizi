@@ -480,8 +480,13 @@
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-500"></i> {{ (article.created_at or '')[:16] }}
                 </span>
                 <span class="text-slate-400 hidden sm:inline">•</span>
-                <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition">
-                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Yalçın Çelik
+                {% set _desk_map = {'Ekonomi': 'Ekonomi Masası', 'Spor': 'Spor Servisi', 'Teknoloji': 'Teknoloji Editörlüğü', 'Otomobil': 'Otomobil Editörlüğü', 'Sağlık': 'Sağlık Editörlüğü', 'Eğitim': 'Eğitim Servisi', 'Dünya': 'Dış Haberler Servisi'} %}
+                <span class="inline-flex items-center gap-1 text-slate-700 font-bold text-xs">
+                    <i data-lucide="users" class="w-3.5 h-3.5 text-red-600"></i> {{ _desk_map.get(article.category, 'Gündem Haber Merkezi') }}
+                </span>
+                <span class="text-slate-400 hidden sm:inline">•</span>
+                <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Genel Yayın Yönetmeni ve Sorumlu Yazı İşleri Müdürü">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Sorumlu YYY: Yalçın Çelik
                 </a>
 
                 <span class="text-slate-400 hidden sm:inline">•</span>
@@ -511,7 +516,7 @@
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="font-extrabold text-slate-900 text-sm sm:text-base">Haberi Sesli Dinle</span>
-                                <span id="audio-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300 uppercase tracking-wider">AI Seslendirici</span>
+                                <span id="audio-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-red-50 text-red-700 border border-red-200 uppercase tracking-wider">Sesli Haber</span>
                             </div>
                             <p id="audio-status-text" class="text-xs text-slate-500">Bu haberi sesli olarak dinlemek için oynat'a basın.</p>
                         </div>
@@ -831,8 +836,8 @@
                         <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> tarafından yayımlanan bilgiler temel alınarak Gündem Analizi tarafından <strong>yapay zekâ desteğiyle</strong> derlenmiş ve yeniden yazılmıştır.{% else %}Bu içerik Gündem Analizi tarafından hazırlanmıştır.{% endif %}
-                        <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> gereği maddi hata bildirimi ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi Editoryal Masası tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi Editoryal Masası tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        Maddi hata bildirimi, cevap ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>
             </div>
@@ -1043,10 +1048,27 @@
         window.addEventListener('DOMContentLoaded', initLucideSafe);
         window.addEventListener('load', initLucideSafe);
         
-        function acceptCookies() {
-            localStorage.setItem('ga_cookie_consent', 'accepted');
-            document.getElementById('cookie-banner').classList.add('hidden');
+        function acceptCookies(mode) {
+            var val = mode || 'accepted';
+            localStorage.setItem('ga_cookie_consent', val);
+            var cb = document.getElementById('cookie-banner');
+            if (cb) cb.classList.add('hidden');
+            if (typeof gtag === 'function') {
+                var granted = (val === 'accepted') ? 'granted' : 'denied';
+                gtag('consent', 'update', {
+                    'ad_storage': granted,
+                    'ad_user_data': granted,
+                    'ad_personalization': granted,
+                    'analytics_storage': granted
+                });
+            }
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('ga_cookie_consent')) {
+                var cb = document.getElementById('cookie-banner');
+                if (cb) cb.classList.remove('hidden');
+            }
+        });
         function copyArticleLink(btn) {
             navigator.clipboard.writeText(window.location.href);
             const orig = btn.innerText;
@@ -1660,5 +1682,22 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- KVKK, GDPR & GOOGLE CONSENT MODE V2 UYUMLU ÇEREZ RIZASI BARI -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 left-0 right-0 z-[90] bg-white/98 backdrop-blur-md border-t-2 border-slate-200 shadow-2xl p-3.5 sm:px-6">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <p class="text-xs text-slate-700 leading-relaxed">
+                🍪 <strong>Çerez ve Gizlilik Tercihleri:</strong> Size daha iyi bir haber deneyimi sunmak, site trafiğini analiz etmek ve kişiselleştirilmiş içerik/reklam göstermek için çerezler kullanıyoruz. Detaylar için <a href="/cerez-politikasi" class="text-red-600 font-bold underline">Çerez Politikası</a> ve <a href="/gizlilik-politikasi" class="text-red-600 font-bold underline">KVKK Aydınlatma Metni</a> sayfalarımızı inceleyebilirsiniz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <button type="button" onclick="acceptCookies('essential')" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold text-xs transition cursor-pointer">
+                    Yalnızca Zorunlu Çerezler
+                </button>
+                <button type="button" onclick="acceptCookies('accepted')" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-sm transition cursor-pointer">
+                    Tümünü Kabul Et
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

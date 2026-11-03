@@ -87,6 +87,33 @@
             {% endfor %}
         </section>
 
+        <section class="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4 text-sm text-slate-700 leading-relaxed">
+            <h2 class="text-xl font-black text-slate-900">Finansal ve Çalışma Hayatı Hesaplama Rehberi</h2>
+            <p>
+                Çalışanların, emeklilerin ve işverenlerin mali haklarını doğru takip edebilmesi için bordro, tazminat ve zam hesaplamalarının yürürlükteki yasal mevzuata uygun formüllerle yapılması gerekir. <strong>Gündem Analizi Hesaplama Araçları</strong>; 5510 sayılı Sosyal Sigortalar ve Genel Sağlık Sigortası Kanunu, 193 sayılı Gelir Vergisi Kanunu ve 4857 sayılı İş Kanunu hükümlerinde yer alan standart hesaplama yöntemlerini esas alır.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <h3 class="font-extrabold text-slate-900 text-sm">1. Brüt – Net Maaş ve Vergi Dilimleri</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Brüt ücretten %14 SGK işçi primi ve %1 işsizlik sigortası kesintisi düşüldükten sonra kalan tutar gelir vergisi matrahını oluşturur. Yıl içinde biriken kümülatif matrah üst vergi dilimlerine (%15, %20, %27, %35, %40) geçtikçe aylık net ödemeler değişir; asgari ücret vergi istisnası ise her ay vergiden mahsup edilir.
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <h3 class="font-extrabold text-slate-900 text-sm">2. Kıdem ve İhbar Tazminatı Esasları</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Aynı işverene bağlı olarak en az 1 tam yıl çalışan işçiler, kanunda belirtilen haklı fesih veya işveren feshi durumlarında her tam yıl için 30 günlük giydirilmiş brüt ücret tutarında kıdem tazminatına hak kazanır. Kıdem tazminatından yalnızca binde 7,59 oranında damga vergisi kesilir; Hazine ve Maliye Bakanlığı tarafından açıklanan kıdem tazminatı tavanı üst sınırı belirler.
+                    </p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <h3 class="font-extrabold text-slate-900 text-sm">3. Emekli Aylığı Artışı ve Döviz Çevirici</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        SSK (4A) ve Bağ-Kur (4B) emekli aylıkları Ocak ve Temmuz dönemlerinde 6 aylık TÜFE artış oranına göre, memur emeklisi (4C) aylıkları ise toplu sözleşme zammı ve enflasyon farkına göre güncellenir. Döviz ve altın çevirici aracımız ise serbest piyasa verileriyle anlık karşılıkları hesaplar.
+                    </p>
+                </div>
+            </div>
+        </section>
+
         {% elif tool == 'maas' %}
         <!-- ===================== MAAŞ ===================== -->
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -271,10 +298,10 @@
         </section>
         {% endif %}
 
-        {% if tool != 'hub' %}
         <section class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-[12px] text-slate-600 leading-relaxed">
-            <strong>Önemli:</strong> Bu araç bilgilendirme amaçlıdır; sonuçlar yasal parametrelere göre yapılmış tahmini hesaplamalardır ve resmi bordro, SGK veya mahkeme hesabı yerine geçmez. Kesin tutar için işvereninize, SGK'ya veya bir mali müşavire danışın. Parametreler en son {{ params.son_guncelleme }} tarihinde güncellenmiştir.
+            <strong>Bilgilendirme ve Yasal Uyarı:</strong> Bu sayfadaki hesaplama araçları yürürlükteki SGK, Gelir Vergisi ve İş Kanunu formüllerine dayalı genel bilgilendirme ve simülasyon amaçlıdır; kullanıcılar kendi brüt/net tutarlarını ve oranlarını değiştirebilir. Sonuçlar resmi bordro, SGK tahsis belgesi veya mahkeme bilirkişi hesabı yerine geçmez. Kesin tutar için işvereninize, SGK'ya veya mali müşavirinize danışınız.
         </section>
+        {% if tool != 'hub' %}
         <section>
             <h2 class="text-base font-black text-slate-900 mb-3">Diğer Hesaplama Araçları</h2>
             <div class="flex flex-wrap gap-2">
