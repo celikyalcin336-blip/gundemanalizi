@@ -243,7 +243,10 @@
             }
         }
         window.submitIhbarForm = submitIhbarForm;
-        function openA11yModal() { openModal('a11y-modal-backdrop'); }
+        function openA11yModal() {
+            if (typeof applyA11ySettings === 'function') applyA11ySettings();
+            openModal('a11y-modal-backdrop');
+        }
         function closeA11yModal() { closeModal('a11y-modal-backdrop'); }
 
         window.openNamazModal = openNamazModal;
@@ -1901,8 +1904,129 @@
             }
         });
 
+
+        // =====================================================================
+        // ♿ 9. GELİŞMİŞ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU (MOBİL & PC)
+        // =====================================================================
+        function applyA11ySettings() {
+            var root = document.documentElement;
+            var body = document.body;
+            if (!root || !body) return;
+
+            var fs = localStorage.getItem('a11y_fs') || 'normal';
+            root.classList.remove('a11y-large', 'a11y-xlarge');
+            body.classList.remove('a11y-large', 'a11y-xlarge');
+            if (fs === 'large') {
+                root.classList.add('a11y-large');
+                body.classList.add('a11y-large');
+            } else if (fs === 'xlarge') {
+                root.classList.add('a11y-xlarge');
+                body.classList.add('a11y-xlarge');
+            }
+
+            var fsBtns = document.querySelectorAll('.a11y-fs-btn');
+            fsBtns.forEach(function(btn) {
+                var btnFs = btn.getAttribute('data-fs') || '';
+                if (!btnFs) {
+                    var oc = btn.getAttribute('onclick') || '';
+                    if (oc.indexOf("'large'") !== -1) btnFs = 'large';
+                    else if (oc.indexOf("'xlarge'") !== -1) btnFs = 'xlarge';
+                    else btnFs = 'normal';
+                }
+                if (btnFs === fs) {
+                    btn.className = 'a11y-fs-btn py-2.5 rounded-xl bg-blue-600 text-white border-2 border-blue-700 font-black text-center transition shadow-sm cursor-pointer';
+                } else {
+                    btn.className = 'a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer';
+                }
+            });
+
+            var contrast = localStorage.getItem('a11y_contrast') === 'true';
+            root.classList.toggle('a11y-contrast', contrast);
+            body.classList.toggle('a11y-contrast', contrast);
+            var contrastBtn = document.getElementById('a11y-contrast-toggle');
+            if (contrastBtn) {
+                contrastBtn.innerText = contrast ? '✓ Açık' : 'Kapalı';
+                contrastBtn.className = contrast
+                    ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                    : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+            }
+
+            var dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
+            root.classList.toggle('a11y-dyslexia', dyslexia);
+            body.classList.toggle('a11y-dyslexia', dyslexia);
+            var dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
+            if (dyslexiaBtn) {
+                dyslexiaBtn.innerText = dyslexia ? '✓ Açık' : 'Kapalı';
+                dyslexiaBtn.className = dyslexia
+                    ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                    : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+            }
+
+            var underline = localStorage.getItem('a11y_underline') === 'true';
+            root.classList.toggle('a11y-underline', underline);
+            body.classList.toggle('a11y-underline', underline);
+            var underlineBtn = document.getElementById('a11y-underline-toggle');
+            if (underlineBtn) {
+                underlineBtn.innerText = underline ? '✓ Açık' : 'Kapalı';
+                underlineBtn.className = underline
+                    ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                    : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+            }
+
+            var focus = localStorage.getItem('a11y_focus') !== 'false';
+            root.classList.toggle('a11y-focus-visible', focus);
+            body.classList.toggle('a11y-focus-visible', focus);
+            var focusBtn = document.getElementById('a11y-focus-toggle');
+            if (focusBtn) {
+                focusBtn.innerText = focus ? '✓ Açık' : 'Kapalı';
+                focusBtn.className = focus
+                    ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                    : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+            }
+        }
+        window.applyA11ySettings = applyA11ySettings;
+
+        window.setA11yFontSize = function(val) {
+            localStorage.setItem('a11y_fs', val || 'normal');
+            applyA11ySettings();
+        };
+
+        window.toggleA11yContrast = function() {
+            var cur = localStorage.getItem('a11y_contrast') === 'true';
+            localStorage.setItem('a11y_contrast', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yDyslexia = function() {
+            var cur = localStorage.getItem('a11y_dyslexia') === 'true';
+            localStorage.setItem('a11y_dyslexia', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yUnderline = function() {
+            var cur = localStorage.getItem('a11y_underline') === 'true';
+            localStorage.setItem('a11y_underline', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.toggleA11yFocus = function() {
+            var cur = localStorage.getItem('a11y_focus') !== 'false';
+            localStorage.setItem('a11y_focus', (!cur).toString());
+            applyA11ySettings();
+        };
+
+        window.resetA11ySettings = function() {
+            localStorage.removeItem('a11y_fs');
+            localStorage.removeItem('a11y_contrast');
+            localStorage.removeItem('a11y_dyslexia');
+            localStorage.removeItem('a11y_underline');
+            localStorage.removeItem('a11y_focus');
+            applyA11ySettings();
+        };
+
         function initApp() {
             if (window.lucide) window.lucide.createIcons();
+            applyA11ySettings();
 
             if (document.getElementById('standings-table-body')) {
                 fetchLiveSuperlig();

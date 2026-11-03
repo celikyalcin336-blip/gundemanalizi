@@ -14,12 +14,12 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         var _savedConsent = null;
-        try { _savedConsent = localStorage.getItem('cookiesAccepted'); } catch(e) {}
+        try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
         gtag('consent', 'default', {
-            'ad_storage': _savedConsent === 'true' ? 'granted' : 'denied',
-            'ad_user_data': _savedConsent === 'true' ? 'granted' : 'denied',
-            'ad_personalization': _savedConsent === 'true' ? 'granted' : 'denied',
-            'analytics_storage': _savedConsent === 'true' ? 'granted' : 'denied',
+            'ad_storage': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
+            'ad_user_data': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
+            'ad_personalization': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
+            'analytics_storage': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
             'wait_for_update': 500
         });
     </script>
@@ -312,7 +312,7 @@
     <script>
         (function(){
             try {
-                if (!localStorage.getItem('cookiesAccepted')) {
+                if (!localStorage.getItem('ga_cookie_consent')) {
                     var cb = document.getElementById('cookie-banner');
                     if (cb) cb.classList.remove('hidden');
                 }
@@ -320,7 +320,7 @@
         })();
         function acceptCookies(mode) {
             try {
-                localStorage.setItem('cookiesAccepted', mode === 'essential' ? 'essential' : 'true');
+                localStorage.setItem('ga_cookie_consent', mode === 'essential' ? 'essential' : 'accepted');
                 localStorage.setItem('cookieConsentMode', mode || 'all');
                 if (typeof gtag === 'function') {
                     var granted = (mode === 'essential') ? 'denied' : 'granted';

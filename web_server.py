@@ -1020,18 +1020,35 @@ def get_cached_category_widgets() -> dict:
         try:
             with database.get_connection() as _c:
                 _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Spor' AND (LOWER(title) LIKE '%loto%' OR LOWER(title) LIKE '%piyango%' OR LOWER(title) LIKE '%şans topu%' OR LOWER(title) LIKE '%on numara%')")
+                _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Asayiş'")
+                _c.execute("UPDATE articles SET title = REPLACE(title, 'Açkladı', 'Açıkladı') WHERE title LIKE '%Açkladı%'")
         except Exception:
             pass
+        breaking_pool = _clean_vitrin(database.get_articles(limit=40), 16)
+        breaking_news = breaking_pool[:14]
+        side_featured = breaking_pool[14:16] if len(breaking_pool) >= 16 else breaking_pool[1:3]
+        used_ids = {a.get("id") for a in breaking_pool[:16] if a.get("id")}
+
+        def _pick_cat_vitrin(cat_name, cap=5):
+            pool = _clean_vitrin(database.get_articles(limit=36, category=cat_name), 24)
+            fresh = [a for a in pool if a.get("id") not in used_ids]
+            chosen = (fresh + [a for a in pool if a not in fresh])[:cap]
+            for a in chosen:
+                if a.get("id"):
+                    used_ids.add(a.get("id"))
+            return chosen
+
         data = {
-            "breaking_news": _clean_vitrin(database.get_articles(limit=28), 14),
+            "breaking_news": breaking_news,
+            "side_featured": side_featured,
             "trending_articles": _clean_vitrin(database.get_trending_articles(limit=24), 10),
-            "gundem_articles": _clean_vitrin(database.get_articles(limit=16, category="Gündem"), 5),
-            "auto_articles": _clean_vitrin(database.get_articles(limit=16, category="Otomobil"), 5),
-            "tech_articles": _clean_vitrin(database.get_articles(limit=16, category="Teknoloji"), 5),
-            "economy_articles": _clean_vitrin(database.get_articles(limit=16, category="Ekonomi"), 5),
-            "sports_articles": _clean_vitrin(database.get_articles(limit=16, category="Spor"), 5),
-            "health_articles": _clean_vitrin(database.get_articles(limit=16, category="Sağlık"), 5),
-            "education_articles": _clean_vitrin(database.get_articles(limit=16, category="Eğitim"), 5),
+            "gundem_articles": _pick_cat_vitrin("Gündem", 5),
+            "auto_articles": _pick_cat_vitrin("Otomobil", 5),
+            "tech_articles": _pick_cat_vitrin("Teknoloji", 5),
+            "economy_articles": _pick_cat_vitrin("Ekonomi", 5),
+            "sports_articles": _pick_cat_vitrin("Spor", 5),
+            "health_articles": _pick_cat_vitrin("Sağlık", 5),
+            "education_articles": _pick_cat_vitrin("Eğitim", 5),
         }
         if data["breaking_news"]:
             _CATEGORY_WIDGETS_CACHE = data
@@ -1109,6 +1126,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     total_pages = max(1, math.ceil(total_count / limit))
     widgets = get_cached_category_widgets()
     breaking_news = widgets["breaking_news"]
+    side_featured = widgets.get("side_featured") or breaking_news[1:3]
     if norm_kategori:
         slider_articles = database.get_articles(limit=14, category=norm_kategori)
         if len(slider_articles) < 3:
@@ -1124,6 +1142,21 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     health_articles = widgets["health_articles"]
     education_articles = widgets["education_articles"]
 
+    # Ana sayfa 1. sayfada üst vitrinlerde (Slider + Yan Kartlar + Kategori Vitrinleri) gösterilen haberlerin
+    # alt 24'lü "Tüm Güncel Gelişmeler" ızgarasında 2.-4. kez tekrarlanmasını önle:
+    if not norm_kategori and not (q and q.strip()) and page == 1:
+        showcase_ids = set()
+        for _grp in (slider_articles[:14], side_featured[:2], gundem_articles[:5], tech_articles[:5], economy_articles[:5], sports_articles[:4], auto_articles[:5]):
+            for _item in (_grp or []):
+                if _item.get("id"):
+                    showcase_ids.add(_item["id"])
+        _wide_pool = _prefer_rich(database.get_articles(limit=100, offset=0), 80)
+        _unique_grid = [a for a in _wide_pool if a.get("id") not in showcase_ids]
+        if len(_unique_grid) >= limit:
+            articles = _unique_grid[:limit]
+        else:
+            articles = (_unique_grid + [a for a in _wide_pool if a not in _unique_grid])[:limit]
+
     import live_services
     superlig_data = await asyncio.to_thread(live_services.get_live_superlig)
     resp = templates.TemplateResponse(
@@ -1132,6 +1165,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         context={
             "articles": articles,
             "slider_articles": slider_articles,
+            "side_featured": side_featured,
             "gundem_articles": gundem_articles,
             "auto_articles": auto_articles,
             "tech_articles": tech_articles,

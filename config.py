@@ -24,6 +24,7 @@ TIKTOK_URL = "https://www.tiktok.com/@gundemanalizi"
 INSTAGRAM_URL = "https://www.instagram.com/gundem_analiz/"
 FACEBOOK_URL = "https://www.facebook.com/gundemanalizi"
 X_URL = "https://x.com/gndmanalizi"
+YOUTUBE_URL = "https://www.youtube.com/@g%C3%BCndemanalizi"
 X_COOLDOWN_MINUTES = float(os.getenv("X_COOLDOWN_MINUTES", "45.0"))  # Saatte 1 tweet (Tam saat başı kilit tamponu: 45 dk)
 
 # Telegram Bildirim Ayarları (Ortam değişkeninden okunur)

@@ -21,7 +21,7 @@
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <link rel="stylesheet" href="/assets/style.min.css">
     <script src="/assets/lucide.min.js" defer></script>
-    <script src="/assets/app.js?v=20261103_v7" defer></script>
+    <script src="/assets/app.js?v=20261103_v9" defer></script>
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
@@ -30,6 +30,22 @@
             <meta name="google-site-verification" content="{{ ad_settings.google_site_verification }}">
         {% endif %}
     {% endif %}
+
+    <!-- Google Consent Mode v2 (AdSense & GDPR/KVKK Varsayılan Rıza Sinyali) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      var _savedConsent = null;
+      try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+      var _cState = (_savedConsent === 'accepted') ? 'granted' : 'denied';
+      gtag('consent', 'default', {
+        'ad_storage': _cState,
+        'ad_user_data': _cState,
+        'ad_personalization': _cState,
+        'analytics_storage': _cState,
+        'wait_for_update': 500
+      });
+    </script>
 
     <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart - Arama ve Zayıf Sayfalarda Devre Dışı) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
@@ -96,7 +112,8 @@
             "https://t.me/gundemanalizi",
             "https://www.instagram.com/gundem_analiz/",
             "https://www.facebook.com/gundemanalizi",
-            "https://www.tiktok.com/@gundemanalizi"
+            "https://www.tiktok.com/@gundemanalizi",
+            "https://www.youtube.com/@g%C3%BCndemanalizi"
           ]
         },
         {
@@ -121,12 +138,57 @@
 
 
     <style id="a11y-custom-style">
-        body.a11y-contrast { filter: contrast(135%) brightness(105%); }
-        body.a11y-large { font-size: 115% !important; }
-        body.a11y-xlarge { font-size: 130% !important; }
-        body.a11y-dyslexia { letter-spacing: 0.06em !important; word-spacing: 0.12em !important; line-height: 1.85 !important; }
-        body.a11y-underline a { text-decoration: underline !important; text-underline-offset: 3px !important; }
-        body.a11y-focus-visible *:focus-visible { outline: 3px solid #facc15 !important; outline-offset: 3px !important; }
+        html.a11y-large { font-size: 118% !important; }
+        html.a11y-xlarge { font-size: 135% !important; }
+        html.a11y-contrast header,
+        html.a11y-contrast main,
+        html.a11y-contrast section,
+        html.a11y-contrast article,
+        html.a11y-contrast aside,
+        html.a11y-contrast footer {
+            filter: contrast(135%) saturate(115%);
+        }
+        html.a11y-dyslexia body,
+        html.a11y-dyslexia p,
+        html.a11y-dyslexia h1,
+        html.a11y-dyslexia h2,
+        html.a11y-dyslexia h3,
+        html.a11y-dyslexia h4,
+        html.a11y-dyslexia a,
+        html.a11y-dyslexia span,
+        html.a11y-dyslexia li {
+            letter-spacing: 0.05em !important;
+            word-spacing: 0.12em !important;
+            line-height: 1.85 !important;
+        }
+        html.a11y-underline main a,
+        html.a11y-underline section a,
+        html.a11y-underline article a,
+        html.a11y-underline footer a {
+            text-decoration: underline !important;
+            text-decoration-thickness: 2px !important;
+            text-underline-offset: 3px !important;
+        }
+        html.a11y-focus-visible *:focus-visible,
+        body.a11y-focus-visible *:focus-visible {
+            outline: 3px solid #facc15 !important;
+            outline-offset: 3px !important;
+        }
+        @keyframes ga-ticker-marquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .ga-ticker-track {
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            will-change: transform;
+            animation: ga-ticker-marquee 52s linear infinite;
+        }
+        .ga-ticker-track:hover,
+        .ga-ticker-track:active {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 
@@ -141,15 +203,21 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
                     SON DAKİKA
                 </span>
-                <div id="breaking-ticker" class="overflow-hidden whitespace-nowrap text-xs font-semibold text-slate-100 truncate">
+                <div id="breaking-ticker" class="overflow-hidden whitespace-nowrap text-xs font-semibold text-slate-100 flex-1 min-w-0">
                     {% if breaking_news and breaking_news|length > 0 %}
-                        {% for b in breaking_news %}
-                            <a href="/haber/{{ b.slug }}" class="hover:underline mr-8 text-slate-100 hover:text-white transition">
-                                [{{ b.category }}] {{ b.title }}
-                            </a>
-                        {% endfor %}
+                        <div class="ga-ticker-track">
+                            {% for _pass in [1, 2] %}
+                                {% for b in breaking_news %}
+                                    <a href="/haber/{{ b.slug }}" class="hover:underline mr-8 text-slate-100 hover:text-white transition inline-flex items-center gap-1.5">
+                                        <span class="text-amber-300 font-extrabold">[{{ b.category }}]</span>
+                                        <span>{{ b.title }}</span>
+                                        <span class="text-amber-400/70 ml-4">•</span>
+                                    </a>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
                     {% else %}
-                        <span>Gündem Analizi yayın hayatına başladı. Güncel haberler anlık aktarılıyor.</span>
+                        <span>Gündem Analizi teyitli son dakika haber akışı.</span>
                     {% endif %}
                 </div>
             </div>
@@ -314,7 +382,7 @@
                     <svg class="w-4 h-4 fill-[#25D366] group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                 </a>
                 <!-- YouTube -->
-                <a href="https://www.youtube.com" target="_blank" title="YouTube Kanalımız" aria-label="YouTube Kanalımız"
+                <a href="https://www.youtube.com/@g%C3%BCndemanalizi" target="_blank" rel="noopener" title="YouTube Kanalımız" aria-label="YouTube Kanalımız"
                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 border border-slate-200 hover:border-red-600 hover:bg-red-50 transition flex items-center justify-center shadow-xs group">
                     <svg class="w-4 h-4 fill-[#FF0000] group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </a>
@@ -414,32 +482,33 @@
                     </div>
                 </div>
 
-                <!-- SAĞ (4 KOLON): 2 SICAK KART -->
+                <!-- SAĞ (4 KOLON): 2 SICAK KART (Manşet Slider'dan Bağımsız Özel Gündem Kartları) -->
+                {% set side_cards = side_featured if (side_featured and side_featured|length >= 2) else slider_list[1:3] %}
                 <div class="lg:col-span-4 flex flex-col justify-between gap-4">
-                    {% if slider_list|length > 1 %}
+                    {% if side_cards|length > 0 %}
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
-                        <a href="/haber/{{ slider_list[1].slug }}" class="block w-full h-full relative">
-                            {% if slider_list[1].image_path %}
-                                <img src="/images/{{ slider_list[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[1].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                        <a href="/haber/{{ side_cards[0].slug }}" class="block w-full h-full relative">
+                            {% if side_cards[0].image_path %}
+                                <img src="/images/{{ side_cards[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
-                                <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">{{ slider_list[1].category }}</span>
-                                <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition mt-1 line-clamp-2">{{ slider_list[1].title }}</h3>
+                                <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">{{ side_cards[0].category }}</span>
+                                <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition mt-1 line-clamp-2">{{ side_cards[0].title }}</h3>
                             </div>
                         </a>
                     </div>
                     {% endif %}
-                    {% if slider_list|length > 2 %}
+                    {% if side_cards|length > 1 %}
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
-                        <a href="/haber/{{ slider_list[2].slug }}" class="block w-full h-full relative">
-                            {% if slider_list[2].image_path %}
-                                <img src="/images/{{ slider_list[2].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ slider_list[2].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                        <a href="/haber/{{ side_cards[1].slug }}" class="block w-full h-full relative">
+                            {% if side_cards[1].image_path %}
+                                <img src="/images/{{ side_cards[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[1].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
-                                <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">{{ slider_list[2].category }}</span>
-                                <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition mt-1 line-clamp-2">{{ slider_list[2].title }}</h3>
+                                <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">{{ side_cards[1].category }}</span>
+                                <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition mt-1 line-clamp-2">{{ side_cards[1].title }}</h3>
                             </div>
                         </a>
                     </div>
@@ -883,11 +952,11 @@
 
         <!-- ANA SAYFA SON HABERLER AKIŞI (24 HABERLİK GÜNCEL LİSTE & SAYFALAMA) -->
         {% if articles and articles|length > 0 %}
-        <section class="pt-6 border-t border-brand-border/60">
-            <div class="flex items-center justify-between pb-3 mb-5 border-b border-brand-border/60">
+        <section class="pt-6 border-t border-slate-200">
+            <div class="flex items-center justify-between pb-3 mb-5 border-b border-slate-200">
                 <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-6 bg-red-600 rounded-sm"></span>
-                    <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
                         TÜM GÜNCEL GELİŞMELER
                     </h2>
                 </div>
@@ -1366,7 +1435,7 @@
             <div class="flex items-center gap-4">
                 <span>TSİ (UTC+3) Canlı Yayın</span>
                 <span>•</span>
-                <span>Yapay Zeka Destekli Doğrulama</span>
+                <span>Bağımsız Editoryal Doğrulama</span>
             </div>
         </div>
     </footer>
@@ -1374,7 +1443,7 @@
     <!-- ==================== TÜM MERKEZİ OVERLAY MODALLAR ==================== -->
 
     <!-- ♿ ERİŞİLEBİLİRLİK MERKEZİ (SAYFAYI ASLA KAYDIRMAYAN CENTER MODAL) -->
-    <div id="a11y-modal-backdrop" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="a11y-modal-backdrop" onclick="if(event.target === this) closeA11yModal()" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white border-2 border-blue-500 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-slate-900 space-y-4">
             <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 p-1.5 rounded-lg bg-slate-100 border border-slate-200 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1393,9 +1462,9 @@
             <div>
                 <label class="text-xs font-bold text-slate-700 block mb-1.5">🔤 Metin Boyutu</label>
                 <div class="grid grid-cols-3 gap-2 text-xs font-bold">
-                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Normal</button>
-                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Büyük (+15%)</button>
-                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Çok Büyük</button>
+                    <button type="button" data-fs="normal" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2.5 rounded-xl bg-blue-600 text-white border-2 border-blue-700 font-black text-center transition shadow-sm cursor-pointer">Normal</button>
+                    <button type="button" data-fs="large" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer">Büyük (+15%)</button>
+                    <button type="button" data-fs="xlarge" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer">Çok Büyük</button>
                 </div>
             </div>
 
@@ -2157,7 +2226,65 @@
                 });
             }
         }
+        function applyA11ySettings() {
+            var root = document.documentElement;
+            var body = document.body;
+            if (!root || !body) return;
+            var fs = localStorage.getItem('a11y_fs') || 'normal';
+            root.classList.remove('a11y-large', 'a11y-xlarge');
+            body.classList.remove('a11y-large', 'a11y-xlarge');
+            if (fs === 'large') { root.classList.add('a11y-large'); body.classList.add('a11y-large'); }
+            else if (fs === 'xlarge') { root.classList.add('a11y-xlarge'); body.classList.add('a11y-xlarge'); }
+
+            document.querySelectorAll('.a11y-fs-btn').forEach(function(btn) {
+                var btnFs = btn.getAttribute('data-fs') || 'normal';
+                btn.className = (btnFs === fs)
+                    ? 'a11y-fs-btn py-2.5 rounded-xl bg-blue-600 text-white border-2 border-blue-700 font-black text-center transition shadow-sm cursor-pointer'
+                    : 'a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer';
+            });
+
+            var toggles = [
+                { key: 'a11y_contrast', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
+                { key: 'a11y_dyslexia', cls: 'a11y-dyslexia', id: 'a11y-dyslexia-toggle', defVal: false },
+                { key: 'a11y_underline', cls: 'a11y-underline', id: 'a11y-underline-toggle', defVal: false },
+                { key: 'a11y_focus', cls: 'a11y-focus-visible', id: 'a11y-focus-toggle', defVal: true }
+            ];
+            toggles.forEach(function(t) {
+                var raw = localStorage.getItem(t.key);
+                var active = (raw === null) ? t.defVal : (raw === 'true');
+                root.classList.toggle(t.cls, active);
+                body.classList.toggle(t.cls, active);
+                var btn = document.getElementById(t.id);
+                if (btn) {
+                    btn.innerText = active ? '✓ Açık' : 'Kapalı';
+                    btn.className = active
+                        ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                        : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+                }
+            });
+        }
+        window.applyA11ySettings = applyA11ySettings;
+        window.openA11yModal = function() {
+            applyA11ySettings();
+            var el = document.getElementById('a11y-modal-backdrop');
+            if (el) { el.classList.remove('hidden'); el.style.setProperty('display', 'flex', 'important'); }
+        };
+        window.closeA11yModal = function() {
+            var el = document.getElementById('a11y-modal-backdrop');
+            if (el) { el.classList.add('hidden'); el.style.setProperty('display', 'none', 'important'); }
+        };
+        window.setA11yFontSize = function(val) { localStorage.setItem('a11y_fs', val || 'normal'); applyA11ySettings(); };
+        window.toggleA11yContrast = function() { localStorage.setItem('a11y_contrast', (localStorage.getItem('a11y_contrast') !== 'true').toString()); applyA11ySettings(); };
+        window.toggleA11yDyslexia = function() { localStorage.setItem('a11y_dyslexia', (localStorage.getItem('a11y_dyslexia') !== 'true').toString()); applyA11ySettings(); };
+        window.toggleA11yUnderline = function() { localStorage.setItem('a11y_underline', (localStorage.getItem('a11y_underline') !== 'true').toString()); applyA11ySettings(); };
+        window.toggleA11yFocus = function() { localStorage.setItem('a11y_focus', (localStorage.getItem('a11y_focus') === 'false').toString()); applyA11ySettings(); };
+        window.resetA11ySettings = function() {
+            ['a11y_fs', 'a11y_contrast', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(function(k) { localStorage.removeItem(k); });
+            applyA11ySettings();
+        };
+        applyA11ySettings();
         document.addEventListener('DOMContentLoaded', function() {
+            applyA11ySettings();
             if (window.lucide) window.lucide.createIcons();
             if (!localStorage.getItem('ga_cookie_consent')) {
                 var cb = document.getElementById('cookie-banner');

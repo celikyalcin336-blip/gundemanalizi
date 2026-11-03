@@ -16,6 +16,22 @@
         {% endif %}
     {% endif %}
 
+    <!-- Google Consent Mode v2 (AdSense & GDPR/KVKK Varsayılan Rıza Sinyali) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      var _savedConsent = null;
+      try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+      var _cState = (_savedConsent === 'accepted') ? 'granted' : 'denied';
+      gtag('consent', 'default', {
+        'ad_storage': _cState,
+        'ad_user_data': _cState,
+        'ad_personalization': _cState,
+        'analytics_storage': _cState,
+        'wait_for_update': 500
+      });
+    </script>
+
     <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca 300+ kelime zengin içeriklerde aktifleşir) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
     {% if not noindex %}
@@ -298,24 +314,52 @@
         .no-save { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
     </style>
 <style id="a11y-custom-style">
-        body.a11y-contrast {
-            filter: contrast(135%) brightness(105%);
+        html.a11y-large {
+            font-size: 118% !important;
         }
-        body.a11y-large {
-            font-size: 115% !important;
+        html.a11y-xlarge {
+            font-size: 135% !important;
         }
-        body.a11y-xlarge {
-            font-size: 130% !important;
+        html.a11y-large .article-body,
+        html.a11y-large article p {
+            font-size: 1.22rem !important;
+            line-height: 1.9 !important;
         }
-        body.a11y-dyslexia {
-            letter-spacing: 0.06em !important;
+        html.a11y-xlarge .article-body,
+        html.a11y-xlarge article p {
+            font-size: 1.4rem !important;
+            line-height: 1.95 !important;
+        }
+        html.a11y-contrast header,
+        html.a11y-contrast main,
+        html.a11y-contrast section,
+        html.a11y-contrast article,
+        html.a11y-contrast aside,
+        html.a11y-contrast footer {
+            filter: contrast(135%) saturate(115%);
+        }
+        html.a11y-dyslexia body,
+        html.a11y-dyslexia p,
+        html.a11y-dyslexia h1,
+        html.a11y-dyslexia h2,
+        html.a11y-dyslexia h3,
+        html.a11y-dyslexia h4,
+        html.a11y-dyslexia a,
+        html.a11y-dyslexia span,
+        html.a11y-dyslexia li {
+            letter-spacing: 0.05em !important;
             word-spacing: 0.12em !important;
             line-height: 1.85 !important;
         }
-        body.a11y-underline a {
+        html.a11y-underline main a,
+        html.a11y-underline section a,
+        html.a11y-underline article a,
+        html.a11y-underline footer a {
             text-decoration: underline !important;
+            text-decoration-thickness: 2px !important;
             text-underline-offset: 3px !important;
         }
+        html.a11y-focus-visible *:focus-visible,
         body.a11y-focus-visible *:focus-visible {
             outline: 3px solid #facc15 !important;
             outline-offset: 3px !important;
@@ -429,10 +473,10 @@
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
                 <div>
-                    <span class="text-[11px] font-black tracking-wider text-white uppercase whitespace-nowrap block leading-tight">
+                    <span class="text-[11px] font-black tracking-wider text-slate-900 uppercase whitespace-nowrap block leading-tight">
                         CANLI PİYASA
                     </span>
-                    <span class="text-[9px] font-medium text-slate-400 block leading-none">
+                    <span class="text-[9px] font-semibold text-slate-500 block leading-none">
                         Anlık Kurlar
                     </span>
                 </div>
@@ -866,8 +910,9 @@
                     <a href="https://t.me/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white transition">📲 Telegram</a>
                     <a href="https://www.instagram.com/gundem_analiz/" target="_blank" class="px-3.5 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-white transition">📸 Instagram</a>
                     <a href="https://www.tiktok.com/@gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white transition">🎵 TikTok</a>
-                    <a href="https://www.facebook.com/gundemanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition">📘 Facebook</a>
-                    <a href="https://x.com/gndmanalizi" target="_blank" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition">🐦 X (Twitter)</a>
+                    <a href="https://www.youtube.com/@g%C3%BCndemanalizi" target="_blank" rel="noopener" class="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white transition">▶️ YouTube</a>
+                    <a href="https://www.facebook.com/gundemanalizi" target="_blank" rel="noopener" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition">📘 Facebook</a>
+                    <a href="https://x.com/gndmanalizi" target="_blank" rel="noopener" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition">🐦 X (Twitter)</a>
                 </div>
             </div>
 
@@ -1505,9 +1550,9 @@
             <div>
                 <label class="text-xs font-bold text-slate-700 block mb-1.5">🔤 Metin Boyutu</label>
                 <div class="grid grid-cols-3 gap-2 text-xs font-bold">
-                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Normal</button>
-                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Büyük (+15%)</button>
-                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Çok Büyük</button>
+                    <button type="button" data-fs="normal" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2.5 rounded-xl bg-blue-600 text-white border-2 border-blue-700 font-black text-center transition shadow-sm cursor-pointer">Normal</button>
+                    <button type="button" data-fs="large" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer">Büyük (+15%)</button>
+                    <button type="button" data-fs="xlarge" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer">Çok Büyük</button>
                 </div>
             </div>
 
@@ -1567,62 +1612,70 @@
         </div>
     </div>
     <script>
-        // ♿ GELİŞMİŞ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU
+        // ♿ GELİŞMİŞ ERİŞİLEBİLİRLİK (WCAG 2.1 AA) YÖNETİM MOTORU (MOBİL & PC)
+        function applyA11ySettings() {
+            const root = document.documentElement;
+            const body = document.body;
+            if (!root || !body) return;
+
+            const fs = localStorage.getItem('a11y_fs') || 'normal';
+            root.classList.remove('a11y-large', 'a11y-xlarge');
+            body.classList.remove('a11y-large', 'a11y-xlarge');
+            if (fs === 'large') { root.classList.add('a11y-large'); body.classList.add('a11y-large'); }
+            else if (fs === 'xlarge') { root.classList.add('a11y-xlarge'); body.classList.add('a11y-xlarge'); }
+
+            document.querySelectorAll('.a11y-fs-btn').forEach(btn => {
+                const btnFs = btn.getAttribute('data-fs') || 'normal';
+                btn.className = (btnFs === fs)
+                    ? 'a11y-fs-btn py-2.5 rounded-xl bg-blue-600 text-white border-2 border-blue-700 font-black text-center transition shadow-sm cursor-pointer'
+                    : 'a11y-fs-btn py-2.5 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 font-bold text-center transition cursor-pointer';
+            });
+
+            const toggles = [
+                { key: 'a11y_contrast', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
+                { key: 'a11y_dyslexia', cls: 'a11y-dyslexia', id: 'a11y-dyslexia-toggle', defVal: false },
+                { key: 'a11y_underline', cls: 'a11y-underline', id: 'a11y-underline-toggle', defVal: false },
+                { key: 'a11y_focus', cls: 'a11y-focus-visible', id: 'a11y-focus-toggle', defVal: true }
+            ];
+            toggles.forEach(t => {
+                const raw = localStorage.getItem(t.key);
+                const active = (raw === null) ? t.defVal : (raw === 'true');
+                root.classList.toggle(t.cls, active);
+                body.classList.toggle(t.cls, active);
+                const btn = document.getElementById(t.id);
+                if (btn) {
+                    btn.innerText = active ? '✓ Açık' : 'Kapalı';
+                    btn.className = active
+                        ? 'px-4 py-1.5 rounded-lg text-xs font-black bg-blue-600 text-white border border-blue-700 shadow-xs transition cursor-pointer'
+                        : 'px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-200 border border-slate-300 text-slate-700 hover:bg-slate-300 transition cursor-pointer';
+                }
+            });
+        }
+        window.applyA11ySettings = applyA11ySettings;
+
         window.openA11yModal = function() {
+            applyA11ySettings();
             const el = document.getElementById('a11y-modal-backdrop');
-            if (el) el.classList.remove('hidden');
+            if (el) {
+                el.classList.remove('hidden');
+                el.style.setProperty('display', 'flex', 'important');
+            }
         };
 
         window.closeA11yModal = function() {
             const el = document.getElementById('a11y-modal-backdrop');
-            if (el) el.classList.add('hidden');
+            if (el) {
+                el.classList.add('hidden');
+                el.style.setProperty('display', 'none', 'important');
+            }
         };
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeA11yModal();
         });
 
-        function applyA11ySettings() {
-            const fs = localStorage.getItem('a11y_fs') || 'normal';
-            document.body.classList.remove('a11y-large', 'a11y-xlarge');
-            if (fs === 'large') document.body.classList.add('a11y-large');
-            if (fs === 'xlarge') document.body.classList.add('a11y-xlarge');
-
-            const contrast = localStorage.getItem('a11y_contrast') === 'true';
-            document.body.classList.toggle('a11y-contrast', contrast);
-            const contrastBtn = document.getElementById('a11y-contrast-toggle');
-            if (contrastBtn) {
-                contrastBtn.innerText = contrast ? 'Açık' : 'Kapalı';
-                contrastBtn.className = contrast ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const dyslexia = localStorage.getItem('a11y_dyslexia') === 'true';
-            document.body.classList.toggle('a11y-dyslexia', dyslexia);
-            const dyslexiaBtn = document.getElementById('a11y-dyslexia-toggle');
-            if (dyslexiaBtn) {
-                dyslexiaBtn.innerText = dyslexia ? 'Açık' : 'Kapalı';
-                dyslexiaBtn.className = dyslexia ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const underline = localStorage.getItem('a11y_underline') === 'true';
-            document.body.classList.toggle('a11y-underline', underline);
-            const underlineBtn = document.getElementById('a11y-underline-toggle');
-            if (underlineBtn) {
-                underlineBtn.innerText = underline ? 'Açık' : 'Kapalı';
-                underlineBtn.className = underline ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-
-            const focus = localStorage.getItem('a11y_focus') !== 'false';
-            document.body.classList.toggle('a11y-focus-visible', focus);
-            const focusBtn = document.getElementById('a11y-focus-toggle');
-            if (focusBtn) {
-                focusBtn.innerText = focus ? 'Açık' : 'Kapalı';
-                focusBtn.className = focus ? 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition' : 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition';
-            }
-        }
-
         window.setA11yFontSize = function(val) {
-            localStorage.setItem('a11y_fs', val);
+            localStorage.setItem('a11y_fs', val || 'normal');
             applyA11ySettings();
         };
 
@@ -1651,11 +1704,7 @@
         };
 
         window.resetA11ySettings = function() {
-            localStorage.removeItem('a11y_fs');
-            localStorage.removeItem('a11y_contrast');
-            localStorage.removeItem('a11y_dyslexia');
-            localStorage.removeItem('a11y_underline');
-            localStorage.removeItem('a11y_focus');
+            ['a11y_fs', 'a11y_contrast', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(k => localStorage.removeItem(k));
             applyA11ySettings();
         };
 
