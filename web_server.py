@@ -177,40 +177,61 @@ import secrets as _secrets
 
 ADMIN_PIN = os.getenv("ADMIN_PIN", "").strip()
 PANEL_SECRET_SLUG = os.getenv("PANEL_SECRET_SLUG", "yonetim-71453").strip("/ ")
-_PIN_FAILURES = {}          # ip -> [(ts, pin_hash), ...]
-_PANEL_SESSIONS = {}        # rastgele oturum anahtarı -> bitiş zamanı
-_PIN_LOCK_SECONDS = 900     # 15 dakika
-_PIN_MAX_DISTINCT_FAILS = 5 # 15 dk içinde 5 FARKLI yanlış PIN = kilit
+_PIN_FAILURES = {}               # ip -> [(ts, pin_hash), ...]
+_GLOBAL_PIN_FAILURES = []        # [(ts, pin_hash), ...] tüm IP'ler toplamı (Botnet/Proxy koruması)
+_GLOBAL_PIN_ALERT_TS = 0.0
+_PANEL_SESSIONS = {}             # rastgele oturum anahtarı -> bitiş zamanı
+_PIN_LOCK_SECONDS = 900          # 15 dakika
+_PIN_MAX_DISTINCT_FAILS = 5      # 15 dk içinde IP başına 5 FARKLI yanlış PIN = kilit
+_GLOBAL_MAX_DISTINCT_FAILS = 8   # 15 dk içinde tüm dünyadan 8 FARKLI yanlış PIN = küresel kilit
 
 def _client_ip(request: Request) -> str:
     return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
 
 def require_admin_pin(request: Request):
     """
-    Kaba kuvvet (brute-force) korumalı PIN kontrolü.
-    - Her yanlış deneme sayılır (başlık atlatılarak sınırsız deneme yapılamaz).
-    - Aynı eski PIN'i tekrar tekrar gönderen arka plan sekmesi tek deneme sayılır (sahibi kilitlenmez);
-      kilit yalnızca 15 dk içinde 5 FARKLI yanlış PIN denendiğinde devreye girer.
-    - Kilitliyken doğru PIN de reddedilir (aksi hâlde kilit anlamsız olur).
-    - PIN yalnızca başlıktan kabul edilir (URL'deki ?pin= loglara düştüğü için kapatıldı).
+    Kaba kuvvet (brute-force) ve Botnet/Proxy korumalı PIN kontrolü.
+    - Hem IP bazlı (5 farklı yanlış PIN) hem küresel (tüm IP'lerden toplam 8 farklı yanlış PIN) kilit uygular.
+    - Küresel kilit devreye girdiğinde yöneticiye Telegram üzerinden güvenlik uyarısı gönderir.
     """
     import hashlib
+    global _GLOBAL_PIN_FAILURES, _GLOBAL_PIN_ALERT_TS
     client_ip = _client_ip(request)
     now_ts = time.time()
     pin = (request.headers.get("X-Admin-Pin") or "").strip()
 
+    _GLOBAL_PIN_FAILURES = [(t, h) for (t, h) in _GLOBAL_PIN_FAILURES if now_ts - t < _PIN_LOCK_SECONDS]
     history = [(t, h) for (t, h) in _PIN_FAILURES.get(client_ip, []) if now_ts - t < _PIN_LOCK_SECONDS]
-    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS:
+
+    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS or len({h for _, h in _GLOBAL_PIN_FAILURES}) >= _GLOBAL_MAX_DISTINCT_FAILS:
         _PIN_FAILURES[client_ip] = history
-        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Lütfen 15 dakika bekleyip tekrar deneyin.")
+        if now_ts - _GLOBAL_PIN_ALERT_TS > _PIN_LOCK_SECONDS:
+            _GLOBAL_PIN_ALERT_TS = now_ts
+            try:
+                import telegram_notifier
+                threading.Thread(
+                    target=telegram_notifier.send_admin_alert,
+                    kwargs={
+                        "subject": "Güvenlik Kalkanı: Yönetim Paneline Şifre Deneme Saldırısı Engellendi!",
+                        "message": f"Son 15 dakika içinde birden fazla hatalı PIN denemesi (Son IP: {client_ip}) tespit edildi ve PIN girişi 15 dakika süreyle otomatik kilitlendi.",
+                    },
+                    daemon=True,
+                ).start()
+            except Exception:
+                pass
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Güvenlik kilidi devreye girdi, lütfen 15 dakika bekleyin.")
 
     if ADMIN_PIN and pin and _secrets.compare_digest(pin, ADMIN_PIN):
         _PIN_FAILURES.pop(client_ip, None)
+        _GLOBAL_PIN_FAILURES.clear()
         return
 
     if pin:
-        history.append((now_ts, hashlib.sha256(pin.encode("utf-8")).hexdigest()[:16]))
+        pin_hash = hashlib.sha256(pin.encode("utf-8")).hexdigest()[:16]
+        history.append((now_ts, pin_hash))
         _PIN_FAILURES[client_ip] = history[-50:]
+        _GLOBAL_PIN_FAILURES.append((now_ts, pin_hash))
+        _GLOBAL_PIN_FAILURES = _GLOBAL_PIN_FAILURES[-100:]
         if len(_PIN_FAILURES) > 5000:
             for ip_key in [k for k, v in _PIN_FAILURES.items() if not v or now_ts - v[-1][0] > _PIN_LOCK_SECONDS]:
                 _PIN_FAILURES.pop(ip_key, None)
@@ -903,12 +924,26 @@ async def page_son_dakika(request: Request, sayfa: int = 1):
     """Google Sitelinks ve doğrudan Son Dakika kategorisi açılış sayfası."""
     return await home(request, kategori="Son Dakika", sayfa=sayfa)
 
+_SEARCH_RATE_LIMIT = {}
+
 @app.get("/api/search")
-async def api_search(q: str = "", limit: int = 8):
-    """Canlı anlık haber arama API'si (Autocompletion & Live Search)."""
-    if not q or len(q.strip()) < 2:
+async def api_search(request: Request, q: str = "", limit: int = 8):
+    """Canlı anlık haber arama API'si (Hız sınırlamalı & DoS korumalı)."""
+    ip = _client_ip(request)
+    now_ts = time.time()
+    recent = [t for t in _SEARCH_RATE_LIMIT.get(ip, []) if now_ts - t < 60]
+    if len(recent) >= 35:
+        return JSONResponse({"ok": False, "count": 0, "results": [], "error": "Çok hızlı arama yapıldı."}, status_code=429)
+    recent.append(now_ts)
+    _SEARCH_RATE_LIMIT[ip] = recent
+    if len(_SEARCH_RATE_LIMIT) > 5000:
+        _SEARCH_RATE_LIMIT.clear()
+
+    clean_q = re.sub(r"[<>\"'`\\]", "", (q or "").strip())[:80]
+    if len(clean_q) < 2:
         return JSONResponse({"ok": True, "count": 0, "results": []})
-    results = database.search_articles(q.strip(), limit=limit, offset=0)
+    limit = max(1, min(int(limit or 8), 12))
+    results = database.search_articles(clean_q, limit=limit, offset=0)
     simplified = []
     for a in results:
         img = a.get("image_path") or ""
@@ -1017,10 +1052,11 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     norm_kategori = database.normalize_category_name(kategori) if kategori else None
 
     if q and q.strip():
-        search_kw = q.strip()
-        articles = database.search_articles(search_kw, limit=limit, offset=offset)
-        total_count = database.get_search_count(search_kw)
-        canonical_url = f"{config.SITE_URL}/?q={urllib.parse.quote(search_kw)}"
+        search_kw = re.sub(r"[<>\"'`\\]", "", q.strip())[:80]
+        articles = database.search_articles(search_kw, limit=limit, offset=offset) if search_kw else []
+        total_count = database.get_search_count(search_kw) if search_kw else 0
+        # Arama sonuç sayfaları asla ayrı canonical oluşturmaz (SEO Zehirleme / Search Spam Koruması)
+        canonical_url = f"{config.SITE_URL}/"
     else:
         if norm_kategori == "Son Dakika":
             articles = [a for a in database.get_articles(limit=limit + 4, offset=offset) if not main.is_commodity_news(a.get("title", ""))][:limit]

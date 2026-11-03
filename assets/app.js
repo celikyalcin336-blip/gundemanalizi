@@ -866,7 +866,49 @@
             return dt.getDate() + ' ' + ASTRO_TR_MONTHS[dt.getMonth()] + ' ' + dt.getFullYear() + ' ' + ASTRO_TR_DAYS[dt.getDay()];
         }
 
-        // PERİYOT METİNLERİNİ DOLDURMA (Bugün, Dün, Yarın, Haftalık, Aylık Gerçek Tarihli)
+        var ASTRO_DAILY_GENERAL_EXTRAS = [
+            'Yönetici gezegeninizin açı kalıpları zihinsel berraklığınızı artırırken, ertelediğiniz bir konuyu hızla çözüme kavuşturmanıza yardımcı oluyor.',
+            'Gökyüzündeki Ay-Gezegen etkileşimi sosyal çevrenizde sözünüzün ağırlığını artırıyor; sezgilerinize güvenerek adım atabilirsiniz.',
+            'Enerji seviyenizin yükseldiği bu süreçte önceliklerinizi sadeleştirmek, hem zaman yönetiminde hem de ruhsal dengenizde büyük rahatlama sağlayacak.',
+            'Beklenmedik bir telefon veya görüşme gündeminizi olumlu yönde değiştirebilir; esnek ve çözüm odaklı kalmanız size avantaj kazandıracak.',
+            'İç disiplin ve kararlılığınız sayesinde çevrenizdeki belirsizlikleri kolayca yönetebileceğiniz, verimli bir zaman dilimindesiniz.',
+            'Yaratıcı fikirlerinizin dikkat çektiği bu dönemde, detaylara takılmadan büyük resme odaklanmak motivasyonunuzu ikiye katlayacak.',
+            'Duygusal ve mantıksal dengeyi kurmakta zorlanmayacağınız, ikili diyaloglarda netliğin size kapılar açacağı bir atmosfer hakim.'
+        ];
+        var ASTRO_DAILY_LOVE_EXTRAS = [
+            'İletişimde samimi ve açık bir üslup seçmeniz, aradaki olası yanlış anlaşılmaları tamamen ortadan kaldıracaktır.',
+            'Kalbinizin sesini dinlerken karşınızdaki kişinin küçük jestlerine odaklanmak bağınızı daha da güçlendirecek.',
+            'Duygularınızı ifade ederken aceleci davranmamak, ilişkinizde güven ve huzur ortamını pekiştirecektir.',
+            'Sosyal ortamlarda dikkat çekici auranızla yeni ve anlamlı paylaşımlara açık bir enerjidesiniz.',
+            'Ortak planlar ve gelecek hedefleri üzerine yapılacak sıcak bir sohbet, aranızdaki uyumu tazeleyecektir.'
+        ];
+        var ASTRO_DAILY_MONEY_EXTRAS = [
+            'Gelir-gider dengenizi gözden geçirip gereksiz harcamaları kısmak, önümüzdeki günlerde elinizi oldukça güçlendirecek.',
+            'İş ortamında stratejik ve planlı hareket etmeniz, üstlerinizin veya iş ortaklarınızın takdirini kazanmanızı sağlayacak.',
+            'Finansal kararlarda ani dürtüler yerine uzun vadeli güvenliği tercih etmek bütçenizi koruyacaktır.',
+            'Mesleki bir konuda ortaya koyacağınız pratik çözüm, beklediğiniz bir fırsatın kapısını aralayabilir.',
+            'Yatırım ve birikim planlarınızda sağlamcı adımlar atmak için gökyüzü sizi destekliyor.'
+        ];
+        var ASTRO_DAILY_HEALTH_EXTRAS = [
+            'Gün içinde su tüketiminizi artırmak ve kısa açık hava yürüyüşleri yapmak enerjinizi tazeleyecektir.',
+            'Uyku düzeninize ve akşam saatlerinde ekran süresini azaltmaya özen göstermeniz zindeliğinizi koruyacak.',
+            'Omuz ve boyun bölgenizdeki gerginliği azaltmak için hafif esneme hareketlerine vakit ayırabilirsiniz.',
+            'Mevsim geçişlerine karşı doğal vitamin desteği ve dengeli öğünler bağışıklığınızı güçlü tutacaktır.',
+            'Zihinsel yorgunluğu atmak için gün sonunda kendinize 15 dakikalık sessiz bir mola vermeyi unutmayın.'
+        ];
+        var ASTRO_LUCKY_COLORS_POOL = ['Gece Mavisi', 'Zümrüt Yeşili', 'Kehribar Sarısı', 'Mercan Kırmızısı', 'Ergavan Moru', 'Turkuaz', 'Gümüş Gri', 'Bordo', 'Safir Mavisi'];
+
+        function _astroDateSeed(signName, dt, salt) {
+            var str = signName + '_' + dt.getFullYear() + '_' + (dt.getMonth() + 1) + '_' + dt.getDate() + '_' + (salt || '');
+            var h = 0;
+            for (var i = 0; i < str.length; i++) {
+                h = ((h << 5) - h) + str.charCodeAt(i);
+                h |= 0;
+            }
+            return Math.abs(h);
+        }
+
+        // PERİYOT METİNLERİNİ DOLDURMA (Bugün, Dün, Yarın, Haftalık, Aylık Gerçek Tarihli & Günlük Dinamik Rotasyonlu)
         function renderAstroPeriodContent(periodKey) {
             var data = ZODIAC_99LVL_DATA[currentAstroSign] || ZODIAC_99LVL_DATA['Koç'];
             var pData = data[periodKey] || data['bugun'];
@@ -877,18 +919,22 @@
             var mEl = document.getElementById('astro-text-money');
             var hEl = document.getElementById('astro-text-health');
             var luckyBox = document.getElementById('astro-lucky-box');
+            var numEl = document.getElementById('astro-lucky-num');
+            var colEl = document.getElementById('astro-lucky-color');
 
             var now = new Date();
+            var targetDate = now;
             if (periodKey === 'bugun') {
+                targetDate = now;
                 if (dateTitleEl) dateTitleEl.innerHTML = '📅 <strong>' + formatTrDateFull(now) + '</strong> • ' + currentAstroSign + ' Burcu Günlük Yorumu';
                 if (luckyBox) luckyBox.style.display = 'grid';
             } else if (periodKey === 'dun') {
-                var yest = new Date(now.getTime() - 86400000);
-                if (dateTitleEl) dateTitleEl.innerHTML = '⏪ <strong>' + formatTrDateFull(yest) + '</strong> • ' + currentAstroSign + ' Burcu Dünün Yorumu';
+                targetDate = new Date(now.getTime() - 86400000);
+                if (dateTitleEl) dateTitleEl.innerHTML = '⏪ <strong>' + formatTrDateFull(targetDate) + '</strong> • ' + currentAstroSign + ' Burcu Dünün Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'yarin') {
-                var tom = new Date(now.getTime() + 86400000);
-                if (dateTitleEl) dateTitleEl.innerHTML = '⏩ <strong>' + formatTrDateFull(tom) + '</strong> • ' + currentAstroSign + ' Burcu Yarının Yorumu';
+                targetDate = new Date(now.getTime() + 86400000);
+                if (dateTitleEl) dateTitleEl.innerHTML = '⏩ <strong>' + formatTrDateFull(targetDate) + '</strong> • ' + currentAstroSign + ' Burcu Yarının Yorumu';
                 if (luckyBox) luckyBox.style.display = 'none';
             } else if (periodKey === 'haftalik') {
                 if (dateTitleEl) dateTitleEl.innerHTML = '📆 <strong>Bu Hafta (' + ASTRO_TR_MONTHS[now.getMonth()] + ' ' + now.getFullYear() + ')</strong> • ' + currentAstroSign + ' Burcu Haftalık Yorumu';
@@ -898,10 +944,24 @@
                 if (luckyBox) luckyBox.style.display = 'none';
             }
 
-            if (gEl) gEl.innerText = pData.general;
-            if (lEl) lEl.innerText = pData.love;
-            if (mEl) mEl.innerText = pData.money;
-            if (hEl) hEl.innerText = pData.health;
+            var seed = _astroDateSeed(currentAstroSign, targetDate, periodKey);
+            var isDailyTab = (periodKey === 'bugun' || periodKey === 'dun' || periodKey === 'yarin');
+            var gExtra = isDailyTab ? (' ' + ASTRO_DAILY_GENERAL_EXTRAS[seed % ASTRO_DAILY_GENERAL_EXTRAS.length]) : '';
+            var lExtra = isDailyTab ? (' ' + ASTRO_DAILY_LOVE_EXTRAS[(seed >> 2) % ASTRO_DAILY_LOVE_EXTRAS.length]) : '';
+            var mExtra = isDailyTab ? (' ' + ASTRO_DAILY_MONEY_EXTRAS[(seed >> 3) % ASTRO_DAILY_MONEY_EXTRAS.length]) : '';
+            var hExtra = isDailyTab ? (' ' + ASTRO_DAILY_HEALTH_EXTRAS[(seed >> 4) % ASTRO_DAILY_HEALTH_EXTRAS.length]) : '';
+
+            if (numEl && periodKey === 'bugun') {
+                numEl.innerText = String(((seed % 29) + 1));
+            }
+            if (colEl && periodKey === 'bugun') {
+                colEl.innerText = ASTRO_LUCKY_COLORS_POOL[seed % ASTRO_LUCKY_COLORS_POOL.length];
+            }
+
+            if (gEl) gEl.innerText = pData.general + gExtra;
+            if (lEl) lEl.innerText = pData.love + lExtra;
+            if (mEl) mEl.innerText = pData.money + mExtra;
+            if (hEl) hEl.innerText = pData.health + hExtra;
         }
 
         // BURÇ UYUMU HESAPLAYICI (AŞK, İLETİŞİM, TUTKU)
@@ -1347,6 +1407,7 @@
 
         function onNamazCityChange(cityName) {
             updateNamazModal(cityName);
+            startPrayerCountdown();
         }
         window.onNamazCityChange = onNamazCityChange;
 
@@ -1682,13 +1743,13 @@
             currentDepremFilter = level;
             var buttons = document.querySelectorAll('.deprem-filter-btn');
             buttons.forEach(function(b) {
-                b.classList.remove('bg-rose-600', 'text-white');
-                b.classList.add('bg-slate-800/90', 'text-slate-300');
+                b.classList.remove('bg-red-600', 'bg-rose-600', 'text-white', 'bg-slate-800/90', 'text-slate-300');
+                b.classList.add('bg-slate-100', 'text-slate-700');
             });
             var activeBtn = document.getElementById('deprem-filter-' + level);
             if (activeBtn) {
-                activeBtn.classList.remove('bg-slate-800/90', 'text-slate-300');
-                activeBtn.classList.add('bg-rose-600', 'text-white');
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700', 'bg-slate-800/90', 'text-slate-300');
+                activeBtn.classList.add('bg-red-600', 'text-white');
             }
             applyDepremFilters();
         }
@@ -1800,14 +1861,14 @@
                         }
 
                         resultsEl.innerHTML = data.results.map(function(item) {
-                            return '<a href="/haber/' + item.slug + '" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-red-500/50 transition flex items-center gap-3 group block">' +
-                                '<img src="' + item.image + '" alt="' + item.title + '" class="w-14 h-12 rounded-xl object-cover shrink-0 border border-slate-700 group-hover:scale-105 transition">' +
+                            return '<a href="/haber/' + item.slug + '" class="p-2.5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-red-400 hover:bg-white transition flex items-center gap-3 group block shadow-2xs">' +
+                                '<img src="' + item.image + '" alt="' + item.title + '" class="w-14 h-12 rounded-xl object-cover shrink-0 border border-slate-200 group-hover:scale-105 transition">' +
                                 '<div class="flex-1 min-w-0">' +
                                     '<div class="flex items-center gap-2 mb-0.5">' +
-                                        '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/30">' + item.category + '</span>' +
-                                        '<span class="text-[10px] text-slate-500">' + item.date + '</span>' +
+                                        '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">' + item.category + '</span>' +
+                                        '<span class="text-[10px] text-slate-500 font-medium">' + item.date + '</span>' +
                                     '</div>' +
-                                    '<h4 class="text-xs font-bold text-white group-hover:text-red-400 transition truncate">' + item.title + '</h4>' +
+                                    '<h4 class="text-xs font-bold text-slate-900 group-hover:text-red-600 transition truncate">' + item.title + '</h4>' +
                                 '</div>' +
                             '</a>';
                         }).join('');
@@ -1852,15 +1913,6 @@
 
         function initApp() {
             if (window.lucide) window.lucide.createIcons();
-
-            var btnNamaz = document.getElementById('btn-open-namaz');
-            if (btnNamaz) btnNamaz.addEventListener('click', openNamazModal);
-
-            var btnNobetci = document.getElementById('btn-open-nobetci');
-            if (btnNobetci) btnNobetci.addEventListener('click', openNobetciModal);
-
-            var btnDeprem = document.getElementById('btn-open-deprem');
-            if (btnDeprem) btnDeprem.addEventListener('click', openDepremModal);
 
             if (document.getElementById('standings-table-body')) {
                 fetchLiveSuperlig();

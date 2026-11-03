@@ -21,7 +21,7 @@
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <link rel="stylesheet" href="/assets/style.min.css">
     <script src="/assets/lucide.min.js" defer></script>
-    <script src="/assets/app.js?v=20261103_v5" defer></script>
+    <script src="/assets/app.js?v=20261103_v6" defer></script>
 
     {% if ad_settings and ad_settings.google_site_verification %}
         {% if "<meta" in ad_settings.google_site_verification %}
@@ -31,9 +31,11 @@
         {% endif %}
     {% endif %}
 
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Arama ve boş sayfalarda reklam yüklenmez) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    {% if not search_query and articles and articles|length > 0 %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    {% endif %}
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
@@ -46,7 +48,11 @@
     {% endif %}
 
     <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, otomobil, teknoloji, spor ve güncel haberlerin tarafsız analizi.">
+    {% if search_query or not articles or articles|length == 0 %}
+    <meta name="robots" content="noindex, follow">
+    {% else %}
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    {% endif %}
     <link rel="canonical" href="{{ canonical_url or 'https://xn--gndemanalizi-dlb.com.tr/' }}">
 
     <!-- Open Graph & Twitter Cards -->
@@ -768,7 +774,7 @@
                             </a>
                             <div class="flex items-center gap-1.5">
                                 <button type="button" onclick="changeFixtureWeek(-1)" class="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center text-xs font-bold transition cursor-pointer" title="Önceki Hafta">‹</button>
-                                <span id="fixture-week-badge" class="text-[10px] text-amber-400 font-extrabold px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-500/30">{{ sl_week }}. Hafta</span>
+                                <span id="fixture-week-badge" class="text-[10px] text-red-700 font-extrabold px-2 py-0.5 rounded bg-red-50 border border-red-200">{{ sl_week }}. Hafta</span>
                                 <button type="button" onclick="changeFixtureWeek(1)" class="w-5 h-5 rounded bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center text-xs font-bold transition cursor-pointer" title="Sonraki Hafta">›</button>
                             </div>
                         </div>
@@ -1369,77 +1375,77 @@
 
     <!-- ♿ ERİŞİLEBİLİRLİK MERKEZİ (SAYFAYI ASLA KAYDIRMAYAN CENTER MODAL) -->
     <div id="a11y-modal-backdrop" style="display: none;" class="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-950 border-2 border-blue-500/80 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white space-y-4">
-            <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
+        <div class="bg-white border-2 border-blue-500 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-slate-900 space-y-4">
+            <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 p-1.5 rounded-lg bg-slate-100 border border-slate-200 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <div class="p-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-2xl flex items-center justify-center">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+                <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-2xl flex items-center justify-center">
                     <span>♿</span>
                 </div>
                 <div>
-                    <h3 class="text-base sm:text-lg font-black text-white">Erişilebilirlik Merkezi</h3>
-                    <p class="text-xs text-slate-400">Görme engelli ve rahat gezinme ayarları</p>
+                    <h3 class="text-base sm:text-lg font-black text-slate-900">Erişilebilirlik Merkezi</h3>
+                    <p class="text-xs text-slate-500">Görme engelli ve rahat gezinme ayarları</p>
                 </div>
             </div>
 
             <!-- 1. Metin Boyutu -->
             <div>
-                <label class="text-xs font-bold text-slate-300 block mb-1.5">🔤 Metin Boyutu</label>
+                <label class="text-xs font-bold text-slate-700 block mb-1.5">🔤 Metin Boyutu</label>
                 <div class="grid grid-cols-3 gap-2 text-xs font-bold">
-                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Normal</button>
-                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Büyük (+15%)</button>
-                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Çok Büyük</button>
+                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Normal</button>
+                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Büyük (+15%)</button>
+                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Çok Büyük</button>
                 </div>
             </div>
 
             <!-- 2. Yüksek Kontrast Modu -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast Modu</div>
-                    <div class="text-[11px] text-slate-400">Az görenler için net zıtlık</div>
+                    <div class="text-xs font-bold text-slate-900">👁️ Yüksek Kontrast Modu</div>
+                    <div class="text-[11px] text-slate-500">Az görenler için net zıtlık</div>
                 </div>
-                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 3. Net & Disleksi Dostu Yazı Tipi -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">📖 Net Okuma Yazı Tipi</div>
-                    <div class="text-[11px] text-slate-400">Geniş harf ve satır aralığı</div>
+                    <div class="text-xs font-bold text-slate-900">📖 Net Okuma Yazı Tipi</div>
+                    <div class="text-[11px] text-slate-500">Geniş harf ve satır aralığı</div>
                 </div>
-                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 4. Bağlantıların Altını Çiz -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">🔗 Bağlantıların Altını Çiz</div>
-                    <div class="text-[11px] text-slate-400">Tıklanabilir yerleri belirginleştir</div>
+                    <div class="text-xs font-bold text-slate-900">🔗 Bağlantıların Altını Çiz</div>
+                    <div class="text-[11px] text-slate-500">Tıklanabilir yerleri belirginleştir</div>
                 </div>
-                <button type="button" id="a11y-underline-toggle" onclick="toggleA11yUnderline()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-underline-toggle" onclick="toggleA11yUnderline()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 5. Klavye Odak Çerçevesi -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">⌨️ Klavye Gezinme Çerçevesi</div>
-                    <div class="text-[11px] text-slate-400">Tab tuşunda sarı odaklama</div>
+                    <div class="text-xs font-bold text-slate-900">⌨️ Klavye Gezinme Çerçevesi</div>
+                    <div class="text-[11px] text-slate-500">Tab tuşunda sarı odaklama</div>
                 </div>
-                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Açık
                 </button>
             </div>
 
             <!-- Alt Kısım: Sıfırla & Tamam -->
-            <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
-                <button type="button" onclick="resetA11ySettings()" class="text-slate-400 hover:text-red-400 transition font-semibold">
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+                <button type="button" onclick="resetA11ySettings()" class="text-slate-600 hover:text-red-600 transition font-semibold">
                     🔄 Ayarları Sıfırla
                 </button>
                 <button type="button" onclick="closeA11yModal()" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-black text-white transition">
@@ -1449,7 +1455,7 @@
         </div>
     </div>
 
-            <!-- 🔍 99 LVL CANLI HABER ARAMA MASASI MODALI -->
+    <!-- 🔍 CANLI HABER ARAMA MASASI MODALI -->
     <div id="search-modal" 
          onclick="if(event.target === this) window.closeModal('search-modal')"
          style="display: none !important; position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-items: flex-start; justify-content: center; padding: 2rem 1rem;">
@@ -1474,27 +1480,27 @@
                 <input type="text" id="live-search-input" name="q" autocomplete="off"
                        oninput="window.handleLiveSearch(this.value)"
                        placeholder="Haber başlığı, kelime veya kişi yazın (örn: Togg, altın, asgari ücret)..." 
-                       class="w-full bg-slate-900 border-2 border-red-500/50 rounded-2xl pl-12 pr-12 py-3.5 text-sm font-semibold text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/30 transition shadow-inner">
-                <span class="absolute left-4 top-3.5 text-lg text-red-400">🔍</span>
-                <button type="button" onclick="clearLiveSearch()" id="live-search-clear-btn" style="display: none;" class="absolute right-4 top-3 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800 text-xs">
+                       class="w-full bg-slate-50 border-2 border-red-300 rounded-2xl pl-12 pr-12 py-3.5 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-red-600 focus:bg-white transition">
+                <span class="absolute left-4 top-3.5 text-lg text-red-600">🔍</span>
+                <button type="button" onclick="clearLiveSearch()" id="live-search-clear-btn" style="display: none;" class="absolute right-4 top-3 text-slate-600 hover:text-slate-900 p-1 rounded-lg bg-slate-200 text-xs">
                     ✕
                 </button>
             </form>
 
             <!-- Hızlı Trend Arama Etiketleri -->
             <div class="space-y-1.5">
-                <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                <span class="text-[11px] font-bold text-slate-600 flex items-center gap-1">
                     <span>🔥 Popüler Aramalar:</span>
                 </span>
                 <div class="flex flex-wrap gap-1.5 text-xs font-semibold">
-                    <button type="button" onclick="quickSearchTag('Togg')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-red-600/30 hover:text-red-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Togg</button>
-                    <button type="button" onclick="quickSearchTag('Altın')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-amber-600/30 hover:text-amber-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Altın</button>
-                    <button type="button" onclick="quickSearchTag('Asgari Ücret')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-emerald-600/30 hover:text-emerald-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#AsgariÜcret</button>
-                    <button type="button" onclick="quickSearchTag('Faiz')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-cyan-600/30 hover:text-cyan-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Faiz</button>
-                    <button type="button" onclick="quickSearchTag('Yapay Zeka')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-purple-600/30 hover:text-purple-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#YapayZeka</button>
-                    <button type="button" onclick="quickSearchTag('MEB')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-indigo-600/30 hover:text-indigo-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#MEB</button>
-                    <button type="button" onclick="quickSearchTag('Deprem')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-rose-600/30 hover:text-rose-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#Deprem</button>
-                    <button type="button" onclick="quickSearchTag('Süper Lig')" class="px-2.5 py-1 rounded-xl bg-slate-800/80 hover:bg-yellow-600/30 hover:text-yellow-400 text-slate-300 border border-slate-700/60 transition cursor-pointer">#SüperLig</button>
+                    <button type="button" onclick="quickSearchTag('Togg')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-700 text-slate-700 border border-slate-200 transition cursor-pointer">#Togg</button>
+                    <button type="button" onclick="quickSearchTag('Altın')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-amber-50 hover:text-amber-700 text-slate-700 border border-slate-200 transition cursor-pointer">#Altın</button>
+                    <button type="button" onclick="quickSearchTag('Asgari Ücret')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 border border-slate-200 transition cursor-pointer">#AsgariÜcret</button>
+                    <button type="button" onclick="quickSearchTag('Faiz')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 border border-slate-200 transition cursor-pointer">#Faiz</button>
+                    <button type="button" onclick="quickSearchTag('Yapay Zeka')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200 transition cursor-pointer">#YapayZeka</button>
+                    <button type="button" onclick="quickSearchTag('MEB')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 border border-slate-200 transition cursor-pointer">#MEB</button>
+                    <button type="button" onclick="quickSearchTag('Deprem')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-700 border border-slate-200 transition cursor-pointer">#Deprem</button>
+                    <button type="button" onclick="quickSearchTag('Süper Lig')" class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-amber-50 hover:text-amber-700 text-slate-700 border border-slate-200 transition cursor-pointer">#SüperLig</button>
                 </div>
             </div>
 
@@ -2025,7 +2031,7 @@
             <!-- Arama Kutusu & Sayaç -->
             <div class="relative">
                 <input type="text" id="deprem-search" oninput="window.searchDeprem(this.value)" placeholder="İl, ilçe veya bölge ara (örn: Malatya, Ege, Çanakkale)..." 
-                       class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl pl-4 pr-10 py-2.5 text-xs focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition placeholder:text-slate-500">
+                       class="w-full bg-slate-50 border border-slate-300 text-slate-900 font-semibold rounded-xl pl-4 pr-10 py-2.5 text-xs focus:outline-none focus:border-rose-500 focus:bg-white transition placeholder:text-slate-400">
                 <span class="absolute right-3.5 top-2.5 text-slate-500 text-xs">🔍</span>
             </div>
 
@@ -2078,19 +2084,19 @@
                 <div>
                     <label class="block text-slate-800 font-bold mb-1">📍 Olay Yeri ve İhbar Detayı *</label>
                     <textarea id="ih-msg" required rows="3" placeholder="Örn: İstanbul Kadıköy'de kaza / olay yerinden görüntüler ve detaylar..."
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition"></textarea>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:bg-white transition"></textarea>
                 </div>
 
                 <div>
                     <label class="block text-slate-800 font-bold mb-1">🎬 Video veya Fotoğraf Yükle (İsteğe Bağlı)</label>
                     <input id="ih-file" type="file" accept="video/*,image/*"
-                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold hover:file:bg-red-500 cursor-pointer">
+                        class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-700 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold hover:file:bg-red-500 cursor-pointer">
                 </div>
 
                 <div>
                     <label class="block text-slate-800 font-semibold mb-1">🔗 Varsa Sosyal Medya Linki veya İsim/İletişim (İsteğe Bağlı)</label>
                     <input id="ih-contact" type="text" placeholder="Anonim kalmak için boş bırakabilirsiniz"
-                        class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-brand-border text-white placeholder-slate-500 text-xs focus:outline-none focus:border-red-500 transition">
+                        class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-red-500 focus:bg-white transition">
                 </div>
 
                 <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>

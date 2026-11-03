@@ -295,7 +295,7 @@
                         ‹ Önceki Hafta
                     </button>
                     <select id="full-week-select" onchange="selectFullFixtureWeek(this.value)" aria-label="Hafta Seçin"
-                            class="px-3.5 py-2 rounded-xl bg-slate-900 text-white font-extrabold text-xs border border-slate-700 focus:outline-none focus:border-red-500 cursor-pointer">
+                            class="px-3.5 py-2 rounded-xl bg-slate-50 text-slate-900 font-extrabold text-xs border border-slate-300 focus:outline-none focus:border-red-500 cursor-pointer">
                         {% for w in range(1, 35) %}
                         <option value="{{ w }}" {% if w == cur_week %}selected{% endif %}>
                             {{ w }}. Hafta {% if w == cur_week %}(Güncel Hafta){% endif %}

@@ -16,9 +16,11 @@
         {% endif %}
     {% endif %}
 
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca 300+ kelime zengin içeriklerde aktifleşir) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    {% if not noindex %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    {% endif %}
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
@@ -1004,25 +1006,25 @@
                 <div>
                     <label class="block text-slate-800 font-bold mb-1">📍 Olay Yeri ve İhbar Detayı *</label>
                     <textarea id="ih-msg" required rows="3" placeholder="Örn: İstanbul Kadıköy'de kaza / olay yerinden görüntüler..."
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white focus:outline-none focus:border-red-500"></textarea>
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:bg-white"></textarea>
                 </div>
 
                 <div>
                     <label class="block text-slate-800 font-bold mb-1">🎬 Video veya Fotoğraf Yükle (İsteğe Bağlı)</label>
                     <input id="ih-file" type="file" accept="video/*,image/*"
-                        class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-slate-300 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold">
+                        class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-700 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-red-600 file:text-white file:font-bold">
                 </div>
 
                 <div>
                     <label class="block text-slate-800 font-semibold mb-1">🔗 Varsa Sosyal Medya Linki veya İsim/İletişim (İsteğe Bağlı)</label>
                     <input id="ih-contact" type="text" placeholder="Anonim kalmak için boş bırakabilirsiniz"
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-brand-border text-white text-xs focus:outline-none focus:border-red-500">
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 text-xs focus:outline-none focus:border-red-500 focus:bg-white">
                 </div>
 
                 <div id="ih-status" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
 
                 <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">Vazgeç</button>
+                    <button type="button" onclick="closeIhbarModal()" class="px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs">Vazgeç</button>
                     <button id="ih-submit" type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs sm:text-sm shadow-lg shadow-red-900/50 transition">
                         🚀 İhbarı Haber Merkezine Gönder
                     </button>
@@ -1463,77 +1465,77 @@
     </button>
     <!-- ♿ ERİŞİLEBİLİRLİK MERKEZİ (SAYFAYI ASLA KAYDIRMAYAN CENTER MODAL) -->
     <div id="a11y-modal-backdrop" onclick="if(event.target === this) closeA11yModal()" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-950 border-2 border-blue-500/80 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-white space-y-4">
-            <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-900 border border-slate-800 transition" aria-label="Kapat">
+        <div class="bg-white border-2 border-blue-500 rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl relative text-slate-900 space-y-4">
+            <button type="button" onclick="closeA11yModal()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 p-1.5 rounded-lg bg-slate-100 border border-slate-200 transition" aria-label="Kapat">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <div class="p-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-2xl flex items-center justify-center">
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-200">
+                <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-2xl flex items-center justify-center">
                     <span>♿</span>
                 </div>
                 <div>
-                    <h3 class="text-base sm:text-lg font-black text-white">Erişilebilirlik Merkezi</h3>
-                    <p class="text-xs text-slate-400">Görme engelli ve rahat gezinme ayarları</p>
+                    <h3 class="text-base sm:text-lg font-black text-slate-900">Erişilebilirlik Merkezi</h3>
+                    <p class="text-xs text-slate-500">Görme engelli ve rahat gezinme ayarları</p>
                 </div>
             </div>
 
             <!-- 1. Metin Boyutu -->
             <div>
-                <label class="text-xs font-bold text-slate-300 block mb-1.5">🔤 Metin Boyutu</label>
+                <label class="text-xs font-bold text-slate-700 block mb-1.5">🔤 Metin Boyutu</label>
                 <div class="grid grid-cols-3 gap-2 text-xs font-bold">
-                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Normal</button>
-                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Büyük (+15%)</button>
-                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-400 text-center transition">Çok Büyük</button>
+                    <button type="button" onclick="setA11yFontSize('normal')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Normal</button>
+                    <button type="button" onclick="setA11yFontSize('large')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Büyük (+15%)</button>
+                    <button type="button" onclick="setA11yFontSize('xlarge')" class="a11y-fs-btn py-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-300 hover:border-blue-500 text-center transition">Çok Büyük</button>
                 </div>
             </div>
 
             <!-- 2. Yüksek Kontrast Modu -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">👁️ Yüksek Kontrast Modu</div>
-                    <div class="text-[11px] text-slate-400">Az görenler için net zıtlık</div>
+                    <div class="text-xs font-bold text-slate-900">👁️ Yüksek Kontrast Modu</div>
+                    <div class="text-[11px] text-slate-500">Az görenler için net zıtlık</div>
                 </div>
-                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-contrast-toggle" onclick="toggleA11yContrast()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 3. Net & Disleksi Dostu Yazı Tipi -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">📖 Net Okuma Yazı Tipi</div>
-                    <div class="text-[11px] text-slate-400">Geniş harf ve satır aralığı</div>
+                    <div class="text-xs font-bold text-slate-900">📖 Net Okuma Yazı Tipi</div>
+                    <div class="text-[11px] text-slate-500">Geniş harf ve satır aralığı</div>
                 </div>
-                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-dyslexia-toggle" onclick="toggleA11yDyslexia()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 4. Bağlantıların Altını Çiz -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">🔗 Bağlantıların Altını Çiz</div>
-                    <div class="text-[11px] text-slate-400">Tıklanabilir yerleri belirginleştir</div>
+                    <div class="text-xs font-bold text-slate-900">🔗 Bağlantıların Altını Çiz</div>
+                    <div class="text-[11px] text-slate-500">Tıklanabilir yerleri belirginleştir</div>
                 </div>
-                <button type="button" id="a11y-underline-toggle" onclick="toggleA11yUnderline()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-underline-toggle" onclick="toggleA11yUnderline()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Kapalı
                 </button>
             </div>
 
             <!-- 5. Klavye Odak Çerçevesi -->
-            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div>
-                    <div class="text-xs font-bold text-white">⌨️ Klavye Gezinme Çerçevesi</div>
-                    <div class="text-[11px] text-slate-400">Tab tuşunda sarı odaklama</div>
+                    <div class="text-xs font-bold text-slate-900">⌨️ Klavye Gezinme Çerçevesi</div>
+                    <div class="text-[11px] text-slate-500">Tab tuşunda sarı odaklama</div>
                 </div>
-                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <button type="button" id="a11y-focus-toggle" onclick="toggleA11yFocus()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 transition">
                     Açık
                 </button>
             </div>
 
             <!-- Alt Kısım: Sıfırla & Tamam -->
-            <div class="flex items-center justify-between pt-2 border-t border-slate-800 text-xs">
-                <button type="button" onclick="resetA11ySettings()" class="text-slate-400 hover:text-red-400 transition font-semibold">
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+                <button type="button" onclick="resetA11ySettings()" class="text-slate-600 hover:text-red-600 transition font-semibold">
                     🔄 Ayarları Sıfırla
                 </button>
                 <button type="button" onclick="closeA11yModal()" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-black text-white transition">
