@@ -287,22 +287,33 @@ def fetch_full_article_text(site_url: str) -> str:
         return ""
 
 
-def format_x_long_post(title: str, full_text: str, category: str = "Gündem", max_chars: int = 3500) -> str:
-    """Mavi tik (X Premium) için haberi TAM anlatan uzun gönderi metni:
-    Başlık + haberin tüm paragrafları + etiketler. Paragraflar asla ortadan kesilmez."""
-    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor", "Dünya", "Sağlık") else "#Gündem"
+def format_x_long_post(title: str, full_text: str, category: str = "Gündem", max_chars: int = 520) -> str:
+    """X (Twitter) akışında göz yormayan, tek bakışta okunan vurucu haber formatı:
+    🔴 Başlık + haberin en can alıcı 1 öz paragrafı (3-4 tam cümle) + etiketler."""
+    cat_tag = f"#{category}" if category in ("Ekonomi", "Teknoloji", "Gündem", "Otomobil", "Spor", "Dünya", "Sağlık", "Eğitim") else "#Gündem"
     tags = f"{cat_tag} #SonDakika #Haber"
     clean_title = re.sub(r'\s*-\s*[A-Za-z0-9ğüşıöçĞÜŞİÖÇ\s\.]+$', '', title.strip()).strip()
     paras = [strip_all_urls(p).strip() for p in full_text.split("\n\n")]
-    paras = [p for p in paras if p and p.lower() != clean_title.lower()]
-    out = []
-    used = len(clean_title) + len(tags) + 10
-    for p in paras:
-        if used + len(p) + 2 > max_chars:
+    paras = [p for p in paras if p and p.lower() != clean_title.lower() and not _is_ui_noise_paragraph(p)]
+    if not paras:
+        return f"🔴 {clean_title}\n\n{tags}".strip()
+
+    # İlk giriş paragrafından en fazla 3-4 tam cümle al (asla cümle ortasında kesme)
+    lead_sents = smart_sentence_split(paras[0])
+    chosen = []
+    char_count = 0
+    for s in lead_sents:
+        s_clean = s.strip()
+        if not s_clean or s_clean.lower() == clean_title.lower():
+            continue
+        if not s_clean.endswith((".", "!", "?")):
+            s_clean += "."
+        if chosen and (len(chosen) >= 3 or char_count + len(s_clean) > 420):
             break
-        out.append(p)
-        used += len(p) + 2
-    body = "\n\n".join(out)
+        chosen.append(s_clean)
+        char_count += len(s_clean) + 1
+
+    body = " ".join(chosen).strip() if chosen else paras[0]
     return f"🔴 {clean_title}\n\n{body}\n\n{tags}".strip()
 
 
