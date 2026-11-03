@@ -823,12 +823,36 @@
 
         <!-- TÜM HABERLER YÖNETİM TABLOSU -->
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6 shadow-lg">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-brand-border">
-                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                    <i data-lucide="list" class="w-4 h-4 text-red-500"></i>
-                    SON YAYINLANAN HABERLER & YÖNETİM (SON 30)
-                </h3>
-                <span class="text-xs text-slate-400">İstemediğin haberi tek tıkla silebilirsin</span>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 mb-4 border-b border-brand-border">
+                <div>
+                    <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                        <i data-lucide="list" class="w-4 h-4 text-red-500"></i>
+                        <span id="panel-articles-heading">SON YAYINLANAN HABERLER & YÖNETİM (SON 30)</span>
+                    </h3>
+                    <span class="text-xs text-slate-400">ID (#1300), başlık veya kategori seçerek tüm arşivde arama yapıp düzenleyebilirsin</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <input id="panel-search-q" type="text" placeholder="🔍 ID (1300) veya başlık ara..."
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();searchPanelArticles();}"
+                        oninput="debouncedSearchPanelArticles()"
+                        class="px-3 py-1.5 rounded-xl bg-slate-900 border border-brand-border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 w-52 sm:w-64">
+                    <select id="panel-search-cat" onchange="searchPanelArticles()"
+                        class="px-3 py-1.5 rounded-xl bg-slate-900 border border-brand-border text-xs text-white focus:outline-none focus:border-red-500">
+                        <option value="">Tüm Kategoriler</option>
+                        <option value="Gündem">Gündem</option>
+                        <option value="Ekonomi">Ekonomi</option>
+                        <option value="Spor">Spor</option>
+                        <option value="Teknoloji">Teknoloji</option>
+                        <option value="Otomobil">Otomobil</option>
+                        <option value="Sağlık">Sağlık</option>
+                        <option value="Eğitim">Eğitim</option>
+                        <option value="Dünya">Dünya</option>
+                        <option value="Son Dakika">Son Dakika</option>
+                        <option value="Asayiş">Asayiş</option>
+                    </select>
+                    <button type="button" onclick="searchPanelArticles()" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition cursor-pointer">Ara</button>
+                    <button type="button" onclick="resetPanelArticlesSearch()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition cursor-pointer">Sıfırla</button>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
@@ -844,7 +868,7 @@
                             <th class="py-3 px-2 text-right">İşlem</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-brand-border/40">
+                    <tbody id="panel-articles-tbody" class="divide-y divide-brand-border/40">
                         {% for a in stats.recent_articles %}
                         <tr id="row-{{ a.id }}" class="hover:bg-slate-900/50 transition">
                             <td class="py-3 px-2 font-mono text-slate-500">#{{ a.id }}</td>
@@ -1473,6 +1497,70 @@
             } finally {
                 setTimeout(() => { btn.disabled = false; btn.innerText = 'Şimdi Haber Çek'; }, 3000);
             }
+        }
+
+        let _panelSearchTimer = null;
+        function debouncedSearchPanelArticles() {
+            if (_panelSearchTimer) clearTimeout(_panelSearchTimer);
+            _panelSearchTimer = setTimeout(searchPanelArticles, 280);
+        }
+        function _escPanelHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+            });
+        }
+        async function searchPanelArticles() {
+            const pin = localStorage.getItem('ga_admin_pin') || '';
+            const qEl = document.getElementById('panel-search-q');
+            const cEl = document.getElementById('panel-search-cat');
+            const tbody = document.getElementById('panel-articles-tbody');
+            const headEl = document.getElementById('panel-articles-heading');
+            if (!tbody) return;
+            const q = qEl ? qEl.value.trim() : '';
+            const cat = cEl ? cEl.value.trim() : '';
+            try {
+                const url = '/api/panel/search-articles?q=' + encodeURIComponent(q) + '&category=' + encodeURIComponent(cat);
+                const res = await fetch(url, { headers: { 'X-Admin-Pin': pin } });
+                const data = await res.json();
+                if (!res.ok || !data.ok) return;
+                const list = data.articles || [];
+                if (headEl) {
+                    headEl.innerText = (q || cat)
+                        ? ('ARAMA SONUÇLARI (' + list.length + ' HABER BULUNDU)')
+                        : 'SON YAYINLANAN HABERLER & YÖNETİM (SON 30)';
+                }
+                if (list.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="py-6 text-center text-slate-400">Aradığınız kriterlere uygun haber bulunamadı.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = list.map(function(a) {
+                    const dt = (a.created_at || '-').substring(0, 16);
+                    return '<tr id="row-' + a.id + '" class="hover:bg-slate-900/50 transition">' +
+                        '<td class="py-3 px-2 font-mono text-slate-500">#' + a.id + '</td>' +
+                        '<td class="py-3 px-2 font-bold text-white max-w-md truncate">' +
+                            '<a href="/haber/' + _escPanelHtml(a.slug) + '" target="_blank" class="hover:text-red-400">' + _escPanelHtml(a.title) + '</a>' +
+                        '</td>' +
+                        '<td class="py-3 px-2"><span class="px-2 py-0.5 rounded bg-red-600/20 text-red-400 font-semibold">' + _escPanelHtml(a.category) + '</span></td>' +
+                        '<td class="py-3 px-2 text-slate-400">' + _escPanelHtml(a.source || '') + '</td>' +
+                        '<td class="py-3 px-2 text-slate-400 whitespace-nowrap">' + _escPanelHtml(dt) + '</td>' +
+                        '<td class="py-3 px-2 text-center font-extrabold text-emerald-400">' + (a.views || 0) + '</td>' +
+                        '<td class="py-3 px-2 text-right whitespace-nowrap">' +
+                            '<a href="/haber/' + _escPanelHtml(a.slug) + '" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 mr-1">Aç</a>' +
+                            '<button onclick="openEditModal(' + a.id + ')" class="px-2.5 py-1 rounded bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white mr-1 transition">✏️ Düzenle</button>' +
+                            '<button onclick="deleteArticle(' + a.id + ')" class="px-2.5 py-1 rounded bg-red-950/80 hover:bg-red-600 text-red-300 hover:text-white transition">Sil</button>' +
+                        '</td>' +
+                    '</tr>';
+                }).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        function resetPanelArticlesSearch() {
+            const qEl = document.getElementById('panel-search-q');
+            const cEl = document.getElementById('panel-search-cat');
+            if (qEl) qEl.value = '';
+            if (cEl) cEl.value = '';
+            searchPanelArticles();
         }
 
         async function deleteArticle(id) {

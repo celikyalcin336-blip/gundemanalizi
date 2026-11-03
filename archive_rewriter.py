@@ -161,17 +161,24 @@ def rewrite_one(dry_run: bool = False) -> str:
                 _set_status(aid, "fail")
             return "fail"
 
+        import re as _re
+        orig_html = art.get("content") or ""
+        vid_match = _re.search(r'(<div[^>]*>\s*<video[\s\S]*?</video>\s*</div>|<video[\s\S]*?</video>)', orig_html, _re.I)
+        new_content = data["content"]
+        if vid_match and "<video" not in new_content.lower():
+            new_content = vid_match.group(1) + "\n" + new_content
+
         if dry_run:
-            print(f"🧪 [Arşiv DRY] #{aid} {content_quality.visible_word_count(data['content'])} kelime üretildi: {title[:60]}")
+            print(f"🧪 [Arşiv DRY] #{aid} {content_quality.visible_word_count(new_content)} kelime üretildi: {title[:60]}")
             return "done"
 
         with database.get_connection() as conn:
             conn.execute(
                 "UPDATE articles SET content_legacy = COALESCE(content_legacy, content), "
                 "content = ?, summary = ?, rewrite_status = 'done' WHERE id = ?",
-                (data["content"], data.get("summary") or art.get("summary") or "", aid),
+                (new_content, data.get("summary") or art.get("summary") or "", aid),
             )
-        print(f"✅ [Arşiv] #{aid} yeniden yazıldı ({content_quality.visible_word_count(data['content'])} kelime): {title[:60]}")
+        print(f"✅ [Arşiv] #{aid} yeniden yazıldı ({content_quality.visible_word_count(new_content)} kelime): {title[:60]}")
         return "done"
     except Exception as e:
         print(f"⚠️ [Arşiv] #{aid} hata: {e}")
@@ -203,8 +210,20 @@ def background_worker():
         ensure_columns()
         # Yarım kalmış (sunucu yeniden başlarken kesilmiş) işleri tekrar kuyruğa al
         # Yarım kalmış veya önceki yüksek (150 kelime) eşiğe takılmış haberleri tekrar kuyruğa al
+        import re as _re
         with database.get_connection() as conn:
             conn.execute("UPDATE articles SET rewrite_status = NULL WHERE rewrite_status IN ('working', 'skip_src')")
+            # Yedekte (content_legacy) video olup yeni metinde video etiketi düşmüş haberlerin videolarını geri yükle
+            like_op = "ILIKE" if conn.is_pg else "LIKE"
+            v_rows = conn.execute(
+                f"SELECT id, content, content_legacy FROM articles WHERE content_legacy {like_op} '%<video%' AND content NOT {like_op} '%<video%'"
+            ).fetchall()
+            for vr in v_rows:
+                vr = dict(vr)
+                vm = _re.search(r'(<div[^>]*>\s*<video[\s\S]*?</video>\s*</div>|<video[\s\S]*?</video>)', vr.get("content_legacy") or "", _re.I)
+                if vm:
+                    restored_c = vm.group(1) + "\n" + (vr.get("content") or "")
+                    conn.execute("UPDATE articles SET content = ? WHERE id = ?", (restored_c, vr["id"]))
     except Exception as e:
         print(f"⚠️ [Arşiv] Başlangıç hatası: {e}")
     print(f"🗂️ [Arşiv] Eski haber yenileyici aktif ({REWRITE_INTERVAL_SEC} sn'de 1 haber).")

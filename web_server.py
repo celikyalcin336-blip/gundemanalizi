@@ -1047,6 +1047,15 @@ def get_cached_category_widgets() -> dict:
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
+    if kategori and not q:
+        import urllib.parse
+        from fastapi.responses import RedirectResponse
+        _norm_k = database.normalize_category_name(kategori)
+        if _norm_k and _norm_k != kategori.strip():
+            _page = max(1, sayfa)
+            _target = f"/?kategori={urllib.parse.quote(_norm_k)}" + (f"&sayfa={_page}" if _page > 1 else "")
+            return RedirectResponse(url=_target, status_code=301)
+
     # Turbo RAM Önbelleği: Arama yoksa ve ilk sayfaysa 0 ms hızında RAM'den ver
     cache_key = f"page_{kategori or 'home'}_{sayfa}" if not q else None
     if cache_key:
@@ -1342,12 +1351,49 @@ async def panel_delete_article(article_id: int, request: Request):
     _CATEGORY_WIDGETS_CACHE_TIME = 0
     return {"ok": deleted}
 
+@app.get("/api/panel/search-articles")
+async def panel_search_articles(request: Request, q: str = "", category: str = ""):
+    require_admin_pin(request)
+    q_clean = (q or "").strip()
+    cat_clean = (category or "").strip()
+    q_num = q_clean.lstrip("#").strip()
+    rows = []
+    with database.get_connection() as conn:
+        like_op = "ILIKE" if getattr(conn, "is_pg", False) else "LIKE"
+        sql = "SELECT id, slug, title, category, source, views, created_at FROM articles WHERE 1=1"
+        params = []
+        if cat_clean:
+            sql += " AND category = ?"
+            params.append(cat_clean)
+        if q_clean:
+            if q_num.isdigit():
+                sql += f" AND (id = ? OR title {like_op} ? OR slug {like_op} ?)"
+                params.extend([int(q_num), f"%{q_clean}%", f"%{q_clean}%"])
+            else:
+                sql += f" AND (title {like_op} ? OR slug {like_op} ?)"
+                params.extend([f"%{q_clean}%", f"%{q_clean}%"])
+        limit_n = 60 if (q_clean or cat_clean) else 30
+        sql += f" ORDER BY id DESC LIMIT {limit_n}"
+        for r in conn.execute(sql, tuple(params)).fetchall():
+            d = database._row_to_dict(r)
+            if not d.get("created_at"):
+                d["created_at"] = "-"
+            rows.append(d)
+    return {"ok": True, "articles": rows}
+
 @app.get("/api/panel/article/{article_id}")
 async def panel_get_article(article_id: int, request: Request):
     require_admin_pin(request)
     art = database.get_article_by_id(article_id)
     if not art:
         raise HTTPException(status_code=404, detail="Haber bulunamadı")
+    try:
+        if "<video" not in (art.get("content") or "").lower() and "<video" in (art.get("content_legacy") or "").lower():
+            vm = re.search(r'(<div[^>]*>\s*<video[\s\S]*?</video>\s*</div>|<video[\s\S]*?</video>)', art.get("content_legacy") or "", re.I)
+            if vm:
+                art["content"] = vm.group(1) + "\n" + (art.get("content") or "")
+    except Exception:
+        pass
     return {"ok": True, "article": art}
 
 @app.post("/api/panel/edit/{article_id}")
@@ -1367,6 +1413,10 @@ async def panel_edit_article(
         content=content.strip(),
         category=category.strip()
     )
+    global _CATEGORY_WIDGETS_CACHE_TIME
+    clear_turbo_cache()
+    _CATEGORY_WIDGETS_CACHE_TIME = 0
+    _INDEX_CACHE["ts"] = 0
     return {"ok": updated, "message": "Haber başarıyla güncellendi!"}
 
 @app.get("/api/panel/radar-videos")
@@ -2007,6 +2057,13 @@ async def article_detail(request: Request, slug: str):
     ad_settings = get_site_ad_settings()
     ad_mid = ad_settings.get("ad_slot_article_mid", "").strip() if ad_settings.get("ads_enabled") else ""
     raw_content = article.get("content", "")
+    try:
+        if "<video" not in raw_content.lower() and "<video" in (article.get("content_legacy") or "").lower():
+            _vm = re.search(r'(<div[^>]*>\s*<video[\s\S]*?</video>\s*</div>|<video[\s\S]*?</video>)', article.get("content_legacy") or "", re.I)
+            if _vm:
+                raw_content = _vm.group(1) + "\n" + raw_content
+    except Exception:
+        pass
     # AdSense kalite: eski şablon/dolgu kalıntılarını gösterimde temizle, kısa haberleri Google dizininden çıkar
     import content_quality
     import html as _html_mod
@@ -2354,7 +2411,9 @@ async def kunye_page(request: Request):
 
 @app.get("/yazar/yalcin-celik", response_class=HTMLResponse)
 async def author_yalcin_page(request: Request):
-    articles = database.get_articles(limit=15)
+    import content_quality
+    pool = database.get_articles(limit=35)
+    articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:15]
     return templates.TemplateResponse(request=request, name="author.html", context={"articles": articles})
 
 @app.get("/yayin-ilkeleri", response_class=HTMLResponse)
@@ -2544,7 +2603,9 @@ Sitemap: {base_url}/news-sitemap.xml
 @app.get("/site-haritasi", response_class=HTMLResponse)
 async def html_sitemap(request: Request):
     """Ziyaretçiler için görsel ve tıklanabilir HTML Site Haritası."""
-    articles = database.get_articles(limit=60)
+    import content_quality
+    pool = database.get_articles(limit=90)
+    articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:60]
     return templates.TemplateResponse(
         request=request,
         name="sitemap.html",
