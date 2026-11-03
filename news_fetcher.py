@@ -186,7 +186,7 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
     question_bait = ["saat kaçta", "incelemesi", "yok satar", "alınır mı", "hangi kanalda", "ne zaman yapılacak", "kaç gün kaldı", "nasıl yapılır?", "nedir, ne zaman"]
     if (title or "").count("?") >= 2 or any(qb in t_low for qb in question_bait):
         return True
-    if (title or "").strip().endswith("?") and len((title or "").strip()) < 45:
+    if (title or "").strip().endswith("?") and len((title or "").strip()) < 45 and not re.search(r'\b(lösev\w*|lösemi\w*|kanser\w*|verem\w*|tüberküloz\w*|tümör\w*|onkoloji\w*|kemoterapi\w*|diyabet\w*|tansiyon\w*|kolesterol\w*|kalp krizi\w*|inme\w*|felç\w*|alzheimer\w*|demans\w*|parkinson\w*|epilepsi\w*|sma\w*|otizm\w*|koah\w*|astım\w*|zatürre\w*|bronşit\w*|enfeksiyon\w*|virüs\w*|bakteri\w*|kızamık\w*|hepatit\w*|menenjit\w*|tiroid\w*|guatr\w*|anemi\w*|kansızlık\w*|kemik erimesi\w*)\b', f"{t_low} {(text or '').lower()}", re.I):
         return True
 
     combined = f"{title} {text}".lower()
@@ -355,7 +355,7 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
         score += 35
 
     # 9. SAĞLIK & TIP (+35 Puan)
-    saglik_regex = r'\b(sağlık bakanlığı|salgın\w*|virüs\w*|kanser\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*|beslenme|diyabet|tansiyon|vitamin\w*|diyet|obezite|ruh sağlığı|depresyon|hastalık\w*|hasta\w*|sağlık|sağlıklı)\b'
+    saglik_regex = r'\b(sağlık bakanlığı|lösev\w*|lösemi\w*|verem\w*|tüberküloz\w*|onkoloji\w*|kemoterapi\w*|ilik nakli\w*|kök hücre\w*|lenfoma\w*|erken teşhis\w*|sma\w*|otizm\w*|alzheimer\w*|demans\w*|parkinson\w*|epilepsi\w*|inme\w*|felç\w*|koah\w*|astım\w*|zatürre\w*|bronşit\w*|kızamık\w*|hepatit\w*|menenjit\w*|tiroid\w*|guatr\w*|anemi\w*|kansızlık\w*|organ nakli\w*|organ bağışı\w*|kan bağışı\w*|kızılay\w*|yeşilay\w*|salgın\w*|virüs\w*|kanser\w*|tümör\w*|kalp sağlığı|kalp krizi|ilaç\w*|aşı|aşısı|aşılama|tedavi\w*|hastane\w*|ameliyat\w*|bağışıklık\w*|grip\w*|enfeksiyon\w*|hekim\w*|doktor\w*|beslenme|diyabet|tansiyon|vitamin\w*|diyet|obezite|ruh sağlığı|depresyon|hastalık\w*|hasta\w*|sağlık|sağlıklı)\b'
     if re.search(saglik_regex, text, re.I):
         score += 35
 
