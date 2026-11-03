@@ -1033,11 +1033,13 @@ def normalize_category_name(cat: Optional[str]) -> Optional[str]:
         "son-dakika": "Son Dakika",
         "sondakika": "Son Dakika",
         "son dakika": "Son Dakika",
-        "asayis": "Asayiş",
-        "asayiş": "Asayiş",
-        "magazin": "Magazin",
-        "yasam": "Yaşam",
-        "yaşam": "Yaşam"
+        "asayis": "Gündem",
+        "asayiş": "Gündem",
+        "magazin": "Gündem",
+        "yasam": "Sağlık",
+        "yaşam": "Sağlık",
+        "kultur-sanat": "Gündem",
+        "kültür-sanat": "Gündem"
     }
     return mapping.get(c, cat.strip())
 
@@ -1077,7 +1079,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
 def get_sitemap_articles(limit: int = 500) -> List[Dict]:
     """Site haritaları için: kalite (kelime sayısı) kontrolü yapılabilsin diye içerikle birlikte döner."""
     with get_connection() as conn:
-        cur = conn.execute("SELECT id, slug, title, content, created_at FROM articles ORDER BY id DESC LIMIT ?", (limit,))
+        cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ?", (limit,))
         return [_row_to_dict(row) for row in cur.fetchall()]
 
 

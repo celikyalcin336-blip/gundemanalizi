@@ -2,6 +2,23 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        (function() {
+            var c = null;
+            try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+            var g = (c === 'accepted') ? 'granted' : 'denied';
+            gtag('consent', 'default', {
+                'ad_storage': g,
+                'ad_user_data': g,
+                'ad_personalization': g,
+                'analytics_storage': g,
+                'wait_for_update': 500
+            });
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İletişim ve Düzeltme Talebi | Gündem Analizi</title>
     <meta name="description" content="Gündem Analizi okur temsilciliği, haber ihbar hattı, kurumsal iletişim bilgileri ve düzeltme/tekzip başvuru formu.">
@@ -76,7 +93,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-4">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <div class="text-xs text-slate-500 font-bold uppercase mb-1">Kurumsal E-Posta</div>
-                        <a href="mailto:iletisim@gündemanalizi.com.tr" class="text-red-600 font-bold text-sm hover:underline"><!--email_off-->iletisim@gündemanalizi.com.tr<!--/email_off--></a>
+                        <a href="mailto:<!--email_off-->iletisim@gündemanalizi.com.tr<!--/email_off-->" class="text-red-600 font-bold text-sm hover:underline"><!--email_off-->iletisim@gündemanalizi.com.tr<!--/email_off--></a>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <div class="text-xs text-slate-500 font-bold uppercase mb-1">Telegram Haber Merkezi</div>
@@ -174,7 +191,7 @@
                             statusEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-red-50 border border-red-300 text-red-800';
                         }
                     } catch (err) {
-                        statusEl.textContent = '⚠️ Bağlantı hatası oluştu. Lütfen iletisim@gündemanalizi.com.tr adresine e-posta gönderiniz.';
+                        statusEl.textContent = '⚠️ Bağlantı hatası oluştu. Lütfen <!--email_off-->iletisim@gündemanalizi.com.tr<!--/email_off--> adresine e-posta gönderiniz.';
                         statusEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-red-50 border border-red-300 text-red-800';
                     } finally {
                         btn.disabled = false;
@@ -211,5 +228,42 @@
     </footer>
 
     <script>lucide.createIcons();</script>
+    <!-- 1 Seferlik Ortak Çerez Onay Kutusu (Onaylanınca tüm sitede ve sekmelerde bir daha çıkmaz) -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900/95 backdrop-blur border-t border-slate-700 p-3 sm:p-4 shadow-2xl">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-200">
+            <p class="leading-relaxed text-center sm:text-left">
+                🍪 Deneyiminizi iyileştirmek ve <a href="/cerez-politikasi" class="underline text-red-400 font-semibold">Çerez Politikamız</a> kapsamında hizmet sunmak için çerezler kullanıyoruz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="acceptSiteCookies('essential')" class="px-3 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 font-bold cursor-pointer">Sadece Zorunlu</button>
+                <button type="button" onclick="acceptSiteCookies('accepted')" class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold cursor-pointer">Tümünü Kabul Et</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function acceptSiteCookies(mode) {
+            var val = mode || 'accepted';
+            try { localStorage.setItem('ga_cookie_consent', val); } catch(e) {}
+            var cb = document.getElementById('cookie-banner');
+            if (cb) cb.classList.add('hidden');
+            if (typeof gtag === 'function') {
+                var granted = (val === 'accepted') ? 'granted' : 'denied';
+                gtag('consent', 'update', {
+                    'ad_storage': granted,
+                    'ad_user_data': granted,
+                    'ad_personalization': granted,
+                    'analytics_storage': granted
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var c = null;
+            try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+            if (!c) {
+                var cb = document.getElementById('cookie-banner');
+                if (cb) cb.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

@@ -177,7 +177,7 @@
 
           <div class="stats-bar">
             <div class="stat-box">
-              <div class="stat-num"><xsl:value-of select="count(sitemap:urlset/sitemap:url)"/></div>
+              <div class="stat-num"><xsl:value-of select="count(sitemap:urlset/sitemap:url | sitemap:sitemapindex/sitemap:sitemap | rss/channel/item)"/></div>
               <div class="stat-label">Toplam İndeksli Bağlantı</div>
             </div>
             <div class="stat-box">
@@ -200,6 +200,25 @@
               </tr>
             </thead>
             <tbody>
+              <xsl:for-each select="rss/channel/item">
+                <tr>
+                  <td><xsl:value-of select="position()"/></td>
+                  <td>
+                    <div class="title-col">[<xsl:value-of select="category"/>] <xsl:value-of select="title"/></div>
+                    <a href="{link}" target="_blank"><xsl:value-of select="link"/></a>
+                  </td>
+                  <td><xsl:value-of select="substring(pubDate, 1, 22)"/></td>
+                  <td style="text-align: center;"><span class="tag">RSS 2.0</span></td>
+                </tr>
+              </xsl:for-each>
+              <xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
+                <tr>
+                  <td><xsl:value-of select="position()"/></td>
+                  <td><a href="{sitemap:loc}" target="_blank"><xsl:value-of select="sitemap:loc"/></a></td>
+                  <td><xsl:value-of select="sitemap:lastmod"/></td>
+                  <td style="text-align: center;"><span class="tag">DİZİN</span></td>
+                </tr>
+              </xsl:for-each>
               <xsl:for-each select="sitemap:urlset/sitemap:url">
                 <tr>
                   <td><xsl:value-of select="position()"/></td>

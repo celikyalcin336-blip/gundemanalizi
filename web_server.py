@@ -1008,7 +1008,7 @@ def get_cached_category_widgets() -> dict:
         rich = [
             a for a in items
             if not main.is_commodity_news(a.get("title", ""))
-            and not content_quality.is_thin(a.get("content") or "")
+            and (not content_quality.is_thin(a["content"]) if a.get("content") else len((a.get("summary") or "").strip()) >= 35)
         ]
         if len(rich) >= cap:
             return rich[:cap]
@@ -1067,7 +1067,10 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     if kategori and not q:
         import urllib.parse
         from fastapi.responses import RedirectResponse
+        _valid_cats = {"Gündem", "Ekonomi", "Spor", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Eğitim", "Son Dakika"}
         _norm_k = database.normalize_category_name(kategori)
+        if _norm_k not in _valid_cats:
+            _norm_k = "Gündem"
         if _norm_k and _norm_k != kategori.strip():
             _page = max(1, sayfa)
             _target = f"/?kategori={urllib.parse.quote(_norm_k)}" + (f"&sayfa={_page}" if _page > 1 else "")
@@ -1103,7 +1106,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         def _prefer_rich(pool, cap):
             non_c = [a for a in pool if not main.is_commodity_news(a.get("title", ""))]
             if page == 1:
-                rich = [a for a in non_c if not content_quality.is_thin(a.get("content") or "")]
+                rich = [a for a in non_c if (not content_quality.is_thin(a["content"]) if a.get("content") else len((a.get("summary") or "").strip()) >= 35)]
                 if len(rich) >= cap:
                     return rich[:cap]
                 return (rich + [a for a in non_c if a not in rich])[:cap]
@@ -2446,8 +2449,10 @@ async def kunye_page(request: Request):
 @app.get("/yazar/yalcin-celik", response_class=HTMLResponse)
 async def author_yalcin_page(request: Request):
     import content_quality
-    pool = database.get_articles(limit=35)
+    pool = database.get_sitemap_articles(limit=45)
     articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:15]
+    if not articles:
+        articles = database.get_articles(limit=15)
     return templates.TemplateResponse(request=request, name="author.html", context={"articles": articles})
 
 @app.get("/yayin-ilkeleri", response_class=HTMLResponse)
@@ -2638,8 +2643,10 @@ Sitemap: {base_url}/news-sitemap.xml
 async def html_sitemap(request: Request):
     """Ziyaretçiler için görsel ve tıklanabilir HTML Site Haritası."""
     import content_quality
-    pool = database.get_articles(limit=90)
+    pool = database.get_sitemap_articles(limit=90)
     articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:60]
+    if not articles:
+        articles = database.get_articles(limit=60)
     return templates.TemplateResponse(
         request=request,
         name="sitemap.html",
@@ -2652,7 +2659,7 @@ async def sitemap_xsl():
     xsl_path = os.path.join(os.path.dirname(__file__), "templates", "sitemap.xsl")
     with open(xsl_path, "r", encoding="utf-8") as f:
         content = f.read()
-    return HTMLResponse(content=content, media_type="application/xml")
+    return HTMLResponse(content=content, media_type="application/xml; charset=utf-8")
 
 def _is_human_browser_request(request: Request) -> bool:
     if request.query_params.get("raw") == "1" or request.query_params.get("format") == "xml":
@@ -2683,7 +2690,7 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title} | Gündem Analizi</title>
     <link rel="icon" type="image/png" href="/assets/logo.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/style.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body {{ font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }}
@@ -2832,7 +2839,7 @@ async def sitemap(request: Request):
         last = (part[0].get("created_at") or today_iso)[:10] if part else today_iso
         xml.append(f'  <sitemap><loc>{base_url}/sitemap-haber-{n}.xml</loc><lastmod>{last}</lastmod></sitemap>')
     xml.append('</sitemapindex>')
-    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 
 @app.get("/sitemap-sayfalar.xml")
@@ -2851,7 +2858,7 @@ async def sitemap_pages():
             pass
         xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{today_iso}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     xml.append('</urlset>')
-    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 
 @app.get("/sitemap-haber-{n}.xml")
@@ -2867,7 +2874,7 @@ async def sitemap_articles_chunk(n: int):
     for a in part:
         xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{(a.get("created_at") or "")[:10]}</lastmod></url>')
     xml.append('</urlset>')
-    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 @app.get("/news-sitemap.xml")
 async def news_sitemap(request: Request):
@@ -2918,7 +2925,7 @@ async def news_sitemap(request: Request):
     </news:news>
   </url>""")
     xml.append('</urlset>')
-    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 @app.get("/video-sitemap.xml")
 async def video_sitemap(request: Request):
@@ -2967,15 +2974,32 @@ async def video_sitemap(request: Request):
     </video:video>
   </url>""")
     xml.append('</urlset>')
-    return HTMLResponse(content="\n".join(xml), media_type="application/xml")
+    return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 @app.get("/rss.xml")
+@app.get("/feed.xml")
 async def rss_feed(request: Request):
     from xml.sax.saxutils import escape
     from email.utils import format_datetime
     import content_quality
     articles = [a for a in database.get_sitemap_articles(limit=50) if not content_quality.is_thin(a.get("content") or "")][:30]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
+    if _is_human_browser_request(request):
+        rows = [
+            {
+                "label": f"[{a.get('category') or 'Gündem'}] {a['title']}",
+                "loc": f"{base_url}/haber/{a['slug']}",
+                "date": (a.get("created_at") or "")[:16],
+                "prio": "RSS 2.0",
+            }
+            for a in articles
+        ]
+        return _render_pretty_sitemap_html(
+            "Gündem Analizi - RSS 2.0 Canlı Haber Akışı",
+            "Bu canlı RSS 2.0 veri akışı, haber okuyucu uygulamalar ve arama motoru botlarının son dakika gelişmelerini anlık takip edebilmesi için UTF-8 standardında üretilmektedir.",
+            rows,
+            "/rss.xml",
+        )
     items_xml = []
     for a in articles:
         img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
@@ -2996,6 +3020,7 @@ async def rss_feed(request: Request):
       <enclosure url="{img_url}" type="image/jpeg"/>
     </item>""")
     rss = f"""<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
@@ -3006,7 +3031,7 @@ async def rss_feed(request: Request):
 {chr(10).join(items_xml)}
   </channel>
 </rss>"""
-    return HTMLResponse(content=rss, media_type="application/rss+xml")
+    return HTMLResponse(content=rss, media_type="application/xml; charset=utf-8")
 
 @app.get("/api/bot-status")
 async def bot_status(request: Request):

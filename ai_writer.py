@@ -369,6 +369,29 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
         return None
 
+    # Her haberin aynı kalıpta (sabit paragraf/alt başlık sayısında) görünmesini önlemek için
+    # haber başlığına göre 3 farklı doğal gazetecilik kurgusundan birini seç:
+    _style_idx = sum(ord(ch) for ch in title) % 3
+    if _style_idx == 0:
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 3 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-7 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
+- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Olayın 5N1K özeti, 4-5 cümle)
+- 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Olayın somut ayrıntıları, rakamlar ve resmi açıklamalar)
+- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Konunun tarihsel/sektörel arka planı ve önceki gelişmeler)
+- 3. Ara Başlık (<h3>) + altında 1 veya 2 <p> paragrafı (Vatandaşa/sektöre etkileri ve önümüzdeki süreçte beklenen adımlar)"""
+    elif _style_idx == 1:
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 2 ÖZGÜN ARA BAŞLIK (<h3>) ve 6 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
+- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 4-5 cümle)
+- Girişin hemen altında ara başlıksız 1 <p> paragrafı daha (İlk tepkiler ve sahadaki/kurumdaki mevcut durum)
+- 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Detaylı veriler, teknik/hukuki boyut ve sürecin geçmişi)
+- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Ekonomik/toplumsal yansımalar ve bundan sonraki takvim)"""
+    else:
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 4 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-8 DOLU PARAGRAF (<p>) ile EN AZ 480-700 KELİME üret:
+- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Kapsamlı 5N1K giriş paragrafı, 4-5 cümle)
+- 1. Ara Başlık (<h3>) + altında 2 <p> paragrafı (Gelişmenin tüm somut detayları ve tarafların açıklamaları)
+- 2. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sürecin arka planı ve önceki kararlar)
+- 3. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sektörel veya toplumsal etkiler)
+- 4. Ara Başlık (<h3>) + altında 1 <p> paragrafı (Önümüzdeki dönemde beklenen somut adımlar)"""
+
     prompt = f"""
 Sen 'Gündem Analizi' adlı Türkçe haber sitesinin kıdemli editörüsün. Aşağıdaki kaynak haberden yola çıkarak
 okura gerçekten değer katan, ÖZGÜN cümlelerle yazılmış, kapsamlı bir haber-analiz metni hazırla.
@@ -398,7 +421,8 @@ Kaynak başlıkla kelimesi kelimesine aynı OLMAYAN, olayın gerçekliğini ve a
 Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 
 [İÇERİK]
-Sadece aşağıdaki HTML etiketlerini kullan ve HER ARA BAŞLIĞIN ALTINA EN AZ 2 DOLU PARAGRAF (her paragraf 4-5 cümle) yazarak toplamda EN AZ 450-600 KELİME üret:
+{_structure_guide}
+Örnek HTML sınıfları (ara başlık metinlerini habere özgü yaz, aşağıdaki kalıp başlıkları KULLANMA):
 <p class="lead font-medium text-lg text-slate-200 mb-6">Haberin ana gelişmesini tüm temel unsurlarıyla (ne, nerede, ne zaman, kim, neden) anlatan kapsamlı giriş paragrafı (4-5 cümle)</p>
 <h3 class="text-xl font-bold text-white mt-6 mb-3">Neler Oldu?</h3>
 <p class="text-slate-300 leading-relaxed mb-4">Olayın gelişimini ve kaynaktaki tüm somut ayrıntıları aktaran birinci paragraf (4-5 cümle).</p>
