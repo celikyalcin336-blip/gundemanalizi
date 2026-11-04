@@ -330,8 +330,16 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
         score += 50
 
     # 4. HALKIN CÜZDANI, EKONOMİ, MAAŞ, ZAM & GEÇİM (+50 Puan)
+    # Not: Sadece araba modeli tanıtımı/müzayedesi olan haberler içinde dolar/TL geçtiği için çift puan (+50 + +35) almasın
+    oto_model_only = bool(re.search(
+        r'\b(ferrari|mercedes|bmw|audi|volkswagen|renault|peugeot|fiat|egea|clio|toyota|hyundai|honda|ford|skoda|karoq|volvo|nissan|chery|byd|tesla|porsche|corvette|lexus|suv|otomobil\w*|otomotiv\w*|hibrit)\b',
+        text, re.I
+    )) and not bool(re.search(
+        r'\b(asgari ücret\w*|emekli\w*|maaş\w*|enflasyon\w*|tüfe|tcmb|merkez bankası|faiz\w*|akaryakıt\w*|benzin\w*|motorin\w*|trafik cezası)\b',
+        text, re.I
+    ))
     cuzdan_regex = r'\b(asgari ücret\w*|emekli\w*|maaş\w*|zam|zammı|zamlandı|ek zam|ikramiye|enflasyon\w*|tüfe|tcmb|merkez bankası|faiz kararı|faiz\w*|altın\w*|dolar\w*|euro\w*|akaryakıt\w*|benzin\w*|motorin\w*|vergi\w*|kira\w*|kredi kartı|konut kredisi|ötv|trafik cezası|fatura\w*|borsa\w*)\b'
-    if re.search(cuzdan_regex, text, re.I):
+    if re.search(cuzdan_regex, text, re.I) and not oto_model_only:
         score += 50
 
     # 5. SPOR, DERBİ, TRANSFER & SÜPER LİG (+40 Puan)

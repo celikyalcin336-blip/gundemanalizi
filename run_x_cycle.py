@@ -68,7 +68,7 @@ def get_latest_articles_pool() -> list:
     articles = []
     try:
         req = urllib.request.Request(
-            "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=40",
+            "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=60",
             headers={"User-Agent": "Mozilla/5.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
@@ -119,15 +119,48 @@ def normalize_text_loose(t: str) -> str:
     return re.sub(r'[^a-z0-9\s]', ' ', t)
 
 
+_AUTO_TOPIC_REGEX = re.compile(
+    r'\b(togg|t10x|t10f|ferrari|mercedes|bmw|audi|volkswagen|renault|peugeot|fiat|egea|clio|'
+    r'toyota|hyundai|honda|ford|skoda|karoq|octavia|volvo|nissan|chery|byd|tesla|porsche|'
+    r'lamborghini|maserati|citroen|opel|dacia|kia|seat|cupra|lexus|corvette|suv|sedan|hatchback|'
+    r'otomobil\w*|otomotiv\w*|hibrit|elektrikli araç\w*|kış lastiği|araç bakım\w*|sürüş güvenliği)\b',
+    re.I
+)
+
+
+def detect_effective_category(title: str, summary: str, raw_cat: str = "Gündem") -> str:
+    """Teknoloji sitelerinden gelen Ferrari/Mercedes/SUV haberlerini de Otomobil rotasyonuna dahil eder."""
+    combined = f"{title or ''} {summary or ''}"
+    if _AUTO_TOPIC_REGEX.search(combined):
+        return "Otomobil"
+    return (raw_cat or "Gündem").strip().title()
+
+
 def extract_key_entities(text: str) -> set:
-    """Metindeki özel isimleri ve kilit kurum/kişi adlarını çıkarır."""
+    """Metindeki gerçek özel isimleri ve kilit kurum/kişi adlarını çıkarır (Başlık büyük harf gürültüsünü eler)."""
     if not text:
         return set()
     proper_nouns = re.findall(r'\b[A-ZÇĞİÖŞÜ][a-zçğıöşü]{3,}\b', text)
     acronyms = re.findall(r'\b[A-ZÇĞİÖŞÜ]{2,}\b', text)
-    res = set(p.lower() for p in proper_nouns + acronyms)
-    common_stops = {"turkiye", "bakan", "baskani", "haber", "bugun", "resmi", "karar", "sayisi", "yeni", "donem"}
-    return res - common_stops
+    res = set(normalize_text_loose(p).strip() for p in proper_nouns + acronyms if p)
+    common_stops = {
+        "turkiye", "bakan", "baskani", "bakanligi", "haber", "bugun", "resmi", "karar", "sayisi",
+        "yeni", "donem", "icin", "yuksek", "milli", "egitim", "saglik", "ekonomi", "teknoloji",
+        "otomobil", "otomotiv", "dunya", "gundem", "spor", "super", "sampiyonlar", "ligi", "ligde",
+        "avrupa", "uefa", "fifa", "futbol", "basketbol", "voleybol", "kadin", "erkek", "cocuk",
+        "cocuklar", "genel", "merkez", "merkezi", "kurulu", "kurumu", "birligi", "federasyonu",
+        "universitesi", "belediyesi", "valiligi", "emniyet", "mudurlugu", "istanbul", "ankara",
+        "izmir", "bursa", "antalya", "adana", "konya", "gaziantep", "hatay", "model", "modelleri",
+        "serisi", "devlet", "kuresel", "uluslararasi", "ulusal", "buyuk", "kucuk", "orta", "uzun",
+        "kisa", "ozel", "kritik", "onemli", "tarihi", "rekor", "rekoru", "satis", "fiyat", "fiyatlari",
+        "olarak", "sonra", "once", "karsi", "arasinda", "uzerinde", "altinda", "icinde", "boyunca",
+        "kadar", "gore", "daha", "cok", "ilk", "son", "tum", "her", "bir", "iki", "uc", "dort",
+        "bes", "alti", "yedi", "sekiz", "dokuz", "on", "yil", "yillik", "aylik", "gunluk", "saat",
+        "dakika", "saniye", "hafta", "haftanin", "teknik", "detaylar", "detaylari", "aciklandi",
+        "belli", "oldu", "basladi", "geliyor", "geri", "sayim", "mucadelesi", "maci", "kadrosu",
+        "transfer", "sezon", "sezonu", "kupasi", "turk", "alman", "amerikan", "ispanyol", "ingiliz"
+    }
+    return {w for w in (res - common_stops) if len(w) >= 3}
 
 
 def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_slug: str, history: list) -> tuple:
@@ -187,12 +220,19 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
                 if len(sum_common) >= 7 and len(sum_common) / max(len(cand_sum_words), 1) >= 0.45:
                     return True, f"Özet ortak terimleri ({len(sum_common)} kelime): {h_title[:35]}"
 
-        # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Örn: Muhsin Atcı + SPK veya Conceiçao + Fenerbahçe)
-        h_entities = extract_key_entities(h_title + " " + h_summary)
-        if cand_entities and h_entities:
-            common_ent = cand_entities & h_entities
-            if len(common_ent) >= 2:
-                return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:2])}): {h_title[:35]}"
+        # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Yalnızca son 24 saatteki haberlerle ve başlık bağlamıyla kontrol edilir)
+        try:
+            h_ts_ent = float(h.get("ts", 0) or 0)
+        except Exception:
+            h_ts_ent = 0.0
+        if time.time() - h_ts_ent < 86400:
+            h_entities = extract_key_entities(h_title + " " + h_summary)
+            if cand_entities and h_entities:
+                common_ent = cand_entities & h_entities
+                h_title_words_ent = set(w for w in h_norm_title.split() if len(w) >= 4)
+                title_overlap = len(cand_title_words & h_title_words_ent) if cand_title_words else 0
+                if len(common_ent) >= 3 or (len(common_ent) >= 2 and title_overlap >= 2):
+                    return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:3])}): {h_title[:35]}"
 
         # 5. SPOR KULÜBÜ KORUMASI: Son 6 saatte aynı kulüp hakkında haber paylaşıldıysa mükerrer say
         MAJOR_CLUBS = ["fenerbahce", "galatasaray", "besiktas", "trabzonspor"]
@@ -237,20 +277,44 @@ def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
         print("ℹ️ Şu an taranacak haber bulunamadı.")
         return False
 
-    # 🚀 VİRALLİK SIRALAMASI: En yüksek etkileşim, son dakika ve halkın ilgisini çeken haberi en başa al
+    history = load_history()
+    recent_posted = [h for h in history if isinstance(h, dict) and h.get("status") == "posted"][-4:]
+    recent_cats = [
+        detect_effective_category(h.get("title", ""), h.get("summary", ""), h.get("category", "Gündem"))
+        for h in recent_posted
+    ]
+
+    # 🚀 VİRALLİK + KATEGORİ ROTASYONU SIRALAMASI:
+    # - Son 3 paylaşımda Otomobil varsa Otomobil adaylarına -80 rotasyon cezası verir (üst üste araba paylaşılmasını önler).
+    # - Bir önceki paylaşımla aynı kategorideki adaylara -40, 2 öncekiyle aynı olanlara -20 rotasyon cezası verir.
+    # - Böylece Gündem -> Ekonomi -> Dünya -> Teknoloji -> Spor -> Sağlık dengeli döner; havuz boşsa yine de paylaşım durmaz.
     try:
         import news_fetcher
         for art in articles:
-            art["virality_score"] = news_fetcher.calculate_virality_score(
+            eff_cat = detect_effective_category(
                 art.get("title", ""),
                 art.get("summary", ""),
-                art.get("category", "")
+                art.get("category", "Gündem")
             )
+            art["effective_category"] = eff_cat
+            score = news_fetcher.calculate_virality_score(
+                art.get("title", ""),
+                art.get("summary", ""),
+                eff_cat
+            )
+            if eff_cat in ("Gündem", "Ekonomi", "Dünya"):
+                score += 15
+            if eff_cat == "Otomobil" and "Otomobil" in recent_cats[-3:]:
+                score -= 80
+            elif recent_cats and eff_cat == recent_cats[-1]:
+                score -= 40
+            elif len(recent_cats) >= 2 and eff_cat == recent_cats[-2]:
+                score -= 20
+            art["virality_score"] = score
         articles.sort(key=lambda x: x.get("virality_score", 0), reverse=True)
     except Exception as e:
         print(f"⚠️ Virallik puanı sıralama uyarısı: {e}")
 
-    history = load_history()
     posted_slugs = {h.get("slug") for h in history if isinstance(h, dict)}
     posted_titles = {h.get("title") for h in history if isinstance(h, dict)}
 
@@ -317,6 +381,7 @@ def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
                 "slug": slug,
                 "title": title,
                 "summary": summary[:250],
+                "category": art.get("effective_category", category),
                 "status": "posted",
                 "url": res.get("url"),
                 "ts": time.time()
