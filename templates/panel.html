@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-title" content="GA Panel">
     <link rel="apple-touch-icon" href="/assets/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -54,6 +55,7 @@
         </div>
     </div>
 
+    {% if panel_authed %}
     <!-- ÜST HEADER -->
     <header class="border-b border-brand-border bg-brand-dark/95 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
@@ -1158,6 +1160,8 @@
         </div>
     </div>
 
+    {% endif %}
+
     <script>
         lucide.createIcons();
         let lastStudioArticleId = null;
@@ -1215,6 +1219,7 @@
             window.location.reload();
         }
 
+        {% if panel_authed %}
         function showToast(text) {
             const box = document.getElementById('toast-box');
             document.querySelector('#toast-msg span').innerText = text;
@@ -1929,6 +1934,7 @@
             showToast('✅ Video linki ve başlık stüdyoya aktarıldı! Şimdi videoyu işleyebilirsin.');
             document.getElementById('v-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        {% endif %}
     </script>
 </body>
 </html>

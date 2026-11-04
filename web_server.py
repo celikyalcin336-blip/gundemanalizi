@@ -1117,7 +1117,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         import content_quality
         def _prefer_rich(pool, cap):
             non_c = [a for a in pool if not main.is_commodity_news(a.get("title", ""))]
-            if page == 1:
+            if page >= 1:
                 rich = [a for a in non_c if (not content_quality.is_thin(a["content"]) if a.get("content") else len((a.get("summary") or "").strip()) >= 35)]
                 if len(rich) >= cap:
                     return rich[:cap]

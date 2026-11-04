@@ -1050,12 +1050,12 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
         if category:
             clean_cat = category.strip()
             if clean_cat.lower() in ["son dakika", "sondakika", "son-dakika", "breaking"]:
-                cur = conn.execute("SELECT id, slug, title, summary, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
+                cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
                 return [_row_to_dict(row) for row in cur.fetchall()]
 
             cat_norm = normalize_category_name(category) or category
             cur = conn.execute(
-                """SELECT id, slug, title, summary, category, image_path, source, views, created_at FROM articles 
+                """SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles 
                    WHERE category = ? OR LOWER(category) = LOWER(?) OR category = ?
                    ORDER BY id DESC LIMIT ? OFFSET ?""",
                 (cat_norm, cat_norm, category.strip(), limit, offset)
@@ -1064,7 +1064,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
             if not rows and offset == 0:
                 kw = cat_norm.lower()
                 cur = conn.execute(
-                    """SELECT id, slug, title, summary, category, image_path, source, views, created_at FROM articles 
+                    """SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles 
                        WHERE title LIKE ? OR summary LIKE ? OR category LIKE ?
                        ORDER BY id DESC LIMIT ? OFFSET ?""",
                     (f"%{kw}%", f"%{kw}%", f"%{kw}%", limit, offset)
@@ -1072,7 +1072,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
                 rows = [_row_to_dict(row) for row in cur.fetchall()]
             return rows
         else:
-            cur = conn.execute("SELECT id, slug, title, summary, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
+            cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
             return [_row_to_dict(row) for row in cur.fetchall()]
 
 
