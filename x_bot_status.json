@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-05 01:42:33",
+  "last_check": "2026-11-05 02:27:52",
   "result": "posted",
-  "last_post": "2026-11-05 01:42:33",
-  "next_planned": "2026-11-05 02:27:33",
+  "last_post": "2026-11-05 02:27:52",
+  "next_planned": "2026-11-05 03:12:52",
   "runner": "github-actions",
-  "log_tail": "[2026-11-04 22:42:14] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 250 | Başlık: İklim Risklerine Karşı Kronik Hastalar İçin Dijital Erken Uyarı Kalkanı Devrede\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793832134.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n⚠️ [Google Indexing API] Token alinamadigi icin atlandi: https://xn--gndemanalizi-dlb.com.tr/haber/iklim-risklerine-karsi-kronik-hastalar-icin-dijital-erken-uyari-kalkani-devrede\n🎉 [X Auto-Poster] Başarıyla tweetlendi: İklim Risklerine Karşı Kronik Hastalar İçin Dijital Erken Uyarı Kalkanı Devrede\n"
+  "log_tail": "[2026-11-04 23:27:33] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 240 | Başlık: Binance Vurgununda Yapay Zeka Araçları ve Sahte Mülakat Tusti\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793834854.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n⚠️ [Google Indexing API] Token alinamadigi icin atlandi: https://xn--gndemanalizi-dlb.com.tr/haber/binance-vurgununda-yapay-zeka-araclari-ve-sahte-mulakat-tusti\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Binance Vurgununda Yapay Zeka Araçları ve Sahte Mülakat Tusti\n"
 }
