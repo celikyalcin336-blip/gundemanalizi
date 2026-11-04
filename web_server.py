@@ -184,15 +184,31 @@ _PANEL_SESSIONS = {}             # rastgele oturum anahtarı -> bitiş zamanı
 _PIN_LOCK_SECONDS = 900          # 15 dakika
 _PIN_MAX_DISTINCT_FAILS = 5      # 15 dk içinde IP başına 5 FARKLI yanlış PIN = kilit
 _GLOBAL_MAX_DISTINCT_FAILS = 8   # 15 dk içinde tüm dünyadan 8 FARKLI yanlış PIN = küresel kilit
+_API_RATE_LIMIT = {}             # ip -> [ts, ...] (genel /api/ hız sınırı)
 
 def _client_ip(request: Request) -> str:
     return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
+
+def _is_exempt_from_rate_limit(request: Request) -> bool:
+    """Yönetici oturumlarını ve resmi arama/reklam motoru botlarını (Googlebot, AdSense vb.) hız sınırından muaf tutar."""
+    if request.cookies.get("ga_admin") == "1":
+        return True
+    tok = request.cookies.get("ga_panel_auth", "")
+    if ADMIN_PIN and tok and _PANEL_SESSIONS.get(tok, 0) > time.time():
+        return True
+    ua_low = (request.headers.get("user-agent") or "").lower()
+    return any(b in ua_low for b in (
+        "googlebot", "mediapartners-google", "adsbot-google", "google-inspectiontool",
+        "google-read-aloud", "bingbot", "msnbot", "yandexbot", "telegrambot",
+        "facebookexternalhit", "meta-externalagent", "twitterbot", "applebot"
+    ))
 
 def require_admin_pin(request: Request):
     """
     Kaba kuvvet (brute-force) ve Botnet/Proxy korumalı PIN kontrolü.
     - Hem IP bazlı (5 farklı yanlış PIN) hem küresel (tüm IP'lerden toplam 8 farklı yanlış PIN) kilit uygular.
-    - Küresel kilit devreye girdiğinde yöneticiye Telegram üzerinden güvenlik uyarısı gönderir.
+    - Doğru PIN girildiğinde (kendi IP'si kilitli değilse) küresel botnet kilidi olsa dahi yöneticiyi engellemez.
+    - Küresel veya IP kilidi devreye girdiğinde yöneticiye Telegram üzerinden güvenlik uyarısı gönderir.
     """
     import hashlib
     global _GLOBAL_PIN_FAILURES, _GLOBAL_PIN_ALERT_TS
@@ -203,8 +219,8 @@ def require_admin_pin(request: Request):
     _GLOBAL_PIN_FAILURES = [(t, h) for (t, h) in _GLOBAL_PIN_FAILURES if now_ts - t < _PIN_LOCK_SECONDS]
     history = [(t, h) for (t, h) in _PIN_FAILURES.get(client_ip, []) if now_ts - t < _PIN_LOCK_SECONDS]
 
-    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS:
-        _PIN_FAILURES[client_ip] = history
+    def _trigger_pin_lock_alert(reason_msg: str):
+        global _GLOBAL_PIN_ALERT_TS
         if now_ts - _GLOBAL_PIN_ALERT_TS > _PIN_LOCK_SECONDS:
             _GLOBAL_PIN_ALERT_TS = now_ts
             try:
@@ -213,19 +229,27 @@ def require_admin_pin(request: Request):
                     target=telegram_notifier.send_admin_alert,
                     kwargs={
                         "subject": "Güvenlik Kalkanı: Yönetim Paneline Şifre Deneme Saldırısı Engellendi!",
-                        "message": f"Son 15 dakika içinde birden fazla hatalı PIN denemesi (Son IP: {client_ip}) tespit edildi ve PIN girişi 15 dakika süreyle otomatik kilitlendi.",
+                        "message": reason_msg,
                     },
                     daemon=True,
                 ).start()
             except Exception:
                 pass
+
+    # 1. Tekil IP kilidi: Aynı IP'den 5 farklı yanlış PIN denendiyse o IP'yi tamamen kilitle
+    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS:
+        _PIN_FAILURES[client_ip] = history
+        _trigger_pin_lock_alert(
+            f"Son 15 dakika içinde aynı IP'den 5+ hatalı PIN denemesi (IP: {client_ip}) tespit edildi ve IP 15 dakika süreyle kilitlendi."
+        )
         raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Güvenlik kilidi devreye girdi, lütfen 15 dakika bekleyin.")
 
+    # 2. Doğru PIN kontrolü: Yönetici doğru şifreyi girdiğinde küresel botnet kilidi olsa bile içeri al
     if ADMIN_PIN and pin and _secrets.compare_digest(pin, ADMIN_PIN):
         _PIN_FAILURES.pop(client_ip, None)
-        _GLOBAL_PIN_FAILURES.clear()
         return
 
+    # 3. Yanlış PIN kaydı ve Küresel Botnet/Proxy kilidi kontrolü
     if pin:
         pin_hash = hashlib.sha256(pin.encode("utf-8")).hexdigest()[:16]
         history.append((now_ts, pin_hash))
@@ -235,6 +259,13 @@ def require_admin_pin(request: Request):
         if len(_PIN_FAILURES) > 5000:
             for ip_key in [k for k, v in _PIN_FAILURES.items() if not v or now_ts - v[-1][0] > _PIN_LOCK_SECONDS]:
                 _PIN_FAILURES.pop(ip_key, None)
+
+    if len({h for _, h in _GLOBAL_PIN_FAILURES}) >= _GLOBAL_MAX_DISTINCT_FAILS:
+        _trigger_pin_lock_alert(
+            f"Son 15 dakika içinde farklı IP/Proxy adreslerinden toplam 8+ hatalı PIN denemesi (Son IP: {client_ip}) tespit edildi ve küresel koruma kilidi devreye girdi."
+        )
+        raise HTTPException(status_code=429, detail="Çok fazla hatalı şifre denemesi! Güvenlik kilidi devreye girdi, lütfen 15 dakika bekleyin.")
+
     raise HTTPException(status_code=403, detail="Hatalı yönetici şifresi (PIN)")
 
 app = FastAPI(
@@ -332,6 +363,18 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith(f"/{PANEL_SECRET_SLUG}") or
         "yonetim" in path
     )
+    # 1.5. Genel /api/ uçları için hız sınırı (Yönetici ve Google/AdSense botları muaf, dakikada 60 istek)
+    if path.startswith("/api/") and not path.startswith("/api/panel/") and not _is_exempt_from_rate_limit(request):
+        api_ip = _client_ip(request)
+        now_api = time.time()
+        recent_api = [t for t in _API_RATE_LIMIT.get(api_ip, []) if now_api - t < 60]
+        if len(recent_api) >= 60:
+            return JSONResponse({"ok": False, "error": "Çok fazla istek gönderildi. Lütfen biraz bekleyin."}, status_code=429)
+        recent_api.append(now_api)
+        _API_RATE_LIMIT[api_ip] = recent_api
+        if len(_API_RATE_LIMIT) > 2000:
+            for k in [k for k, v in _API_RATE_LIMIT.items() if not v or now_api - v[-1] > 60]:
+                _API_RATE_LIMIT.pop(k, None)
     # 2. Statik dosyaları ve sistem uçlarını sayaca dahil etme
     is_static_or_system = (
         path.startswith("/assets") or
@@ -928,18 +971,27 @@ async def page_son_dakika(request: Request, sayfa: int = 1):
 
 _SEARCH_RATE_LIMIT = {}
 
-@app.get("/api/search")
-async def api_search(request: Request, q: str = "", limit: int = 8):
-    """Canlı anlık haber arama API'si (Hız sınırlamalı & DoS korumalı)."""
+def _check_search_rate_limit(request: Request) -> bool:
+    """Arama uçları için IP başına dakikada 35 istek sınırı (Admin ve resmi arama botları muaf)."""
+    if _is_exempt_from_rate_limit(request):
+        return True
     ip = _client_ip(request)
     now_ts = time.time()
     recent = [t for t in _SEARCH_RATE_LIMIT.get(ip, []) if now_ts - t < 60]
     if len(recent) >= 35:
-        return JSONResponse({"ok": False, "count": 0, "results": [], "error": "Çok hızlı arama yapıldı."}, status_code=429)
+        return False
     recent.append(now_ts)
     _SEARCH_RATE_LIMIT[ip] = recent
-    if len(_SEARCH_RATE_LIMIT) > 5000:
-        _SEARCH_RATE_LIMIT.clear()
+    if len(_SEARCH_RATE_LIMIT) > 2000:
+        for k in [k for k, v in _SEARCH_RATE_LIMIT.items() if not v or now_ts - v[-1] > 60]:
+            _SEARCH_RATE_LIMIT.pop(k, None)
+    return True
+
+@app.get("/api/search")
+async def api_search(request: Request, q: str = "", limit: int = 8):
+    """Canlı anlık haber arama API'si (Hız sınırlamalı & DoS korumalı)."""
+    if not _check_search_rate_limit(request):
+        return JSONResponse({"ok": False, "count": 0, "results": [], "error": "Çok hızlı arama yapıldı."}, status_code=429)
 
     clean_q = re.sub(r"[<>\"'`\\]", "", (q or "").strip())[:80]
     if len(clean_q) < 2:
@@ -1128,6 +1180,8 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     norm_kategori = database.normalize_category_name(kategori) if kategori else None
 
     if q and q.strip():
+        if not _check_search_rate_limit(request):
+            raise HTTPException(status_code=429, detail="Çok hızlı arama yapıldı. Lütfen 1 dakika bekleyin.")
         search_kw = re.sub(r"[<>\"'`\\]", "", q.strip())[:80]
         articles = database.search_articles(search_kw, limit=limit, offset=offset) if search_kw else []
         total_count = database.get_search_count(search_kw) if search_kw else 0
@@ -1890,6 +1944,9 @@ async def submit_ihbar(
         raise HTTPException(status_code=413, detail="Dosya boyutu en fazla 15 MB olabilir.")
     recent_ihbar.append(now_ts)
     _IHBAR_RATE_LIMIT[client_ip] = recent_ihbar
+    if len(_IHBAR_RATE_LIMIT) > 2000:
+        for k in [k for k, v in _IHBAR_RATE_LIMIT.items() if not v or now_ts - v[-1] > 900]:
+            _IHBAR_RATE_LIMIT.pop(k, None)
 
     import hashlib
     import telegram_notifier
@@ -2545,6 +2602,9 @@ async def api_contact_submit(request: Request):
         return JSONResponse({"ok": False, "error": "Lütfen ad, geçerli e-posta ve en az 10 karakterlik mesaj giriniz."}, status_code=400)
     recent.append(now_ts)
     _CONTACT_RATE_LIMIT[client_ip] = recent
+    if len(_CONTACT_RATE_LIMIT) > 2000:
+        for k in [k for k, v in _CONTACT_RATE_LIMIT.items() if not v or now_ts - v[-1] > 900]:
+            _CONTACT_RATE_LIMIT.pop(k, None)
     msg_text = (
         f"📩 [KURUMSAL İLETİŞİM / DÜZELTME FORMU]\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
@@ -2620,8 +2680,9 @@ async def api_add_reaction(request: Request):
         if len(_REACT_SEEN) > 100000:
             for k in [k for k, t in _REACT_SEEN.items() if now_ts - t > 86400 * 3]:
                 _REACT_SEEN.pop(k, None)
-        if len(_REACT_IP_RATE) > 20000:
-            _REACT_IP_RATE.clear()
+        if len(_REACT_IP_RATE) > 5000:
+            for k in [k for k, v in _REACT_IP_RATE.items() if not v or now_ts - v[-1] > 600]:
+                _REACT_IP_RATE.pop(k, None)
     counts = await asyncio.to_thread(database.get_reactions, aid)
     return {"ok": True, "duplicate": duplicate, "counts": counts}
 
