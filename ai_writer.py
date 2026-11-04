@@ -339,8 +339,10 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
     """
     import news_fetcher
+    import content_quality
     title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
+    source = content_quality.clean_source_name(source)
 
     valid_official_cats = {"Gündem", "Ekonomi", "Eğitim", "Otomobil", "Teknoloji", "Sağlık", "Spor", "Dünya"}
     if force_category in valid_official_cats:
@@ -377,20 +379,20 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
 - Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Olayın 5N1K özeti, 4-5 cümle)
 - 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Olayın somut ayrıntıları, rakamlar ve resmi açıklamalar)
 - 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Konunun tarihsel/sektörel arka planı ve önceki gelişmeler)
-- 3. Ara Başlık (<h3>) + altında 1 veya 2 <p> paragrafı (Vatandaşa/sektöre etkileri ve önümüzdeki süreçte beklenen adımlar)"""
+- 3. Ara Başlık (<h3>) + altında 1 veya 2 <p> paragrafı (Uygulama takvimi, resmi süreçteki sıradaki adımlar ve somut detaylar)"""
     elif _style_idx == 1:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 2 ÖZGÜN ARA BAŞLIK (<h3>) ve 6 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
 - Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 4-5 cümle)
 - Girişin hemen altında ara başlıksız 1 <p> paragrafı daha (İlk tepkiler ve sahadaki/kurumdaki mevcut durum)
 - 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Detaylı veriler, teknik/hukuki boyut ve sürecin geçmişi)
-- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Ekonomik/toplumsal yansımalar ve bundan sonraki takvim)"""
+- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Uygulama detayları, ilgili kurumların takvimi ve somut veriler)"""
     else:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 4 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-8 DOLU PARAGRAF (<p>) ile EN AZ 480-700 KELİME üret:
 - Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Kapsamlı 5N1K giriş paragrafı, 4-5 cümle)
 - 1. Ara Başlık (<h3>) + altında 2 <p> paragrafı (Gelişmenin tüm somut detayları ve tarafların açıklamaları)
 - 2. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sürecin arka planı ve önceki kararlar)
-- 3. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sektörel veya toplumsal etkiler)
-- 4. Ara Başlık (<h3>) + altında 1 <p> paragrafı (Önümüzdeki dönemde beklenen somut adımlar)"""
+- 3. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sektörel veya toplumsal veriler)
+- 4. Ara Başlık (<h3>) + altında 1 <p> paragrafı (Takvimdeki somut tarih, resmi prosedür veya açıklanan son detay)"""
 
     prompt = f"""
 Sen 'Gündem Analizi' adlı Türkçe haber sitesinin kıdemli editörüsün. Aşağıdaki kaynak haberden yola çıkarak
@@ -408,9 +410,14 @@ KESİN KURALLAR:
 2. DOĞRULUK: Kaynakta OLMAYAN rakam, isim, tarih, alıntı veya iddia UYDURMA. Arka plan ve bağlam bölümünde yalnızca
    genel kabul görmüş, doğrulanabilir bilgiler ver; emin olmadığın hiçbir bilgiyi yazma.
 3. UZUNLUK: Metin en az 450, ideal olarak 500-700 kelime olmalı. Uzunluğu laf kalabalığıyla değil; bağlam, arka plan,
-   etkiler ve okurun bilmesi gerekenlerle sağla.
+   süreç detayları ve okurun bilmesi gereken somut bilgilerle sağla.
 4. DİL: Sade, akıcı, dil bilgisi kurallarına uygun Türkçe. Klişe, abartı, tık tuzağı, hashtag, emoji ve okura soru sorma YOK.
-5. Her habere uyan genel geçer dolgu cümleleri ("gelişmeler yakından takip ediliyor", "kamuoyunun gündeminde" vb.) YAZMA.
+5. DOĞAL AJANS KAPANIŞI (ÇOK KRİTİK): Haberin son paragrafını ve son cümlesini ASLA kompozisyon/makale özeti gibi bitirme!
+   Son paragrafta "Sonuç olarak", "Özetle", "pekiştirmektedir", "gözler önüne sermektedir", "net bir şekilde ortaya koymaktadır",
+   "çerçevesini belirleyecektir", "büyük önem taşımaktadır", "en doğru yaklaşım olacaktır", "merakla bekleniyor",
+   "yakından takip ediliyor" gibi yapay zeka klişeleri KESİNLİKLE KULLANMA. Bunun yerine tıpkı Anadolu Ajansı, NTV veya
+   Bloomberg HT muhabirlerinin haber bitirişi gibi; olayın somut bir takvim detayıyla, resmi açıklamadaki son bilgiyle,
+   rakamsal bir veriyle veya yürürlük/uygulama süreciyle doğal biçimde noktala.
 6. Yatırım tavsiyesi verme; sağlık konularında teşhis/tedavi önerme, uzman görüşüne yönlendir.
 
 ÇIKTI BİÇİMİ (aynen bu üç bölüm):
@@ -422,22 +429,12 @@ Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 
 [İÇERİK]
 {_structure_guide}
-Örnek HTML sınıfları (ara başlık metinlerini habere özgü yaz, aşağıdaki kalıp başlıkları KULLANMA):
-<p class="lead font-medium text-lg text-slate-200 mb-6">Haberin ana gelişmesini tüm temel unsurlarıyla (ne, nerede, ne zaman, kim, neden) anlatan kapsamlı giriş paragrafı (4-5 cümle)</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Neler Oldu?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">Olayın gelişimini ve kaynaktaki tüm somut ayrıntıları aktaran birinci paragraf (4-5 cümle).</p>
-<p class="text-slate-300 leading-relaxed mb-4">Tarafların açıklamalarını, teknik veya hukuki detayları ve sahadaki durumu aktaran ikinci paragraf (4-5 cümle).</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Arka Plan ve Sürecin Geçmişi</h3>
-<p class="text-slate-300 leading-relaxed mb-4">Bu gelişmeye zemin hazırlayan önceki olayları ve konunun tarihsel/sektörel bağlamını anlatan birinci paragraf (4-5 cümle).</p>
-<p class="text-slate-300 leading-relaxed mb-4">Konuyla ilgili mevcut kuralları, standartları veya daha önce atılan adımları açıklayan ikinci paragraf (4-5 cümle).</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Neden Önemli ve Etkileri Neler?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">Gelişmenin vatandaşlar, ekonomi, ilgili sektör veya uluslararası dengeler açısından neden kritik olduğunu açıklayan birinci paragraf (4-5 cümle).</p>
-<p class="text-slate-300 leading-relaxed mb-4">Kısa ve orta vadede günlük hayata, piyasaya veya kurumlara yansımalarını somut çerçevede değerlendiren ikinci paragraf (4-5 cümle).</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Bundan Sonra Ne Bekleniyor?</h3>
-<p class="text-slate-300 leading-relaxed mb-4">Takvimde öne çıkan kritik tarihleri, resmi süreçleri ve beklenen somut adımları anlatan kapanış paragrafı (4-5 cümle).</p>
-<h3 class="text-xl font-bold text-white mt-6 mb-3">Haberin Konusuna Özgü Değerlendirme Başlığı</h3>
-<p class="text-slate-300 leading-relaxed mb-4">Editoryal değerlendirme (3-4 cümle): Bu gelişmenin sektöre, topluma, piyasaya veya günlük hayata somut yansıması nedir? Kaynakta olmayan rakam veya iddia UYDURMA. Genel geçer cümle kurma ve son cümlede ASLA "en doğru yaklaşım olacaktır", "en doğru korunma yöntemidir" gibi kalıp ifadeler kullanma; doğrudan bu habere özgü, doğal bir gazetecilik cümlesiyle bitir.</p>
-Tüm ara başlıkları (son bölüm dahil) haberin konusuna göre tamamen özgün ve doğal gazetecilik diliyle yaz; hiçbir haberde sabit/şablon başlık kullanma. Başka etiket, markdown veya kod bloğu kullanma.
+
+HTML Etiket Kuralları:
+- İlk giriş paragrafı: <p class="lead font-medium text-lg text-slate-200 mb-6">...</p>
+- Ara başlıklar: <h3 class="text-xl font-bold text-white mt-6 mb-3">Habere Özgü Somut Ara Başlık</h3>
+- Normal paragraflar: <p class="text-slate-300 leading-relaxed mb-4">...</p>
+Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp başlıklar KULLANMADAN) doğrudan haberin içindeki somut gelişmeye göre özgün gazetecilik diliyle yaz. Başka etiket, markdown veya kod bloğu kullanma.
 """
 
     try:

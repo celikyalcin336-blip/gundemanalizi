@@ -279,3 +279,30 @@ def diversify_article_layout(content: str, article_id: int = 0) -> str:
             c = re.sub(r"<p[^>]*>(.*?)</p>", _p4_to_bq, c, flags=re.S | re.I)
 
     return c
+
+
+def clean_source_name(source: str) -> str:
+    """
+    RSS beslemelerinin sonundaki iç kategori eklerini ('ShiftDelete Yapay Zeka' -> 'ShiftDelete',
+    'Motor1 Otomobil' -> 'Motor1', 'Log.com.tr Teknoloji' -> 'Log', 'Habertürk Dünya' -> 'Habertürk' vb.)
+    temizleyerek yayın kuruluşunun yalnızca gerçek kurumsal adını döndürür.
+    """
+    s = (source or "").strip()
+    if not s:
+        return "Basın Kaynakları"
+    if s.lower() in ("a spor", "trt spor", "otomobil haber"):
+        return s
+    # Alan adı uzantısını sadeleştir ('Log.com.tr Teknoloji' -> 'Log Teknoloji')
+    s = re.sub(r"\.com\.tr\b", "", s, flags=re.I)
+    # RSS kategori soneklerini kaldır (gerçek yayın adını korur)
+    s = re.sub(
+        r"\s+(?:Otomobil|Teknoloji|Yapay\s+Zeka|AI\s*&\s*İnovasyon|Ekonomi|Finans|Sağlık|Eğitim|Dünya|Gündem)\s*$",
+        "",
+        s,
+        flags=re.I,
+    ).strip()
+    # 'TRT Haber Spor' -> 'TRT Haber', 'Habertürk Spor' -> 'Habertürk' ('A Spor' ve 'TRT Spor' hariç)
+    if re.search(r"\s+Spor$", s, flags=re.I) and s.lower() not in ("a spor", "trt spor"):
+        s = re.sub(r"\s+Spor$", "", s, flags=re.I).strip()
+    return s or "Basın Kaynakları"
+

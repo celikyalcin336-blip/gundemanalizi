@@ -48,7 +48,7 @@ IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID", "")
 RSS_FEEDS = [
     # 🚗 OTOMOBİL & KAMPANYALAR (Yüksek Tık & Gelir Değeri)
     {
-        "name": "Motor1 Otomobil",
+        "name": "Motor1",
         "url": "https://tr.motor1.com/rss/news/all/",
         "category": "Otomobil"
     },
@@ -58,61 +58,61 @@ RSS_FEEDS = [
         "category": "Otomobil"
     },
     {
-        "name": "Ensonhaber Otomobil",
+        "name": "Ensonhaber",
         "url": "https://www.ensonhaber.com/rss/otomobil.xml",
         "category": "Otomobil"
     },
     {
-        "name": "ShiftDelete Otomobil",
+        "name": "ShiftDelete",
         "url": "https://shiftdelete.net/otomobil/feed",
         "category": "Otomobil"
     },
     {
-        "name": "NTV Otomobil",
+        "name": "NTV",
         "url": "https://www.ntv.com.tr/otomobil.rss",
         "category": "Otomobil"
     },
     {
-        "name": "Otoajanda Otomobil",
+        "name": "Otoajanda",
         "url": "https://www.otoajanda.com/feed/",
         "category": "Otomobil"
     },
 
     # 🚀 TEKNOLOJİ & YAPAY ZEKA (Yüksek Tık & Gelir Değeri)
     {
-        "name": "Webtekno Teknoloji",
+        "name": "Webtekno",
         "url": "https://www.webtekno.com/rss.xml",
         "category": "Teknoloji"
     },
     {
-        "name": "ShiftDelete Teknoloji",
+        "name": "ShiftDelete",
         "url": "https://shiftdelete.net/feed",
         "category": "Teknoloji"
     },
     {
-        "name": "Log.com.tr Teknoloji",
+        "name": "Log",
         "url": "https://www.log.com.tr/feed/",
         "category": "Teknoloji"
     },
     {
-        "name": "CHIP Online Teknoloji",
+        "name": "CHIP Online",
         "url": "https://www.chip.com.tr/rss/",
         "category": "Teknoloji"
     },
 
     # 🤖 ÖZEL YAPAY ZEKA (AI) & İNOVASYON
     {
-        "name": "ShiftDelete Yapay Zeka",
+        "name": "ShiftDelete",
         "url": "https://shiftdelete.net/yapay-zeka/feed",
         "category": "Teknoloji"
     },
     {
-        "name": "Webrazzi Yapay Zeka",
+        "name": "Webrazzi",
         "url": "https://webrazzi.com/kategori/yapay-zeka/feed/",
         "category": "Teknoloji"
     },
     {
-        "name": "E-Girişim AI & İnovasyon",
+        "name": "E-Girişim",
         "url": "https://egirisim.com/feed/",
         "category": "Teknoloji"
     },
@@ -129,93 +129,93 @@ RSS_FEEDS = [
         "category": "Ekonomi"
     },
     {
-        "name": "Mynet Finans",
+        "name": "Mynet",
         "url": "https://finans.mynet.com/haber/rss/kategori/ekonomi/",
         "category": "Ekonomi"
     },
     {
-        "name": "Ensonhaber Ekonomi",
+        "name": "Ensonhaber",
         "url": "https://www.ensonhaber.com/rss/ekonomi.xml",
         "category": "Ekonomi"
     },
     {
-        "name": "TRT Haber Ekonomi",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/ekonomi_articles.rss",
         "category": "Ekonomi"
     },
 
     # 🩺 SAĞLIK & YAŞAM (Yüksek Tık & Gelir Değeri)
     {
-        "name": "TRT Haber Sağlık",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/saglik_articles.rss",
         "category": "Sağlık"
     },
     {
-        "name": "NTV Sağlık",
+        "name": "NTV",
         "url": "https://www.ntv.com.tr/saglik.rss",
         "category": "Sağlık"
     },
     {
-        "name": "Habertürk Sağlık",
+        "name": "Habertürk",
         "url": "https://www.haberturk.com/rss/kategori/saglik.xml",
         "category": "Sağlık"
     },
     {
-        "name": "Cumhuriyet Sağlık",
+        "name": "Cumhuriyet",
         "url": "https://www.cumhuriyet.com.tr/rss/saglik.xml",
         "category": "Sağlık"
     },
     {
-        "name": "CNN Türk Sağlık",
+        "name": "CNN Türk",
         "url": "https://www.cnnturk.com/feed/rss/saglik/news",
         "category": "Sağlık"
     },
 
     # 🎓 EĞİTİM, MEB & SINAVLAR (Yüksek Tık & Aile/Öğrenci Trafiği)
     {
-        "name": "Anadolu Ajansı Eğitim",
+        "name": "Anadolu Ajansı",
         "url": "https://www.aa.com.tr/tr/rss/default?cat=egitim",
         "category": "Eğitim"
     },
     {
-        "name": "TRT Haber Eğitim",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/egitim_articles.rss",
         "category": "Eğitim"
     },
     {
-        "name": "NTV Eğitim",
+        "name": "NTV",
         "url": "https://www.ntv.com.tr/egitim.rss",
         "category": "Eğitim"
     },
     {
-        "name": "Sabah Eğitim",
+        "name": "Sabah",
         "url": "https://www.sabah.com.tr/rss/egitim.xml",
         "category": "Eğitim"
     },
     {
-        "name": "Cumhuriyet Eğitim",
+        "name": "Cumhuriyet",
         "url": "https://www.cumhuriyet.com.tr/rss/egitim.xml",
         "category": "Eğitim"
     },
 
     # 🌍 DÜNYA & DIŞ POLİTİKA (Küresel Sıcak Gelişmeler & Krizler)
     {
-        "name": "TRT Haber Dünya",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/dunya_articles.rss",
         "category": "Dünya"
     },
     {
-        "name": "NTV Dünya",
+        "name": "NTV",
         "url": "https://www.ntv.com.tr/dunya.rss",
         "category": "Dünya"
     },
     {
-        "name": "Habertürk Dünya",
+        "name": "Habertürk",
         "url": "https://www.haberturk.com/rss/kategori/dunya.xml",
         "category": "Dünya"
     },
     {
-        "name": "Ensonhaber Dünya",
+        "name": "Ensonhaber",
         "url": "https://www.ensonhaber.com/rss/dunya.xml",
         "category": "Dünya"
     },
@@ -227,7 +227,7 @@ RSS_FEEDS = [
         "category": "Spor"
     },
     {
-        "name": "TRT Haber Spor",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/spor_articles.rss",
         "category": "Spor"
     },
@@ -237,29 +237,29 @@ RSS_FEEDS = [
         "category": "Spor"
     },
     {
-        "name": "Habertürk Spor",
+        "name": "Habertürk",
         "url": "https://www.haberturk.com/rss/kategori/spor.xml",
         "category": "Spor"
     },
 
     # 🚨 SICAK GÜNDEM & SON DAKİKA
     {
-        "name": "TRT Haber Gündem",
+        "name": "TRT Haber",
         "url": "https://www.trthaber.com/gundem_articles.rss",
         "category": "Gündem"
     },
     {
-        "name": "Habertürk Gündem",
+        "name": "Habertürk",
         "url": "https://www.haberturk.com/rss/kategori/gundem.xml",
         "category": "Gündem"
     },
     {
-        "name": "Ensonhaber Gündem",
+        "name": "Ensonhaber",
         "url": "https://www.ensonhaber.com/rss/ensonhaber.xml",
         "category": "Gündem"
     },
     {
-        "name": "NTV Gündem",
+        "name": "NTV",
         "url": "https://www.ntv.com.tr/gundem.rss",
         "category": "Gündem"
     }

@@ -2378,11 +2378,12 @@ async def article_detail(request: Request, slug: str):
             raw_content = "</p>".join(parts[:2]) + mid_banner + "</p>".join(parts[2:])
 
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
+    clean_src = content_quality.clean_source_name(article.get("source"))
     resp = templates.TemplateResponse(
         request=request,
         name="article.html",
         context={
-            "article": {**article, "content": raw_content},
+            "article": {**article, "content": raw_content, "source": clean_src},
             "highlights": highlights,
             "related_articles": related_articles,
             "other_articles": other_articles,
