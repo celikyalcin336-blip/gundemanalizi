@@ -167,3 +167,62 @@ def visible_word_count(content: str) -> int:
 
 def is_thin(content: str, threshold: int = 300) -> bool:
     return visible_word_count(clean_article_html(content or "")) < threshold
+
+
+def diversify_article_layout(content: str, article_id: int = 0) -> str:
+    """
+    Mevcut ve yeni haberlerin tekdüze (her haberde 5 adet <h3>) görünmesini önler;
+    haber ID'sine göre 3 farklı editoryal mizanpaj (<h2>, <blockquote>, birleştirilmiş akıcı paragraflar) uygular.
+    """
+    if not content:
+        return content
+    c = content
+    mode = (article_id or 0) % 3
+
+    if mode == 0:
+        c = re.sub(
+            r"<h3([^>]*)>(.*?)</h3>",
+            r'<h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-7 mb-3"\1>\2</h2>',
+            c,
+            flags=re.S | re.I,
+        )
+        if "<blockquote" not in c.lower():
+            p_idx = [0]
+            def _p_to_bq(m):
+                p_idx[0] += 1
+                inner = m.group(1).strip()
+                if p_idx[0] == 3 and 90 <= len(_norm(inner)) <= 480:
+                    return f'<blockquote class="my-6 pl-4 border-l-4 border-red-600 italic text-slate-700 bg-slate-50/80 py-3 pr-4 rounded-r-xl">{inner}</blockquote>'
+                return m.group(0)
+            c = re.sub(r"<p[^>]*>(.*?)</p>", _p_to_bq, c, flags=re.S | re.I)
+
+    elif mode == 1:
+        h_idx = [0]
+        def _selective_h2(m):
+            h_idx[0] += 1
+            if h_idx[0] in (1, 3):
+                return f'<h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-7 mb-3"{m.group(1)}>{m.group(2)}</h2>'
+            return ""
+        if c.lower().count("<h3") >= 3:
+            c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _selective_h2, c, flags=re.S | re.I)
+
+    else:
+        h_idx = [0]
+        def _trim_extra_h3(m):
+            h_idx[0] += 1
+            if h_idx[0] in (2, 5):
+                return ""
+            return m.group(0)
+        if c.lower().count("<h3") >= 4:
+            c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _trim_extra_h3, c, flags=re.S | re.I)
+        if "<blockquote" not in c.lower() and (article_id or 0) % 2 == 0:
+            p_idx = [0]
+            def _p4_to_bq(m):
+                p_idx[0] += 1
+                inner = m.group(1).strip()
+                if p_idx[0] == 4 and 90 <= len(_norm(inner)) <= 480:
+                    return f'<blockquote class="my-6 pl-4 border-l-4 border-red-600 italic text-slate-700 bg-slate-50/80 py-3 pr-4 rounded-r-xl">{inner}</blockquote>'
+                return m.group(0)
+            c = re.sub(r"<p[^>]*>(.*?)</p>", _p4_to_bq, c, flags=re.S | re.I)
+
+    return c

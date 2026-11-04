@@ -203,7 +203,7 @@ def require_admin_pin(request: Request):
     _GLOBAL_PIN_FAILURES = [(t, h) for (t, h) in _GLOBAL_PIN_FAILURES if now_ts - t < _PIN_LOCK_SECONDS]
     history = [(t, h) for (t, h) in _PIN_FAILURES.get(client_ip, []) if now_ts - t < _PIN_LOCK_SECONDS]
 
-    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS or len({h for _, h in _GLOBAL_PIN_FAILURES}) >= _GLOBAL_MAX_DISTINCT_FAILS:
+    if len({h for _, h in history}) >= _PIN_MAX_DISTINCT_FAILS:
         _PIN_FAILURES[client_ip] = history
         if now_ts - _GLOBAL_PIN_ALERT_TS > _PIN_LOCK_SECONDS:
             _GLOBAL_PIN_ALERT_TS = now_ts
@@ -322,6 +322,7 @@ async def track_visitors_middleware(request: Request, call_next):
         resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
         resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
+        resp.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'self'"
         return resp
 
     # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
@@ -415,6 +416,7 @@ async def track_visitors_middleware(request: Request, call_next):
     resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
     resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
+    resp.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'self'"
     if not (is_api_or_admin or is_static_or_system) and not bot_type and not request.cookies.get("ga_vis"):
         try:
             resp.set_cookie("ga_vis", "1", max_age=31536000, httponly=True, samesite="lax", path="/")
@@ -1064,6 +1066,16 @@ def get_cached_category_widgets() -> dict:
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
+    if "page" in request.query_params:
+        import urllib.parse
+        from fastapi.responses import RedirectResponse
+        try:
+            _p = max(1, int(request.query_params.get("page") or 1))
+        except Exception:
+            _p = 1
+        _kat_part = f"kategori={urllib.parse.quote(kategori)}&" if kategori else ""
+        _target = f"/?{_kat_part}sayfa={_p}" if _p > 1 else (f"/?kategori={urllib.parse.quote(kategori)}" if kategori else "/")
+        return RedirectResponse(url=_target, status_code=301)
     if kategori and not q:
         import urllib.parse
         from fastapi.responses import RedirectResponse
@@ -1219,7 +1231,7 @@ def _new_panel_session() -> str:
 def _is_panel_session_valid(tok: str) -> bool:
     return bool(ADMIN_PIN and tok and _PANEL_SESSIONS.get(tok, 0) > time.time())
 
-@app.get("/panel", response_class=HTMLResponse)
+# /panel herkese açık adresi güvenlik için kapatıldı; yalnızca gizli yönetim adresi aktiftir.
 @app.get(f"/{PANEL_SECRET_SLUG}", response_class=HTMLResponse)
 @app.get("/yonetim-71453", response_class=HTMLResponse)
 async def admin_panel(request: Request):
@@ -2244,7 +2256,9 @@ async def article_detail(request: Request, slug: str):
             print(f"Spor puan durumu kutusu atlandı: {_e}")
 
     # 3. alt başlığın hemen üstüne tek satırlık şık "İlginizi Çekebilir" iç bağlantısı (SEO & Sayfa Görüntüleme Artırıcı)
-    if related_articles and raw_content.count("<h3") >= 3:
+    # İçerik çeşitlendirme (her haberde aynı 5'li <h3> şablonu yerine ID'ye göre 3 farklı editoryal mizanpaj)
+    raw_content = content_quality.diversify_article_layout(raw_content, article_id or 0)
+    if related_articles and len(re.findall(r"<h[23]\b", raw_content, flags=re.I)) >= 2:
         rel_pick = related_articles[-1]
         rel_title_esc = _html_mod.escape(rel_pick.get("title") or "")
         rel_cat_esc = _html_mod.escape(rel_pick.get("category") or "Gündem")
@@ -2258,8 +2272,15 @@ async def article_detail(request: Request, slug: str):
             f'<a href="/haber/{rel_slug_esc}" class="shrink-0 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold transition shadow-xs">Oku →</a>'
             f'</div>'
         )
-        h3_positions = [m.start() for m in re.finditer(r"<h3\b", raw_content, flags=re.I)]
-        if len(h3_positions) >= 3:
+        h3_positions = [m.start() for m in re.finditer(r"<h[23]\b", raw_content, flags=re.I)]
+        if len(h3_positions) >= 2:
+            pos_idx = 1 if (article_id or 0) % 2 == 0 or len(h3_positions) == 2 else 2
+            pos3 = h3_positions[pos_idx]
+            raw_content = raw_content[:pos3] + inline_box + raw_content[pos3:]
+        elif False and len(h3_positions) >= 3:
+            pass
+        # Inline box placed above
+        elif False and len(h3_positions) >= 99:
             pos3 = h3_positions[2]
             raw_content = raw_content[:pos3] + inline_box + raw_content[pos3:]
 
@@ -2632,7 +2653,7 @@ async def robots(request: Request):
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     content = f"""User-agent: *
 Allow: /
-Disallow: /panel
+Disallow: /arama
 Disallow: /api/
 Sitemap: {base_url}/sitemap.xml
 Sitemap: {base_url}/news-sitemap.xml

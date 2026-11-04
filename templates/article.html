@@ -687,7 +687,7 @@
                     const aid = parseInt(box.getAttribute('data-article-id') || '0', 10) || 0;
                     if (!aid) return;
                     const storageKey = 'ga_react_v3_' + aid;
-                    const MIN_VOTES_TO_SHOW = 10; // Az oyda yanıltıcı yüzde (ör. 1 oy = %100) gösterilmez
+                    const MIN_VOTES_TO_SHOW = 1; // Oy verildiği anda gerçek yüzdeleri canlı göster
                     const sub = document.getElementById('reaction-subtitle');
                     const btns = box.querySelectorAll('.react-btn');
                     btns.forEach(b => { const p = b.querySelector('.react-pct'); if (p) p.innerText = ''; });
@@ -866,7 +866,7 @@
             <!-- Kaynak Bilgisi -->
             <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
                 <span>Haber Kaynağı: <strong class="text-slate-900">{{ article.source }}</strong></span>
-                <span>Sorumlu Yayıncı: <a href="/yazar/yalcin-celik" class="font-bold text-red-600 hover:underline">Yalçın Çelik</a></span>
+                <span>Masa: <strong class="text-slate-800">{{ article.category or 'Gündem' }} Editörlüğü</strong> • Sorumlu Yayıncı: <a href="/yazar/yalcin-celik" class="font-bold text-red-600 hover:underline">Yalçın Çelik</a></span>
             </div>
 
             <!-- E-E-A-T DOĞRULUK VE İLKELER KUTUSU (Google & AdSense Güven Standardı) -->
@@ -881,7 +881,7 @@
                         <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi Editoryal Masası tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi Editoryal Masası tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
                         Maddi hata bildirimi, cevap ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>
@@ -1184,7 +1184,7 @@
             }
         }
 
-        // Tüm video ve görselleri indirilmeye karşı koru (Download butonunu ve sağ tıklamayı engelle)
+            // Videoları indirilmeye karşı koru (Görsellerde sağ tık okuyucu ve denetçi için serbesttir)
         document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll("video").forEach(v => {
                 v.setAttribute("controlsList", "nodownload noplaybackrate");
@@ -1192,7 +1192,7 @@
                 v.oncontextmenu = (e) => e.preventDefault();
             });
             document.querySelectorAll("img").forEach(img => {
-                img.oncontextmenu = (e) => e.preventDefault();
+            // Görsellerde sağ tıklama (yeni sekmede açma) serbest bırakıldı
             });
         });
 
