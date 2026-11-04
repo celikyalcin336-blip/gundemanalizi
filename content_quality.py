@@ -161,12 +161,65 @@ def clean_article_html(content: str) -> str:
     return c
 
 
+_THIN_WORD_MEMO = {}
+
+
 def visible_word_count(content: str) -> int:
     return len(_norm(content).split())
 
 
+def _fast_clean_for_word_count(content: str) -> str:
+    if not content:
+        return ""
+    c = content
+
+    def _drop_eval_box(m):
+        return "" if _is_generic(m.group(0).split("</h4>", 1)[-1]) else m.group(0)
+
+    c = re.sub(r'<div[^>]*>\s*<h4[^>]*>.*?DEĞERLENDİRMESİ\s*</h4>.*?</div>', _drop_eval_box, c, flags=re.S | re.I)
+    c = re.sub(r"<p[^>]*>(.*?)</p>", lambda m: "" if _is_generic(m.group(1)) else m.group(0), c, flags=re.S)
+
+    def _fix_p_fast(m):
+        inner = m.group(2)
+        inner = re.sub(r"https?://t\.co/[\w]+(?:\s+[\w]{2,6}){0,4}", "", inner)
+        inner = re.sub(r"(?<![\"'=])https?://[^\s<]+", "", inner)
+        inner = re.sub(r"pic\.twitter\.com/\S+", "", inner)
+        inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’\-]+\s*", "", inner.strip())
+        return f"{m.group(1)}{inner}</p>"
+
+    c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p_fast, c, flags=re.S)
+
+    seen_text = [""]
+
+    def _dedupe(m):
+        inner = m.group(2)
+        sents = re.split(r"(?<=[.!?])\s+", inner)
+        keep = []
+        for s in sents:
+            key = re.sub(r"\W+", "", _norm(s).lower())
+            if len(key) > 40 and len(_norm(s).split()) >= 8 and key in seen_text[0]:
+                continue
+            seen_text[0] += key + "|"
+            keep.append(s)
+        return f"{m.group(1)}{' '.join(keep)}</p>"
+
+    c = re.sub(r"(<p[^>]*>)(.*?)</p>", _dedupe, c, flags=re.S)
+    c = re.sub(r"<p[^>]*>\s*</p>", "", c)
+    c = re.sub(r"<h3[^>]*>[^<]*</h3>\s*(?=(<div|$|<h3))", "", c.strip())
+    return c
+
+
 def is_thin(content: str, threshold: int = 300) -> bool:
-    return visible_word_count(clean_article_html(content or "")) < threshold
+    if not content:
+        return True
+    key = (len(content), content[:80], content[-80:])
+    wc = _THIN_WORD_MEMO.get(key)
+    if wc is None:
+        if len(_THIN_WORD_MEMO) > 5000:
+            _THIN_WORD_MEMO.clear()
+        wc = visible_word_count(_fast_clean_for_word_count(content))
+        _THIN_WORD_MEMO[key] = wc
+    return wc < threshold
 
 
 def diversify_article_layout(content: str, article_id: int = 0) -> str:

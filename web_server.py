@@ -998,13 +998,11 @@ def clear_turbo_cache():
 
 _CATEGORY_WIDGETS_CACHE = {}
 _CATEGORY_WIDGETS_CACHE_TIME = 0
+_WIDGETS_REFRESH_LOCK = threading.Lock()
+_ONE_TIME_CAT_CLEANUP_DONE = False
 
-def get_cached_category_widgets() -> dict:
-    global _CATEGORY_WIDGETS_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
-    now = time.time()
-    if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 180:
-        return _CATEGORY_WIDGETS_CACHE
-
+def _refresh_category_widgets_sync() -> dict:
+    global _CATEGORY_WIDGETS_CACHE, _CATEGORY_WIDGETS_CACHE_TIME, _ONE_TIME_CAT_CLEANUP_DONE
     import content_quality
     def _clean_vitrin(items, cap):
         rich = [
@@ -1018,14 +1016,15 @@ def get_cached_category_widgets() -> dict:
         return (rich + [a for a in non_comm if a not in rich])[:cap]
 
     try:
-        # Otomatik kategori düzeltmesi: Sayısal Loto vb. şans oyunları yanlışlıkla Spor'a düştüyse Gündem yap
-        try:
-            with database.get_connection() as _c:
-                _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Spor' AND (LOWER(title) LIKE '%loto%' OR LOWER(title) LIKE '%piyango%' OR LOWER(title) LIKE '%şans topu%' OR LOWER(title) LIKE '%on numara%')")
-                _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Asayiş'")
-                _c.execute("UPDATE articles SET title = REPLACE(title, 'Açkladı', 'Açıkladı') WHERE title LIKE '%Açkladı%'")
-        except Exception:
-            pass
+        if not _ONE_TIME_CAT_CLEANUP_DONE:
+            _ONE_TIME_CAT_CLEANUP_DONE = True
+            try:
+                with database.get_connection() as _c:
+                    _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Spor' AND (LOWER(title) LIKE '%loto%' OR LOWER(title) LIKE '%piyango%' OR LOWER(title) LIKE '%şans topu%' OR LOWER(title) LIKE '%on numara%')")
+                    _c.execute("UPDATE articles SET category = 'Gündem' WHERE category = 'Asayiş'")
+                    _c.execute("UPDATE articles SET title = REPLACE(title, 'Açkladı', 'Açıkladı') WHERE title LIKE '%Açkladı%'")
+            except Exception:
+                pass
         breaking_pool = _clean_vitrin(database.get_articles(limit=40), 16)
         breaking_news = breaking_pool[:14]
         side_featured = breaking_pool[14:16] if len(breaking_pool) >= 16 else breaking_pool[1:3]
@@ -1054,7 +1053,7 @@ def get_cached_category_widgets() -> dict:
         }
         if data["breaking_news"]:
             _CATEGORY_WIDGETS_CACHE = data
-            _CATEGORY_WIDGETS_CACHE_TIME = now
+            _CATEGORY_WIDGETS_CACHE_TIME = time.time()
         return data
     except Exception as e:
         print(f"Kategori önbellek yenileme hatası: {e}")
@@ -1063,6 +1062,27 @@ def get_cached_category_widgets() -> dict:
             "economy_articles": [], "sports_articles": [], "health_articles": [],
             "education_articles": []
         }
+
+def get_cached_category_widgets() -> dict:
+    now = time.time()
+    if _CATEGORY_WIDGETS_CACHE and (now - _CATEGORY_WIDGETS_CACHE_TIME) < 180:
+        return _CATEGORY_WIDGETS_CACHE
+    # Eğer önbellek doluysa ama süresi geçmişse: ziyaretçiyi 0 ms beklet, kilitli tek thread ile arka planda tazele
+    if _CATEGORY_WIDGETS_CACHE:
+        if not _WIDGETS_REFRESH_LOCK.locked():
+            def _bg():
+                if _WIDGETS_REFRESH_LOCK.acquire(blocking=False):
+                    try:
+                        _refresh_category_widgets_sync()
+                    finally:
+                        _WIDGETS_REFRESH_LOCK.release()
+            threading.Thread(target=_bg, daemon=True).start()
+        return _CATEGORY_WIDGETS_CACHE
+    # İlk açılışta önbellek tamamen boşsa kilit altında 1 kez senkron doldur
+    with _WIDGETS_REFRESH_LOCK:
+        if _CATEGORY_WIDGETS_CACHE:
+            return _CATEGORY_WIDGETS_CACHE
+        return _refresh_category_widgets_sync()
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def home(request: Request, kategori: str = None, q: str = None, sayfa: int = 1):
@@ -1127,6 +1147,10 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         if norm_kategori == "Son Dakika":
             articles = _prefer_rich(database.get_articles(limit=limit + 16, offset=offset), limit)
             total_count = database.get_articles_total_count()
+        elif not norm_kategori and page == 1:
+            # Ana sayfa 1. sayfada aşağıda 100'lük havuz çekildiği için burada mükerrer 40'lık sorgu atılmaz
+            articles = []
+            total_count = database.get_articles_total_count()
         else:
             articles = _prefer_rich(database.get_articles(limit=limit + 16, category=norm_kategori, offset=offset), limit)
             total_count = database.get_articles_total_count(category=norm_kategori)
@@ -1143,7 +1167,7 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     breaking_news = widgets["breaking_news"]
     side_featured = widgets.get("side_featured") or breaking_news[1:3]
     if norm_kategori:
-        slider_articles = database.get_articles(limit=14, category=norm_kategori)
+        slider_articles = articles[:14] if (page == 1 and len(articles) >= 3) else database.get_articles(limit=14, category=norm_kategori)
         if len(slider_articles) < 3:
             slider_articles = widgets["breaking_news"]
     else:
