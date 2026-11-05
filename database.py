@@ -120,9 +120,9 @@ class _Conn:
 
     def execute(self, sql: str, params: tuple = ()):
         if self.is_pg:
-            sql = sql.replace("?", "%s")
             cur = self.raw.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             if params:
+                sql = sql.replace("%", "%%").replace("?", "%s")
                 cur.execute(sql, params)
             else:
                 cur.execute(sql)
@@ -1575,16 +1575,16 @@ def get_dashboard_summary() -> Dict:
                     SELECT COUNT(*) AS c 
                     FROM visitor_logs 
                     WHERE created_at >= ? 
-                      AND (device LIKE '%AdSense%' OR referrer LIKE '%AdSense%')
-                """, (today_start_utc,)).fetchone()
+                      AND (device LIKE ? OR referrer LIKE ?)
+                """, (today_start_utc, '%AdSense%', '%AdSense%')).fetchone()
                 adsense_today = int(ads_today_row["c"]) if (ads_today_row and ads_today_row["c"]) else 0
 
                 ads_7d_row = conn.execute("""
                     SELECT COUNT(*) AS c 
                     FROM visitor_logs 
                     WHERE created_at >= ? 
-                      AND (device LIKE '%AdSense%' OR referrer LIKE '%AdSense%')
-                """, (seven_days_ago_utc,)).fetchone()
+                      AND (device LIKE ? OR referrer LIKE ?)
+                """, (seven_days_ago_utc, '%AdSense%', '%AdSense%')).fetchone()
                 adsense_7d = int(ads_7d_row["c"]) if (ads_7d_row and ads_7d_row["c"]) else 0
 
                 traffic_rows = conn.execute(
@@ -1613,12 +1613,12 @@ def get_dashboard_summary() -> Dict:
                     ('/api/%',)
                 ).fetchall()
                 lv_adsense = conn.execute(
-                    _base_lv_sql + " AND (v.device LIKE '%AdSense%' OR v.referrer LIKE '%AdSense%') ORDER BY v.id DESC LIMIT 20",
-                    ('/api/%',)
+                    _base_lv_sql + " AND (v.device LIKE ? OR v.referrer LIKE ?) ORDER BY v.id DESC LIMIT 20",
+                    ('/api/%', '%AdSense%', '%AdSense%')
                 ).fetchall()
                 lv_bots = conn.execute(
-                    _base_lv_sql + " AND v.device NOT IN ('Mobil', 'Masaüstü', 'Tablet') AND v.device NOT LIKE '%AdSense%' ORDER BY v.id DESC LIMIT 20",
-                    ('/api/%',)
+                    _base_lv_sql + " AND v.device NOT IN ('Mobil', 'Masaüstü', 'Tablet') AND v.device NOT LIKE ? ORDER BY v.id DESC LIMIT 20",
+                    ('/api/%', '%AdSense%')
                 ).fetchall()
 
                 seen_lv_ids = set()
