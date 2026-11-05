@@ -2542,6 +2542,7 @@ async def calc_emekli(request: Request):
 
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
+@app.get("/vizyonumuz", response_class=HTMLResponse)
 async def about_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
 
