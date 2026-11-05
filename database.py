@@ -316,9 +316,32 @@ def init_db():
         print(f"article_reactions tablo hatası: {e}")
 
     # Arka plan API sorgu kayıtlarını (döviz kurları vb.) ziyaretçi geçmişinden temizle
+    # ve geçmişte Masaüstü/Doğrudan olarak sızmış otomatik site haritası kazıyıcı yığınlarını "🤖 Arama Botu" olarak sınıflandır (Veri silinmez, doğru kategoriye taşınır)
     try:
         with get_connection() as conn:
             conn.execute("DELETE FROM visitor_logs WHERE page LIKE ?", ('/api/%',))
+            conn.execute("""
+                UPDATE visitor_logs
+                SET device = '🤖 Arama Botu', referrer = '🤖 Arama Botu', is_first_visit = 0
+                WHERE device = 'Masaüstü'
+                  AND referrer = 'Doğrudan'
+                  AND (
+                      created_at IN (
+                          SELECT created_at
+                          FROM visitor_logs
+                          WHERE device = 'Masaüstü' AND referrer = 'Doğrudan'
+                          GROUP BY created_at
+                          HAVING COUNT(*) >= 4
+                      )
+                      OR visitor_hash IN (
+                          SELECT visitor_hash
+                          FROM visitor_logs
+                          WHERE device = 'Masaüstü' AND referrer = 'Doğrudan' AND page LIKE '/haber/%'
+                          GROUP BY visitor_hash
+                          HAVING COUNT(*) >= 6
+                      )
+                  )
+            """)
     except Exception:
         pass
 
@@ -1287,15 +1310,25 @@ def _start_db_buffer_worker():
                 try:
                     with get_connection() as conn:
                         for item in logs_copy:
-                            if len(item) == 7:
+                            if len(item) == 8:
+                                v_hash, is_first, page, ref, dev, ctry, city, v_ts = item
+                                conn.execute("""
+                                    INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city, created_at)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                """, (v_hash, is_first, page, ref, dev, ctry, city, v_ts))
+                            elif len(item) == 7:
                                 v_hash, is_first, page, ref, dev, ctry, city = item
+                                conn.execute("""
+                                    INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """, (v_hash, is_first, page, ref, dev, ctry, city))
                             else:
                                 v_hash, page, ref, dev, ctry, city = item
                                 is_first = 1
-                            conn.execute("""
-                                INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)
-                            """, (v_hash, is_first, page, ref, dev, ctry, city))
+                                conn.execute("""
+                                    INSERT INTO visitor_logs (visitor_hash, is_first_visit, page, referrer, device, country, city)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                                """, (v_hash, is_first, page, ref, dev, ctry, city))
                 except Exception:
                     pass
 
@@ -1351,13 +1384,14 @@ def set_setting(key: str, val: str):
 
 
 def log_visitor(visitor_hash: str, page: str = "/", referrer: str = "Doğrudan", device: str = "Mobil", country: str = "TR", city: str = "", is_first_visit: int = 1) -> bool:
-    """Ziyaretçiyi RAM kuyruğuna ekler (0 ms bekleme, 0 DB kilidi)."""
+    """Ziyaretçiyi gerçek giriş saniyesiyle RAM kuyruğuna ekler (0 ms bekleme, 0 DB kilidi)."""
     if not page or page.startswith("/api/") or page.startswith("/assets") or page.startswith("/images"):
         return False
     _start_db_buffer_worker()
+    visit_ts_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     with _VISITOR_QUEUE_LOCK:
         if len(_VISITOR_LOG_QUEUE) < 4000:
-            _VISITOR_LOG_QUEUE.append((visitor_hash, is_first_visit, page[:120], referrer[:50], device[:30], country[:10], city[:50]))
+            _VISITOR_LOG_QUEUE.append((visitor_hash, is_first_visit, page[:120], referrer[:50], device[:30], country[:10], city[:50], visit_ts_utc))
     return True
 
 
@@ -1401,6 +1435,10 @@ def get_dashboard_summary() -> Dict:
     active_now = 1
     today_uniques = 0
     first_time_today = 0
+    google_today = 0
+    bot_uniques_today = 0
+    adsense_today = 0
+    adsense_7d = 0
     live_visitors = []
     traffic_sources = []
     device_stats = []
@@ -1532,6 +1570,23 @@ def get_dashboard_summary() -> Dict:
                 """, (today_start_utc,)).fetchone()
                 bot_uniques_today = bot_row["c"] if bot_row else 0
 
+                # 💰 Google AdSense Taramaları ve İnceleme Girişleri (Bugün ve Son 7 Gün)
+                ads_today_row = conn.execute("""
+                    SELECT COUNT(*) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? 
+                      AND (device LIKE '%AdSense%' OR referrer LIKE '%AdSense%')
+                """, (today_start_utc,)).fetchone()
+                adsense_today = int(ads_today_row["c"]) if (ads_today_row and ads_today_row["c"]) else 0
+
+                ads_7d_row = conn.execute("""
+                    SELECT COUNT(*) AS c 
+                    FROM visitor_logs 
+                    WHERE created_at >= ? 
+                      AND (device LIKE '%AdSense%' OR referrer LIKE '%AdSense%')
+                """, (seven_days_ago_utc,)).fetchone()
+                adsense_7d = int(ads_7d_row["c"]) if (ads_7d_row and ads_7d_row["c"]) else 0
+
                 traffic_rows = conn.execute(
                     "SELECT referrer, COUNT(*) AS cnt FROM visitor_logs WHERE created_at >= ? GROUP BY referrer ORDER BY cnt DESC LIMIT 7", (seven_days_ago_utc,)
                 ).fetchall()
@@ -1542,22 +1597,43 @@ def get_dashboard_summary() -> Dict:
                 ).fetchall()
                 device_stats = [dict(r) for r in dev_rows]
 
-                lv_rows = conn.execute("""
+                # Her sekmenin (Gerçek Okuyucular / AdSense / Arama Botları) bot yoğunluğunda bile dolu görünmesi için
+                # 3 ayrı havuzdan son 20'şer kaydı çekip birleştir
+                _base_lv_sql = """
                     SELECT v.*,
                            CASE 
-                               WHEN NOT EXISTS (SELECT 1 FROM visitor_logs v2 WHERE v2.visitor_hash = v.visitor_hash AND v2.created_at < v.created_at) THEN 1
+                               WHEN NOT EXISTS (SELECT 1 FROM visitor_logs v2 WHERE v2.visitor_hash = v.visitor_hash AND v2.id < v.id) THEN 1
                                ELSE 0 
                            END AS computed_first
                     FROM visitor_logs v
                     WHERE v.page NOT LIKE ?
-                    ORDER BY v.id DESC LIMIT 20
-                """, ('/api/%',)).fetchall()
-                live_visitors = []
-                for r in lv_rows:
+                """
+                lv_human = conn.execute(
+                    _base_lv_sql + " AND v.device IN ('Mobil', 'Masaüstü', 'Tablet') ORDER BY v.id DESC LIMIT 20",
+                    ('/api/%',)
+                ).fetchall()
+                lv_adsense = conn.execute(
+                    _base_lv_sql + " AND (v.device LIKE '%AdSense%' OR v.referrer LIKE '%AdSense%') ORDER BY v.id DESC LIMIT 20",
+                    ('/api/%',)
+                ).fetchall()
+                lv_bots = conn.execute(
+                    _base_lv_sql + " AND v.device NOT IN ('Mobil', 'Masaüstü', 'Tablet') AND v.device NOT LIKE '%AdSense%' ORDER BY v.id DESC LIMIT 20",
+                    ('/api/%',)
+                ).fetchall()
+
+                seen_lv_ids = set()
+                merged_lv = []
+                for r in list(lv_human) + list(lv_adsense) + list(lv_bots):
                     d = _row_to_dict(r)
+                    rid = d.get("id")
+                    if rid in seen_lv_ids:
+                        continue
+                    seen_lv_ids.add(rid)
                     if "computed_first" in d:
                         d["is_first_visit"] = d["computed_first"]
-                    live_visitors.append(d)
+                    merged_lv.append(d)
+                merged_lv.sort(key=lambda x: x.get("id") or 0, reverse=True)
+                live_visitors = merged_lv
             except Exception as e:
                 if hasattr(conn.raw, "rollback"):
                     try: conn.raw.rollback()
@@ -1605,6 +1681,8 @@ def get_dashboard_summary() -> Dict:
         "returning_today": returning_today,
         "google_today": google_today,
         "bot_uniques_today": bot_uniques_today,
+        "adsense_today": adsense_today,
+        "adsense_7d": adsense_7d,
         "traffic_sources": traffic_sources,
         "device_stats": device_stats,
         "live_visitors": live_visitors,

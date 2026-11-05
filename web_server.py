@@ -319,6 +319,8 @@ _CSP_REPORT_ONLY = (
     "frame-src 'self' https:; "
     "frame-ancestors 'self';"
 )
+_VISITOR_BURST_HITS = {}          # vis_hash -> [ts, ...] (otomatik kazıyıcı hız tespiti)
+_DIRECT_ARTICLE_BURST_TS = []     # [ts, ...] (yurt dışı doğrudan /haber/ toplu tarama tespiti)
 
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
@@ -385,70 +387,123 @@ async def track_visitors_middleware(request: Request, call_next):
     )
     if not (is_api_or_admin or is_static_or_system):
         try:
+            global _DIRECT_ARTICLE_BURST_TS
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
             ip = ip.split(",")[0].strip()
             ua = request.headers.get("user-agent", "")
             ua_low = ua.lower()
+            ref = request.headers.get("referer", "").lower()
+            accept_lang = (request.headers.get("accept-language") or "").strip()
+            accept_hdr = (request.headers.get("accept") or "").lower()
+            sec_fetch_mode = (request.headers.get("sec-fetch-mode") or "").lower()
+            country = (request.headers.get("cf-ipcountry") or "TR").upper().strip()
+            city = request.headers.get("cf-ipcity", "")
+            has_cookie = bool(request.cookies.get("ga_vis"))
 
-            # 🤖 Arama motoru örümcekleri ve botları tespit et
+            import hashlib
+            vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
+
+            # 1. 💰 Google AdSense Botları ve AdSense İnceleme Girişleri (Ayrı ve Net Tespit)
             bot_type = None
-            if "googlebot" in ua_low or "google-read-aloud" in ua_low:
+            is_adsense = False
+            if any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense")):
+                bot_type = "AdSense Bot"
+                is_adsense = True
+            elif any(a in ref for a in ("adsense.google", "partnerdash.google", "googlesyndication.com", "doubleclick.net", "googleads.")):
+                bot_type = "AdSense İnceleme"
+                is_adsense = True
+            # 2. 🤖 Arama Motoru Örümcekleri ve Bilinen Botlar
+            elif any(g in ua_low for g in (
+                "googlebot", "googleother", "google-inspectiontool", "google-read-aloud",
+                "feedfetcher-google", "apis-google", "google-safety", "storebot-google",
+                "google-extended", "googleweblight", "google-site-verification", "googleproducer"
+            )):
                 bot_type = "Googlebot"
-            elif "bingbot" in ua_low or "msnbot" in ua_low:
+            elif any(b in ua_low for b in ("bingbot", "msnbot", "adidxbot", "bingpreview")):
                 bot_type = "Bingbot"
             elif "yandexbot" in ua_low or "yandex" in ua_low:
                 bot_type = "YandexBot"
             elif "telegrambot" in ua_low:
                 bot_type = "TelegramBot"
-            elif "facebookexternalhit" in ua_low or "meta-externalagent" in ua_low:
+            elif any(m in ua_low for m in ("facebookexternalhit", "meta-externalagent", "facebot")):
                 bot_type = "MetaBot"
             elif "twitterbot" in ua_low:
                 bot_type = "TwitterBot"
-            elif any(b in ua_low for b in ("bot", "spider", "crawl", "slurp", "headless", "ahrefs", "semrush", "python-requests")):
+            elif any(b in ua_low for b in (
+                "bot", "spider", "crawl", "slurp", "headless", "ahrefs", "semrush",
+                "python", "requests", "urllib", "httpx", "aiohttp", "scrapy",
+                "curl/", "wget/", "go-http-client", "axios", "node-fetch", "undici",
+                "okhttp", "java/", "libwww-perl", "php/", "ruby", "postman", "insomnia",
+                "apache-httpclient", "claude", "chatgpt", "openai", "gpt", "perplexity",
+                "anthropic", "cohere", "bytespider", "applebot", "petal", "amazonbot",
+                "duckduck", "baidu", "sogou", "mj12", "dotbot", "blex", "seekport",
+                "dataforseo", "screaming", "lighthouse", "pagespeed", "gtmetrix",
+                "pingdom", "uptime", "statuscake", "datadog", "newrelic", "censys",
+                "shodan", "zgrab", "gundemanalizi"
+            )):
                 bot_type = "Arama Botu"
 
-            import hashlib
-            vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
+            # 3. 🛡️ Sahte Masaüstü / Veri Merkezi Kazıyıcı (Scraper) Tespiti
+            # Gerçek tarayıcılar her zaman Mozilla/5.0, Accept-Language ve text/html (veya Sec-Fetch-Mode) gönderir
+            now_v = time.time()
+            if not bot_type:
+                if "mozilla/5.0" not in ua_low or not accept_lang or ("text/html" not in accept_hdr and sec_fetch_mode != "navigate"):
+                    bot_type = "Arama Botu"
+                else:
+                    vh_hits = [t for t in _VISITOR_BURST_HITS.get(vis_hash, []) if now_v - t < 60]
+                    vh_hits.append(now_v)
+                    _VISITOR_BURST_HITS[vis_hash] = vh_hits
+                    if len(_VISITOR_BURST_HITS) > 3000:
+                        for k in [k for k, v in _VISITOR_BURST_HITS.items() if not v or now_v - v[-1] > 60]:
+                            _VISITOR_BURST_HITS.pop(k, None)
 
-            if bot_type:
+                    recent_30s = [t for t in vh_hits if now_v - t < 30]
+                    if len(vh_hits) >= 10 or (not ref and path.startswith("/haber/") and len(recent_30s) >= 4):
+                        bot_type = "Arama Botu"
+                    elif not ref and path.startswith("/haber/") and not has_cookie and country != "TR":
+                        _DIRECT_ARTICLE_BURST_TS = [t for t in _DIRECT_ARTICLE_BURST_TS if now_v - t < 20]
+                        _DIRECT_ARTICLE_BURST_TS.append(now_v)
+                        if len(_DIRECT_ARTICLE_BURST_TS) >= 3:
+                            bot_type = "Arama Botu"
+
+            if is_adsense:
+                device = f"💰 {bot_type}"
+                source = "💰 Google AdSense"
+            elif bot_type:
                 device = f"🤖 {bot_type}"
-            elif any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
-                device = "Mobil"
-            elif "ipad" in ua_low or "tablet" in ua_low:
-                device = "Tablet"
-            else:
-                device = "Masaüstü"
-
-            ref = request.headers.get("referer", "").lower()
-            if bot_type:
                 source = f"🤖 {bot_type}"
-            elif "google." in ref:
-                source = "Google"
-            elif "t.me" in ref or "telegram" in ref:
-                source = "Telegram"
-            elif "instagram.com" in ref:
-                source = "Instagram"
-            elif "tiktok.com" in ref:
-                source = "TikTok"
-            elif "facebook.com" in ref or "fb.com" in ref:
-                source = "Facebook"
-            elif "twitter.com" in ref or "t.co" in ref or "x.com" in ref:
-                source = "X (Twitter)"
-            elif "whatsapp" in ref or "wa.me" in ref:
-                source = "WhatsApp"
-            elif ref:
-                source = "Diğer Web"
             else:
-                source = "Doğrudan"
+                if any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
+                    device = "Mobil"
+                elif "ipad" in ua_low or "tablet" in ua_low:
+                    device = "Tablet"
+                else:
+                    device = "Masaüstü"
+
+                if "google." in ref:
+                    source = "Google"
+                elif "t.me" in ref or "telegram" in ref:
+                    source = "Telegram"
+                elif "instagram.com" in ref:
+                    source = "Instagram"
+                elif "tiktok.com" in ref:
+                    source = "TikTok"
+                elif "facebook.com" in ref or "fb.com" in ref:
+                    source = "Facebook"
+                elif "twitter.com" in ref or "t.co" in ref or "x.com" in ref:
+                    source = "X (Twitter)"
+                elif "whatsapp" in ref or "wa.me" in ref:
+                    source = "WhatsApp"
+                elif "gndemanalizi" in ref or "gundemanalizi" in ref:
+                    source = "Site İçi Tıklama"
+                elif ref:
+                    source = "Diğer Web"
+                else:
+                    source = "Doğrudan"
 
             # Gerçek kullanıcılar için cookie tabanlı yeni/eski tespiti
-            has_cookie = bool(request.cookies.get("ga_vis"))
-            is_first = 0 if has_cookie else 1
-            if bot_type:
-                is_first = 0
+            is_first = 0 if (has_cookie or bot_type) else 1
 
-            country = request.headers.get("cf-ipcountry", "TR")
-            city = request.headers.get("cf-ipcity", "")
             database.log_visitor(vis_hash, path, source, device, country, city, is_first_visit=is_first)
         except Exception:
             pass
@@ -1346,6 +1401,8 @@ async def admin_panel(request: Request):
     stats.setdefault("returning_today", 0)
     stats.setdefault("google_today", 0)
     stats.setdefault("bot_uniques_today", 0)
+    stats.setdefault("adsense_today", 0)
+    stats.setdefault("adsense_7d", 0)
     stats.setdefault("traffic_sources", [])
     stats.setdefault("device_stats", [])
     stats.setdefault("live_visitors", [])
@@ -1869,9 +1926,11 @@ async def panel_live_stats(request: Request):
         "returning_today": stats.get("returning_today", 0),
         "google_today": stats.get("google_today", 0),
         "bot_uniques_today": stats.get("bot_uniques_today", 0),
+        "adsense_today": stats.get("adsense_today", 0),
+        "adsense_7d": stats.get("adsense_7d", 0),
         "total_views": stats.get("total_views", 0),
         "total_all_hits": stats.get("total_all_hits", 0),
-        "live_visitors": stats.get("live_visitors", [])[:15],
+        "live_visitors": stats.get("live_visitors", [])[:60],
         "total_revenue": stats.get("total_revenue", 0.0)
     }
 
