@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-06 04:09:58",
+  "last_check": "2026-11-06 04:55:19",
   "result": "posted",
-  "last_post": "2026-11-06 04:09:58",
-  "next_planned": "2026-11-06 04:54:58",
+  "last_post": "2026-11-06 04:55:19",
+  "next_planned": "2026-11-06 05:40:19",
   "runner": "github-actions",
-  "log_tail": "[2026-11-06 01:09:38] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Sağlık | Virallik/Duygu Skoru: 185 | Başlık: Kış Mevsiminde Solunum Yolu Enfeksiyonları ve Risk Grubundakiler İçin Uyarılar\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793927379.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n⚠️ [Google Indexing API] Token alinamadigi icin atlandi: https://xn--gndemanalizi-dlb.com.tr/haber/kis-mevsiminde-solunum-yolu-enfeksiyonlari-ve-risk-grubundakiler-icin-uyarilar\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Kış Mevsiminde Solunum Yolu Enfeksiyonları ve Risk Grubundakiler İçin Uyarılar\n"
+  "log_tail": "[2026-11-06 01:54:58] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Sağlık Devinde Radikal Dönüşüm: CVS... (Birebir slug eşleşmesi: saglik-devinde-radikal-donusum-cvs-health-iki-ayri-sirkete-ayriliyor)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Nişantaşı’nda Devrilen Ağaç Faciası... (Birebir slug eşleşmesi: nisantasinda-devrilen-agac-faciasini-saniye-farkiyla-bes-kisi-atlatmayi-basardi)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: NVIDIA Sürücüsüz Araç Geliştiricile... (Ortak varlıklar (yazilim, i cin, yapay): OpenAI Yazılım Geliştirme Yetenekle)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: OpenAI Yazılım Geliştirme Yetenekle... (Birebir slug eşleşmesi: openai-yazilim-gelistirme-yeteneklerini-guclendirmek-icin-pierre-sirketini-bunye)\n🎯 [X Paylaşım Adayı] Kategori: Dünya | Virallik/Duygu Skoru: 150 | Başlık: Washington'dan Gelen Yardım Kararı Tel Aviv Siyasetinde Şok Etkisi Yarattı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1793930100.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n⚠️ [Google Indexing API] Token alinamadigi icin atlandi: https://xn--gndemanalizi-dlb.com.tr/haber/washingtondan-gelen-yardim-karari-tel-aviv-siyasetinde-sok-etkisi-yaratti\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Washington'dan Gelen Yardım Kararı Tel Aviv Siyasetinde Şok Etkisi Yarattı\n"
 }
