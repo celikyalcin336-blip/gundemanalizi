@@ -1958,5 +1958,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794003611.5725694
+  },
+  {
+    "slug": "kasimpasada-yeni-donem-galibiyetle-basladi-gaziantep-fk-dususte",
+    "title": "Kasımpaşa’da Yeni Dönem Galibiyetle Başladı: Gaziantep FK Düşüşte",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794006312.9794788
+  },
+  {
+    "slug": "sudan-collerinde-ortaya-cikan-devasa-katedral-tarihi-degistiriyor",
+    "title": "Sudan Çöllerinde Ortaya Çıkan Devasa Katedral Tarihi Değiştiriyor",
+    "summary": "Arkeologlar, Sudan’ın tarihi Eski Dongola bölgesinde kumlar altında saklı devasa boyutlarda bir katedral keşfetti. Yapılan ilk ölçümler, antik yapının Beyaz Saray'dan bile daha geniş bir alana yayıldığını ortaya koyuyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794006333.8830624
   }
 ]
