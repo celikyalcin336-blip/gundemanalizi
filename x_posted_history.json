@@ -2062,5 +2062,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794030832.324417
+  },
+  {
+    "slug": "turk-futbolunda-ataturkun-anisina-kapsamli-saygi-durusu-karari",
+    "title": "Türk Futbolunda Atatürk'ün Anısına Kapsamlı Saygı Duruşu Kararı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794033533.8880742
+  },
+  {
+    "slug": "emre-belozoglu-donemi-baslarken-futbol-ekonomisinde-yeni-stratejik-hedefler-beli",
+    "title": "Emre Belözoğlu Dönemi Başlarken Futbol Ekonomisinde Yeni Stratejik Hedefler Belirlendi",
+    "summary": "Fenerbahçe bünyesinde teknik direktörlük görevine resmen getirilen Emre Belözoğlu, gerçekleştirdiği imza töreninde yeni dönem vizyonunu kamuoyuyla paylaştı. Kulüp yönetimi ve teknik heyet arasındaki uyumun finansal verimliliğe yansıtılması hedeflenir",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794033552.7860317
   }
 ]
