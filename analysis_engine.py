@@ -299,6 +299,12 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     import database
 
     synth_pool = database.get_articles(limit=18, category="Analiz")
+    if not synth_pool or not any((x.get("category") or "").strip() == "Analiz" for x in synth_pool):
+        try:
+            ensure_daily_synthesis_reports(force=True)
+            synth_pool = database.get_articles(limit=18, category="Analiz")
+        except Exception as _e:
+            print(f"İlk Analiz otomatik üretim uyarısı: {_e}")
     dossiers = []
     for s in (synth_pool or []):
         # Çift güvenlik: Sadece gerçek kategorisi 'Analiz' olanları kabul et
@@ -328,7 +334,7 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     return result
 
 
-def ensure_daily_synthesis_reports() -> Optional[str]:
+def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
     """
     Her gün 10:00 (dün 20:00 -> 10:00), 15:00 (10:00 -> 15:00) ve 19:00 (15:00 -> 19:00)
     dilimlerinde; o saat aralığındaki EN ÖNEMLİ 1 ANA GELİŞMEYİ (Odak Konuyu) seçer,
@@ -344,19 +350,34 @@ def ensure_daily_synthesis_reports() -> Optional[str]:
     today_str = now_tr.strftime("%Y-%m-%d")
     hour = now_tr.hour
 
-    slot_map = {10: "10", 15: "15", 19: "19"}
-    if hour not in slot_map:
-        return None
+    existing_analiz = database.get_articles(limit=2, category="Analiz")
+    has_any_analiz = any((x.get("category") or "").strip() == "Analiz" for x in (existing_analiz or []))
 
-    slot_key = slot_map[hour]
-    setting_key = f"ga_analiz_{today_str}_{slot_key}"
-    if database.get_setting(setting_key, "") == "1":
-        return None
+    if not force and has_any_analiz:
+        if 10 <= hour < 15:
+            slot_key = "10"
+        elif 15 <= hour < 19:
+            slot_key = "15"
+        elif hour >= 19:
+            slot_key = "19"
+        else:
+            return None
+        setting_key = f"ga_analiz_{today_str}_{slot_key}"
+        if database.get_setting(setting_key, "") == "1":
+            return None
+    else:
+        if hour >= 19:
+            slot_key = "19"
+        elif hour >= 15:
+            slot_key = "15"
+        else:
+            slot_key = "10"
+        setting_key = f"ga_analiz_{today_str}_{slot_key}"
 
     yesterday_str = (now_tr - timedelta(days=1)).strftime("%Y-%m-%d")
-    if hour == 10:
+    if slot_key == "10":
         win_start = f"{yesterday_str} 20:00:00"
-    elif hour == 15:
+    elif slot_key == "15":
         win_start = f"{today_str} 10:00:00"
     else:
         win_start = f"{today_str} 15:00:00"
@@ -493,7 +514,37 @@ KURALLAR:
         print(f"Gündem Analizi AI üretim uyarısı: {_ai_e}")
 
     if not ai_html:
-        return None
+        ft_esc = _html.escape(focus_title)
+        fs_esc = _html.escape(focus_summary)
+        fc_esc = _html.escape(focus_cat)
+        para_chunks = [p.strip() for p in re.split(r'(?<=[.!?])\s+', focus_content_plain) if len(p.strip()) > 35]
+        p1 = " ".join(para_chunks[:3]) if len(para_chunks) >= 3 else fs_esc
+        p2 = " ".join(para_chunks[3:6]) if len(para_chunks) >= 6 else fs_esc
+        p3 = " ".join(para_chunks[6:10]) if len(para_chunks) >= 7 else p1
+        ai_html = (
+            f'<h3>{ft_esc}: Gelişmenin Arka Planı ve Temel Dinamikler</h3>'
+            f'<p>{fc_esc} gündeminin ilk sırasına yerleşen <a href="/haber/{focus_slug}" class="text-red-600 font-bold underline">{ft_esc}</a> başlığı, '
+            f'hem karar alıcılar hem de kamuoyu açısından kritik bir dönüm noktasına işaret ediyor. {_html.escape(p1)} '
+            f'Bu tablo, ilgili alanda uzun süredir tartışılan yapısal beklentilerin somut adımlara dönüşmeye başladığını gösteriyor.</p>'
+            f'<p>Özellikle son dönemde yaşanan gelişmeler ışığında değerlendirildiğinde, {_html.escape(p2)} '
+            f'Uzmanlar, alınan kararların ve açıklanan verilerin yalnızca kısa vadeli bir tepki olarak kalmayacağını, orta vadede sektör standartlarını yeniden belirleyeceğini vurguluyor.</p>'
+            f'<h3>Sektörel Yansımalar ve Günlük Hayata Somut Etkileri</h3>'
+            f'<p>Söz konusu gelişmenin sahadaki yansımaları incelendiğinde, vatandaşların ve sektör paydaşlarının doğrudan etkileneceği başlıklar öne çıkıyor. '
+            f'{_html.escape(p3)} Uygulama aşamasında denetim mekanizmalarının etkinliği, maliyet dengesi ve erişilebilirlik kriterleri belirleyici rol oynayacak.</p>'
+            f'<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+            f'<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+            f'<th class="p-2.5 border border-slate-200">Analiz Boyutu</th>'
+            f'<th class="p-2.5 border border-slate-200">Mevcut Durum ve Beklenen Etki</th>'
+            f'</tr></thead><tbody>'
+            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Odak Alanı</td><td class="p-2.5 border border-slate-200">{fc_esc} — {ft_esc}</td></tr>'
+            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Temel Gündem</td><td class="p-2.5 border border-slate-200">{fs_esc}</td></tr>'
+            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Kısa Vadeli Etki</td><td class="p-2.5 border border-slate-200">İlgili kurum ve paydaşlar nezdinde yeni uygulama ve uyum sürecinin başlaması</td></tr>'
+            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Orta Vadeli Beklenti</td><td class="p-2.5 border border-slate-200">Düzenleme ve saha sonuçlarının ekonomik ve toplumsal göstergelere yansıması</td></tr>'
+            f'</tbody></table></div>'
+            f'<h3>Önümüzdeki Süreçte Neler Bekleniyor?</h3>'
+            f'<p>Önümüzdeki günlerde <a href="/haber/{focus_slug}" class="text-red-600 font-bold underline">{ft_esc}</a> dosyasına ilişkin yeni uygulama detaylarının ve resmi takvimin netleşmesi bekleniyor. '
+            f'Kararın sahadaki ilk sonuçları, hem kamuoyunun beklentilerini karşılama düzeyi hem de bundan sonra atılacak tamamlayıcı adımlar açısından yakından takip edilecek.</p>'
+        )
 
     # Eğer aynı saat diliminde başka haberler de varsa, yazının en altına birbirine karıştırmadan şık bir 'Aynı Saat Dilimindeki Diğer Başlıklar' kutusu ekle
     if other_items:

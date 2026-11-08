@@ -3,6 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        (function() {
+            var c = null;
+            try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+            var g = (c === 'rejected' || c === 'essential') ? 'denied' : 'granted';
+            gtag('consent', 'default', {
+                'ad_storage': g,
+                'ad_user_data': g,
+                'ad_personalization': g,
+                'analytics_storage': g,
+                'wait_for_update': 500
+            });
+        })();
+    </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gündem Analizi — Özel Dosyalar ve Gündem Değerlendirmeleri</title>
@@ -27,34 +43,46 @@
 <body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
 
     <!-- ÜST HEADER -->
-    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <a href="/" class="flex items-center gap-3 group shrink-0">
-                <img src="/assets/logo-128.png" width="40" height="40" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-sm" onerror="this.onerror=null;this.src='/assets/logo.png';">
-                <div>
-                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
-                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
-                    </span>
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm" style="background-color: #ffffff !important;">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-2.5 sm:py-3 gap-3">
+                <a href="/" class="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+                    <img src="/assets/logo-128.png" width="42" height="42" alt="Gündem Analizi Logo" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full border-2 border-red-600 shadow-sm" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                    <div class="leading-tight">
+                        <span class="text-lg sm:text-2xl font-black tracking-tight flex items-center gap-1" style="color: #0f172a !important;">
+                            <span style="color: #0f172a !important;">GÜNDEM</span> <span style="color: #dc2626 !important;">ANALİZİ</span>
+                        </span>
+                        <span class="text-[9px] sm:text-[10px] font-bold tracking-widest uppercase block" style="color: #64748b !important;">
+                            Doğru Haber • Tarafsız Analiz
+                        </span>
+                    </div>
+                </a>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="/" class="text-xs font-extrabold px-3.5 py-1.5 rounded-full border border-slate-300 bg-slate-100 hover:bg-slate-200 transition" style="color: #0f172a !important;">
+                        ← Ana Sayfa
+                    </a>
                 </div>
-            </a>
-
-            <nav class="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-700">
-                <a href="/" class="px-3 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ana Sayfa</a>
-                <a href="/analiz" class="px-3 py-1.5 rounded-lg bg-red-600 text-white font-extrabold shadow-xs">
-                    Gündem Analizi
-                </a>
-                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Gündem</a>
-                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ekonomi</a>
-                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Teknoloji</a>
-                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Otomobil</a>
-                <a href="/?kategori=Dünya" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Dünya</a>
-                <a href="/piyasalar" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Piyasalar</a>
-            </nav>
-
-            <div class="flex items-center gap-2 shrink-0">
-                <a href="/" class="text-xs font-bold text-slate-800 hover:text-red-600 px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 transition">
-                    ← Ana Sayfa
-                </a>
+            </div>
+        </div>
+        <div class="w-full bg-red-600 border-t border-red-700 shadow-xs" style="background-color: #dc2626 !important; border-color: #b91c1c !important;">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+                <nav aria-label="Ana Kategoriler" class="flex items-center justify-start md:justify-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-2 text-xs sm:text-[13px] font-extrabold whitespace-nowrap">
+                    <a href="/son-dakika" class="px-3 py-1 rounded-full bg-red-800 hover:bg-red-900 text-white transition flex items-center gap-1.5 shrink-0 shadow-xs" style="background-color: #991b1b !important; color: #ffffff !important;">
+                        <span class="w-2 h-2 rounded-full bg-white animate-pulse" style="background-color: #ffffff !important;"></span>
+                        <span style="color: #ffffff !important;">Son Dakika</span>
+                    </a>
+                    <a href="/analiz" class="px-3 py-1 rounded-full bg-white text-red-600 font-black transition flex items-center gap-1 shrink-0 shadow-xs" style="background-color: #ffffff !important; color: #dc2626 !important;">
+                        <span style="color: #dc2626 !important;">📊 Analiz</span>
+                    </a>
+                    <a href="/?kategori=Gündem" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Gündem</a>
+                    <a href="/?kategori=Ekonomi" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Ekonomi</a>
+                    <a href="/?kategori=Eğitim" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Eğitim</a>
+                    <a href="/?kategori=Otomobil" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Otomobil</a>
+                    <a href="/?kategori=Teknoloji" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Teknoloji</a>
+                    <a href="/?kategori=Sağlık" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Sağlık</a>
+                    <a href="/?kategori=Spor" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Spor</a>
+                    <a href="/?kategori=Dünya" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Dünya</a>
+                </nav>
             </div>
         </div>
     </header>
@@ -141,5 +169,42 @@
             </div>
         </div>
     </footer>
+    <!-- 1 Seferlik Ortak Çerez Onay Kutusu -->
+    <div id="cookie-banner" class="hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900/95 backdrop-blur border-t border-slate-700 p-3 sm:p-4 shadow-2xl">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-200">
+            <p class="leading-relaxed text-center sm:text-left">
+                🍪 Deneyiminizi iyileştirmek ve <a href="/cerez-politikasi" class="underline text-red-400 font-semibold">Çerez Politikamız</a> kapsamında hizmet sunmak için çerezler kullanıyoruz.
+            </p>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="acceptSiteCookies('essential')" class="px-3 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 font-bold cursor-pointer">Sadece Zorunlu</button>
+                <button type="button" onclick="acceptSiteCookies('accepted')" class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-extrabold cursor-pointer">Tümünü Kabul Et</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function acceptSiteCookies(mode) {
+            var val = mode || 'accepted';
+            try { localStorage.setItem('ga_cookie_consent', val); } catch(e) {}
+            var cb = document.getElementById('cookie-banner');
+            if (cb) cb.classList.add('hidden');
+            if (typeof gtag === 'function') {
+                var granted = (val === 'accepted') ? 'granted' : 'denied';
+                gtag('consent', 'update', {
+                    'ad_storage': granted,
+                    'ad_user_data': granted,
+                    'ad_personalization': granted,
+                    'analytics_storage': granted
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var c = null;
+            try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+            if (!c) {
+                var cb = document.getElementById('cookie-banner');
+                if (cb) cb.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

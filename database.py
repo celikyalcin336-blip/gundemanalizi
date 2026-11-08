@@ -1274,9 +1274,7 @@ def get_adjacent_articles(article_id: int) -> Tuple[Optional[Dict], Optional[Dic
         row_newer = cur_newer.fetchone()
         prev_step_art = _row_to_dict(row_newer) if row_newer else None
 
-        # En yeni haberdeyse geriye dönüş olarak bir öncekini ver
-        if not prev_step_art:
-            prev_step_art = next_step_art
+        # En yeni haberdeyse prev_step_art None kalır (next_article ile aynı haberi 2 kez tekrarlamaz)
 
         # Şablonda next_article değişkeni "Sonraki Habere Geç" kartını besler
         return prev_step_art, next_step_art

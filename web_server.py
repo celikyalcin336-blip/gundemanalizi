@@ -1230,6 +1230,8 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
         from fastapi.responses import RedirectResponse
         _valid_cats = {"Gündem", "Ekonomi", "Spor", "Teknoloji", "Otomobil", "Sağlık", "Dünya", "Eğitim", "Son Dakika"}
         _norm_k = database.normalize_category_name(kategori)
+        if _norm_k == "Analiz" or (kategori and kategori.strip().lower() == "analiz"):
+            return RedirectResponse(url="/analiz", status_code=301)
         if _norm_k not in _valid_cats:
             _norm_k = "Gündem"
         if _norm_k and _norm_k != kategori.strip():
