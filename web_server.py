@@ -64,6 +64,8 @@ def bot_background_worker():
         try:
             import main as bot_main
             bot_main.run_bot(max_items=1)
+            import analysis_engine
+            analysis_engine.ensure_daily_synthesis_reports()
             gc.collect()
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
@@ -205,6 +207,11 @@ async def lifespan(app: FastAPI):
             _INDEX_CACHE["ts"] = 0.0
         clear_turbo_cache()
         gc.collect()
+        try:
+            import analysis_engine
+            analysis_engine.ensure_daily_synthesis_reports()
+        except Exception as _se:
+            print(f'Sentez raporu başlangıç uyarısı: {_se}')
         _warmup_turbo_cache()
         gc.collect()
     threading.Thread(target=_bg_startup_pipeline, daemon=True).start()

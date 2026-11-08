@@ -340,15 +340,21 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
 
     category_guide = ""
     if category == "Otomobil":
-        category_guide = "Bu bir OTOMOBİL & KAMPANYA haberidir. Kampanya şartları, fiyatlar, faizsiz kredi/taksit seçenekleri, model özellikleri ve tüketicinin nasıl yararlanacağını açıkça vurgula."
+        category_guide = "Bu bir OTOMOBİL & MOBİLİTE haberidir. Aracın teknik ve tasarım özelliklerinin yanı sıra kendi segmentindeki konumunu, Türkiye otomotiv pazarındaki ve ÖTV/vergi dilimlerindeki olası yansımalarını ve tüketici açısından sunduğu avantajları sade, akıcı bir dille değerlendir."
     elif category == "Teknoloji":
-        category_guide = "Bu bir TEKNOLOJİ & YAPAY ZEKA haberidir. Cihazın veya teknolojinin öne çıkan özellikleri, tahmini/kesin Türkiye fiyatı, çıkış tarihi ve günlük hayattaki faydalarını tüketici odaklı anlat."
+        category_guide = "Bu bir TEKNOLOJİ & YAPAY ZEKA haberidir. Cihazın veya teknolojinin öne çıkan özelliklerini, sektördeki rakip çözümlerle farkını ve günlük hayattaki/kullanıcı deneyimindeki somut karşılığını anlaşılır bir dille anlat."
     elif category == "Eğitim":
-        category_guide = "Bu bir EĞİTİM, MEB & SINAV haberidir. Tarihleri, sınav/başvuru detaylarını, öğrencileri ve velileri ilgilendiren önemli bilgileri açık, net ve güvenilir bir dille anlat."
+        category_guide = "Bu bir EĞİTİM, MEB & SINAV haberidir. Resmi takvimi, başvuru/sınav şartlarını ve öğrencileri, öğretmenleri ve velileri ilgilendiren uygulama adımlarını açık, net ve güvenilir bir dille aktar."
     elif category == "Sağlık":
-        category_guide = "Bu bir SAĞLIK & YAŞAM haberidir. Belirtileri, uzman tavsiyelerini ve dikkat edilmesi gereken noktaları güvenilir ve bilgilendirici bir dille anlat."
+        category_guide = "Bu bir SAĞLIK & YAŞAM haberidir. Belirtileri, uzman uyarılarını, korunma yollarını ve dikkat edilmesi gereken noktaları sade ve bilgilendirici bir dille anlat."
     elif category == "Ekonomi":
-        category_guide = "Bu bir EKONOMİ & FİNANS haberidir. Rakamları, piyasa oranlarını ve vatandaşın bütçesine/cüzdanına yansımalarını somut verilerle açıkla."
+        category_guide = "Bu bir EKONOMİ & FİNANS haberidir. Açıklanan rakamları, piyasa oranlarını ve alınan kararların vatandaşın bütçesine, maaşına, kredi/mevduat koşullarına ve alım gücüne somut yansımalarını açıkla."
+    elif category == "Dünya":
+        category_guide = "Bu bir DÜNYA & DİPLOMASİ haberidir. Uluslararası gelişmenin bölgesel dengelere, diplomasi trafiğine ve Türkiye ile küresel ekonomi üzerindeki yansımalarına dair arka planını sade bir dille aktar."
+    elif category == "Spor":
+        category_guide = "Bu bir SPOR & FUTBOL haberidir. Karşılaşmanın veya kulüp gelişmesinin puan durumuna, fikstür sürecine ve takımın teknik/taktik tablosuna etkisini akıcı bir spor gazeteciliği diliyle anlat."
+    else:
+        category_guide = "Bu bir TÜRKİYE GÜNDEMİ haberidir. Resmi açıklamaları, sahadaki somut durumu, hukuki/idari süreci ve kamuoyunu ilgilendiren yönlerini berrak bir gazetecilik diliyle aktar."
 
     if not config.GEMINI_API_KEY:
         print("❌ [Makale] GEMINI_API_KEY tanımlı değil. Kopya/şablon metin yayınlanmaz; haber atlandı.")

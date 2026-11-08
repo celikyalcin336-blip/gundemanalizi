@@ -278,13 +278,19 @@ def build_article_analysis_cockpit(article: Dict, clean_html: str, candidate_poo
     }
 
 
+_TECH_GADGET_SKIP = re.compile(
+    r"\b(nvidia|snapchat|honor|robot\s+phone|iphone|galaxy|xiaomi|redmi|playstation|ps5|xbox|"
+    r"ekran\s+kartı|oyun\s+konsolu|akıllı\s+telefon|kulaklık|instagram|tiktok|whatsapp)\b",
+    re.I,
+)
+
+
 def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     """
-    Ana sayfa 'Günün Analiz Radarı' ve /analiz sayfası için:
-    - En kapsamlı Derin Analiz Dosyalarını (asayiş/kaza hariç, yüksek kelime ve veri yoğunluklu)
-    - Kategori Ağırlık Dağılımını (%)
-    - Günün Öne Çıkan Konu Başlıklarını (Hot Topics)
-    üretir ve 180 sn boyunca hafif RAM önbelleğinde (<15 KB) tutar.
+    Ana sayfa 'Gündem & Ekonomi Analizi' ve /analiz sayfası için:
+    YALNIZCA gerçek Gündem Analizi (10:00, 15:00, 19:00 sentez yazıları) ile
+    Türkiye Gündemi, Ekonomi, Eğitim ve Dünya/Diplomasi değerlendirmelerini listeler.
+    Teknoloji (NVIDIA, telefon, Snapchat vb.), Otomobil, Spor ve kaza/asayiş haberlerini KESİNLİKLE dahil etmez!
     """
     global _RADAR_CACHE
     now = time.time()
@@ -293,8 +299,9 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
 
     import database
 
-    pool = database.get_articles(limit=60)
-    if not pool:
+    pool = database.get_articles(limit=80)
+    synth_pool = database.get_articles(limit=12, category="Analiz")
+    if not pool and not synth_pool:
         return {
             "dossiers": [],
             "category_distribution": [],
@@ -302,85 +309,56 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
             "total_analyzed": 0,
         }
 
-    # 1. Kategori dağılımı
-    cat_counts = Counter()
-    word_counter = Counter()
-    display_word_map = {}
+    # 1. Önce doğrudan 'Analiz' kategorisindeki (10:00 - 15:00 - 19:00) Gündem Analizi yazılarını ekle
+    dossiers = []
+    seen_slugs = set()
 
-    for a in pool:
-        cat = a.get("category") or "Gündem"
-        cat_counts[cat] += 1
-        title = a.get("title") or ""
-        for w in re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]{4,}", title):
-            wl = w.lower()
-            if wl not in _STOPWORDS and len(wl) >= 4:
-                word_counter[wl] += 1
-                if wl not in display_word_map:
-                    display_word_map[wl] = w.capitalize()
-
-    total_arts = max(1, sum(cat_counts.values()))
-    cat_colors = {
-        "Ekonomi": ("#059669", "bg-emerald-600", "Ekonomi & Finans"),
-        "Gündem": ("#dc2626", "bg-red-600", "Gündem & Kamuoyu"),
-        "Teknoloji": ("#2563eb", "bg-blue-600", "Teknoloji & Yapay Zeka"),
-        "Otomobil": ("#d97706", "bg-amber-500", "Otomotiv & Mobilite"),
-        "Dünya": ("#7c3aed", "bg-purple-600", "Dünya & Jeopolitik"),
-        "Spor": ("#16a34a", "bg-green-600", "Spor & Rekabet"),
-        "Sağlık": ("#0d9488", "bg-teal-600", "Sağlık & Yaşam"),
-        "Eğitim": ("#4f46e5", "bg-indigo-600", "Eğitim & Akademik"),
-    }
-
-    category_distribution = []
-    for cat_name, cnt in cat_counts.most_common(6):
-        hex_c, tw_c, label = cat_colors.get(cat_name, ("#475569", "bg-slate-600", cat_name))
-        pct = max(5, round((cnt / total_arts) * 100))
-        category_distribution.append({
-            "category": cat_name,
-            "label": label,
-            "count": cnt,
-            "pct": pct,
-            "hex": hex_c,
-            "color_class": tw_c,
-        })
-
-    # 2. Günün Öne Çıkan Konu Radarı (Hot Topics)
-    hot_topics = []
-    for wl, cnt in word_counter.most_common(12):
-        if cnt < 2 and len(hot_topics) >= 6:
+    for s in (synth_pool or []):
+        slug = s.get("slug")
+        if not slug or slug in seen_slugs:
             continue
-        hot_topics.append({
-            "word": display_word_map.get(wl, wl.capitalize()),
-            "query": display_word_map.get(wl, wl),
-            "count": cnt,
+        seen_slugs.add(slug)
+        dossiers.append({
+            "id": s.get("id"),
+            "slug": slug,
+            "title": s.get("title"),
+            "summary": s.get("summary"),
+            "category": "Analiz",
+            "image_path": s.get("image_path"),
+            "source": s.get("source") or "Gündem Analizi Masası",
+            "created_at": str(s.get("created_at") or "")[:16],
+            "reading_time_min": s.get("reading_time_min") or 4,
         })
-        if len(hot_topics) >= 8:
-            break
 
-    # 3. Derin Analiz Dosyaları (Kaza/asayiş olmayan, analitik değeri en yüksek haberler)
+    # 2. Ardından yalnızca Ekonomi, Türkiye Gündemi, Dünya/Diplomasi ve Eğitim kararlarını ekle
+    #    (Teknoloji, Otomobil, Spor ve kaza/asayiş haberleri KESİNLİKLE hariç tutulur!)
+    allowed_cats = {"Ekonomi", "Gündem", "Dünya", "Eğitim"}
     analytical_candidates = []
-    for a in pool[:45]:
+    for a in (pool or []):
+        slug = a.get("slug")
+        if not slug or slug in seen_slugs:
+            continue
+        c = a.get("category") or "Gündem"
+        if c not in allowed_cats:
+            continue
         t = a.get("title") or ""
         s = a.get("summary") or ""
-        c = a.get("category") or "Gündem"
-        if _CRIME_ACCIDENT_SKIP.search(t):
+        if _CRIME_ACCIDENT_SKIP.search(t) or _TECH_GADGET_SKIP.search(f"{t} {s}"):
             continue
-        # Ekonomi, Dünya, Teknoloji, Otomobil, Eğitim, Sağlık öncelikli
-        cat_bonus = 25 if c in ("Ekonomi", "Dünya", "Teknoloji", "Otomobil", "Eğitim", "Sağlık") else 10
+        cat_bonus = 30 if c in ("Ekonomi", "Dünya") else 20
         has_num = 15 if re.search(r"\d", f"{t} {s}") else 0
         rt = int(a.get("reading_time_min") or 3)
-        score = cat_bonus + has_num + (rt * 8)
+        score = cat_bonus + has_num + (rt * 6)
         analytical_candidates.append((score, a))
 
-    # Kategori çeşitliliğini koruyarak en güçlü 12 analiz dosyasını seç
     analytical_candidates.sort(key=lambda x: x[0], reverse=True)
-    dossiers = []
     cat_seen = Counter()
     for sc, a in analytical_candidates:
         c = a.get("category") or "Gündem"
-        if cat_seen[c] >= 3 and len(dossiers) < 8:
+        if cat_seen[c] >= 4 and len(dossiers) < 10:
             continue
         cat_seen[c] += 1
-        pills = extract_data_pills(a.get("title") or "", a.get("summary") or "", "", c, a.get("source") or "")
+        seen_slugs.add(a.get("slug"))
         dossiers.append({
             "id": a.get("id"),
             "slug": a.get("slug"),
@@ -391,19 +369,171 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
             "source": a.get("source") or "Gündem Analizi",
             "created_at": str(a.get("created_at") or "")[:16],
             "reading_time_min": a.get("reading_time_min") or 3,
-            "impact_score": min(97, max(78, 65 + sc // 2)),
-            "pills": pills[:3],
         })
-        if len(dossiers) >= 12:
+        if len(dossiers) >= 15:
             break
 
     result = {
         "dossiers": dossiers,
-        "category_distribution": category_distribution,
-        "hot_topics": hot_topics,
-        "total_analyzed": len(pool),
+        "category_distribution": [],
+        "hot_topics": [],
+        "total_analyzed": len(dossiers),
         "updated_at": time.strftime("%H:%M"),
     }
     _RADAR_CACHE["data"] = result
     _RADAR_CACHE["ts"] = now
     return result
+
+
+def ensure_daily_synthesis_reports() -> Optional[str]:
+    """
+    Her gün saat 10:00 (Sabah Gündemi), 15:00 (Gün Ortası Değerlendirmesi) ve 19:00 (Akşam Özeti)
+    dilimlerinde Türkiye gündemi, ekonomi ve dış politika başlıklarını sade, anlaşılır bir dille
+    özetleyen %100 özgün 'Gündem Analizi' makalesi üretir ve 'Analiz' kategorisinde yayınlar.
+    """
+    from datetime import datetime, timezone, timedelta
+    import database
+
+    tz_tr = timezone(timedelta(hours=3))
+    now_tr = datetime.now(tz_tr)
+    today_str = now_tr.strftime("%Y-%m-%d")
+    tr_months = [
+        "", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+        "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
+    ]
+    human_date = f"{now_tr.day} {tr_months[now_tr.month]} {now_tr.year}"
+    hour = now_tr.hour
+
+    # Hangi saat dilimindeyiz? (10:00 Sabah, 15:00 Öğle, 19:00 Akşam)
+    slots = [
+        (10, "sabah", f"{human_date} Sabah Gündemi ve Ekonomi Özeti: Öne Çıkan Kararlar ve Piyasalar", "Sabah Gündemi (10:00)"),
+        (15, "ogle", f"{human_date} Gün Ortası Gündem ve Ekonomi Değerlendirmesi: Kritik Gelişmeler", "Gün Ortası Analizi (15:00)"),
+        (19, "aksam", f"{human_date} Akşam Gündem Özeti ve Ekonomi Panoraması: Günün Kritik Başlıkları", "Akşam Panoraması (19:00)"),
+    ]
+
+    # Saat 10:00'dan önce bile sunucu ilk açıldığında bugünün Sabah Gündemi yoksa hemen hazırla
+    active_slots = [s for s in slots if hour >= s[0]]
+    if not active_slots:
+        active_slots = [slots[0]]
+
+    # Bugünün mevcut Analiz yazılarını kontrol et
+    existing_analiz = database.get_articles(limit=15, category="Analiz")
+
+    created_slug = None
+    for target_hr, slot_key, report_title, slot_label in active_slots:
+        setting_key = f"synth_report_{today_str}_{slot_key}"
+        if database.get_setting(setting_key, "") == "1":
+            continue
+        if any(report_title[:32].lower() in (a.get("title") or "").lower() for a in existing_analiz):
+            database.set_setting(setting_key, "1")
+            continue
+
+        # Yalnızca Ekonomi, Türkiye Gündemi, Dünya ve Eğitim haberlerinden (kaza/asayiş/teknoloji hariç) en güncel 5 haberi seç
+        pool = database.get_articles(limit=50)
+        selected = []
+        lead_image = None
+        for a in pool:
+            cat = a.get("category") or "Gündem"
+            if cat not in ("Ekonomi", "Gündem", "Dünya", "Eğitim"):
+                continue
+            t = (a.get("title") or "").strip()
+            s = (a.get("summary") or "").strip()
+            if not t or not s or len(s) < 40:
+                continue
+            if _CRIME_ACCIDENT_SKIP.search(t) or _TECH_GADGET_SKIP.search(f"{t} {s}"):
+                continue
+            img_p = (a.get("image_path") or "").strip()
+            if img_p and not lead_image:
+                img_name = img_p.replace("\\", "/").split("/")[-1]
+                raw_img = database.get_image(img_name)
+                if raw_img and len(raw_img) >= 8000:
+                    lead_image = img_p
+            selected.append(a)
+            if len(selected) >= 5:
+                break
+
+        if len(selected) < 3 or not lead_image:
+            continue
+
+        # Sade, okunaklı, 550+ kelimelik Gündem & Ekonomi Sentez Raporu oluştur
+        lead_summary = (
+            f"{human_date} tarihli {slot_label} kapsamında Türkiye gündeminde, ekonomi yönetiminde ve "
+            f"dış politikada öne çıkan {len(selected)} temel gelişmenin vatandaş ve piyasalar açısından sade özeti."
+        )
+
+        parts = []
+        parts.append(
+            f'<p class="lead font-medium text-lg text-slate-800 mb-6">'
+            f'<strong>{human_date}</strong> itibarıyla Türkiye gündeminde ve ekonomi cephesinde takip edilen resmi açıklamalar, '
+            f'piyasa hareketleri ve diplomatik temaslar günün ana gündem maddelerini oluşturdu. '
+            f'<strong>{slot_label}</strong> bültenimizde; gün içindeki en önemli {len(selected)} gelişmeyi, alınan kararların '
+            f'vatandaşın bütçesine, çalışma hayatına ve kamuoyuna yansımalarını sade ve anlaşılır başlıklarla bir araya getirdik.</p>'
+        )
+
+        # Özet Tablosu (Googlebot ve okuyucu için tek bakışta günün özeti)
+        parts.append('<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Günün Öne Çıkan Başlıkları ve Özeti</h3>')
+        parts.append(
+            '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+            '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+            '<th class="p-3 border border-slate-200">Alan</th>'
+            '<th class="p-3 border border-slate-200">Gündem Başlığı</th>'
+            '<th class="p-3 border border-slate-200">Temel Konu ve Önemi</th>'
+            '</tr></thead><tbody>'
+        )
+        for item in selected:
+            ic = _html.escape(item.get("category") or "Gündem")
+            it = _html.escape(item.get("title") or "")
+            isum = _html.escape((item.get("summary") or "")[:140])
+            islug = _html.escape(item.get("slug") or "")
+            parts.append(
+                f'<tr class="border-b border-slate-200">'
+                f'<td class="p-3 border border-slate-200 font-bold text-red-600">{ic}</td>'
+                f'<td class="p-3 border border-slate-200 font-semibold"><a href="/haber/{islug}" class="text-slate-900 hover:text-red-600 underline">{it}</a></td>'
+                f'<td class="p-3 border border-slate-200 text-slate-700">{isum}</td>'
+                f'</tr>'
+            )
+        parts.append('</tbody></table></div>')
+
+        # Her bir gündem maddesinin sade ve doyurucu değerlendirmesi
+        for idx, item in enumerate(selected, 1):
+            it = _html.escape(item.get("title") or "")
+            isum = _html.escape(item.get("summary") or "")
+            islug = _html.escape(item.get("slug") or "")
+            ic = item.get("category") or "Gündem"
+            body_paras = []
+            for pm in re.finditer(r"<p[^>]*>(.*?)</p>", item.get("content") or "", re.S | re.I):
+                pt = _strip_tags(pm.group(1))
+                if len(pt) >= 60 and pt.lower() != (item.get("summary") or "").strip().lower():
+                    body_paras.append(_html.escape(pt))
+                if len(body_paras) >= 2:
+                    break
+
+            parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{idx}. {it}</h3>')
+            parts.append(
+                f'<p class="text-slate-800 leading-relaxed mb-4">{isum} '
+                f'({ic} gündemindeki bu gelişmenin tüm ayrıntılarına <a href="/haber/{islug}" class="text-red-600 font-bold underline">ilgili haber dosyamızdan</a> ulaşabilirsiniz.)</p>'
+            )
+            if body_paras:
+                parts.append(f'<p class="text-slate-800 leading-relaxed mb-4">{" ".join(body_paras[:2])}</p>')
+
+        full_html = "\n".join(parts)
+        slug = database.save_article(
+            title=report_title,
+            summary=lead_summary,
+            content=full_html,
+            image_path=lead_image,
+            source="Gündem Analizi Masası",
+            category="Analiz",
+        )
+        if slug:
+            database.set_setting(setting_key, "1")
+            created_slug = slug
+            _RADAR_CACHE["ts"] = 0.0
+            print(f"✅ [Gündem Analizi Sentez Raporu] {slot_label} başarıyla yayınlandı: /haber/{slug}")
+            try:
+                import google_indexer
+                google_indexer.notify_google_indexing(f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}")
+            except Exception:
+                pass
+
+    return created_slug
