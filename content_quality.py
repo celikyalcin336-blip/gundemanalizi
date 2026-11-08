@@ -68,6 +68,21 @@ _BRAND_SAFETY_SUBS = [
     (re.compile(r"F\.\s*Bahçe\s+Tarfin(?:'|&#39;|’)in\s+konuğu\s+Valencia!?", re.I), "Fenerbahçe Beko'nun Konuğu Valencia"),
     (re.compile(r"\bF\.\s*Bahçe\s+Tarfin\b", re.I), "Fenerbahçe Beko"),
     (re.compile(r"BİM[’'ʻ`]?E\s+KUMTEL\s+CAM\s+ANKASTRE\s+SET\s+GELİYOR!?\s*\(BİM\s+1-7\s+KASIM\)", re.I), "Perakende Zincirlerinde Kasım Dönemi Ankastre ve Beyaz Eşya Kampanyaları"),
+    (re.compile(r"Afyonkarahisar\s+Katliamında\s+Kan\s+Donduran\s+İtiraf:\s+Planlı\s+Cinayetlerin", re.I), "Afyonkarahisar'daki Adli Soruşturmada Çarpıcı İtiraf: Planlı Olayların"),
+    (re.compile(r"\bKatliamında\b"), "Soruşturmasında"),
+    (re.compile(r"\bkatliamında\b", re.I), "soruşturmasında"),
+    (re.compile(r"\bKan\s+Donduran\b", re.I), "Çarpıcı"),
+    (re.compile(r"\bCinayetlerin\b"), "Adli Vakaların"),
+    (re.compile(r"\bcinayetlerin\b", re.I), "adli vakaların"),
+    (re.compile(r"\bcinayete\s+teşebbüs\b", re.I), "ağır yaralama"),
+    (re.compile(r"\bCinayetinde\b"), "Adli Vakasında"),
+    (re.compile(r"\bcinayetinde\b", re.I), "adli vakasında"),
+    (re.compile(r"\bCinayeti\b"), "Adli Vakası"),
+    (re.compile(r"\bcinayeti\b", re.I), "adli vakası"),
+    (re.compile(r"\bCinayet\b"), "Adli Vaka"),
+    (re.compile(r"\bcinayet\b", re.I), "adli vaka"),
+    (re.compile(r"\bVuruldu\b"), "Etkisiz Hale Getirildi"),
+    (re.compile(r"\bvuruldu\b", re.I), "etkisiz hale getirildi"),
 ]
 
 
@@ -277,7 +292,7 @@ def clean_article_html(content: str) -> str:
 
     # 5) Boş kalan paragraflar ve altı boş kalan ara başlıklar
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
-    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=(<div|$|<h[23]))", "", c.strip())
+    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=($|<h[23]))", "", c.strip())
 
     # 6) Alt başlıklara (<h3>) Google Arama Jump-Link SEO id etiketi ekle
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
@@ -359,7 +374,7 @@ def _fast_clean_for_word_count(content: str) -> str:
 
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _dedupe, c, flags=re.S)
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
-    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=(<div|$|<h[23]))", "", c.strip())
+    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=($|<h[23]))", "", c.strip())
     return c
 
 

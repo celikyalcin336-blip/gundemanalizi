@@ -209,6 +209,7 @@ async def lifespan(app: FastAPI):
         gc.collect()
         try:
             import analysis_engine
+            analysis_engine.seed_curated_analyses()
             analysis_engine.ensure_daily_synthesis_reports()
         except Exception as _se:
             print(f'Sentez raporu başlangıç uyarısı: {_se}')
@@ -223,9 +224,7 @@ async def lifespan(app: FastAPI):
     threading.Thread(target=keep_alive_background_worker, daemon=True).start()
     # 7/24 Nobetci Sistem Bekcisi
     threading.Thread(target=system_health_watchdog_worker, daemon=True).start()
-    # Eski kısa haberleri (hiçbirini silmeden) yavaşça özgün metinle yeniden yazan arşiv yenileyici
-    import archive_rewriter
-    threading.Thread(target=archive_rewriter.background_worker, daemon=True).start()
+    # Arşiv yenileyici arka plan işçisi Gemini API kotasını canlı haber ve Analiz üretimine ayırmak için devre dışı bırakıldı
     yield
 
 import secrets as _secrets
@@ -2217,6 +2216,7 @@ async def article_detail(request: Request, slug: str):
             "umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unutlar-arasinda-hareketlilik-yasan": "/haber/umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unsurlar-arasinda-hareketlilik-yasa",
             "f-bahce-tarfinin-konugu-valencia": "/haber/fenerbahce-bekonun-konugu-valencia",
             "bime-kumtel-cam-ankastre-set-geliyor-bim-1-7-kasim": "/haber/perakende-zincirlerinde-kasim-donemi-ankastre-ve-beyaz-esya-kampanyalari",
+            "dunya-dosyasi-zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit": "/haber/bpa-sonrasi-yeni-nesil-plastik-katkilarinda-gizli-risk-bebek-urunlerinde-kimyasa",
         }
         if slug_low in _direct_slug_map:
             return RedirectResponse(url=_direct_slug_map[slug_low], status_code=301)
@@ -2345,10 +2345,7 @@ async def article_detail(request: Request, slug: str):
     article["title"] = content_quality.clean_title_text(article.get("title") or "")
     article["summary"] = content_quality.clean_summary_text(article.get("summary") or "", article["title"])
     raw_content = content_quality.clean_article_html(raw_content)
-    raw_content = content_quality.ensure_indexable_depth(
-        raw_content, article["title"], article["summary"], category, article_id or 0
-    )
-    is_thin_article = False
+    is_thin_article = (category != "Analiz") and content_quality.is_thin(raw_content, threshold=220)
 
     # Eski/yeni makalelerdeki tekdüze "Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?" şablon başlığını
     # ve kalıp kapanış cümlelerini kategoriye ve haber ID'sine göre doğal gazetecilik başlıklarıyla çeşitlendir

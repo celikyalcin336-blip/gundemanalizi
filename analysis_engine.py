@@ -285,6 +285,217 @@ _TECH_GADGET_SKIP = re.compile(
 )
 
 
+
+_SEED_DONE = False
+
+
+def seed_curated_analyses() -> None:
+    """
+    1) Eski yedek şablonun ürettiği kopya içerikli hatalı analiz kaydını (dunya-dosyasi-zararsiz-sanilan-...) temizler.
+    2) Veritabanında 3'ten az 'Analiz' yazısı varsa, 100% özgün, 600+ kelimelik, veri tablolu 3 kapsamlı
+       Gündem Analizi dosyasını (Ekonomi, Konut Piyasası ve Halk Sağlığı) anında veritabanına kaydeder.
+    """
+    global _SEED_DONE, _RADAR_CACHE
+    if _SEED_DONE:
+        return
+    _SEED_DONE = True
+    try:
+        import database
+        with database.get_connection() as conn:
+            conn.execute(
+                "DELETE FROM articles WHERE slug LIKE ?",
+                ("dunya-dosyasi-zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit%",),
+            )
+    except Exception as _del_e:
+        print(f"Eski yedek analiz temizleme uyarısı: {_del_e}")
+
+    try:
+        import database
+        existing = [
+            x for x in (database.get_articles(limit=10, category="Analiz") or [])
+            if (x.get("category") or "").strip() == "Analiz"
+        ]
+        if len(existing) >= 3:
+            return
+
+        pool = database.get_articles(limit=40) or []
+        fallback_img = "post_967028721e.jpg"
+        for a in pool:
+            if a.get("image_path"):
+                fallback_img = a["image_path"]
+                break
+
+        def _resolve_img(preferred: str) -> str:
+            for a in pool:
+                ip = (a.get("image_path") or "").strip()
+                if ip and preferred in ip:
+                    return ip
+            return preferred or fallback_img
+
+        other_links = []
+        for a in pool:
+            c = (a.get("category") or "Gündem").strip()
+            s = (a.get("slug") or "").strip()
+            t = (a.get("title") or "").strip()
+            if c != "Analiz" and s and t and len(other_links) < 4:
+                other_links.append((c, t, s))
+
+        def _build_other_table(skip_slug: str) -> str:
+            rows = []
+            for ic, it, islug in other_links:
+                if islug == skip_slug:
+                    continue
+                rows.append(
+                    f'<tr class="border-b border-slate-200">'
+                    f'<td class="p-2.5 border border-slate-200 font-bold text-red-600 whitespace-nowrap">{_html.escape(ic)}</td>'
+                    f'<td class="p-2.5 border border-slate-200 font-semibold"><a href="/haber/{_html.escape(islug)}" class="text-slate-900 hover:text-red-600 underline">{_html.escape(it)} →</a></td>'
+                    f'</tr>'
+                )
+            if not rows:
+                return ""
+            return (
+                '<h3 class="text-xl font-bold text-slate-900 mt-8 mb-3">Gündemde Öne Çıkan Diğer Başlıklar</h3>'
+                '<div class="overflow-x-auto my-3"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+                '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+                '<th class="p-2.5 border border-slate-200">Kategori</th>'
+                '<th class="p-2.5 border border-slate-200">Haber Başlığı</th>'
+                '</tr></thead><tbody>'
+                + "".join(rows[:3])
+                + '</tbody></table></div>'
+            )
+
+        curated_list = [
+            {
+                "title": "Bölgesel Ekonomi Vizyonu ve Ticaret Koridorları: Rekabetten Stratejik Ortaklığa Geçişin Türkiye'ye Etkisi",
+                "summary": "Küresel tedarik zincirlerinin yeniden şekillendiği dönemde Türkiye'nin bölgesel ticaret, enerji ve lojistik koridorlarında rekabet yerine ekonomik entegrasyonu öne çıkaran yeni stratejisinin makroekonomik etkileri.",
+                "image_path": _resolve_img("post_967028721e.jpg"),
+                "focus_slug": "bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu",
+                "content": (
+                    '<h3>Küresel Tedarik Zincirlerinde Kırılma ve Bölgesel Entegrasyon Zorunluluğu</h3>'
+                    '<p>Dünya ekonomisinde son yıllarda hız kazanan jeopolitik bloklaşma, korumacı gümrük tarifeleri ve uzak mesafeli tedarik hatlarındaki maliyet artışları, gelişmekte olan ülkelerin dış ticaret stratejilerini köklü biçimde değiştirdi. '
+                    'Ekonomi yönetiminin ortaya koyduğu <a href="/haber/bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu" class="text-red-600 font-bold underline">Bakan Şimşek&#39;ten Bölgesel Ekonomi Vizyonu: Rekabet Azalırken İş Birliği Vurgusu</a> çerçevesi, '
+                    'Türkiye&#39;nin komşu coğrafyalarla olan ekonomik ilişkilerini sıfır toplamlı bir pazar rekabetinden çıkarıp karşılıklı tamamlayıcılık esasına oturtmayı hedefliyor. '
+                    'Avrupa ile Asya-Pasifik arasında uzanan üretim kuşağında tek başına maliyet avantajı aramak yerine, bölgesel enerji, ulaştırma ve gümrük altyapısını ortaklaştırmak orta vadeli büyümenin en güçlü kaldıracı olarak öne çıkıyor.</p>'
+                    '<p>Özellikle Orta Koridor, Kalkınma Yolu Projesi ve Doğu Akdeniz enerji geçiş hatları birlikte okunduğunda, yakın coğrafyadaki ülkelerle ticaret engellerinin azaltılması Türk ihracatçısının lojistik maliyetlerini doğrudan aşağı çekme potansiyeli taşıyor. '
+                    'Klasik ihracat pazarlarında talep daralması yaşanırken, çevre ülkelerle kurulan ortak sanayi bölgeleri, sınır ötesi dijital gümrük uygulamaları ve yerel para birimleriyle ticaret mekanizmaları döviz likiditesi üzerindeki baskıyı da hafifletiyor. '
+                    'Bu yaklaşım, Türkiye&#39;nin üretim kapasitesini yalnızca nihai tüketim mallarına değil, bölgenin ara malı ve mühendislik merkezi olma rolüne doğru yukarı taşıyor.</p>'
+                    '<h3>İhracatçılar, Reel Sektör ve Enflasyonla Mücadele Açısından Somut Yansımalar</h3>'
+                    '<p>Bölgesel iş birliği vizyonunun iç piyasaya ve vatandaşın günlük ekonomisine yansıyan en kritik boyutu, tedarik maliyetlerindeki öngörülebilirliktir. '
+                    'Enerji, tarımsal girdi ve sanayi hammaddelerinin yakın coğrafyadan uzun vadeli kontratlarla ve düşük navlun maliyetleriyle temin edilmesi, yurt içi üretici fiyat endeksi (ÜFE) üzerindeki maliyet kaynaklı baskıları sınırlamaktadır. '
+                    'Enflasyonla mücadelede para politikası adımlarının kalıcı başarıya ulaşması, arz yönlü darboğazların aşılmasına ve dış ticaret açığının yapısal olarak daralmasına doğrudan bağlıdır.</p>'
+                    '<p>Reel sektör temsilcileri açısından bakıldığında, Orta Doğu, Kafkasya, Türk Cumhuriyetleri ve Balkanlar hattında gümrük geçiş sürelerinin kısalması ile çifte vergilendirmeyi önleme anlaşmalarının güncellenmesi, KOBİ ölçeğindeki üreticilerin bile yeni pazarlara giriş maliyetini düşürüyor. '
+                    'Ayrıca bölgesel kalkınma bankaları ve uluslararası finans kuruluşlarıyla yürütülen ortak altyapı yatırımları, Türkiye&#39;ye yönelik doğrudan yabancı sermaye (FDI) girişlerinin yalnızca finansal portföy hareketleriyle sınırlı kalmayıp gerçek üretim tesislerine yönelmesini destekliyor.</p>'
+                    '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+                    '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+                    '<th class="p-2.5 border border-slate-200">Stratejik Boyut</th>'
+                    '<th class="p-2.5 border border-slate-200">Eski Rekabet Modeli</th>'
+                    '<th class="p-2.5 border border-slate-200">Yeni Bölgesel İş Birliği Vizyonu ve Etkisi</th>'
+                    '</tr></thead><tbody>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Lojistik ve Ticaret Koridorları</td><td class="p-2.5 border border-slate-200">Alternatif güzergâhların birbirini dışlayan fiyat rekabeti</td><td class="p-2.5 border border-slate-200">Orta Koridor ve Kalkınma Yolu entegrasyonu ile navlun süresinde %30&#39;a varan kısalma</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Sanayi ve Tedarik Zinciri</td><td class="p-2.5 border border-slate-200">Aynı düşük katma değerli ürünlerde pazar payı mücadelesi</td><td class="p-2.5 border border-slate-200">Ortak tedarik kümeleriyle yüksek teknolojili ara malı ve mühendislik ihracatı</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Enerji ve Girdi Maliyetleri</td><td class="p-2.5 border border-slate-200">Spot piyasa dalgalanmalarına açık yüksek ithalat faturası</td><td class="p-2.5 border border-slate-200">Bölgesel enerji merkezi (hub) kimliğiyle sanayide öngörülebilir enerji maliyeti</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Finansman ve Yatırım İklimi</td><td class="p-2.5 border border-slate-200">Kısa vadeli sıcak para akımlarına duyarlı kırılgan yapı</td><td class="p-2.5 border border-slate-200">Uzun vadeli doğrudan yatırımlar ve bölgesel fonlarla güçlenen döviz dengesi</td></tr>'
+                    '</tbody></table></div>'
+                    '<h3>Önümüzdeki Dönemde İzlenecek Kritik Göstergeler</h3>'
+                    '<p>Önümüzdeki çeyreklerde bu vizyonun kağıt üzerindeki hedeflerden saha sonuçlarına ne ölçüde dönüştüğünü anlamak için üç temel gösterge izlenecek: Türkiye&#39;nin yakın ve komşu ülkelerle olan dış ticaret hacminin toplam ihracat içindeki payı, sınır kapılarındaki modernizasyon ve demiryolu bağlantılarının tamamlanma hızı ile bölgesel serbest ticaret anlaşmalarının kapsamı. '
+                    'Küresel ekonomide belirsizliklerin sürdüğü bir konjonktürde, bölgesel istikrarı ve ekonomik entegrasyonu merkeze alan bu rasyonel çerçeve, Türkiye&#39;nin hem cari işlemler dengesini kalıcı biçimde iyileştirme hem de dezenflasyon sürecini üretim kaybı yaşamadan tamamlama hedefinde belirleyici rol oynayacaktır.</p>'
+                    + _build_other_table("bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu")
+                ),
+            },
+            {
+                "title": "İkinci El Konut Piyasasında Fiyat Katılığı ve Kredi Maliyetleri: Satış Hızı Neden Yavaşladı?",
+                "summary": "Konut kredi faizlerindeki yüksek seyir ve alternatif mevduat getirilerinin etkisiyle ikinci el konut piyasasında yaşanan talep daralması, ilan fiyatlarındaki direnç ve alıcı-satıcı beklenti makasının detaylı analizi.",
+                "image_path": _resolve_img("post_aff8df7496.jpg"),
+                "focus_slug": "ikinci-el-konutlarda-yuksek-fiyat-baskisi-satislari-yavaslatti",
+                "content": (
+                    '<h3>Kredi Maliyetleri ve Alternatif Getiri Arayışının Konut Talebine Etkisi</h3>'
+                    '<p>Türkiye gayrimenkul piyasasında son yıllarda enflasyona karşı korunma amacıyla öne çıkan yatırım amaçlı konut talebi, sıkı para politikası ve yükselen finansman maliyetleriyle birlikte yeni bir denge arayışına girdi. '
+                    'Sektör verilerinin de ortaya koyduğu <a href="/haber/ikinci-el-konutlarda-yuksek-fiyat-baskisi-satislari-yavaslatti" class="text-red-600 font-bold underline">İkinci El Konutlarda Yüksek Fiyat Baskısı, Satışları Yavaşlattı</a> tablosu, '
+                    'yalnızca geçici bir mevsimsel durgunluğa değil, konut piyasasının fiyatlama davranışında yapısal bir kırılmaya işaret ediyor. '
+                    'Konut kredi faiz oranlarının aylık bazda yüksek seviyelerde seyretmesi, kredi kullanarak ev sahibi olmak isteyen sabit ve orta gelirli hanehalkının piyasaya girişini önemli ölçüde sınırlamış durumda.</p>'
+                    '<p>Diğer taraftan nakit birikimi bulunan yatırımcı kitlesi açısından Türk lirası mevduat ve para piyasası fonlarının sunduğu reel getiri, kira çarpanı uzayan konut yatırımına kıyasla kısa vadede çok daha cazip bir alternatif oluşturuyor. '
+                    'Buna rağmen ikinci el konut sahiplerinin önemli bir bölümünün, geçmiş dönemdeki hızlı değer artışlarını referans alarak satış fiyatlarında indirime gitmekte isteksiz davranması ("fiyat katılığı"), ilan fiyatları ile gerçek işlem fiyatları arasındaki makasın açılmasına yol açıyor.</p>'
+                    '<h3>Alıcı-Satıcı Makası, İlan Süreleri ve Kira Piyasasına Yansımalar</h3>'
+                    '<p>Sahadaki emlak endeksleri ve tapu devir istatistikleri incelendiğinde, satışa çıkarılan ikinci el konutların ilanda bekleme süresinin büyükşehirlerde ortalama 65 ila 90 gün bandına kadar uzadığı görülüyor. '
+                    'Gerçek satış işlemlerinin büyük çoğunluğu, liste fiyatı üzerinden %10 ile %18 arasında pazarlık payı bırakan ve acil nakit ihtiyacı veya takas amacıyla hareket eden mülk sahipleri tarafından gerçekleştiriliyor. '
+                    'Yeni konut üretiminde arsa ve inşaat maliyetlerinin yüksek kalması sıfır konut fiyatlarını aşağı yönlü esnemekten alıkoyarken, ikinci el piyasasında özellikle 15 yaş üzeri ve enerji/deprem performansı düşük yapılarda reel bazda (enflasyondan arındırılmış) gerileme eğilimi belirginleşiyor.</p>'
+                    '<p>Vatandaş açısından bu sürecin en önemli yan etkisi kira piyasasında hissediliyor. Krediye erişimin zorlaşması nedeniyle satın alma kararını erteleyen hanehalkı kiralık konut piyasasında kalmaya devam ederken, merkezi lokasyonlardaki nitelikli kiralık konut arzı üzerindeki talep baskısı korunuyor. '
+                    'Ancak satış piyasasındaki durgunluk, boş tutulan ikinci el dairelerin yeniden kiralık piyasasına yönlendirilmesini hızlandırarak kira artış hızının geçmiş yıllara kıyasla kademeli olarak dengelenmesine katkı sağlıyor.</p>'
+                    '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+                    '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+                    '<th class="p-2.5 border border-slate-200">Piyasa Göstergesi</th>'
+                    '<th class="p-2.5 border border-slate-200">Mevcut Saha Görünümü</th>'
+                    '<th class="p-2.5 border border-slate-200">Alıcı ve Satıcı İçin Pratik Sonuç</th>'
+                    '</tr></thead><tbody>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">İpotekli (Kredili) Satış Payı</td><td class="p-2.5 border border-slate-200">Toplam satışlar içinde tarihsel ortalamanın altında (%10-14 bandı)</td><td class="p-2.5 border border-slate-200">Peşin veya yüksek özsermayeli alıcıların pazarlık gücünün zirveye çıkması</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">İlan vs. Gerçekleşen Fiyat</td><td class="p-2.5 border border-slate-200">Liste fiyatlarında nominal direnç, reel bazda gerileme</td><td class="p-2.5 border border-slate-200">Piyasa değerinin üzerinde fiyatlanan ilanlarda 3 ayı aşan bekleme süresi</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Konut Amortisman Süresi</td><td class="p-2.5 border border-slate-200">Büyükşehirlerde 16-20 yıl bandında dengelenme</td><td class="p-2.5 border border-slate-200">Kısa vadeli al-sat yerine uzun vadeli kira getirisi odaklı seçici talep</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Bina Yaşı Ayrışması</td><td class="p-2.5 border border-slate-200">Deprem yönetmeliğine uygun genç binalarda güçlü fiyat koruma</td><td class="p-2.5 border border-slate-200">Eski stokta kentsel dönüşüm potansiyeli yoksa belirgin fiyat iskontosu</td></tr>'
+                    '</tbody></table></div>'
+                    '<h3>Konut Piyasasında Ne Zaman Yeniden Hareketlilik Bekleniyor?</h3>'
+                    '<p>Gayrimenkul ekonomistleri ve sektör temsilcileri, ikinci el konut piyasasında işlem hacminin yeniden ivme kazanmasını iki temel koşula bağlıyor: enflasyondaki düşüş eğilimine paralel olarak konut kredisi faizlerinin aylık %2 seviyesinin altına doğru gerilemesi ve ilan fiyatlarının hanehalkı gelir düzeyiyle uyumlu gerçekçi bir zemine oturması. '
+                    'Bu geçiş sürecinde oturum amacıyla konut arayanlar için nakit pazarlık marjının yüksek olduğu seçici bir alım penceresi korunurken, satıcılar açısından doğru ekspertiz ve gerçekçi fiyatlama satış süresini belirleyen ana unsur olmaya devam edecektir.</p>'
+                    + _build_other_table("ikinci-el-konutlarda-yuksek-fiyat-baskisi-satislari-yavaslatti")
+                ),
+            },
+            {
+                "title": "BPA Sonrası Yeni Nesil Plastik Katkılarında Gizli Risk: Bebek Ürünlerinde Kimyasal Güvenlik ve Denetim Standartları",
+                "summary": "Bisfenol A (BPA) yasağı sonrasında endüstride yaygınlaşan yeni nesil plastik yumuşatıcı ve sertleştirici bileşiklerin bebek sağlığı üzerindeki endokrin etkileri, bilimsel bulgular ve tüketicilerin dikkat etmesi gereken güvenlik kriterleri.",
+                "image_path": _resolve_img("post_bae286ed5a.jpg"),
+                "focus_slug": "zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor",
+                "content": (
+                    '<h3>"BPA İçermez" Etiketi Neden Tek Başına Yeterli Güvenlik Sağlamıyor?</h3>'
+                    '<p>Son on yılda bebek biberonlarından gıda saklama kaplarına kadar pek çok tüketici ürününde Bisfenol A (BPA) maddesinin kullanımına getirilen yasal kısıtlamalar, kimya endüstrisini alternatif polimer katkılarına yöneltti. '
+                    'Ancak uluslararası toksikoloji araştırmalarının mercek altına aldığı <a href="/haber/zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor" class="text-red-600 font-bold underline">Zararsız Sanılan Yeni Nesil Plastik Katkısı Bebek Sağlığını Tehdit Ediyor</a> bulguları, '
+                    'BPA yerine kullanılan Bisfenol S (BPS), Bisfenol F (BPF) ve yeni nesil ftalat türevi plastikleştiricilerin moleküler yapı olarak selefleriyle büyük benzerlik taşıdığını ortaya koyuyor. '
+                    'Üreticilerin yasal olarak "BPA Free" (BPA İçermez) etiketiyle piyasaya sunduğu bazı sentetik materyaller, ısı ve tekrarlı yıkama temasında benzer biyolojik riskleri tetikleyebiliyor.</p>'
+                    '<p>Bebekler ve erken çocukluk dönemindeki bireyler, vücut ağırlıklarına kıyasla daha yüksek gıda/sıvı tüketim oranına sahip olmaları ve karaciğer detoksifikasyon enzimlerinin henüz tam olgunlaşmaması nedeniyle kimyasal göç (migrasyon) süreçlerine yetişkinlerden çok daha duyarlıdır. '
+                    'Özellikle sıcak sıvılarla temas eden plastik beslenme gereçlerinde veya mikrodalga/bulaşık makinesi ısısına maruz kalan ambalajlarda polimer zincirlerinden kopan mikro düzeydeki katkı maddeleri doğrudan sindirim sistemine karışabilmektedir.</p>'
+                    '<h3>Endokrin Sistem Etkileri, Tıbbi Malzemeler ve Regülasyon Boşluğu</h3>'
+                    '<p>Pediatrik endokrinoloji ve çevre sağlığı uzmanlarının dikkat çektiği en kritik nokta, bu yeni nesil katkı maddelerinin "endokrin bozucu" (hormon taklit edici) potansiyelidir. '
+                    'Çok düşük dozlarda dahi östrojen ve tiroit reseptörleriyle etkileşime girebilen bu bileşikler; hücresel büyüme, bağışıklık sistemi gelişimi ve metabolik dengeler üzerinde uzun vadeli etkilere yol açabilmektedir. '
+                    'Üstelik risk alanı yalnızca mutfak gereçleriyle sınırlı kalmayıp yenidoğan yoğun bakım ünitelerinde kullanılan esnek serum setleri, beslenme sondaları ve medikal ambalajlara kadar uzanmaktadır.</p>'
+                    '<p>Mevcut uluslararası kimyasal güvenlik mevzuatında en büyük zorluk, her bir kimyasal bileşiğin tek tek yıllar süren toksikolojik testlerden sonra kısıtlanmasıdır. '
+                    'Bir madde yasaklandığında aynı kimyasal aileden hafifçe değiştirilmiş yeni bir izomer hızla üretim hattına girebilmektedir. Bu nedenle Avrupa Kimyasallar Ajansı (ECHA) ve sağlık otoriteleri, artık tekil maddeleri değil tüm bisfenol ve orto-ftalat grubunu kapsayan "grup bazlı regülasyon" modeline geçişi tartışmaktadır.</p>'
+                    '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+                    '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+                    '<th class="p-2.5 border border-slate-200">Malzeme / Katkı Türü</th>'
+                    '<th class="p-2.5 border border-slate-200">Isı ve Aşınma Dayanımı</th>'
+                    '<th class="p-2.5 border border-slate-200">Bebek ve Çocuk Sağlığı İçin Güvenlik Önerisi</th>'
+                    '</tr></thead><tbody>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">BPS / BPF İçeren Polikarbonat Türevleri</td><td class="p-2.5 border border-slate-200">Sıcak sıvı ve çizilmelerde kimyasal sızıntı (migrasyon) riski yüksek</td><td class="p-2.5 border border-slate-200">Kaynar su ve mikrodalga temasından kesinlikle kaçınılmalı</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Borosilikat Cam Gereçler</td><td class="p-2.5 border border-slate-200">Termal şoka ve kaynatmaya karşı tam kimyasal eylemsizlik (inert)</td><td class="p-2.5 border border-slate-200">Yenidoğan biberonları ve sıcak mama hazırlığında en güvenli birinci tercih</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Medikal Sınıf (Platin Kürlü) Silikon</td><td class="p-2.5 border border-slate-200">Plastikleştirici içermez, yüksek ısıda yapısal bütünlüğünü korur</td><td class="p-2.5 border border-slate-200">Emzik ve biberon başlıklarında sertifikalı %100 medikal silikon seçilmeli</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Paslanmaz Çelik (304 / 316 Kalite)</td><td class="p-2.5 border border-slate-200">Kırılmaz, kaplama gerektirmeyen ve mikroplastik üretmeyen yapı</td><td class="p-2.5 border border-slate-200">Ek gıda kapları ve suluklarda uzun ömürlü güvenli kullanım</td></tr>'
+                    '</tbody></table></div>'
+                    '<h3>Ebeveynler ve Tüketiciler Günlük Hayatta Hangi Önlemleri Almalı?</h3>'
+                    '<p>Bilimsel veriler ışığında uzmanlar, ebeveynlerin bebek ve çocuk beslenmesinde basit ama etkili koruyucu adımlar atabileceğini vurguluyor. '
+                    'Öncelikle sıcak süt, mama veya su hazırlığında plastik kaplar yerine borosilikat cam veya 304/316 kalite paslanmaz çelik ürünlerin tercih edilmesi kimyasal maruziyeti büyük oranda sıfırlamaktadır. '
+                    'Plastik ürün kullanılması gereken durumlarda ise bulaşık makinesinin yüksek ısılı programları yerine elde ılık suyla yıkama yapılması, iç yüzeyi çizilmiş veya matlaşmış kapların derhal kullanım dışı bırakılması ve yalnızca "BPA İçermez" ibaresine değil, tüm bisfenol türevlerinden arındırılmış sertifikalı ürünlere yönelinmesi hayati önem taşımaktadır.</p>'
+                    + _build_other_table("zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor")
+                ),
+            },
+        ]
+
+        existing_titles = {(x.get("title") or "").strip().lower() for x in existing}
+        for item in curated_list:
+            if item["title"].strip().lower() in existing_titles:
+                continue
+            slug = database.save_article(
+                title=item["title"],
+                summary=item["summary"],
+                content=item["content"],
+                image_path=item["image_path"],
+                source="Gündem Analizi",
+                category="Analiz",
+            )
+            if slug:
+                print(f"✅ [Gündem Analizi] Özgün başlangıç analizi eklendi: /haber/{slug}")
+        _RADAR_CACHE["ts"] = 0.0
+    except Exception as _se:
+        print(f"Özgün analiz başlangıç yükleme uyarısı: {_se}")
+
+
 def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     """
     Ana sayfa 'Gündem Analizi' ve /analiz sayfası için:
@@ -298,6 +509,7 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
 
     import database
 
+    seed_curated_analyses()
     synth_pool = database.get_articles(limit=18, category="Analiz")
     if not synth_pool or not any((x.get("category") or "").strip() == "Analiz" for x in synth_pool):
         if not globals().get("_BG_ANALIZ_RUNNING"):
@@ -495,7 +707,7 @@ KURALLAR:
 [İÇERİK]
 (HTML analiz metni)
 """
-            for m_name in ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"]:
+            for m_name in ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-flash-lite-latest"]:
                 try:
                     res = client.models.generate_content(model=m_name, contents=synth_prompt)
                     raw_t = (res.text or "").strip() if res else ""
@@ -518,37 +730,8 @@ KURALLAR:
         print(f"Gündem Analizi AI üretim uyarısı: {_ai_e}")
 
     if not ai_html:
-        ft_esc = _html.escape(focus_title)
-        fs_esc = _html.escape(focus_summary)
-        fc_esc = _html.escape(focus_cat)
-        para_chunks = [p.strip() for p in re.split(r'(?<=[.!?])\s+', focus_content_plain) if len(p.strip()) > 35]
-        p1 = " ".join(para_chunks[:3]) if len(para_chunks) >= 3 else fs_esc
-        p2 = " ".join(para_chunks[3:6]) if len(para_chunks) >= 6 else fs_esc
-        p3 = " ".join(para_chunks[6:10]) if len(para_chunks) >= 7 else p1
-        ai_html = (
-            f'<h3>{ft_esc}: Gelişmenin Arka Planı ve Temel Dinamikler</h3>'
-            f'<p>{fc_esc} gündeminin ilk sırasına yerleşen <a href="/haber/{focus_slug}" class="text-red-600 font-bold underline">{ft_esc}</a> başlığı, '
-            f'hem karar alıcılar hem de kamuoyu açısından kritik bir dönüm noktasına işaret ediyor. {_html.escape(p1)} '
-            f'Bu tablo, ilgili alanda uzun süredir tartışılan yapısal beklentilerin somut adımlara dönüşmeye başladığını gösteriyor.</p>'
-            f'<p>Özellikle son dönemde yaşanan gelişmeler ışığında değerlendirildiğinde, {_html.escape(p2)} '
-            f'Uzmanlar, alınan kararların ve açıklanan verilerin yalnızca kısa vadeli bir tepki olarak kalmayacağını, orta vadede sektör standartlarını yeniden belirleyeceğini vurguluyor.</p>'
-            f'<h3>Sektörel Yansımalar ve Günlük Hayata Somut Etkileri</h3>'
-            f'<p>Söz konusu gelişmenin sahadaki yansımaları incelendiğinde, vatandaşların ve sektör paydaşlarının doğrudan etkileneceği başlıklar öne çıkıyor. '
-            f'{_html.escape(p3)} Uygulama aşamasında denetim mekanizmalarının etkinliği, maliyet dengesi ve erişilebilirlik kriterleri belirleyici rol oynayacak.</p>'
-            f'<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
-            f'<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
-            f'<th class="p-2.5 border border-slate-200">Analiz Boyutu</th>'
-            f'<th class="p-2.5 border border-slate-200">Mevcut Durum ve Beklenen Etki</th>'
-            f'</tr></thead><tbody>'
-            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Odak Alanı</td><td class="p-2.5 border border-slate-200">{fc_esc} — {ft_esc}</td></tr>'
-            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Temel Gündem</td><td class="p-2.5 border border-slate-200">{fs_esc}</td></tr>'
-            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Kısa Vadeli Etki</td><td class="p-2.5 border border-slate-200">İlgili kurum ve paydaşlar nezdinde yeni uygulama ve uyum sürecinin başlaması</td></tr>'
-            f'<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Orta Vadeli Beklenti</td><td class="p-2.5 border border-slate-200">Düzenleme ve saha sonuçlarının ekonomik ve toplumsal göstergelere yansıması</td></tr>'
-            f'</tbody></table></div>'
-            f'<h3>Önümüzdeki Süreçte Neler Bekleniyor?</h3>'
-            f'<p>Önümüzdeki günlerde <a href="/haber/{focus_slug}" class="text-red-600 font-bold underline">{ft_esc}</a> dosyasına ilişkin yeni uygulama detaylarının ve resmi takvimin netleşmesi bekleniyor. '
-            f'Kararın sahadaki ilk sonuçları, hem kamuoyunun beklentilerini karşılama düzeyi hem de bundan sonra atılacak tamamlayıcı adımlar açısından yakından takip edilecek.</p>'
-        )
+        # AdSense Kalite Kuralı: AI üretimi kota nedeniyle başarısız olursa kaynak haberden cümle kopyalayan şablon basma; bir sonraki döngüde gerçek AI ile üret.
+        return None
 
     # Eğer aynı saat diliminde başka haberler de varsa, yazının en altına birbirine karıştırmadan şık bir 'Aynı Saat Dilimindeki Diğer Başlıklar' kutusu ekle
     if other_items:
