@@ -395,8 +395,8 @@ KESİN KURALLAR:
 1. ÖZGÜNLÜK: Kaynak metinden cümle KOPYALAMA. Tüm bilgiyi kendi cümlelerinle, farklı bir kurgu ve akışla yeniden anlat.
 2. DOĞRULUK: Kaynakta OLMAYAN rakam, isim, tarih, alıntı veya iddia UYDURMA. Arka plan ve bağlam bölümünde yalnızca
    genel kabul görmüş, doğrulanabilir bilgiler ver; emin olmadığın hiçbir bilgiyi yazma.
-3. UZUNLUK: Metin en az 450, ideal olarak 500-700 kelime olmalı. Uzunluğu laf kalabalığıyla değil; bağlam, arka plan,
-   süreç detayları ve okurun bilmesi gereken somut bilgilerle sağla.
+3. UZUNLUK VE ANALİTİK DERİNLİK (GÜNDEM ANALİZİ FARKI): Metin en az 480, ideal olarak 550-700 kelime olmalı. Sadece ajans bülteni gibi "ne olduğunu" aktarmakla yetinme;
+   olayın neden-sonuç ilişkisini, önceki dönem veya benzer kararlarla karşılaştırmasını, rakamsal/sektörel boyutunu ve vatandaşın/piyasanın üzerindeki somut etkisini analitik gazetecilik perspektifiyle derinlemesine incele.
 4. DİL: Sade, akıcı, dil bilgisi kurallarına uygun Türkçe. Klişe, abartı, tık tuzağı, hashtag, emoji ve okura soru sorma YOK.
 5. DOĞAL AJANS KAPANIŞI (ÇOK KRİTİK): Haberin son paragrafını ve son cümlesini ASLA kompozisyon/makale özeti gibi bitirme!
    Son paragrafta "Sonuç olarak", "Özetle", "pekiştirmektedir", "gözler önüne sermektedir", "net bir şekilde ortaya koymaktadır",

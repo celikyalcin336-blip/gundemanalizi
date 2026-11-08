@@ -261,6 +261,9 @@
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
                     🔴 Son Dakika
                 </a>
+                <a href="/analiz" class="px-3 py-1.5 rounded-lg font-extrabold transition flex items-center gap-1 bg-amber-500/15 text-amber-300 hover:bg-amber-500 hover:text-slate-950 border border-amber-400/40">
+                    <span>📊</span> Analiz
+                </a>
                 <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Gündem' else '' }}">Gündem</a>
                 <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Ekonomi' else '' }}">Ekonomi</a>
                 <a href="/?kategori=Eğitim" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'text-red-500 font-extrabold' if active_category == 'Eğitim' else '' }}">Eğitim</a>
@@ -303,6 +306,9 @@
             <a href="/son-dakika" class="shrink-0 px-3.5 py-1.5 rounded-full font-black text-xs transition flex items-center gap-1.5 {{ 'bg-red-600 text-white shadow-lg shadow-red-900/50 scale-105' if active_category in ['Son Dakika', 'sondakika'] else 'bg-red-950/80 text-red-300 border border-red-500/40' }}">
                 <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
                 🔴 Son Dakika
+            </a>
+            <a href="/analiz" class="shrink-0 px-3.5 py-1.5 rounded-full font-extrabold text-xs transition flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                📊 Analiz Merkezi
             </a>
             <a href="/?kategori=Gündem" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if active_category == 'Gündem' else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Gündem</a>
             <a href="/?kategori=Ekonomi" class="px-3 py-1.5 rounded-full transition {{ 'bg-red-600 text-white shadow-sm' if active_category == 'Ekonomi' else 'bg-slate-800/90 text-slate-300 hover:text-white' }}">Ekonomi</a>
@@ -516,6 +522,113 @@
                 </div>
             </div>
         </section>
+
+        <!-- 5.5 📊 GÜNDEM ANALİZİ ÖZEL: GÜNÜN DERİN ANALİZ DOSYALARI & CANLI VERİ RADARI -->
+        {% if radar and radar.dossiers and radar.dossiers|length >= 3 %}
+        <section class="rounded-2xl p-5 sm:p-7 text-white shadow-xl border border-slate-700" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #0f172a 100%);">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 mb-5 border-b border-slate-700/80">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-lg font-black shadow-md shrink-0">📊</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-500/30">GÜNDEM ANALİZİ ÖZEL</span>
+                            <span class="text-[11px] text-slate-400 font-semibold hidden sm:inline">• Veri, Bağlam ve Sektörel Etki Raporları</span>
+                        </div>
+                        <h2 class="text-lg sm:text-2xl font-black tracking-tight text-white mt-0.5">
+                            GÜNÜN DERİN ANALİZ DOSYALARI &amp; GÜNDEM RADARI
+                        </h2>
+                    </div>
+                </div>
+                <a href="/analiz" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md transition shrink-0">
+                    <span>Tüm Analiz Merkezini Aç</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Sol 8 Kolon: Günün 3 Derin Analiz Dosyası -->
+                <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for d in radar.dossiers[:3] %}
+                    <article class="rounded-xl bg-slate-900/95 border border-slate-700/80 hover:border-red-500 transition flex flex-col justify-between overflow-hidden group shadow-md">
+                        <div>
+                            <a href="/haber/{{ d.slug }}" class="block relative h-36 overflow-hidden bg-slate-950">
+                                {% if d.image_path %}
+                                <img src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                {% endif %}
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+                                <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-black uppercase shadow">
+                                    Dosya #{{ loop.index }} • {{ d.category }}
+                                </span>
+                                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-slate-900/90 border border-slate-700 text-emerald-400 text-[10px] font-mono font-bold">
+                                    Etki: {{ d.impact_score }}/100
+                                </span>
+                            </a>
+                            <div class="p-3.5">
+                                {% if d.pills %}
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    {% for p in d.pills[:2] %}
+                                    <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-bold text-slate-200">
+                                        {{ p.icon }} {{ p.value }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <a href="/haber/{{ d.slug }}">
+                                    <h3 class="text-xs sm:text-sm font-extrabold text-white group-hover:text-red-400 transition leading-snug line-clamp-2 mb-1.5">
+                                        {{ d.title }}
+                                    </h3>
+                                </a>
+                                <p class="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
+                                    {{ (d.summary or '')[:115] ~ ('...' if (d.summary or '')|length > 115 else '') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="px-3.5 py-2.5 bg-slate-950/70 border-t border-slate-800 flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400 font-medium">⏱️ {{ d.reading_time_min }} dk analiz</span>
+                            <a href="/haber/{{ d.slug }}" class="text-red-400 group-hover:text-red-300 font-extrabold">Raporu Oku →</a>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <!-- Sağ 4 Kolon: Canlı Gündem Ağırlık Radarı & Odak Kavramlar -->
+                <div class="lg:col-span-4 rounded-xl bg-slate-900/95 border border-slate-700/80 p-4 flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-extrabold text-white flex items-center gap-1.5">📡 Gündem Yoğunluk Radarı</span>
+                            <span class="text-[10px] font-mono text-emerald-400 font-bold">Canlı Dağılım</span>
+                        </div>
+                        <div class="space-y-2">
+                            {% for c in radar.category_distribution[:4] %}
+                            <div>
+                                <div class="flex items-center justify-between text-[11px] font-bold mb-0.5">
+                                    <span class="text-slate-200">{{ c.label }}</span>
+                                    <span class="font-mono text-slate-300">%{{ c.pct }}</span>
+                                </div>
+                                <div style="width:100%;height:7px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
+                                    <div style="width:{{ c.pct }}%;height:100%;background-color:{{ c.hex }};border-radius:999px;"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if radar.hot_topics %}
+                    <div class="pt-2.5 border-t border-slate-800">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block mb-1.5">🔥 Günün Odak Kavramları</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for ht in radar.hot_topics[:5] %}
+                            <a href="/?q={{ ht.query }}" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white border border-slate-700 text-[10px] font-bold transition">
+                                #{{ ht.word }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
 
         <!-- 6. 🔴 GÜNDEM & SICAK GELİŞMELER (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set gundem_items = gundem_articles if (gundem_articles and gundem_articles|length >= 3) else articles[0:5] %}
@@ -1015,25 +1128,34 @@
                 {% endfor %}
             </div>
 
-            <!-- Ana Sayfa Sayfalama -->
+            <!-- Ana Sayfa Sayfalama & Tam Arşiv Bağlantısı -->
             {% if total_pages > 1 %}
-            <div class="flex items-center justify-center gap-2 pt-8">
+            <nav aria-label="Sayfalama" class="flex flex-wrap items-center justify-center gap-2 pt-8">
                 {% if current_page > 1 %}
-                    <a href="/?sayfa={{ current_page - 1 }}" 
-                       class="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 text-xs font-bold transition flex items-center gap-1 shadow-xs">
+                    <a href="/?sayfa={{ current_page - 1 }}" rel="prev"
+                       class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 text-xs font-bold transition flex items-center gap-1 shadow-xs">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i> Önceki
                     </a>
                 {% endif %}
-                <span class="px-4 py-2 rounded-xl bg-red-600 text-white text-xs font-black shadow-xs">
-                    Sayfa {{ current_page }} / {{ total_pages }}
-                </span>
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == 1 or p == total_pages or (p >= current_page - 2 and p <= current_page + 2) or p in [5, 10, 15, 20, 25, 30, 35, 40] %}
+                        {% if p == current_page %}
+                        <span class="px-3.5 py-2 rounded-xl bg-red-600 text-white text-xs font-black shadow-xs">{{ p }}</span>
+                        {% else %}
+                        <a href="{% if p == 1 %}/{% else %}/?sayfa={{ p }}{% endif %}" class="px-3 py-2 rounded-xl bg-white border border-slate-200 hover:border-red-400 text-slate-700 hover:text-red-600 text-xs font-bold transition shadow-xs">{{ p }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
                 {% if current_page < total_pages %}
-                    <a href="/?sayfa={{ current_page + 1 }}" 
-                       class="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 text-xs font-bold transition flex items-center gap-1 shadow-xs">
+                    <a href="/?sayfa={{ current_page + 1 }}" rel="next"
+                       class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-700 hover:text-slate-900 text-xs font-bold transition flex items-center gap-1 shadow-xs">
                         Sonraki <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </a>
                 {% endif %}
-            </div>
+                <a href="/site-haritasi" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-red-600 text-white text-xs font-extrabold transition shadow-xs ml-1">
+                    📚 Tüm Haber Arşivi
+                </a>
+            </nav>
             {% endif %}
         </section>
         {% endif %}

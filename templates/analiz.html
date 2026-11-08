@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        (function() {
+            var c = null;
+            try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+            var g = (c === 'rejected' || c === 'essential') ? 'denied' : 'granted';
+            gtag('consent', 'default', {
+                'ad_storage': g,
+                'ad_user_data': g,
+                'ad_personalization': g,
+                'analytics_storage': g,
+                'wait_for_update': 500
+            });
+        })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gündem Analizi Merkezi — Derin Dosyalar, Veri Radarı &amp; Etki Analizleri</title>
+    <meta name="description" content="Türkiye ve dünya gündemine dair veri odaklı derin analiz dosyaları, canlı gündem yoğunluk radarı, ekonomik etki simülatörü ve sektörel incelemeler.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/analiz">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Gündem Analizi Veri ve Strateji Merkezi",
+      "description": "Ekonomi, jeopolitik, teknoloji ve kamuoyu gelişmelerinin veri odaklı derin analiz dosyaları.",
+      "url": "https://xn--gndemanalizi-dlb.com.tr/analiz",
+      "publisher": {
+        "@type": "NewsMediaOrganization",
+        "name": "Gündem Analizi",
+        "url": "https://xn--gndemanalizi-dlb.com.tr",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"
+        }
+      }
+    }
+    </script>
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <script src="/assets/lucide.min.js" defer></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .radar-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+            border: 1px solid #334155;
+        }
+        .radar-bar-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .radar-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s ease;
+        }
+        .dossier-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .dossier-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px -10px rgba(15, 23, 42, 0.14);
+            border-color: #dc2626;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- ÜST HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3 group shrink-0">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Logo" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-sm" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
+                        GÜNDEM <span class="text-red-600">ANALİZİ</span>
+                    </span>
+                    <p class="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+                        Veri • Bağlam • Stratejik Analiz
+                    </p>
+                </div>
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-700">
+                <a href="/" class="px-3 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ana Sayfa</a>
+                <a href="/analiz" class="px-3 py-1.5 rounded-lg bg-red-600 text-white font-extrabold shadow-xs flex items-center gap-1.5">
+                    <span>📊</span> Analiz Merkezi
+                </a>
+                <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Gündem</a>
+                <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ekonomi</a>
+                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Teknoloji</a>
+                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Otomobil</a>
+                <a href="/?kategori=Dünya" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Dünya</a>
+                <a href="/piyasalar" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Piyasalar</a>
+            </nav>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="/" class="text-xs font-bold text-slate-800 hover:text-red-600 px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 transition">
+                    ← Ana Sayfa
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-8">
+
+        <!-- 1. ÜST KOKPİT: CANLI GÜNDEM RADARI & EKONOMİK ETKİ SİMÜLATÖRÜ -->
+        <section class="radar-hero rounded-2xl p-5 sm:p-8 text-white shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-700/80">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-extrabold uppercase tracking-wider mb-2">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        CANLI VERİ &amp; STRATEJİ ÜSSÜ
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white">
+                        GÜNDEM ANALİZİ <span class="text-red-500">VERİ RADARI</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
+                        Sıradan haber akışının ötesinde; güncel gelişmelerin sektörel ağırlık dağılımını, öne çıkan kavramlarını, ekonomik alım gücü etkisini ve 3 boyutlu analiz dosyalarını tek ekranda inceleyin.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 bg-slate-900/90 border border-slate-700 px-4 py-3 rounded-xl">
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">İncelenen Aktif Havuz</span>
+                        <span class="text-lg font-black text-emerald-400">{{ radar.total_analyzed or 60 }} Güncel Dosya</span>
+                    </div>
+                    <span class="text-slate-600">|</span>
+                    <div>
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Son Güncelleme</span>
+                        <span class="text-sm font-mono font-bold text-white">{{ radar.updated_at or 'Canlı' }} TSİ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- SOL (7 KOLON): KATEGORİ AĞIRLIK RADARI & KONU BULUTU -->
+                <div class="lg:col-span-7 bg-slate-900/80 border border-slate-700/80 rounded-2xl p-5 space-y-5">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
+                            <span>📡</span> Türkiye &amp; Dünya Gündemi Ağırlık Dağılımı
+                        </h2>
+                        <span class="text-[11px] text-slate-400 font-semibold">Gerçek Zamanlı Kategori Yoğunluğu</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        {% for c in radar.category_distribution %}
+                        <div>
+                            <div class="flex items-center justify-between text-xs font-bold mb-1">
+                                <a href="/?kategori={{ c.category }}" class="text-slate-200 hover:text-red-400 transition flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ c.hex }};"></span>
+                                    <span>{{ c.label }}</span>
+                                </a>
+                                <span class="font-mono text-slate-300">%{{ c.pct }} <span class="text-[10px] text-slate-400">({{ c.count }} haber)</span></span>
+                            </div>
+                            <div class="radar-bar-track">
+                                <div class="radar-bar-fill" style="width: {{ c.pct }}%; background-color: {{ c.hex }};"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Günün Öne Çıkan Kavramları -->
+                    {% if radar.hot_topics %}
+                    <div class="pt-4 border-t border-slate-800">
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block mb-2.5">
+                            🔥 Günün Odak Başlıkları ve Anahtar Kavramları (Tıkla &amp; Dosyaları Gör)
+                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            {% for ht in radar.hot_topics %}
+                            <a href="/?q={{ ht.query }}" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-red-600 text-slate-200 hover:text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1.5">
+                                <span>#{{ ht.word }}</span>
+                                <span class="px-1.5 py-0.5 rounded bg-slate-950/60 text-[10px] text-amber-400 font-mono">{{ ht.count }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- SAĞ (5 KOLON): İNTERAKTİF ALIM GÜCÜ & KUR SEPETİ SİMÜLATÖRÜ -->
+                <div class="lg:col-span-5 bg-slate-900/80 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-sm sm:text-base font-extrabold text-white flex items-center gap-2">
+                                <span>🧮</span> Canlı Kur &amp; Sepet Etki Simülatörü
+                            </h2>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Canlı Veri</span>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                            TL bütçenizin veya birikiminizin güncel Dolar, Euro ve Gram Altın karşılığını ve olası piyasa değişim senaryolarındaki etkisini anında analiz edin:
+                        </p>
+
+                        <label for="sim-tl-input" class="text-[11px] font-bold text-slate-300 uppercase block mb-1.5">Analiz Edilecek Tutar (TL)</label>
+                        <div class="flex items-center gap-2 mb-4">
+                            <input id="sim-tl-input" type="number" value="50000" min="100" step="1000" oninput="runBasketAnalysis()"
+                                   class="w-full bg-slate-950 border border-slate-700 focus:border-red-500 rounded-xl px-3.5 py-2 text-sm font-mono font-extrabold text-white focus:outline-none">
+                            <button type="button" onclick="document.getElementById('sim-tl-input').value=100000;runBasketAnalysis();" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 shrink-0 cursor-pointer">100 Bin ₺</button>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2.5 text-center">
+                            <div class="p-3 rounded-xl bg-slate-950/90 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 font-bold block">💵 ABD Doları</span>
+                                <span id="sim-usd-out" class="text-sm sm:text-base font-mono font-black text-emerald-400 mt-0.5 block">-</span>
+                                <span id="sim-usd-rate" class="text-[10px] text-slate-500 font-mono block">Kur: -</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-950/90 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 font-bold block">💶 Euro</span>
+                                <span id="sim-eur-out" class="text-sm sm:text-base font-mono font-black text-blue-400 mt-0.5 block">-</span>
+                                <span id="sim-eur-rate" class="text-[10px] text-slate-500 font-mono block">Kur: -</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-950/90 border border-slate-800">
+                                <span class="text-[10px] text-slate-400 font-bold block">🪙 Gram Altın</span>
+                                <span id="sim-gold-out" class="text-sm sm:text-base font-mono font-black text-amber-400 mt-0.5 block">-</span>
+                                <span id="sim-gold-rate" class="text-[10px] text-slate-500 font-mono block">Fiyat: -</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs space-y-1.5">
+                        <div class="flex items-center justify-between text-slate-300">
+                            <span>📊 Eşit Dağılımlı Sepet (%10 Kur Artışı Senaryosu):</span>
+                            <span id="sim-scenario-up" class="font-mono font-extrabold text-emerald-400">-</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                            <span>Detaylı maaş, kıdem ve enflasyon hesaplamaları:</span>
+                            <a href="/hesaplama" class="text-red-400 font-bold hover:underline">Hesaplama Araçları →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. DERİN ANALİZ DOSYALARI & SEKTÖREL ETKİ RAPORLARI -->
+        <section class="space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-6 bg-red-600 rounded-sm"></span>
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                            DERİN ANALİZ DOSYALARI &amp; ETKİ RAPORLARI
+                        </h2>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1">
+                        Her dosya; içerdiği somut veriler, sektörel etkileri ve kronolojik bağlam zinciriyle birlikte hazırlanmıştır.
+                    </p>
+                </div>
+
+                <!-- Kategori Filtre Sekmeleri -->
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold" id="dossier-filters">
+                    <button type="button" onclick="filterDossiers('ALL', this)" class="dossier-filter-btn px-3.5 py-1.5 rounded-xl bg-red-600 text-white font-extrabold shadow-xs cursor-pointer transition">Tümü</button>
+                    <button type="button" onclick="filterDossiers('Ekonomi', this)" class="dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition">Ekonomi</button>
+                    <button type="button" onclick="filterDossiers('Dünya', this)" class="dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition">Dünya &amp; Diplomasi</button>
+                    <button type="button" onclick="filterDossiers('Teknoloji', this)" class="dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition">Teknoloji</button>
+                    <button type="button" onclick="filterDossiers('Otomobil', this)" class="dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition">Otomobil</button>
+                    <button type="button" onclick="filterDossiers('Gündem', this)" class="dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition">Gündem</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dossier-grid">
+                {% for d in radar.dossiers %}
+                <article class="dossier-card bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col justify-between shadow-sm" data-cat="{{ d.category }}">
+                    <div>
+                        <a href="/haber/{{ d.slug }}" class="block relative h-48 overflow-hidden bg-slate-900">
+                            {% if d.image_path %}
+                            <img src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                            {% endif %}
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent"></div>
+                            <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-red-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
+                                    📐 {{ d.category }} Analizi
+                                </span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-700 text-emerald-400 text-[10px] font-mono font-extrabold">
+                                    Etki Skoru: {{ d.impact_score }}/100
+                                </span>
+                            </div>
+                            <div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-slate-200 font-semibold">
+                                <span>📅 {{ d.created_at }}</span>
+                                <span>⏱️ {{ d.reading_time_min }} dk derin okuma</span>
+                            </div>
+                        </a>
+
+                        <div class="p-5">
+                            <!-- Veri Rozetleri (Data Pills) -->
+                            {% if d.pills %}
+                            <div class="flex flex-wrap gap-1.5 mb-3">
+                                {% for p in d.pills %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-bold text-slate-700">
+                                    <span>{{ p.icon }}</span>
+                                    <span class="text-slate-900 font-extrabold">{{ p.value }}</span>
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <a href="/haber/{{ d.slug }}">
+                                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 hover:text-red-600 transition leading-snug mb-2.5">
+                                    {{ d.title }}
+                                </h3>
+                            </a>
+                            <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                                {{ d.summary }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                        <span class="text-[11px] text-slate-500 font-semibold">Kaynak: <strong class="text-slate-700">{{ d.source }}</strong></span>
+                        <a href="/haber/{{ d.slug }}" class="font-extrabold text-red-600 hover:text-red-700 flex items-center gap-1">
+                            <span>Analizi İncele</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- 3. METODOLOJİ VE ŞEFFAFLIK KUTUSU (AdSense E-E-A-T Güveni) -->
+        <section class="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <div class="text-xs font-black uppercase tracking-wider text-red-600">01 • Veri Odaklı Habercilik</div>
+                    <h3 class="text-base font-extrabold text-slate-900">Rakamları ve Kaynakları Ayrıştırıyoruz</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Gündem Analizi'nde yayımlanan her dosya, resmi kurum verileri ve birincil ajans kaynakları üzerinden teyit edilir; metin içindeki kritik oranlar ve finansal göstergeler okur için özetlenir.
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-xs font-black uppercase tracking-wider text-blue-600">02 • Kronolojik Bağlam Zinciri</div>
+                    <h3 class="text-base font-extrabold text-slate-900">Olayın Geçmişini ve Bugününü Bağlıyoruz</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Tekil bir haberi kopuk biçimde sunmak yerine, aynı başlık etrafındaki geçmiş gelişmeleri kronolojik zaman tüneli ile birbirine bağlayarak bütünlüklü bir perspektif sunuyoruz.
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-xs font-black uppercase tracking-wider text-emerald-600">03 • Editoryal Sorumluluk</div>
+                    <h3 class="text-base font-extrabold text-slate-900">Şeffaf Künye ve 24 Saat Düzeltme İlkesi</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Tüm analiz dosyaları Genel Yayın Yönetmeni <a href="/yazar/yalcin-celik" class="text-red-600 font-bold underline">Yalçın Çelik</a> denetiminde <a href="/yayin-ilkeleri" class="text-red-600 font-bold underline">Yayın İlkelerimiz</a> çerçevesinde hazırlanır.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-900 py-8 text-xs text-slate-400 mt-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-slate-300 font-bold">GÜNDEM ANALİZİ © 2026 • Doğru Haber, Tarafsız Analiz</p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="/hakkimizda" class="hover:text-white">Hakkımızda</a>
+                <span>•</span>
+                <a href="/kunye" class="hover:text-white">Künye</a>
+                <span>•</span>
+                <a href="/yayin-ilkeleri" class="hover:text-white">Yayın İlkeleri</a>
+                <span>•</span>
+                <a href="/iletisim" class="hover:text-white">İletişim</a>
+                <span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-white">Gizlilik</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const _RAW_RATES = {{ market_rates | tojson if market_rates else '[]' }};
+        function _parseRate(symKey, fallbackVal) {
+            for (const r of (_RAW_RATES || [])) {
+                const n = ((r.name || '') + ' ' + (r.symbol || '')).toLowerCase();
+                if (n.includes(symKey)) {
+                    const clean = String(r.price || '').replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '');
+                    const val = parseFloat(clean);
+                    if (val > 0) return val;
+                }
+            }
+            return fallbackVal;
+        }
+        function runBasketAnalysis() {
+            const tl = Math.max(0, parseFloat(document.getElementById('sim-tl-input').value || '0'));
+            const usd = _parseRate('dolar', 34.50);
+            const eur = _parseRate('euro', 37.20);
+            const gold = _parseRate('altın', 3050.0);
+
+            document.getElementById('sim-usd-out').innerText = '$' + (tl / usd).toLocaleString('tr-TR', {maximumFractionDigits: 1});
+            document.getElementById('sim-usd-rate').innerText = '1$ = ' + usd.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ₺';
+
+            document.getElementById('sim-eur-out').innerText = '€' + (tl / eur).toLocaleString('tr-TR', {maximumFractionDigits: 1});
+            document.getElementById('sim-eur-rate').innerText = '1€ = ' + eur.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' ₺';
+
+            document.getElementById('sim-gold-out').innerText = (tl / gold).toLocaleString('tr-TR', {maximumFractionDigits: 1}) + ' gr';
+            document.getElementById('sim-gold-rate').innerText = '1 gr = ' + gold.toLocaleString('tr-TR', {maximumFractionDigits: 0}) + ' ₺';
+
+            const upVal = Math.round(tl * 1.10);
+            document.getElementById('sim-scenario-up').innerText = upVal.toLocaleString('tr-TR') + ' ₺ (+' + Math.round(tl * 0.10).toLocaleString('tr-TR') + ' ₺)';
+        }
+        function filterDossiers(cat, btn) {
+            document.querySelectorAll('.dossier-filter-btn').forEach(b => {
+                b.className = 'dossier-filter-btn px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-red-400 cursor-pointer transition';
+            });
+            if (btn) {
+                btn.className = 'dossier-filter-btn px-3.5 py-1.5 rounded-xl bg-red-600 text-white font-extrabold shadow-xs cursor-pointer transition';
+            }
+            document.querySelectorAll('#dossier-grid > article').forEach(card => {
+                const c = card.getAttribute('data-cat') || '';
+                card.style.display = (cat === 'ALL' || c === cat) ? '' : 'none';
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            runBasketAnalysis();
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

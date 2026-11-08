@@ -117,11 +117,49 @@
             </div>
         </div>
 
-        <!-- Son Yayınlanan Haberler Listesi -->
-        <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
-            <h2 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2">
-                <span class="text-red-600">📰</span> Son Yayınlanan Haberler ({{ articles|length }})
-            </h2>
+        <!-- Kategori Bazlı Tam Haber Arşivi (Sıfır Yetim Sayfa - Tüm Haberler Doğrudan Taranabilir) -->
+        <div class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
+                        <span class="text-red-600">📰</span> Tüm Haber Arşivi ({{ articles|length }} Haber)
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Kategorilere göre sınıflandırılmış tam yayın dizini. Hızlı geçiş için kategori seçebilirsiniz:</p>
+                </div>
+                <a href="/analiz" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-red-600 text-white text-xs font-extrabold transition shrink-0">
+                    📊 Gündem Analizi Veri Radarı →
+                </a>
+            </div>
+
+            {% if grouped_articles %}
+            <div class="flex flex-wrap gap-2">
+                {% for cat_name, cat_items in grouped_articles %}
+                <a href="#arsiv-{{ loop.index }}" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-600 hover:text-white text-slate-800 text-xs font-extrabold transition border border-slate-200">
+                    {{ cat_name }} ({{ cat_items|length }})
+                </a>
+                {% endfor %}
+            </div>
+
+            {% for cat_name, cat_items in grouped_articles %}
+            <section id="arsiv-{{ loop.index }}" class="pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                        {{ cat_name }} Haberleri ({{ cat_items|length }})
+                    </h3>
+                    <a href="/?kategori={{ cat_name }}" class="text-xs font-bold text-red-600 hover:underline">{{ cat_name }} Vitrinine Git →</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {% for a in cat_items %}
+                    <a href="/haber/{{ a.slug }}" class="p-2.5 rounded-xl bg-slate-50 hover:bg-red-50/60 border border-slate-200/80 hover:border-red-300 transition flex items-start justify-between gap-2 group">
+                        <span class="text-xs font-bold text-slate-800 group-hover:text-red-600 transition line-clamp-1">{{ a.title }}</span>
+                        <span class="text-[10px] text-slate-400 font-mono shrink-0">{{ (a.created_at or '')[:10] }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+            {% else %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {% for a in articles %}
                 <a href="/haber/{{ a.slug }}" class="p-3 rounded-xl bg-slate-50 hover:bg-red-50/60 border border-slate-200/80 hover:border-red-300 transition flex items-start justify-between gap-3 group">
@@ -133,6 +171,7 @@
                 </a>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
     </main>
 

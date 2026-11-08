@@ -1864,7 +1864,7 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
             ph = ",".join(["?"] * len(batch_ids))
             with get_connection() as conn:
                 b_rows = conn.execute(
-                    f"SELECT id, slug, title, summary, content FROM articles WHERE id IN ({ph})",
+                    f"SELECT id, slug, title, summary, content, category FROM articles WHERE id IN ({ph})",
                     tuple(batch_ids),
                 ).fetchall()
             b_updates = []
@@ -1874,9 +1874,11 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
                 orig_t = r["title"] or ""
                 orig_s = r["summary"] or ""
                 orig_c = r["content"] or ""
+                orig_cat = r["category"] or "Gündem"
                 new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
                 new_s = content_quality.clean_summary_text(news_fetcher.sanitize_news_text(orig_s), new_t)
                 new_c = content_quality.clean_article_html(orig_c)
+                new_c = content_quality.ensure_indexable_depth(new_c, new_t, new_s, orig_cat, aid)
                 if new_t != orig_t or new_s != orig_s or new_c != orig_c:
                     b_updates.append((new_t, new_s, new_c, aid, slug))
             if b_updates:

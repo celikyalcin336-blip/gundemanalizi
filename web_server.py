@@ -1291,12 +1291,15 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             articles = (_unique_grid + [a for a in _wide_pool if a not in _unique_grid])[:limit]
 
     import live_services
+    import analysis_engine
     superlig_data = await asyncio.to_thread(live_services.get_live_superlig)
+    radar_data = analysis_engine.get_agenda_radar_data(widgets)
     resp = templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "articles": articles,
+            "radar": radar_data,
             "slider_articles": slider_articles,
             "side_featured": side_featured,
             "gundem_articles": gundem_articles,
@@ -2236,9 +2239,36 @@ async def article_detail(request: Request, slug: str):
     else:
         cat_pool = widgets.get("gundem_articles") or []
 
-    related_articles = [a for a in cat_pool if a.get("slug") != slug][:4]
+    fresh_rel = [a for a in cat_pool if a.get("slug") != slug][:2]
+    if len(fresh_rel) < 2:
+        fresh_rel = [a for a in breaking_news if a.get("slug") != slug][:2]
+    used_rel_slugs = {slug} | {a.get("slug") for a in fresh_rel if a.get("slug")}
+    arch_rel = []
+    try:
+        idx_pool = _INDEX_CACHE.get("rows") or _indexable_articles()
+        same_cat_arch = [a for a in idx_pool if (a.get("category") or "Gündem") == category and a.get("slug") not in used_rel_slugs]
+        if len(same_cat_arch) < 6:
+            same_cat_arch = [a for a in idx_pool if a.get("slug") not in used_rel_slugs]
+        if same_cat_arch:
+            n_arch = len(same_cat_arch)
+            seed_id = int(article_id or 1)
+            for step in range(min(8, n_arch)):
+                pick = same_cat_arch[(seed_id * 7 + step * 19) % n_arch]
+                if pick.get("slug") not in used_rel_slugs:
+                    used_rel_slugs.add(pick.get("slug"))
+                    arch_rel.append(pick)
+                if len(arch_rel) >= 4:
+                    break
+    except Exception:
+        pass
+    related_articles = (fresh_rel + arch_rel)[:6]
     if len(related_articles) < 3:
-        related_articles = [a for a in breaking_news if a.get("slug") != slug][:4]
+        for bn in breaking_news:
+            if bn.get("slug") not in used_rel_slugs:
+                related_articles.append(bn)
+                used_rel_slugs.add(bn.get("slug"))
+            if len(related_articles) >= 6:
+                break
 
     slider_articles = related_articles if len(related_articles) >= 3 else breaking_news
 
@@ -2274,13 +2304,10 @@ async def article_detail(request: Request, slug: str):
     article["title"] = content_quality.clean_title_text(article.get("title") or "")
     article["summary"] = content_quality.clean_summary_text(article.get("summary") or "", article["title"])
     raw_content = content_quality.clean_article_html(raw_content)
-    is_thin_article = content_quality.is_thin(raw_content)
-    # Loto/burç/maç saati gibi rutin "emtia" haberler sitede kalır ama Google dizinine alınmaz
-    try:
-        if main.is_commodity_news(article.get("title", "")):
-            is_thin_article = True
-    except Exception:
-        pass
+    raw_content = content_quality.ensure_indexable_depth(
+        raw_content, article["title"], article["summary"], category, article_id or 0
+    )
+    is_thin_article = False
 
     # Eski/yeni makalelerdeki tekdüze "Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?" şablon başlığını
     # ve kalıp kapanış cümlelerini kategoriye ve haber ID'sine göre doğal gazetecilik başlıklarıyla çeşitlendir
@@ -2460,6 +2487,9 @@ async def article_detail(request: Request, slug: str):
         name="article.html",
         context={
             "article": {**article, "content": raw_content, "source": clean_src},
+            "analysis_cockpit": __import__("analysis_engine").build_article_analysis_cockpit(
+                {**article, "source": clean_src}, raw_content, (related_articles or []) + (breaking_news or [])
+            ),
             "highlights": highlights,
             "related_articles": related_articles,
             "other_articles": other_articles,
@@ -2621,6 +2651,22 @@ async def calc_emekli(request: Request):
 @app.get("/vizyonumuz", response_class=HTMLResponse)
 async def about_page(request: Request):
     return templates.TemplateResponse(request=request, name="about.html", context={})
+
+@app.api_route("/analiz", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def analiz_merkezi_page(request: Request):
+    """Gündem Analizi Veri Radarı, Etki Simülatörü ve Derin Analiz Dosyaları Merkezi."""
+    import analysis_engine
+    widgets = get_cached_category_widgets()
+    radar_data = analysis_engine.get_agenda_radar_data(widgets)
+    return templates.TemplateResponse(
+        request=request,
+        name="analiz.html",
+        context={
+            "radar": radar_data,
+            "market_rates": get_market_rates()["rates"],
+            "ad_settings": get_site_ad_settings(),
+        },
+    )
 
 @app.get("/kunye", response_class=HTMLResponse)
 async def kunye_page(request: Request):
@@ -2825,16 +2871,26 @@ Sitemap: {base_url}/news-sitemap.xml
 
 @app.get("/site-haritasi", response_class=HTMLResponse)
 async def html_sitemap(request: Request):
-    """Ziyaretçiler için görsel ve tıklanabilir HTML Site Haritası."""
-    import content_quality
-    pool = database.get_sitemap_articles(limit=90)
-    articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:60]
+    """Ziyaretçiler ve Googlebot için tüm haber arşivini (Sıfır Yetim Sayfa) kategorilere göre sunan HTML Site Haritası."""
+    articles = await asyncio.to_thread(_indexable_articles)
     if not articles:
-        articles = database.get_articles(limit=60)
+        articles = database.get_articles(limit=200)
+    cat_order = ["Gündem", "Ekonomi", "Teknoloji", "Spor", "Otomobil", "Sağlık", "Eğitim", "Dünya"]
+    grouped_map = {c: [] for c in cat_order}
+    for a in articles:
+        c = database.normalize_category_name(a.get("category") or "Gündem") or "Gündem"
+        if c not in grouped_map:
+            c = "Gündem"
+        grouped_map[c].append(a)
+    grouped_articles = [(c, grouped_map[c]) for c in cat_order if grouped_map.get(c)]
     return templates.TemplateResponse(
         request=request,
         name="sitemap.html",
-        context={"articles": articles}
+        context={
+            "articles": articles,
+            "grouped_articles": grouped_articles,
+            "total_articles_count": len(articles),
+        }
     )
 
 @app.get("/sitemap.xsl")
@@ -2932,9 +2988,22 @@ _INDEX_CACHE = {"ts": 0, "rows": []}
 _INDEX_LOCK = threading.Lock()
 
 
+def _format_w3c_lastmod(raw_dt: str, fallback_date: str) -> str:
+    """Tarih dizgesini Google Sitemap standardına uygun tam ISO-8601 (+03:00) formatına dönüştürür."""
+    s = (raw_dt or "").strip().replace(" ", "T")
+    if not s:
+        return f"{fallback_date}T09:00:00+03:00"
+    if len(s) == 10:
+        return f"{s}T09:00:00+03:00"
+    if len(s) == 16:
+        return f"{s}:00+03:00"
+    if "+" not in s and "Z" not in s:
+        return f"{s[:19]}+03:00"
+    return s
+
+
 def _indexable_articles() -> list:
-    """noindex OLMAYAN (zayıf olmayan) tüm haberleri en yeniden eskiye döner.
-    İçerik yalnızca yeni/değişmiş haberler için okunur; böylece arşiv büyüse de veritabanı yorulmaz."""
+    """Veritabanındaki tüm temiz haberleri (%100 kapsam) en yeniden eskiye hafif meta sözlükleri olarak döner."""
     import content_quality
     now = time.time()
     if _INDEX_CACHE["rows"] and now - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
@@ -2944,32 +3013,22 @@ def _indexable_articles() -> list:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
             meta = [dict(r) for r in conn.execute(
-                "SELECT id, slug, title, created_at, LENGTH(content) AS clen FROM articles ORDER BY id DESC"
+                "SELECT id, slug, title, category, image_path, created_at FROM articles ORDER BY id DESC"
             ).fetchall()]
-        changed = [m["id"] for m in meta
-                   if m["id"] not in _INDEX_MEMO or _INDEX_MEMO[m["id"]]["len"] != (m["clen"] or 0)]
-        for i in range(0, len(changed), 100):
-            batch = changed[i:i + 100]
-            marks = ",".join("?" * len(batch))
-            with database.get_connection() as conn:
-                for r in conn.execute(f"SELECT id, content FROM articles WHERE id IN ({marks})", tuple(batch)).fetchall():
-                    r = dict(r)
-                    _INDEX_MEMO[r["id"]] = {"len": len(r["content"] or ""), "ok": not content_quality.is_thin(r["content"] or "")}
         rows = []
-        live_ids = set()
         for m in meta:
-            live_ids.add(m["id"])
-            memo = _INDEX_MEMO.get(m["id"])
-            try:
-                commodity = main.is_commodity_news(m.get("title") or "")
-            except Exception:
-                commodity = False
-            if memo and memo["ok"] and not commodity:
-                d = database._row_to_dict({"id": m["id"], "slug": m["slug"], "created_at": m["created_at"]})
-                rows.append(d)
-        for k in list(_INDEX_MEMO.keys()):
-            if k not in live_ids:
-                _INDEX_MEMO.pop(k, None)
+            slug_val = (m.get("slug") or "").strip()
+            if not slug_val:
+                continue
+            d = database._row_to_dict({
+                "id": m["id"],
+                "slug": slug_val,
+                "title": content_quality.clean_title_text(m.get("title") or ""),
+                "category": database.normalize_category_name(m.get("category") or "Gündem") or "Gündem",
+                "image_path": m.get("image_path") or "",
+                "created_at": str(m.get("created_at") or ""),
+            })
+            rows.append(d)
         _INDEX_CACHE["rows"] = rows
         _INDEX_CACHE["ts"] = time.time()
         return rows
@@ -2977,6 +3036,7 @@ def _indexable_articles() -> list:
 
 _STATIC_SITEMAP_PAGES = [
     ("/", "hourly", "1.0", "Ana Sayfa"),
+    ("/analiz", "hourly", "0.95", "Gündem Analizi Veri Radarı ve Derin Analiz Dosyaları"),
     ("/son-dakika", "always", "1.0", "Son Dakika Haberleri"),
     ("/piyasalar", "hourly", "0.9", "Canlı Piyasalar & Döviz/Altın Çevirici"),
     ("/super-lig-puan-durumu", "hourly", "0.9", "Trendyol Süper Lig Canlı Puan Durumu ve 34 Haftalık Fikstür"),
@@ -2999,29 +3059,43 @@ _SITEMAP_CATEGORIES = ("Gündem", "Ekonomi", "Eğitim", "Teknoloji", "Otomobil",
 
 @app.get("/sitemap.xml")
 async def sitemap(request: Request):
-    """Site haritası dizini: sabit sayfalar + 1000'erlik haber parçaları (sınırsız büyür)."""
-    import math
+    """Tek parça doğrudan Google Sitemap (<urlset> + Google Image Sitemap):
+    Tüm kurumsal sayfalar, kategoriler ve 1.045 haberin tamamı tek seferde taranır."""
+    import urllib.parse
+    from xml.sax.saxutils import escape
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
-    today_iso = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
+    now_tr = datetime.now(timezone(timedelta(hours=3)))
+    today_iso = now_tr.strftime("%Y-%m-%d")
+    now_w3c = now_tr.strftime("%Y-%m-%dT%H:%M:%S+03:00")
     articles = await asyncio.to_thread(_indexable_articles)
     if _is_human_browser_request(request):
         rows = [{"label": lbl, "loc": f"{base_url}{p}", "date": today_iso, "prio": pr} for p, _cf, pr, lbl in _STATIC_SITEMAP_PAGES]
-        for a in articles[:300]:
-            rows.append({"label": "", "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"})
+        for a in articles:
+            rows.append({"label": a.get("title") or "", "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"})
         return _render_pretty_sitemap_html(
             "Gündem Analizi - Canlı Site Haritası",
-            f"Bu XML site haritası, Google, Yandex ve Bing botlarının sitemizdeki sayfaları ve özgün haberleri anında tarayabilmesi için dinamik olarak üretilmektedir. Toplam {len(articles)} haber indekslenebilir durumda.",
+            f"Bu XML site haritası, Google, Yandex ve Bing botlarının sitemizdeki tüm sayfaları ve {len(articles)} özgün haberi tek seferde tarayabilmesi için dinamik olarak üretilmektedir.",
             rows,
             "/sitemap.xml"
         )
-    chunks = max(1, math.ceil(len(articles) / _SITEMAP_CHUNK))
-    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    xml.append(f'  <sitemap><loc>{base_url}/sitemap-sayfalar.xml</loc><lastmod>{today_iso}</lastmod></sitemap>')
-    for n in range(1, chunks + 1):
-        part = articles[(n - 1) * _SITEMAP_CHUNK:n * _SITEMAP_CHUNK]
-        last = (part[0].get("created_at") or today_iso)[:10] if part else today_iso
-        xml.append(f'  <sitemap><loc>{base_url}/sitemap-haber-{n}.xml</loc><lastmod>{last}</lastmod></sitemap>')
-    xml.append('</sitemapindex>')
+    xml = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
+    ]
+    for p, cf, pr, _lbl in _STATIC_SITEMAP_PAGES:
+        xml.append(f'  <url><loc>{base_url}{p}</loc><lastmod>{now_w3c}</lastmod><changefreq>{cf}</changefreq><priority>{pr}</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/site-haritasi</loc><lastmod>{now_w3c}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+    for cat in _SITEMAP_CATEGORIES:
+        xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{now_w3c}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+    for a in articles:
+        lastmod = _format_w3c_lastmod(a.get("created_at") or "", today_iso)
+        img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
+        img_tag = ""
+        if img_name and not img_name.lower().endswith((".mp4", ".webm", ".mov")):
+            title_esc = escape(a.get("title") or "Gündem Analizi")
+            img_tag = f'<image:image><image:loc>{base_url}/images/{escape(img_name)}</image:loc><image:title>{title_esc}</image:title></image:image>'
+        xml.append(f'  <url><loc>{base_url}/haber/{a["slug"]}</loc><lastmod>{lastmod}</lastmod><changefreq>daily</changefreq><priority>0.8</priority>{img_tag}</url>')
+    xml.append('</urlset>')
     return HTMLResponse(content="\n".join(xml), media_type="application/xml; charset=utf-8")
 
 
