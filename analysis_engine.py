@@ -356,13 +356,33 @@ def ensure_daily_synthesis_reports() -> Optional[str]:
     if database.get_setting(setting_key, "") == "1":
         return None
 
-    # Gündemdeki en önemli 5 farklı haberi seç (kaza/asayiş hariç, tüm ciddi gündem başlıkları)
-    pool = database.get_articles(limit=40)
+    # Zaman penceresi kuralı (Aynı haberin iki farklı analizde tekrar edilmesini %100 önler):
+    # - 10:00 Analizi -> Dün akşam 20:00'den bugün 10:00'a kadar paylaşılan haberler
+    # - 15:00 Analizi -> Bugün sabah 10:00'dan 15:00'e kadar paylaşılan haberler
+    # - 19:00 Analizi -> Bugün saat 15:00'ten 19:00'a kadar paylaşılan haberler
+    yesterday_str = (now_tr - timedelta(days=1)).strftime("%Y-%m-%d")
+    if hour == 10:
+        win_start = f"{yesterday_str} 20:00:00"
+    elif hour == 15:
+        win_start = f"{today_str} 10:00:00"
+    else:
+        win_start = f"{today_str} 15:00:00"
+
+    used_slugs_raw = database.get_setting("ga_analiz_used_slugs", "") or ""
+    used_slugs = {x.strip() for x in used_slugs_raw.split(",") if x.strip()}
+
+    pool = database.get_articles(limit=50)
     selected = []
     lead_image = None
     for a in (pool or []):
         cat = (a.get("category") or "Gündem").strip()
         if cat == "Analiz":
+            continue
+        art_slug = (a.get("slug") or "").strip()
+        if not art_slug or art_slug in used_slugs:
+            continue
+        created_str = str(a.get("created_at") or "").strip()
+        if created_str and created_str < win_start:
             continue
         t = (a.get("title") or "").strip()
         s = (a.get("summary") or "").strip()
@@ -515,6 +535,8 @@ Gündem Analizi: (Günün en önemli gelişmesini ve genel çerçevesini yansıt
     )
     if slug:
         database.set_setting(setting_key, "1")
+        new_used = list(used_slugs) + [it.get("slug") for it in selected if it.get("slug")]
+        database.set_setting("ga_analiz_used_slugs", ",".join(new_used[-60:]))
         _RADAR_CACHE["ts"] = 0.0
         print(f"✅ [Gündem Analizi] Saat {hour}:00 analizi başarıyla yayınlandı: /haber/{slug}")
         try:
