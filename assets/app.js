@@ -1940,7 +1940,7 @@
                 }
             });
 
-            var contrast = localStorage.getItem('a11y_contrast') === 'true';
+            var contrast = localStorage.getItem('a11y_contrast_v2') === 'true';
             root.classList.toggle('a11y-contrast', contrast);
             body.classList.toggle('a11y-contrast', contrast);
             var contrastBtn = document.getElementById('a11y-contrast-toggle');
@@ -1992,8 +1992,8 @@
         };
 
         window.toggleA11yContrast = function() {
-            var cur = localStorage.getItem('a11y_contrast') === 'true';
-            localStorage.setItem('a11y_contrast', (!cur).toString());
+            var cur = localStorage.getItem('a11y_contrast_v2') === 'true';
+            localStorage.setItem('a11y_contrast_v2', (!cur).toString());
             applyA11ySettings();
         };
 
@@ -2017,7 +2017,7 @@
 
         window.resetA11ySettings = function() {
             localStorage.removeItem('a11y_fs');
-            localStorage.removeItem('a11y_contrast');
+            localStorage.removeItem('a11y_contrast_v2');
             localStorage.removeItem('a11y_dyslexia');
             localStorage.removeItem('a11y_underline');
             localStorage.removeItem('a11y_focus');

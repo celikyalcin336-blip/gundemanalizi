@@ -331,7 +331,7 @@
         html.a11y-contrast article,
         html.a11y-contrast aside,
         html.a11y-contrast footer {
-            filter: contrast(135%) saturate(115%);
+            /* Fotoğraf renklerini bozan filtre kaldırıldı */
         }
         html.a11y-dyslexia body,
         html.a11y-dyslexia p,
@@ -1342,7 +1342,7 @@
             });
 
             const toggles = [
-                { key: 'a11y_contrast', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
+                { key: 'a11y_contrast_v2', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
                 { key: 'a11y_dyslexia', cls: 'a11y-dyslexia', id: 'a11y-dyslexia-toggle', defVal: false },
                 { key: 'a11y_underline', cls: 'a11y-underline', id: 'a11y-underline-toggle', defVal: false },
                 { key: 'a11y_focus', cls: 'a11y-focus-visible', id: 'a11y-focus-toggle', defVal: true }
@@ -1390,8 +1390,8 @@
         };
 
         window.toggleA11yContrast = function() {
-            const cur = localStorage.getItem('a11y_contrast') === 'true';
-            localStorage.setItem('a11y_contrast', (!cur).toString());
+            const cur = localStorage.getItem('a11y_contrast_v2') === 'true';
+            localStorage.setItem('a11y_contrast_v2', (!cur).toString());
             applyA11ySettings();
         };
 
@@ -1414,7 +1414,7 @@
         };
 
         window.resetA11ySettings = function() {
-            ['a11y_fs', 'a11y_contrast', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(k => localStorage.removeItem(k));
+            ['a11y_fs', 'a11y_contrast_v2', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(k => localStorage.removeItem(k));
             applyA11ySettings();
         };
 

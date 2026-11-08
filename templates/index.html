@@ -146,7 +146,7 @@
         html.a11y-contrast article,
         html.a11y-contrast aside,
         html.a11y-contrast footer {
-            filter: contrast(135%) saturate(115%);
+            /* Fotoğraf renklerini bozan filtre kaldırıldı */
         }
         html.a11y-dyslexia body,
         html.a11y-dyslexia p,
@@ -2288,7 +2288,7 @@
             });
 
             var toggles = [
-                { key: 'a11y_contrast', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
+                { key: 'a11y_contrast_v2', cls: 'a11y-contrast', id: 'a11y-contrast-toggle', defVal: false },
                 { key: 'a11y_dyslexia', cls: 'a11y-dyslexia', id: 'a11y-dyslexia-toggle', defVal: false },
                 { key: 'a11y_underline', cls: 'a11y-underline', id: 'a11y-underline-toggle', defVal: false },
                 { key: 'a11y_focus', cls: 'a11y-focus-visible', id: 'a11y-focus-toggle', defVal: true }
@@ -2318,12 +2318,12 @@
             if (el) { el.classList.add('hidden'); el.style.setProperty('display', 'none', 'important'); }
         };
         window.setA11yFontSize = function(val) { localStorage.setItem('a11y_fs', val || 'normal'); applyA11ySettings(); };
-        window.toggleA11yContrast = function() { localStorage.setItem('a11y_contrast', (localStorage.getItem('a11y_contrast') !== 'true').toString()); applyA11ySettings(); };
+        window.toggleA11yContrast = function() { localStorage.setItem('a11y_contrast_v2', (localStorage.getItem('a11y_contrast_v2') !== 'true').toString()); applyA11ySettings(); };
         window.toggleA11yDyslexia = function() { localStorage.setItem('a11y_dyslexia', (localStorage.getItem('a11y_dyslexia') !== 'true').toString()); applyA11ySettings(); };
         window.toggleA11yUnderline = function() { localStorage.setItem('a11y_underline', (localStorage.getItem('a11y_underline') !== 'true').toString()); applyA11ySettings(); };
         window.toggleA11yFocus = function() { localStorage.setItem('a11y_focus', (localStorage.getItem('a11y_focus') === 'false').toString()); applyA11ySettings(); };
         window.resetA11ySettings = function() {
-            ['a11y_fs', 'a11y_contrast', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(function(k) { localStorage.removeItem(k); });
+            ['a11y_fs', 'a11y_contrast_v2', 'a11y_dyslexia', 'a11y_underline', 'a11y_focus'].forEach(function(k) { localStorage.removeItem(k); });
             applyA11ySettings();
         };
         applyA11ySettings();
