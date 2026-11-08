@@ -23,6 +23,9 @@ BRANDS = [
     "TOGG", "DeFi", "NFTs", "AliExpress", "DoorDash", "WeChat", "TechCrunch", "XPeng", "NIO", "BYD", "ZEEKR",
     "MiniMax", "xAI", "SpaceX", "StarLink", "Starlink", "FaceTime", "AppleCare", "GoPro", "PlayStation",
     "SmartThings", "ThinkPad", "IdeaPad", "ZenBook", "VivoBook", "ROG", "SteamOS", "PCIe", "LPDDR", "GDDR",
+    "mAh", "kWh", "MWh", "GWh", "GHz", "MHz", "kHz", "Gbps", "Mbps", "Kbps", "OneUI", "SynthID", "LiFePO4",
+    "DisplayPort", "Thunderbolt", "Snapdragon", "Dimensity", "Exynos", "Tensor", "Bionic", "FreeSync", "GSync",
+    "RayTracing", "DLSS", "WiFi", "VoLTE", "VoWiFi", "nvme", "NVMe", "microSD", "MacroHard",
 ]
 _BRAND_SPLIT_RE = []
 for _b in sorted(set(BRANDS), key=len, reverse=True):
@@ -101,6 +104,27 @@ _BRAND_SAFETY_SUBS = [
     (re.compile(r"\bKatil\s+Netanyahu", re.I), "Netanyahu"),
     (re.compile(r"\bKatil\b"), "Şüpheli"),
     (re.compile(r"\bkatil\b", re.I), "şüpheli"),
+    (re.compile(r"Nevzat\s+Aydın[’']a\s+şok\s+tehdit:\s*1\s+milyon\s+Euro\s+vermezsen\s+çocuğunu\s+öldürürüz", re.I), "İş İnsanı Nevzat Aydın'a Yönelik 1 Milyon Euro'luk Şantaj ve Tehdit Soruşturması"),
+    (re.compile(r"1\s+milyon\s+Euro\s+vermezsen\s+çocuğunu\s+öldürürüz", re.I), "1 milyon Euro talepli şantaj ve tehdit iddiası"),
+    (re.compile(r"Eli\s+kanlı\s+Netanyahudan\s+provokatif\s+sandık\s+çağrısı", re.I), "Netanyahu'dan Tartışmalı Erken Seçim ve Sandık Çağrısı"),
+    (re.compile(r"\bEli\s+kanlı\b", re.I), "Tartışmalı"),
+    (re.compile(r"Soykırımcı\s+İsrail(?:'in|’in)?\s+saldırıları", re.I), "İsrail'in saldırıları"),
+    (re.compile(r"Öksürük\s+şikayeti\s+vardı\.\.\.\s*Öldüren\s+iğnede\s+flaş\s+gelişme!?", re.I), "Öksürük Şikayetiyle Başvuran Hastanın Enjeksiyon Sonrası Vefatında Adli Tıp Süreci"),
+    (re.compile(r"BİM'E\s+3\s+KASIM’DA\s+GELECEK\s+ÜRÜNLER\s+BELLİ\s+OLDU:\s+LİSTEDE\s+YOK\s+YOK\s*\(BİM\s+3-9\s+KASIM\)", re.I), "BİM 3-9 Kasım 2026 Aktüel Ürünler Kataloğu ve Fiyat Listesi Açıklandı"),
+    (re.compile(r"TRANSFER\s+HABERİ:\s*Fenerbahçe'de\s+flaş\s+ayrılık!\s*Bunu\s+kimse\s+beklemiyordu", re.I), "Fenerbahçe'de Kadro Planlaması: Sürpriz Ayrılık Kararı"),
+    (re.compile(r"Fenerbahçe'de\s+futbolculardan\s+yönetime\s+flaş\s+hoca\s+talebi!\s*Kaptan\s+Skriniar\s+önderliğinde\.\.\.", re.I), "Fenerbahçe'de Futbolculardan Yönetime Teknik Direktör Görüşü: Kaptan Skriniar Devrede"),
+    (re.compile(r"Beşiktaş'ın\s+transferde\s+ilk\s+hedefi\s+belli\s+oldu!\s*Kulübü\s+bonservisinde\s+indirime\s+giderse\.\.\.", re.I), "Beşiktaş'ın Ara Transferdeki İlk Hedefi Netleşti: Bonservis Pazarlığı Başlıyor"),
+    (re.compile(r"Ahmet\s+Çakar'dan\s+flaş\s+Galatasaray\s+yorumu!\s*\"Şampiyonluğun\s+en\s+büyük\s+favorisi\.\.\.\"", re.I), "Ahmet Çakar'dan Galatasaray Değerlendirmesi: Şampiyonluk Yarışında Öne Çıkan Tablo"),
+    (re.compile(r"Jose\s+Mourinho'dan\s+Arda\s+Güler\s+için\s+flaş\s+karar!\s*El\s+Clasico\s+zaferi\s+sonrası\.\.\.", re.I), "Jose Mourinho'dan Arda Güler Değerlendirmesi: El Clasico Sonrası Yeni Plan"),
+    (re.compile(r"Fenerbahçe'de\s+flaş\s+Guendouzi\s+gelişmesi!\s*Ocak\s+ayında\.\.\.", re.I), "Fenerbahçe'nin Orta Saha Gündeminde Guendouzi Gelişmesi: Ocak Ayı Transfer Planı"),
+    (re.compile(r"Dirk\s+Kuyt\s+için\s+flaş\s+açıklama!\s*Sezon\s+sonuna\s+kadar\.\.\.", re.I), "Dirk Kuyt'ın Teknik Direktörlük Geleceği Hakkında Sezon Sonu Planı Açıklandı"),
+    (re.compile(r"\bflaş\s+gelişme!?", re.I), "yeni gelişme"),
+    (re.compile(r"\bflaş\s+ayrıntı!?", re.I), "dikkat çeken ayrıntı"),
+    (re.compile(r"\bflaş\s+sözler!?", re.I), "dikkat çeken açıklamalar"),
+    (re.compile(r"\bflaş\s+karar!?", re.I), "kritik karar"),
+    (re.compile(r"\bflaş\s+açıklama!?", re.I), "önemli açıklama"),
+    (re.compile(r"\bflaş\s+iddiası!?", re.I), "transfer iddiası"),
+    (re.compile(r"\bflaş\s+", re.I), "dikkat çeken "),
 ]
 
 
@@ -331,6 +355,10 @@ def clean_article_html(content: str) -> str:
     # 5) Boş kalan paragraflar ve altı boş kalan ara başlıklar
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
     c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=($|<h[23]))", "", c.strip())
+
+    # 5.5) Beyaz Gazete Teması uyumu: Makale gövdesi içindeki koyu tema metin sınıflarını açık temaya dönüştür
+    c = re.sub(r"\btext-white\b", "text-slate-900", c)
+    c = re.sub(r"\btext-slate-[23]00\b", "text-slate-800", c)
 
     # 6) Alt başlıklara (<h3>) Google Arama Jump-Link SEO id etiketi ekle
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")

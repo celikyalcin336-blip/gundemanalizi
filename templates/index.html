@@ -412,7 +412,7 @@
                         <div class="manset-slide absolute inset-0 transition-opacity duration-300 {% if loop.first %}opacity-100 z-10 pointer-events-auto{% else %}opacity-0 z-0 pointer-events-none{% endif %}" data-index="{{ loop.index0 }}">
                             <a href="/haber/{{ a.slug }}" class="block w-full h-full relative">
                                 {% if a.image_path %}
-                                    <img src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ a.title }}"
+                                    <img width="800" height="450" src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ a.title }}"
                                          fetchpriority="{% if loop.first %}high{% else %}low{% endif %}"
                                          loading="{% if loop.first %}eager{% else %}lazy{% endif %}"
                                          decoding="async"
@@ -474,7 +474,7 @@
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
                         <a href="/haber/{{ side_cards[0].slug }}" class="block w-full h-full relative">
                             {% if side_cards[0].image_path %}
-                                <img src="/images/{{ side_cards[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ side_cards[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
@@ -488,7 +488,7 @@
                     <div class="h-1/2 rounded-2xl overflow-hidden border border-brand-border bg-slate-900 relative group shadow-xl">
                         <a href="/haber/{{ side_cards[1].slug }}" class="block w-full h-full relative">
                             {% if side_cards[1].image_path %}
-                                <img src="/images/{{ side_cards[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[1].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ side_cards[1].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ side_cards[1].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent"></div>
                             <div class="absolute bottom-0 left-0 right-0 p-4">
@@ -523,7 +523,7 @@
                     <div>
                         <a href="/haber/{{ d.slug }}" class="block relative h-48 overflow-hidden bg-slate-100">
                             {% if d.image_path %}
-                            <img src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                            <img width="800" height="450" src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 Gündem Analizi
@@ -574,7 +574,7 @@
                     <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase flex items-center gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
@@ -601,7 +601,7 @@
                     <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                         </a>
                         <div class="p-3">
@@ -642,7 +642,7 @@
                     <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-blue-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
@@ -668,7 +668,7 @@
                     <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                         </a>
                         <div class="p-3">
@@ -709,7 +709,7 @@
                     <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-emerald-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
@@ -735,7 +735,7 @@
                     <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                         </a>
                         <div class="p-3">
@@ -775,7 +775,7 @@
                     <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition flex flex-col justify-between">
                         <a href="/haber/{{ sport_items[0].slug }}" class="block relative h-56 sm:h-72 overflow-hidden bg-slate-100">
                             {% if sport_items[0].image_path %}
-                                <img src="/images/{{ sport_items[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sport_items[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ sport_items[0].image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sport_items[0].title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ sport_items[0].category }}
@@ -801,7 +801,7 @@
                         <div class="category-side-card rounded-xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
                             <a href="/haber/{{ sp.slug }}" class="block relative h-28 overflow-hidden bg-slate-100">
                                 {% if sp.image_path %}
-                                    <img src="/images/{{ sp.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sp.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                    <img width="800" height="450" src="/images/{{ sp.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ sp.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                                 {% endif %}
                             </a>
                             <div class="p-2.5">
@@ -940,7 +940,7 @@
                     <div class="category-hero-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-sm hover:shadow-md transition h-full flex flex-col justify-between">
                         <a href="/haber/{{ hero.slug }}" class="block relative h-64 sm:h-80 overflow-hidden bg-slate-100">
                             {% if hero.image_path %}
-                                <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
                                 {{ hero.category }}
@@ -966,7 +966,7 @@
                     <div class="category-side-card rounded-2xl overflow-hidden border border-slate-200 bg-white group shadow-xs hover:border-red-300 hover:shadow-md transition flex flex-col justify-between">
                         <a href="/haber/{{ item.slug }}" class="block relative h-32 overflow-hidden bg-slate-100">
                             {% if item.image_path %}
-                                <img src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
+                                <img width="800" height="450" src="/images/{{ item.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ item.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                         </a>
                         <div class="p-3">
@@ -1004,7 +1004,7 @@
                 <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-red-400 hover:shadow-md transition shadow-xs flex flex-col group">
                     <a href="/haber/{{ a.slug }}" class="relative block aspect-[16/10] overflow-hidden bg-slate-100">
                         {% if a.image_path %}
-                            <img src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" 
+                            <img width="800" height="450" src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" 
                                  alt="{{ a.title }}"
                                  loading="lazy"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
@@ -1162,7 +1162,7 @@
                         <div class="lg:col-span-7 relative h-[260px] sm:h-[360px] lg:h-[420px] overflow-hidden bg-slate-100">
                             <a href="/haber/{{ hero.slug }}" class="block w-full h-full">
                                 {% if hero.image_path %}
-                                    <img src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out aspect-[16/9]">
+                                    <img width="800" height="450" src="/images/{{ hero.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ hero.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out aspect-[16/9]">
                                 {% else %}
                                     <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
                                         <i data-lucide="image" class="w-16 h-16"></i>
@@ -1207,7 +1207,7 @@
                     <article class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-red-400 hover:shadow-md transition shadow-xs flex flex-col group">
                         <a href="/haber/{{ a.slug }}" class="relative block aspect-[16/10] overflow-hidden bg-slate-100">
                             {% if a.image_path %}
-                                <img src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" 
+                                <img width="800" height="450" src="/images/{{ a.image_path.replace('\\', '/').split('/')[-1] }}" 
                                      alt="{{ a.title }}"
                                      loading="lazy"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">

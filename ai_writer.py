@@ -368,19 +368,19 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     _style_idx = sum(ord(ch) for ch in title) % 3
     if _style_idx == 0:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 3 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-7 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Olayın 5N1K özeti, 4-5 cümle)
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Olayın 5N1K özeti, 4-5 cümle)
 - 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Olayın somut ayrıntıları, rakamlar ve resmi açıklamalar)
 - 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Konunun tarihsel/sektörel arka planı ve önceki gelişmeler)
 - 3. Ara Başlık (<h3>) + altında 1 veya 2 <p> paragrafı (Uygulama takvimi, resmi süreçteki sıradaki adımlar ve somut detaylar)"""
     elif _style_idx == 1:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 2 ÖZGÜN ARA BAŞLIK (<h3>) ve 6 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 4-5 cümle)
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 4-5 cümle)
 - Girişin hemen altında ara başlıksız 1 <p> paragrafı daha (İlk tepkiler ve sahadaki/kurumdaki mevcut durum)
 - 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Detaylı veriler, teknik/hukuki boyut ve sürecin geçmişi)
 - 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Uygulama detayları, ilgili kurumların takvimi ve somut veriler)"""
     else:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 4 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-8 DOLU PARAGRAF (<p>) ile EN AZ 480-700 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-200 mb-6"> (Kapsamlı 5N1K giriş paragrafı, 4-5 cümle)
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Kapsamlı 5N1K giriş paragrafı, 4-5 cümle)
 - 1. Ara Başlık (<h3>) + altında 2 <p> paragrafı (Gelişmenin tüm somut detayları ve tarafların açıklamaları)
 - 2. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sürecin arka planı ve önceki kararlar)
 - 3. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sektörel veya toplumsal veriler)
@@ -423,9 +423,9 @@ Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
 {_structure_guide}
 
 HTML Etiket Kuralları:
-- İlk giriş paragrafı: <p class="lead font-medium text-lg text-slate-200 mb-6">...</p>
-- Ara başlıklar: <h3 class="text-xl font-bold text-white mt-6 mb-3">Habere Özgü Somut Ara Başlık</h3>
-- Normal paragraflar: <p class="text-slate-300 leading-relaxed mb-4">...</p>
+- İlk giriş paragrafı: <p class="lead font-medium text-lg text-slate-900 mb-6">...</p>
+- Ara başlıklar: <h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Habere Özgü Somut Ara Başlık</h3>
+- Normal paragraflar: <p class="text-slate-800 leading-relaxed mb-4">...</p>
 Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp başlıklar KULLANMADAN) doğrudan haberin içindeki somut gelişmeye göre özgün gazetecilik diliyle yaz. Başka etiket, markdown veya kod bloğu kullanma.
 """
 

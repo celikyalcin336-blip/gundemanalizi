@@ -205,6 +205,23 @@ async def lifespan(app: FastAPI):
         clear_turbo_cache()
         gc.collect()
         try:
+            import content_quality
+            with database.get_connection() as _conn:
+                _t_rows = _conn.execute("SELECT id, title FROM articles").fetchall()
+                _t_updates = []
+                for _r in _t_rows:
+                    _old_t = _r["title"] or ""
+                    _new_t = content_quality.clean_title_text(_old_t)
+                    if _new_t and _new_t != _old_t:
+                        _t_updates.append((_new_t, _r["id"]))
+                if _t_updates:
+                    with _conn:
+                        for _nt, _aid in _t_updates:
+                            _conn.execute("UPDATE articles SET title = ? WHERE id = ?", (_nt, _aid))
+                    print(f"✅ [Başlık Temizliği] {len(_t_updates)} başlık kurumsal gazetecilik diline güncellendi.")
+        except Exception as _te:
+            print(f"Başlık temizliği uyarısı: {_te}")
+        try:
             import analysis_engine
             analysis_engine.seed_curated_analyses()
             analysis_engine.ensure_daily_synthesis_reports()
@@ -3128,11 +3145,13 @@ async def sitemap(request: Request):
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
     ]
+    latest_art_lastmod = _format_w3c_lastmod(articles[0].get("created_at") or "", today_iso) if articles else today_iso
     for p, cf, pr, _lbl in _STATIC_SITEMAP_PAGES:
-        xml.append(f'  <url><loc>{base_url}{p}</loc><lastmod>{now_w3c}</lastmod><changefreq>{cf}</changefreq><priority>{pr}</priority></url>')
-    xml.append(f'  <url><loc>{base_url}/site-haritasi</loc><lastmod>{now_w3c}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+        page_lm = latest_art_lastmod if cf in ("always", "hourly") else today_iso
+        xml.append(f'  <url><loc>{base_url}{p}</loc><lastmod>{page_lm}</lastmod><changefreq>{cf}</changefreq><priority>{pr}</priority></url>')
+    xml.append(f'  <url><loc>{base_url}/site-haritasi</loc><lastmod>{latest_art_lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     for cat in _SITEMAP_CATEGORIES:
-        xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{now_w3c}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
+        xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{latest_art_lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     for a in articles:
         lastmod = _format_w3c_lastmod(a.get("created_at") or "", today_iso)
         img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]

@@ -532,9 +532,9 @@
                 </span>
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 {% set _desk_map = {'Analiz': 'Gündem Analizi Masası', 'Ekonomi': 'Ekonomi Masası', 'Spor': 'Spor Servisi', 'Teknoloji': 'Teknoloji Editörlüğü', 'Otomobil': 'Otomobil Editörlüğü', 'Sağlık': 'Sağlık Editörlüğü', 'Eğitim': 'Eğitim Servisi', 'Dünya': 'Dış Haberler Servisi'} %}
-                <span class="inline-flex items-center gap-1 text-slate-700 font-bold text-xs">
+                <a href="/kunye" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Gündem Analizi Editöryal Masaları ve Yayın Künyesi">
                     <i data-lucide="users" class="w-3.5 h-3.5 text-red-600"></i> {{ _desk_map.get(article.category, 'Gündem Haber Merkezi') }}
-                </span>
+                </a>
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Genel Yayın Yönetmeni ve Sorumlu Yazı İşleri Müdürü">
                     <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Sorumlu YYY: Yalçın Çelik
@@ -558,9 +558,9 @@
             </h1>
 
             <!-- Ana Görsel (Haber Kartı) -->
-            <div class="rounded-2xl overflow-hidden border border-brand-border mb-6 shadow-2xl bg-black select-none">
+            <div class="rounded-2xl overflow-hidden border border-slate-200 mb-6 shadow-lg bg-slate-100 select-none">
                 {% if article.image_path %}
-                    <img src="/images/{{ article.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" loading="eager" decoding="async" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save aspect-[16/9]">
+                    <img width="800" height="450" src="/images/{{ article.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ article.title }}" fetchpriority="high" loading="eager" decoding="async" oncontextmenu="return false;" class="w-full h-auto object-cover max-h-[500px] pointer-events-none no-save aspect-[16/9]">
                 {% endif %}
             </div>
 
@@ -770,9 +770,9 @@
                 <div class="flex flex-col sm:flex-row gap-4 items-center">
                     <a href="/haber/{{ next_article.slug }}" class="w-full sm:w-48 h-32 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-200 block relative shadow-sm">
                         {% if next_article.image_path %}
-                        <img src="/images/{{ next_article.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img width="800" height="450" src="/images/{{ next_article.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ next_article.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         {% else %}
-                        <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-3">
+                        <img width="800" height="450" src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-3">
                         {% endif %}
                         <span class="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-[10px] font-extrabold text-white uppercase shadow-sm">
                             {{ next_article.category }}
@@ -812,9 +812,9 @@
                     <a href="/haber/{{ rel.slug }}" class="group rounded-xl bg-white border border-slate-200 hover:border-red-400 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
                         <div class="h-32 bg-slate-100 overflow-hidden relative">
                             {% if rel.image_path %}
-                            <img src="/images/{{ rel.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ rel.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img width="800" height="450" src="/images/{{ rel.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ rel.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             {% else %}
-                            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-4">
+                            <img width="800" height="450" src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-4">
                             {% endif %}
                         </div>
                         <div class="p-3 flex-1 flex flex-col justify-between">
@@ -880,16 +880,16 @@
                             {% if loop.index == 1 %}bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 ring-1 ring-amber-300
                             {% elif loop.index == 2 %}bg-gradient-to-br from-slate-200 to-slate-400 text-slate-950
                             {% elif loop.index == 3 %}bg-gradient-to-br from-amber-700 to-amber-900 text-amber-100
-                            {% else %}bg-slate-800 text-slate-400 border border-slate-700{% endif %}">
+                            {% else %}bg-slate-100 text-slate-700 border border-slate-300{% endif %}">
                             {{ loop.index }}
                         </div>
 
                         <!-- Küçük Görsel -->
-                        <div class="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80">
+                        <div class="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-100 border border-slate-200">
                             {% if trend.image_path %}
-                            <img src="/images/{{ trend.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ trend.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img width="800" height="450" src="/images/{{ trend.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ trend.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
-                            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
+                            <img width="800" height="450" src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
                             {% endif %}
                         </div>
 
@@ -915,11 +915,11 @@
                 <div class="space-y-3">
                     {% for other in other_articles %}
                     <a href="/haber/{{ other.slug }}" class="group flex items-start gap-3 pb-3 border-b border-brand-border/40 last:border-0 last:pb-0">
-                        <div class="w-14 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-950 border border-brand-border/80 mt-0.5">
+                        <div class="w-14 h-11 rounded-lg overflow-hidden shrink-0 bg-slate-100 border border-slate-200 mt-0.5">
                             {% if other.image_path %}
-                            <img src="/images/{{ other.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ other.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img width="800" height="450" src="/images/{{ other.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ other.title }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             {% else %}
-                            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
+                            <img width="800" height="450" src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain p-1">
                             {% endif %}
                         </div>
                         <div class="flex-1 min-w-0">
@@ -1151,7 +1151,7 @@
                 const container = document.getElementById('market-rates-bar');
                 if (!container) return;
                 container.innerHTML = data.rates.map(r => `
-                    <div class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 transition shadow-sm">
+                    <a href="/piyasalar" title="Canlı Döviz ve Altın Hesaplama Aracı" class="flex items-center justify-between px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-red-400 transition shadow-sm">
                         <div class="flex items-center gap-2 truncate">
                             <span class="text-base sm:text-lg select-none">${r.icon}</span>
                             <div>
@@ -1168,7 +1168,7 @@
                                 <span>%${Math.abs(r.change)}</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 `).join('');
             } catch (e) {}
         }

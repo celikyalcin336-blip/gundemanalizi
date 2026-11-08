@@ -316,9 +316,9 @@ def calculate_virality_score(title: str, summary: str, source: str) -> int:
     score = 50  # Taban puan
 
     # 1. DERİN VİCDAN, ACIMA, MERHAMET, CAN PAZARI & İNSAN DRAMI (+65 Puan - En Yüksek Viral Etki!)
-    empati_regex = r'\b(bebek\w*|çocuk\w*|evlat\w*|anne\w*|baba\w*|öksüz\w*|yetim\w*|yaşlı\w*|nine|dede|engelli\w*|şehit\w*|gazi\w*|kahraman\w*|kurtardı\w*|kurtarıldı\w*|mucize\w*|can pazarı|can havliyle|gözyaş\w*|ağlattı|yürek yakan|yürekleri dağla\w*|kahreden\w*|acı haber|facia\w*|katliam\w*|vahşet\w*|yaşam mücadelesi|hayata tutun\w*|köpek\w*|yavru kedi\w*|can dostu\w*|hayvansever\w*|işkence\w*|vicdansız\w*|fedakar\w*)\b'
+    empati_regex = r'\b(bebek\w*|çocuk\w*|evlat\w*|anne\w*|baba\w*|yaşlı\w*|engelli\w*|şehit\w*|gazi\w*|kahraman\w*|kurtardı\w*|kurtarıldı\w*|mucize\w*|yaşam mücadelesi|hayata tutun\w*|can dostu\w*|hayvansever\w*|fedakar\w*)\b'
     if re.search(empati_regex, text, re.I):
-        score += 65
+        score += 45
 
     # 2. ADALET, İSYAN, SKANDAL, PES DEDİRTEN OLAYLAR & MAĞDURİYET (+55 Puan)
     isyan_regex = r'\b(skandal\w*|isyan etti\w*|tepki yağdı|pes dedirtti|akılalmaz|şok eden|vurgun\w*|dolandırıcı\w*|dolandırıldı|sahte\w*|mağdur\w*|ihmal\w*|cezasız kalmadı|tutuklandı|tutuklama|haksızlık|ifşa\w*|suçüstü|gözaltı)\b'
