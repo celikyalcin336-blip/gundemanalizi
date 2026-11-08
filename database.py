@@ -1015,11 +1015,8 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
 
     slug = base_slug
     with get_connection() as conn:
-        # Slug benzersizliği sağla
-        counter = 1
-        while conn.execute("SELECT 1 FROM articles WHERE slug = ?", (slug,)).fetchone():
-            slug = f"{base_slug}-{counter}"
-            counter += 1
+        if conn.execute("SELECT 1 FROM articles WHERE slug = ? OR LOWER(title) = ?", (slug, title.strip().lower())).fetchone():
+            return (slug, False) if return_status else slug
 
         conn.execute("""
             INSERT INTO articles (slug, title, summary, content, category, image_path, source)

@@ -312,10 +312,15 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
                     globals()["_BG_ANALIZ_RUNNING"] = False
             threading.Thread(target=_bg_gen, daemon=True).start()
     dossiers = []
+    seen_titles = set()
     for s in (synth_pool or []):
         # Çift güvenlik: Sadece gerçek kategorisi 'Analiz' olanları kabul et
         if (s.get("category") or "").strip() != "Analiz":
             continue
+        t_norm = (s.get("title") or "").strip().lower()
+        if t_norm in seen_titles:
+            continue
+        seen_titles.add(t_norm)
         dossiers.append({
             "id": s.get("id"),
             "slug": s.get("slug"),
