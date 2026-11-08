@@ -46,54 +46,72 @@ def process_single_news(item: dict) -> bool:
     print(f"📌 Kaynak: {source}")
     print("="*60)
 
-    # 1. Metin, Makale ve Yüksek Kaliteli Medya Toplama
-    print("✍️  Sosyal medya metni, web makalesi ve yüksek çözünürlüklü görseller toplanıyor...")
+    # 1. ÖNCE GERÇEK FOTOĞRAF KALKANI (Görseli olmayan haber için AI kotası harcanmaz ve ASLA yayınlanmaz!)
+    print("🎨 [Kesin Emir 1] Önce haberin gerçek ve yüksek çözünürlüklü fotoğrafı doğrulanıyor...")
     raw_summary = item.get("summary", "")
-    
-    # Haberin orijinal web sayfasına giderek gerçek paragrafları ve Full HD görselleri al
     article_details = news_fetcher.fetch_article_details(link)
     scraped_body = article_details.get("body", "")
     summary = scraped_body if (scraped_body and len(scraped_body) > len(raw_summary)) else raw_summary
 
-    # Web Makalesi ve Özgün Başlık Üretimi
-    item_category = item.get("category")
-    article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
-    if not article_data:
-        # AdSense kalite kuralı: yapay zeka özgün metin üretemediyse kopya/şablon haber yayınlanmaz
-        print(f"⏩ [Kalite Kalkanı] '{title[:50]}' için özgün metin üretilemedi; yayınlanmadı.")
-        return False
-    final_title = article_data.get("title") or title
-    category = article_data.get("category", "Gündem")
-    telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
-    print(f"   [Kategori: {category} | Özgün Başlık & Telegram Metni Hazır]")
-
-    # 2. Kristal Netliğinde Görsel Üretimi
-    print("🎨 Yüksek çözünürlüklü haber görseli hazırlanıyor...")
     candidate_images = article_details.get("images", [])
     if image_url and image_url not in candidate_images:
         candidate_images.append(image_url)
+
+    if not candidate_images:
+        print(f"⛔ [KESİN EMİR - GÖRSELSİZ HABER ENGELLENDİ] '{title[:50]}' kaynağında hiç fotoğraf adayı yok! Yayınlanmadı.")
+        return False
 
     img_filename = f"post_{news_hash[:10]}.jpg"
     visual_path = image_generator.create_news_visual(
         candidate_urls=candidate_images,
         output_filename=img_filename,
-        title=final_title,
-        category=category
+        title=title,
+        category=item.get("category") or "Gündem"
     )
-    if not visual_path or not os.path.exists(visual_path) or image_generator.is_synthetic_card_image(visual_path):
-        print(f"⏩ [Görsel Kalite Kalkanı] '{final_title[:50]}' için gerçek haber fotoğrafı bulunamadı; yapay görselli haber yayınlanmadı.")
+    if (
+        not visual_path
+        or not os.path.exists(visual_path)
+        or os.path.getsize(visual_path) < 8000
+        or image_generator.is_synthetic_card_image(visual_path)
+    ):
+        print(f"⛔ [KESİN EMİR - GÖRSEL KALİTE KALKANI] '{title[:50]}' için gerçek ve net haber fotoğrafı doğrulanamadı; görselsiz/kartlı paylaşım kesinlikle engellendi!")
         return False
-    print(f"   [Görsel Hazırlandı: {visual_path} | Aday Görsel Sayısı: {len(candidate_images)}]")
+    print(f"   ✅ [Gerçek Fotoğraf Doğrulandı: {visual_path} ({os.path.getsize(visual_path) // 1024} KB)]")
 
-    # 2.5. HASSAS 13.5 DAKİKA NİŞANGAHI (En Fazla 15 Dk Garantisi):
-    # Haber 10. dakikada önceden hazırlanır; 13.5. dakikada yayına basılır, en geç 14. dakikada kanallara düşer!
-    TARGET_MINUTES = 28.5
+    # 2. Özgün Analitik Makale ve Başlık Üretimi (Kesin Emir 2: En az 250 kelime ve alt başlıklı yapı)
+    import content_quality
+    item_category = item.get("category")
+    article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
+    if not article_data:
+        print(f"⛔ [KESİN EMİR - METİN KALİTE KALKANI] '{title[:50]}' için özgün makale üretilemedi; yayınlanmadı.")
+        return False
+
+    clean_t = content_quality.clean_title_text(article_data.get("title") or title)
+    clean_s = content_quality.clean_summary_text(article_data.get("summary") or "", clean_t)
+    clean_c = content_quality.clean_article_html(article_data.get("content") or "")
+    category = database.normalize_category_name(article_data.get("category") or item_category or "Gündem") or "Gündem"
+    clean_c = content_quality.ensure_indexable_depth(clean_c, clean_t, clean_s, category, 0)
+
+    if len(clean_t) < 15 or content_quality.visible_word_count(clean_c) < 250:
+        print(f"⛔ [KESİN EMİR - YETERSİZ İÇERİK ENGELLENDİ] '{clean_t[:50]}' kelime/başlık barajını geçemedi; yayınlanmadı.")
+        return False
+
+    article_data["title"] = clean_t
+    article_data["summary"] = clean_s
+    article_data["content"] = clean_c
+    final_title = clean_t
+    telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
+    print(f"   [Kategori: {category} | {content_quality.visible_word_count(clean_c)} Kelime Özgün Makale Hazır]")
+
+    # 2.5. HASSAS 40 DAKİKA NİŞANGAHI:
+    # Haber 35.5. dakikada önceden hazırlanır; 39.5. dakikada yayına basılır!
+    TARGET_MINUTES = 39.5
     while True:
         mins_now = get_minutes_since_last_article()
         if mins_now >= TARGET_MINUTES:
             break
         wait_sec = min(10.0, max(1.0, (TARGET_MINUTES - mins_now) * 60.0))
-        print(f"⏱️ [30 Dk Kuralı] Haber hazır! 28.5. dk hedefi için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
+        print(f"⏱️ [40 Dk Kuralı] Haber ve gerçek görseli hazır! 39.5. dk hedefi için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
         time.sleep(wait_sec)
 
     # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
@@ -218,7 +236,7 @@ def run_bot(max_items: int = 1, force: bool = False):
 def _run_bot_internal(max_items: int = 1, force: bool = False):
     if not force:
         # En fazla 15 dk kuralı: Hazırlığa 10.0. dakikada başlar, 13.5. dakikada yayına basar!
-        prep_start_minute = 25.0
+        prep_start_minute = 35.5
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < prep_start_minute:
             remaining = round(prep_start_minute - minutes_passed, 1)

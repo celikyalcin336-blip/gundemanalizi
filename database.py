@@ -990,11 +990,24 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
                 print(f"⚠️ [Mükerrer Haber Engellendi - Benzer Başlık] '{title[:50]}' sitede zaten var ({ex_slug}). İkinci kez eklenmedi.")
                 return (ex_slug, False) if return_status else ex_slug
 
-    # Görseli kalıcı depoya yaz (Her türlü ağ/veritabanı istisnasına karşı korumalı)
+    # ⛔ KESİN EMİR: Görselsiz veya bozuk görselli haber ASLA veritabanına kaydedilemez!
+    img_base = _basename(image_path or "")
+    if not img_base:
+        print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' için image_path boş! Kayıt reddedildi.")
+        return ("", False) if return_status else ""
+    if not img_base.lower().endswith((".mp4", ".webm", ".mov")):
+        if not os.path.exists(image_path) or os.path.getsize(image_path) < 6000:
+            print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görsel dosyası eksik veya <6KB! Kayıt reddedildi.")
+            return ("", False) if return_status else ""
     try:
         save_image_file(image_path)
     except Exception as e:
-        print(f"⚠️ save_image_file güvenli atlandı: {e}")
+        print(f"⚠️ save_image_file uyarısı: {e}")
+    if not img_base.lower().endswith((".mp4", ".webm", ".mov")):
+        db_img_bytes = get_image(img_base)
+        if not db_img_bytes or len(db_img_bytes) < 6000:
+            print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görseli PostgreSQL images tablosunda doğrulanamadı! Kayıt reddedildi.")
+            return ("", False) if return_status else ""
 
     slug = base_slug
     with get_connection() as conn:
