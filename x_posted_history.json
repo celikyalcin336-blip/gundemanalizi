@@ -2344,5 +2344,28 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794109731.5942526
+  },
+  {
+    "slug": "stanimir-stoilovdan-basaksehir-maglubiyeti-sonrasi-savunma-uyarisi-ve-genc-oyunc",
+    "title": "Stanimir Stoilov'dan Başakşehir Mağlubiyeti Sonrası Savunma Uyarısı ve Genç Oyuncu Mesajı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794112433.5935485
+  },
+  {
+    "slug": "manchester-city-deplasmanda-sarsildi-nottingham-forest-uc-golle-kazandi",
+    "title": "Manchester City Deplasmanda Sarsıldı: Nottingham Forest Üç Golle Kazandı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794112433.6461213
+  },
+  {
+    "slug": "general-motors-kalkis-sureclerini-otomatiklestiren-yeni-sistem-icin-patent-aldi",
+    "title": "General Motors Kalkış Süreçlerini Otomatikleştiren Yeni Sistem İçin Patent Aldı",
+    "summary": "Otomotiv devi General Motors, drag yarışlarında pist ışıklarını algılayarak kalkış sürecini tamamen otomatik hale getiren yenilikçi bir teknoloji geliştirdi. Kamera ve gelişmiş yazılım altyapısına dayanan patentli sistem, sürücü müdahalesine gerek ka",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794112452.43796
   }
 ]
