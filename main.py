@@ -80,6 +80,9 @@ def process_single_news(item: dict) -> bool:
         title=final_title,
         category=category
     )
+    if not visual_path or not os.path.exists(visual_path) or image_generator.is_synthetic_card_image(visual_path):
+        print(f"⏩ [Görsel Kalite Kalkanı] '{final_title[:50]}' için gerçek haber fotoğrafı bulunamadı; yapay görselli haber yayınlanmadı.")
+        return False
     print(f"   [Görsel Hazırlandı: {visual_path} | Aday Görsel Sayısı: {len(candidate_images)}]")
 
     # 2.5. HASSAS 13.5 DAKİKA NİŞANGAHI (En Fazla 15 Dk Garantisi):

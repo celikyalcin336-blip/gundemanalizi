@@ -102,6 +102,7 @@ def sanitize_news_text(text: str) -> str:
     t = re.sub(r'(\d{2}:\d{2})([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = re.sub(r'([\.!?])([A-ZÇĞİÖŞÜ])', r'\1 \2', t)
     t = content_quality.restore_brands(t, _brand_map)
+    t = content_quality.fix_brand_splits(t)
     # Tweet gömme kalıntıları (https://t.co/..., pic.twitter.com/...) haber metnine girmesin
     t = re.sub(r'https?://t\.co/\S+', '', t)
     t = re.sub(r'pic\.twitter\.com/\S+', '', t)

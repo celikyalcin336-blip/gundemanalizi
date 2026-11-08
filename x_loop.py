@@ -71,7 +71,7 @@ def push_state(message: str) -> bool:
     git("add", "x_posted_history.json", "x_bot_status.json")
     if git("diff", "--staged", "--quiet").returncode == 0:
         return git("status", "-sb").stdout.find("ahead") == -1
-    git("commit", "-m", f"{message} [skip ci]")
+    git("commit", "-m", f"{message} [skip ci] [skip render]")
     for attempt in range(1, 5):
         git("pull", "--rebase", "--autostash", "-X", "theirs", "origin", "main")
         r = git("push", "origin", "HEAD:main")

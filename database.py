@@ -397,12 +397,13 @@ def cleanup_corrupted_articles():
                 orig_content = r["content"] or ""
                 category = r["category"] or "Gündem"
 
+                import content_quality
                 # 1. Başlık temizliği
-                clean_title = news_fetcher.sanitize_news_text(orig_title)
+                clean_title = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_title))
                 clean_title = re.sub(r'\s*-\s*(?:Hürriyet|Mynet|Milliyet|Sabah|Habertürk|Ensonhaber|NTV|Bloomberg HT).*$', '', clean_title, flags=re.I).strip()
 
                 # 2. Özet temizliği
-                clean_summary = news_fetcher.sanitize_news_text(orig_summary)
+                clean_summary = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_summary))
 
                 # 3. İçerik temizliği
                 clean_content = orig_content
@@ -467,34 +468,8 @@ def cleanup_corrupted_articles():
                         if not re.search(r'\b\d+\.\s*$', full_lead):
                             clean_summary = full_lead
 
-                # 6. Çok kısa kalmış (1-2 cümlelik) veya eksik paragraflı haberleri zenginleştir (Örn: Frank McCourt vb.)
-                paras = re.findall(r'<p class="text-slate-300[^>]*>(.*?)</p>', clean_content, re.DOTALL)
-                if len(paras) < 2 and '<p class="lead' in clean_content:
-                    cat_lower = correct_cat.lower()
-                    extra_paras = []
-                    if "eko" in cat_lower:
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Piyasalarda ve ekonomi çevrelerinde geniş yankı uyandıran gelişmeyle ilgili olarak uzmanlar, mali dengeler, fiyatlama dinamikleri ve yatırım trendleri üzerindeki etkilerin önümüzdeki süreçte belirginleşeceğini vurguluyor. Yüksek meblağlı işlemler ve piyasa hareketlilikleri, sektör temsilcileri tarafından yakından izleniyor.</p>')
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Önümüzdeki günlerde sürecin resmiyet kazanması ve ilgili finansal adımların tamamlanmasıyla birlikte, sektörel göstergeler ve emsal değerler açısından piyasaların nasıl bir yön çizeceği ekonomi servisimiz tarafından takip edilmektedir.</p>')
-                    elif "spor" in cat_lower:
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Spor kamuoyunda ve taraftarlar arasında büyük heyecan uyandıran gelişmeyle ilgili olarak kulüp yönetiminin resmi adımları bekleniyor. Teknik heyetin sezon planlaması doğrultusunda atılacak bu adımın, takım içi dengelere ve önümüzdeki kritik maç takvimine doğrudan etki etmesi öngörülüyor.</p>')
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Müsabaka takvimi ve resmi sözleşme süreçlerinde imzaların atılmasının ardından, tarafların önümüzdeki günlerde kapsamlı bir bilgilendirmeyle ayrıntıları paylaşması beklenirken, spor servisimiz gelişmeleri aktaracaktır.</p>')
-                    elif "tekno" in cat_lower:
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji dünyasında ve dijital ekosistemde dengeleri değiştirebilecek bu yenilik, geliştiriciler ve son kullanıcılar açısından önemli avantajlar barındırıyor. Yüksek işlem kapasitesi ve yeni nesil algoritmalarla donatılan sistemin sektörel rekabeti artıracağı vurgulanıyor.</p>')
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Teknoloji otoriteleri, yeni modelin yaygınlaşmasıyla birlikte dijital dönüşüm süreçlerinde hız ve verimlilik artışı yaşanacağına dikkat çekerken, küresel pazardaki entegrasyon takvimi merakla takip ediliyor.</p>')
-                    elif "sağlık" in cat_lower or "saglik" in cat_lower:
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlık otoriteleri ve tıp uzmanları, doğru bilgilendirmenin ve erken farkındalığın hayati önem taşıdığına dikkat çekiyor. Benzer sağlık göstergeleri karşısında vatandaşların vakit kaybetmeden uzman hekim kontrolünden geçmesinin önemine vurgu yapılıyor.</p>')
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Sağlıklı yaşam standartları ve koruyucu hekimlik kapsamında alınacak bireysel tedbirlerin yaşam kalitesini doğrudan artıracağı belirtilirken, klinik değerlendirmeler yakından izleniyor.</p>')
-                    else:
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek yeni bilgilendirmeler beklenirken, kamuoyundaki yansımalar dikkatle takip ediliyor. Sürecin detayları anbean okuyucularımızla paylaşılmaya devam edecektir.</p>')
-                        extra_paras.append('<p class="text-slate-300 leading-relaxed mb-4">Konuya ilişkin kurumlar arası koordinasyon ve sahadaki yansımalar yakından izlenirken, yeni gelişmeler netleştikçe haberimiz güncellenecektir.</p>')
-
-                    if '<div class="p-5 rounded-xl bg-red-950/40' in clean_content:
-                        clean_content = clean_content.replace(
-                            '<div class="p-5 rounded-xl bg-red-950/40',
-                            "\n".join(extra_paras) + '\n<div class="p-5 rounded-xl bg-red-950/40'
-                        )
-                    else:
-                        clean_content = clean_content + "\n" + "\n".join(extra_paras)
+                # 6. Ham HTML sızıntılarını, şablon kutularını ve mükerrer paragrafları temizle (Hazır dolgu paragrafı ASLA eklenmez)
+                clean_content = content_quality.clean_article_html(clean_content)
 
                 if clean_title != orig_title or clean_summary != orig_summary or clean_content != orig_content or correct_cat != category:
                     conn.execute(
@@ -1176,12 +1151,37 @@ def get_articles_total_count(category: str = None) -> int:
         return 0
 
 
+_SLUG_TO_ID_CACHE = {}
+
+def increment_article_view_by_slug(slug: str):
+    """Turbo önbellekten dönen makalelerde gerçek ziyaretçi okunma sayısını veritabanını yormadan RAM'de artırır."""
+    if not slug:
+        return
+    art_id = _SLUG_TO_ID_CACHE.get(slug)
+    if art_id is None:
+        try:
+            with get_connection() as conn:
+                row = conn.execute("SELECT id FROM articles WHERE slug = ? LIMIT 1", (slug,)).fetchone()
+                if row:
+                    art_id = row["id"]
+                    if len(_SLUG_TO_ID_CACHE) > 5000:
+                        _SLUG_TO_ID_CACHE.clear()
+                    _SLUG_TO_ID_CACHE[slug] = art_id
+        except Exception:
+            return
+    if art_id:
+        _start_db_buffer_worker()
+        with _RAM_ARTICLE_VIEWS_LOCK:
+            _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
+
+
 def get_article_by_slug(slug: str) -> Optional[Dict]:
     """Slug'a göre makale detayını çeker ve okunma sayısını RAM'de sıfır gecikmeyle biriktirir (0 ms bekleme, 0 thread)."""
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
         if row:
             art_id = row["id"]
+            _SLUG_TO_ID_CACHE[slug] = art_id
             _start_db_buffer_worker()
             with _RAM_ARTICLE_VIEWS_LOCK:
                 _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
@@ -1739,3 +1739,152 @@ def add_reaction(article_id: int, choice: str) -> bool:
     except Exception as e:
         print(f"add_reaction hatası: {e}")
         return False
+
+
+_AUDIT_REPORT = {
+    "status": "pending",
+    "html_sanitized_count": 0,
+    "html_sanitized_slugs": [],
+    "cards_healed_count": 0,
+    "cards_healed": [],
+    "cards_remaining_count": 0,
+    "cards_remaining": [],
+    "broken_short_articles": [],
+}
+
+def get_audit_report() -> Dict:
+    return _AUDIT_REPORT
+
+def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
+    """
+    1) Veritabanında ham HTML belge sızıntısı (<!DOCTYPE html>, <style>, ```html, <!-- Giriş -->,
+       editor-comment, source-info, Gündem Analizi Yorumu) veya sembol/marka bölünmesi (📌, ▬, i OS)
+       bulunan makaleleri hiçbirini silmeden yerinde (in-place) temizler.
+    2) Görseli yapay yazılı kart (is_synthetic_card_image) olan makaleleri tespit eder ve raporlar
+       (Kural 1 gereği kullanıcı onayı olmadan hiçbir makaleyi silmez).
+    """
+    global _AUDIT_REPORT
+    import content_quality
+    import news_fetcher
+    import image_generator
+
+    _AUDIT_REPORT["status"] = "running_html_clean"
+    sanitized_slugs = []
+    healed_cards = []
+    remaining_cards = []
+    broken_short = []
+
+    try:
+        # ADIM 1: Tüm makalelerin başlık, özet ve içeriklerinde HTML sızıntısı / sembol / marka bölünmesi kontrolü
+        with get_connection() as conn:
+            rows = conn.execute("SELECT id, slug, title, summary, content, category, image_path, created_at FROM articles ORDER BY id DESC").fetchall()
+
+        updates = []
+        for r in rows:
+            aid = r["id"]
+            slug = r["slug"] or ""
+            orig_t = r["title"] or ""
+            orig_s = r["summary"] or ""
+            orig_c = r["content"] or ""
+
+            new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
+            new_s = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_s))
+            new_c = content_quality.clean_article_html(orig_c)
+
+            if new_t != orig_t or new_s != orig_s or new_c != orig_c:
+                updates.append((new_t, new_s, new_c, aid, slug))
+
+            wc = content_quality.visible_word_count(new_c)
+            if wc < 45 or len(slug) < 15:
+                broken_short.append({
+                    "id": aid,
+                    "slug": slug,
+                    "title": new_t,
+                    "words": wc,
+                    "created_at": str(r["created_at"] or "")[:16],
+                })
+
+        if updates:
+            with get_connection() as conn:
+                for new_t, new_s, new_c, aid, slug in updates:
+                    conn.execute(
+                        "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",
+                        (new_t, new_s, new_c, aid),
+                    )
+                    sanitized_slugs.append(slug)
+            print(f"✅ [HTML & Metin Temizliği] {len(updates)} makaledeki ham HTML/şablon kalıntıları yerinde temizlendi.")
+
+        _AUDIT_REPORT["html_sanitized_count"] = len(sanitized_slugs)
+        _AUDIT_REPORT["html_sanitized_slugs"] = sanitized_slugs[:120]
+        _AUDIT_REPORT["broken_short_articles"] = broken_short
+        _AUDIT_REPORT["status"] = "scanning_images"
+
+        # ADIM 2: Yapay yazılı kart görseli (kendi görseli) kullanan haberleri tespit et (Batch sorgu ile çok hızlı)
+        file_to_articles = {}
+        for r in rows:
+            aid = r["id"]
+            slug = r["slug"] or ""
+            title = content_quality.clean_title_text(r["title"] or "")
+            cat = r["category"] or "Gündem"
+            ip = r["image_path"] or ""
+            safe_name = os.path.basename(ip.replace("\\", "/")).split("?")[0]
+            if not safe_name:
+                remaining_cards.append({
+                    "id": aid, "slug": slug, "title": title, "img": "(görsel yok)",
+                    "reason": "görsel kaydı yok", "created_at": str(r["created_at"] or "")[:16]
+                })
+                continue
+            if safe_name.lower().endswith((".mp4", ".webm", ".mov")):
+                continue
+            file_to_articles.setdefault(safe_name, []).append({
+                "id": aid, "slug": slug, "title": title, "category": cat,
+                "img": safe_name, "created_at": str(r["created_at"] or "")[:16]
+            })
+
+        all_fnames = list(file_to_articles.keys())
+        batch_size = 80
+        for i in range(0, len(all_fnames), batch_size):
+            batch = all_fnames[i:i + batch_size]
+            found_map = {}
+            with get_connection() as conn:
+                placeholders = ",".join(["?"] * len(batch))
+                img_rows = conn.execute(
+                    f"SELECT filename, data FROM images WHERE filename IN ({placeholders})",
+                    tuple(batch),
+                ).fetchall()
+                for ir in img_rows:
+                    fn = ir["filename"]
+                    dval = ir["data"]
+                    if dval:
+                        found_map[fn] = bytes(dval)
+
+            for fn in batch:
+                raw_bytes = found_map.get(fn)
+                if not raw_bytes:
+                    local_p = os.path.join(OUTPUT_DIR, fn)
+                    if os.path.exists(local_p) and os.path.getsize(local_p) >= 6000:
+                        with open(local_p, "rb") as f:
+                            raw_bytes = f.read()
+
+                is_synth = False
+                reason = ""
+                if not raw_bytes or len(raw_bytes) < 6000:
+                    is_synth = True
+                    reason = "görsel veritabanında bulunamadı"
+                elif image_generator.is_synthetic_card_image(raw_bytes):
+                    is_synth = True
+                    reason = "yapay yazılı kart (kendi görseli)"
+
+                if is_synth:
+                    for item in file_to_articles[fn]:
+                        remaining_cards.append({**item, "reason": reason})
+
+            _AUDIT_REPORT["cards_remaining_count"] = len(remaining_cards)
+            _AUDIT_REPORT["cards_remaining"] = remaining_cards
+
+        _AUDIT_REPORT["status"] = "completed"
+        print(f"✨ [Görsel Denetimi Tamamlandı] Tespit Edilen Yapay Kartlı / Eksik Görselli Haber: {len(remaining_cards)}")
+    except Exception as e:
+        _AUDIT_REPORT["status"] = f"error: {e}"
+        print(f"⚠️ sanitize_db_html_and_heal_cards hatası: {e}")
+    return _AUDIT_REPORT

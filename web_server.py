@@ -171,6 +171,12 @@ async def lifespan(app: FastAPI):
     # Eski kısa haberleri (hiçbirini silmeden) yavaşça özgün metinle yeniden yazan arşiv yenileyici
     import archive_rewriter
     threading.Thread(target=archive_rewriter.background_worker, daemon=True).start()
+    def _bg_sanitize_and_heal():
+        time.sleep(6)
+        database.sanitize_db_html_and_heal_cards(heal_cards=False)
+        clear_turbo_cache()
+        _INDEX_CACHE["ts"] = 0.0
+    threading.Thread(target=_bg_sanitize_and_heal, daemon=True).start()
     yield
 
 import secrets as _secrets
@@ -383,7 +389,7 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith("/images") or
         path.startswith("/.well-known") or
         path.startswith("/sitemap") or
-        path in ("/favicon.ico", "/ads.txt", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/video-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js")
+        path in ("/favicon.ico", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/video-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js") or (path == "/ads.txt" and not any(k in (request.headers.get("user-agent") or "").lower() for k in ("google", "adsense", "mediapartners", "adsbot")))
     )
     if not (is_api_or_admin or is_static_or_system):
         try:
@@ -406,7 +412,7 @@ async def track_visitors_middleware(request: Request, call_next):
             # 1. 💰 Google AdSense Botları ve AdSense İnceleme Girişleri (Ayrı ve Net Tespit)
             bot_type = None
             is_adsense = False
-            if any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense")):
+            if any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense", "google-adstxt")) or (path == "/ads.txt" and "google" in ua_low):
                 bot_type = "AdSense Bot"
                 is_adsense = True
             elif any(a in ref for a in ("adsense.google", "partnerdash.google", "googlesyndication.com", "doubleclick.net", "googleads.")):
@@ -2172,6 +2178,8 @@ async def article_detail(request: Request, slug: str):
     if request.cookies.get("ga_admin") != "1":
         cached_html = get_turbo_page(cache_key)
         if cached_html:
+            if _is_human_browser_request(request):
+                database.increment_article_view_by_slug(slug)
             return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=120, s-maxage=120", "CDN-Cache-Control": "max-age=120", "Cloudflare-CDN-Cache-Control": "max-age=120"})
 
     article = database.get_article_by_slug(slug)
@@ -2256,6 +2264,8 @@ async def article_detail(request: Request, slug: str):
     # AdSense kalite: eski şablon/dolgu kalıntılarını gösterimde temizle, kısa haberleri Google dizininden çıkar
     import content_quality
     import html as _html_mod
+    article["title"] = content_quality.clean_title_text(article.get("title") or "")
+    article["summary"] = content_quality.clean_title_text(article.get("summary") or "")
     raw_content = content_quality.clean_article_html(raw_content)
     is_thin_article = content_quality.visible_word_count(raw_content) < 300
     # Loto/burç/maç saati gibi rutin "emtia" haberler sitede kalır ama Google dizinine alınmaz
@@ -3198,6 +3208,11 @@ async def rss_feed(request: Request):
   </channel>
 </rss>"""
     return HTMLResponse(content=rss, media_type="application/xml; charset=utf-8")
+
+@app.get("/api/audit-report")
+async def api_audit_report():
+    """HTML temizliği ve yapay kart görseli onarım raporunu döner."""
+    return JSONResponse(database.get_audit_report())
 
 @app.get("/api/bot-status")
 async def bot_status(request: Request):

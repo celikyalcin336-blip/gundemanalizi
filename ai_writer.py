@@ -237,8 +237,6 @@ def smart_sentence_split(text: str) -> list:
     return clean_sents
 
 
-import re
-
 def classify_article(title: str, summary: str = "", force_category: str = None) -> str:
     """
     Haber metnini 'Başlık Ağırlıklı' (Title-Weighted) ve Türkçe çekim eklerine tam uyumlu
@@ -259,8 +257,6 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     full_text = f"{lower_title} {lower_summary}"
 
     # 0. VEFAT, CENAZE, TAZİYE, YAS, ÖLÜM, KAZA & FACİA KORUMASI (En Yüksek Öncelik: KESİNLİKLE GÜNDEM)
-    # Kurban veya vefat eden kişi üniversiteli, liseli, öğretmen, doktor, polis veya sporcu olsa bile:
-    # Ölüm, kaza, çarpışma, cinayet, facia haberleri ASLA Eğitim, Sağlık veya Spor yapılamaz!
     death_accident_regex = r'\b(ölüm\w*|öldü\w*|ölen\w*|ölü\b|vefat\w*|cenaze\w*|son yolculuğuna\w*|toprağa verildi\w*|defnedildi\w*|hayatını kaybetti\w*|yaşamını yitirdi\w*|can verdi\w*|can pazarı\w*|facia\w*|katliam\w*|cinayet\w*|katledil\w*|kıyd\w*|vahşet\w*|bıçakla\w*|vurul\w*|öldürül\w*|boğazı\w*|kaza\w*|feci kaza\w*|zincirleme kaza\w*|çarpıştı\w*|şarampole\w*|devrildi\w*|feci şekilde|araç hurdaya\w*|otomobil hurdaya\w*|tır devrildi\w*|otobüs devrildi\w*|fren patladı\w*|alkollü sürücü\w*|ehliyetine el konuldu|ehliyetsiz sürücü\w*|cansız beden\w*|ceset\w*|cesed\w*|dehşet\w*|intihar\w*|boğul\w*|yangında can\w*)\b'
     if re.search(death_accident_regex, lower_title, re.IGNORECASE) and not re.search(r'\b(ölüm risk\w*|ölüm oran\w*|ölümcül\s+(?:hastalık\w*|virüs\w*|bakteri\w*|enfeksiyon\w*|kanser\w*|tümör\w*|salgın\w*)|kanser\w*|lösemi\w*|lösev\w*|verem\w*|tüberküloz\w*|kemoterapi\w*|onkoloji\w*|erken teşhis\w*)\b', lower_title, re.IGNORECASE):
         return "Gündem"
@@ -296,7 +292,6 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     # Puanlama (Başlık 4 Kat Daha Ağırlıklıdır + Kaynak Kategorisi Koruması)
     scores = {}
     if force_category in regex_map:
-        # Kaynağın kendi kategorisine +3 taban puan ver (Özetten gelen tek bir 'dolar/tl' kelimesi Teknoloji/Sağlık/Eğitim haberini bozmasın)
         scores[force_category] = 3
 
     for cat, reg in regex_map.items():
@@ -313,21 +308,9 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     # ADIM 3: Besleme kategorisi varsa içerikle çapraz doğrula
     if force_category and force_category in regex_map:
         if force_category == "Ekonomi":
-            econ_check = r'(lira|tl|faiz|enflasyon|dolar|euro|altın|borsa|hisse|maaş|zam|vergi|kdv|ötv|banka|kredi|mevduat|ihracat|ithalat|bütçe)'
+            econ_check = r' (lira|tl|faiz|enflasyon|dolar|euro|altın|borsa|hisse|maaş|zam|vergi|kdv|ötv|banka|kredi|mevduat|ihracat|ithalat|bütçe) '
             if not re.search(econ_check, full_text, re.IGNORECASE):
-                if re.search(r'(estetik|ameliyat|bıçak altına|hasta|doktor|tedavi|sağlık)', full_text, re.IGNORECASE):
-                    return "Sağlık"
-                return "Gündem"
-        return force_category
-
-    return "Gündem"
-
-    # ADIM 3: Besleme kategorisi varsa içerikle çapraz doğrula
-    if force_category and force_category in regex_map:
-        if force_category == "Ekonomi":
-            econ_check = r'(lira|tl|faiz|enflasyon|dolar|euro|altın|borsa|hisse|maaş|zam|vergi|kdv|ötv|banka|kredi|mevduat|ihracat|ithalat|bütçe)'
-            if not re.search(econ_check, full_text, re.IGNORECASE):
-                if re.search(r'(estetik|ameliyat|bıçak altına|hasta|doktor|tedavi|sağlık)', full_text, re.IGNORECASE):
+                if re.search(r' (estetik|ameliyat|bıçak altına|hasta|doktor|tedavi|sağlık) ', full_text, re.IGNORECASE):
                     return "Sağlık"
                 return "Gündem"
         return force_category
@@ -340,7 +323,7 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
     """
     import news_fetcher
     import content_quality
-    title = news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip())))
+    title = content_quality.clean_title_text(news_fetcher.sanitize_news_text(html.unescape(html.unescape(title.strip()))))
     summary = news_fetcher.sanitize_news_text(html.unescape(html.unescape(summary.strip()))) if summary else ""
     source = content_quality.clean_source_name(source)
 
@@ -371,8 +354,6 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
         return None
 
-    # Her haberin aynı kalıpta (sabit paragraf/alt başlık sayısında) görünmesini önlemek için
-    # haber başlığına göre 3 farklı doğal gazetecilik kurgusundan birini seç:
     _style_idx = sum(ord(ch) for ch in title) % 3
     if _style_idx == 0:
         _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 3 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-7 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
@@ -449,7 +430,6 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
         return None
 
     import content_quality
-    # Bir model yoğun/kotası dolu olursa sıradakine geçilir (ücretsiz kotalar model bazında ayrıdır)
     model_chain = [m.strip() for m in os.getenv(
         "GEMINI_ARTICLE_MODELS",
         "gemini-flash-lite-latest,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.5-flash,gemini-flash-latest,gemini-3.8-flash"
@@ -466,17 +446,16 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
             if "[ÖZET]" in head_and_sum:
                 t_part, s_part = head_and_sum.split("[ÖZET]", 1)
                 cand_title = t_part.replace("[BAŞLIK]", "").strip().strip('"#* \'')
-                cand_title = content_quality.fix_brand_splits(re.sub(r'\s+', ' ', cand_title))
-                cand_title = cand_title.splitlines()[0].strip()
+                cand_title = content_quality.clean_title_text(re.sub(r'\s+', ' ', cand_title))
+                cand_title = cand_title.splitlines()[0].strip() if cand_title else ""
                 if 15 <= len(cand_title) <= 130:
                     gen_title = cand_title
                 gen_summary = s_part.strip()
             else:
                 gen_summary = head_and_sum.replace("[BAŞLIK]", "").strip()
-            gen_content = content_part.strip()
-            gen_content = re.sub(r'^```(?:html)?\s*', '', gen_content, flags=re.I)
-            gen_content = re.sub(r'\s*```$', '', gen_content).strip()
-            gen_content = content_quality.fix_brand_splits(gen_content)
+            gen_title = content_quality.clean_title_text(gen_title)
+            gen_summary = content_quality.clean_title_text(gen_summary)
+            gen_content = content_quality.clean_article_html(content_part.strip())
 
             words = content_quality.visible_word_count(gen_content)
             if words < 350:

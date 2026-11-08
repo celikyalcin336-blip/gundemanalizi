@@ -251,9 +251,11 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
 
 
 def is_placeholder_image(path: str) -> bool:
-    """Sitenin fotoğraf bulamayınca ürettiği 'sadece yazılı kırmızı kart' görselini tespit eder.
-    (Üstte düz kırmızı bant + ortası tek renk). Bu haberler gerçek fotoğrafı olmadığı için X'te paylaşılmaz."""
+    """Sitenin fotoğraf bulamayınca ürettiği tüm yapay yazılı kart görsellerini tespit eder."""
     try:
+        import image_generator
+        if image_generator.is_synthetic_card_image(path):
+            return True
         from PIL import Image, ImageStat
         im = Image.open(path).convert("RGB").resize((128, 72))
         top = ImageStat.Stat(im.crop((0, 0, 128, 3))).mean

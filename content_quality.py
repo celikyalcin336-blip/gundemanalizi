@@ -4,10 +4,11 @@
 - fix_brand_splits(): Otomatik temizleyicinin böldüğü marka adlarını düzeltir ("You Tube" -> "YouTube").
 - protect_brands()/restore_brands(): Yapışık kelime ayırıcısı çalışmadan önce marka adlarını korur.
 - clean_article_html(): Yayındaki (eski) haberlerden şablon "değerlendirme" kutusunu, her habere eklenen
-  hazır dolgu paragraflarını, kırık linkleri ve tekrar eden cümleleri GÖSTERİM ANINDA temizler.
-  (Veritabanındaki kayıt değiştirilmez.)
+  hazır dolgu paragraflarını, kırık linkleri, ham HTML belge sızıntılarını (<!DOCTYPE html>, <style>, <!-- Giriş -->)
+  ve tekrar eden cümle/paragrafları GÖSTERİM ANINDA ve VERİTABANI TEMİZLİĞİNDE temizler.
 - visible_word_count() / is_thin(): Haberin okunabilir kelime sayısını ölçer; kısa haberler noindex alır.
 """
+import difflib
 import html as _html
 import re
 
@@ -38,6 +39,18 @@ def fix_brand_splits(text: str) -> str:
     for rx, brand in _BRAND_SPLIT_RE:
         text = rx.sub(brand, text)
     return text
+
+
+def clean_title_text(text: str) -> str:
+    """Başlık ve özetlerdeki dekoratif sembolleri (📌, ▬ vb.), markdown kalıntılarını ve bölünmüş marka adlarını temizler."""
+    if not text:
+        return text
+    t = text
+    t = re.sub(r"[📌▬▭▮▰🔴🚨⚡💥📢▶️▪️▫️•✦✧★☆]+", " ", t)
+    t = re.sub(r"```[a-zA-Z0-9_-]*", "", t).replace("```", "").replace("**", "")
+    t = fix_brand_splits(t)
+    t = re.sub(r"\s+", " ", t).strip(" -–—|:;,")
+    return t.strip()
 
 
 def protect_brands(text: str):
@@ -81,6 +94,8 @@ _GENERIC_STARTS = [
     "Bölgedeki aktörlerin atacağı yeni adımlar",
     "Gelişmeyle ilgili resmi makamlar ve yetkili mercilerden gelecek",
     "Konuya ilişkin kurumlar arası koordinasyon ve sahadaki yansımalar",
+    "Konuyla ilgili resmi mercilerin ve ilgili kurumların değerlendirmeleri",
+    "Spor kamuoyunun yakından takip ettiği gelişmeyle ilgili resmi açıklamaların",
 ]
 
 
@@ -93,11 +108,76 @@ def _is_generic(text: str) -> bool:
     return any(t.startswith(g) for g in _GENERIC_STARTS)
 
 
+def _strip_raw_html_document_leak(content: str) -> str:
+    """
+    AI modelinin yanlışlıkla tam HTML belgesi (```html <!DOCTYPE html> <head><style>...</style></head>
+    <body><h1>...</h1><!-- Giriş --><div class="editor-comment">...</div><div class="source-info">...</div></body></html> ```)
+    döndürdüğü makalelerdeki tüm yapısal ve şablonsal kalıntıları kökünden temizler.
+    """
+    if not content:
+        return ""
+    c = content
+
+    # 0) Eğer makalede ham HTML sızıntısı (<!DOCTYPE, <html, ```html) varsa ve başına database.py tarafından
+    # yapay bir <p class="lead..."> eklenmişse, gerçek giriş paragrafıyla mükerrer olmaması için yapay lead'i kaldır
+    if re.search(r"<!\s*DOCTYPE|<html\b|```html|<!--\s*Giriş", c, flags=re.I):
+        c = re.sub(r"^\s*<p\s+class=\"lead[^\"]*\"[^>]*>.*?</p>\s*", "", c, count=1, flags=re.S | re.I)
+
+    # 1) Markdown kod çitleri (```html, ```xml, ```)
+    c = re.sub(r"```[a-zA-Z0-9_-]*\s*", "", c)
+    c = c.replace("```", "")
+
+    # 2) İç içe sızmış <head>, <style>, <script>, <title> blokları
+    c = re.sub(r"<head\b[^>]*>.*?</head>", "", c, flags=re.S | re.I)
+    c = re.sub(r"<style\b[^>]*>.*?</style>", "", c, flags=re.S | re.I)
+    c = re.sub(r"<script\b[^>]*>.*?</script>", "", c, flags=re.S | re.I)
+    c = re.sub(r"<title\b[^>]*>.*?</title>", "", c, flags=re.S | re.I)
+
+    # 3) Belge sarmalayıcı etiketler (<!DOCTYPE>, <html>, <body>, <meta>, <link>, <article>, <section>, <main>, <header>, <footer>)
+    c = re.sub(r"<!\s*DOCTYPE[^>]*>", "", c, flags=re.I)
+    c = re.sub(r"</?(?:html|body|meta|link|article|section|main|header|footer)\b[^>]*>", "", c, flags=re.I)
+
+    # 4) AI şablon yorum satırları (<!-- Giriş -->, <!-- Gelişme - Paragraf 1 -->, <!-- Gündem Analizi Yorumu --> vb.)
+    c = re.sub(r"<!--.*?-->", "", c, flags=re.S)
+
+    # 5) Makale gövdesi içindeki mükerrer <h1>...</h1> başlığı (sayfa şablonunda zaten <h1> var)
+    c = re.sub(r"<h1\b[^>]*>.*?</h1>", "", c, flags=re.S | re.I)
+
+    # 6) AI şablon "Gündem Analizi Yorumu / Değerlendirmesi" ve "source-info" kutuları
+    c = re.sub(
+        r'<div\b[^>]*class="[^"]*(?:editor-comment|source-info|article-meta|meta-info)[^"]*"[^>]*>.*?</div>',
+        "",
+        c,
+        flags=re.S | re.I,
+    )
+    c = re.sub(
+        r'<div\b[^>]*>\s*<h[2-5][^>]*>[^<]*(?:Gündem\s+Analizi\s+(?:Yorumu|Değerlendirmesi|Analizi|Notu)|Editör(?:ün)?\s+(?:Yorumu|Notu|Değerlendirmesi))[^<]*</h[2-5]>.*?</div>',
+        "",
+        c,
+        flags=re.S | re.I,
+    )
+    c = re.sub(
+        r'<h[2-5][^>]*>[^<]*(?:Gündem\s+Analizi\s+(?:Yorumu|Değerlendirmesi|Analizi|Notu)|Editör(?:ün)?\s+(?:Yorumu|Notu|Değerlendirmesi))[^<]*</h[2-5]>\s*(?:<p[^>]*>.*?</p>)?',
+        "",
+        c,
+        flags=re.S | re.I,
+    )
+
+    # 7) Alt kısımda kalan tekil "Kaynak: ..." ve "Kategori: ..." satırları
+    c = re.sub(
+        r"<p[^>]*>\s*(?:<(?:strong|b)>)?\s*(?:Kaynak|Kategori|Haber\s+Kaynağı|Etiketler)\s*:\s*(?:</(?:strong|b)>)?\s*[^<]{1,120}</p>",
+        "",
+        c,
+        flags=re.I,
+    )
+    return c.strip()
+
+
 def clean_article_html(content: str) -> str:
-    """Gösterim anında eski şablon kalıntılarını temizler. Gemini ile yazılmış yeni haberlere zarar vermez."""
+    """Gösterim anında ve veritabanı bakımında eski şablon kalıntılarını ve ham HTML sızıntılarını temizler."""
     if not content:
         return content
-    c = content
+    c = _strip_raw_html_document_leak(content)
 
     # 1) Şablon "GÜNDEM ANALİZİ DEĞERLENDİRMESİ" kutusu: içi hazır metinse tamamen kaldır
     def _drop_eval_box(m):
@@ -113,17 +193,36 @@ def clean_article_html(content: str) -> str:
         inner = re.sub(r"https?://t\.co/[\w]+(?:\s+[\w]{2,6}){0,4}", "", inner)
         inner = re.sub(r"(?<![\"'=])https?://[^\s<]+", "", inner)
         inner = re.sub(r"pic\.twitter\.com/\S+", "", inner)
-        # Kaynak siteden paragraf başına/içine karışmış BÜYÜK HARFLİ ara başlık kalıntılarını temizle (örn: DEV TESİSİN ODAĞINDA BÜYÜK SUV MODELLERİ YER ALIYOR)
+        # Kaynak siteden paragraf başına/içine karışmış BÜYÜK HARFLİ ara başlık kalıntılarını temizle
         inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’\-]+\s*", "", inner.strip())
         inner = fix_brand_splits(inner)
         return f"{m.group(1)}{inner}</p>"
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p, c, flags=re.S)
 
-    # 4) Paragraflar arası tekrar eden cümleler
+    # 3.5) Ara başlıklardaki (h2/h3) marka bölünmelerini ve sembolleri düzelt
+    def _fix_heading(m):
+        tag, attrs, inner = m.group(1), m.group(2), m.group(3)
+        inner = clean_title_text(inner)
+        return f"<{tag}{attrs}>{inner}</{tag}>"
+    c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _fix_heading, c, flags=re.S | re.I)
+
+    # 4) Paragraflar arası tekrar eden cümleler ve mükerrer giriş (lead) paragrafı
     seen_text = [""]
+    seen_paras = []
 
     def _dedupe(m):
         inner = m.group(2)
+        p_norm = _norm(inner).lower()
+        p_words = {w for w in re.findall(r"\w+", p_norm) if len(w) >= 4}
+        if p_norm and len(p_words) >= 6:
+            for prev_norm, prev_words in seen_paras:
+                if difflib.SequenceMatcher(None, p_norm, prev_norm).ratio() >= 0.62:
+                    return ""
+                if prev_words and min(len(p_words), len(prev_words)) >= 8:
+                    if len(p_words & prev_words) / min(len(p_words), len(prev_words)) >= 0.65:
+                        return ""
+            seen_paras.append((p_norm, p_words))
+
         sents = re.split(r"(?<=[.!?])\s+", inner)
         keep = []
         for s in sents:
@@ -136,9 +235,9 @@ def clean_article_html(content: str) -> str:
         return f"{m.group(1)}{' '.join(keep)}</p>"
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _dedupe, c, flags=re.S)
 
-    # 5) Boş kalan paragraflar ve altı boş kalan "Gelişmenin Ayrıntıları" başlığı
+    # 5) Boş kalan paragraflar ve altı boş kalan ara başlıklar
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
-    c = re.sub(r"<h3[^>]*>[^<]*</h3>\s*(?=(<div|$|<h3))", "", c.strip())
+    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=(<div|$|<h[23]))", "", c.strip())
 
     # 6) Alt başlıklara (<h3>) Google Arama Jump-Link SEO id etiketi ekle
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
@@ -171,7 +270,7 @@ def visible_word_count(content: str) -> int:
 def _fast_clean_for_word_count(content: str) -> str:
     if not content:
         return ""
-    c = content
+    c = _strip_raw_html_document_leak(content)
 
     def _drop_eval_box(m):
         return "" if _is_generic(m.group(0).split("</h4>", 1)[-1]) else m.group(0)
@@ -190,9 +289,21 @@ def _fast_clean_for_word_count(content: str) -> str:
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p_fast, c, flags=re.S)
 
     seen_text = [""]
+    seen_paras = []
 
     def _dedupe(m):
         inner = m.group(2)
+        p_norm = _norm(inner).lower()
+        p_words = {w for w in re.findall(r"\w+", p_norm) if len(w) >= 4}
+        if p_norm and len(p_words) >= 6:
+            for prev_norm, prev_words in seen_paras:
+                if difflib.SequenceMatcher(None, p_norm, prev_norm).ratio() >= 0.62:
+                    return ""
+                if prev_words and min(len(p_words), len(prev_words)) >= 8:
+                    if len(p_words & prev_words) / min(len(p_words), len(prev_words)) >= 0.65:
+                        return ""
+            seen_paras.append((p_norm, p_words))
+
         sents = re.split(r"(?<=[.!?])\s+", inner)
         keep = []
         for s in sents:
@@ -205,7 +316,7 @@ def _fast_clean_for_word_count(content: str) -> str:
 
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _dedupe, c, flags=re.S)
     c = re.sub(r"<p[^>]*>\s*</p>", "", c)
-    c = re.sub(r"<h3[^>]*>[^<]*</h3>\s*(?=(<div|$|<h3))", "", c.strip())
+    c = re.sub(r"<h[23][^>]*>[^<]*</h[23]>\s*(?=(<div|$|<h[23]))", "", c.strip())
     return c
 
 
@@ -305,4 +416,3 @@ def clean_source_name(source: str) -> str:
     if re.search(r"\s+Spor$", s, flags=re.I) and s.lower() not in ("a spor", "trt spor"):
         s = re.sub(r"\s+Spor$", "", s, flags=re.I).strip()
     return s or "Basın Kaynakları"
-

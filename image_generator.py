@@ -179,8 +179,9 @@ def create_dual_news_collage(url1: str, url2: str, output_path: str, width: int 
     sharp.save(output_path, "JPEG", quality=82, optimize=True, progressive=True)
     return output_path
 
-def search_editorial_web_image(title: str, category: str = "") -> str:
-    """Haberin konusuyla doğrudan ilgili gerçek, yüksek çözünürlüklü ve yatay basın fotoğrafı arar."""
+def search_editorial_web_image_candidates(title: str, category: str = "", max_results: int = 8) -> list:
+    """Haberin konusuyla doğrudan ilgili gerçek basın fotoğrafı adaylarını liste olarak döndürür."""
+    candidates = []
     try:
         import urllib.parse
         headers = {
@@ -190,7 +191,6 @@ def search_editorial_web_image(title: str, category: str = "") -> str:
         clean_q = re.sub(r'[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ\s]', ' ', title)
         stop_words = {'haber', 'haberi', 'haberleri', 'son', 'dakika', 'flas', 'flaş', 'iste', 'işte', 'acikladi', 'açıkladı', 'mesaji', 'mesajı', 'dedi', 've', 'ile', 'icin', 'için', 'bir', 'bu'}
         words = [w for w in clean_q.split() if len(w) > 2 and w.lower() not in stop_words]
-        
         queries = []
         if len(words) >= 3:
             queries.append(" ".join(words[:4]))
@@ -198,21 +198,60 @@ def search_editorial_web_image(title: str, category: str = "") -> str:
             queries.append(" ".join(words[:2]))
         if words:
             queries.append(words[0])
-            
         for q in queries:
             url = f'https://www.bing.com/images/search?q={urllib.parse.quote(q)}&first=1'
             r = requests.get(url, headers=headers, timeout=5)
             murls = re.findall(r'murl&quot;:&quot;(https?://[^&]+?\.(?:jpg|jpeg|png|webp))&quot;', r.text)
             if not murls:
                 murls = re.findall(r'"murl":"(https?://[^"]+?\.(?:jpg|jpeg|png|webp))"', r.text)
-                
             for candidate in murls:
-                if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector', 'icon']):
+                if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector', 'icon', 'logo', 'placeholder']):
                     continue
-                return candidate
+                if candidate not in candidates:
+                    candidates.append(candidate)
+                    if len(candidates) >= max_results:
+                        return candidates
     except Exception as e:
         print(f"Editoryal görsel arama hatası: {e}")
-    return None
+    return candidates
+
+
+def search_editorial_web_image(title: str, category: str = "") -> str:
+    """Haberin konusuyla doğrudan ilgili gerçek, yüksek çözünürlüklü ve yatay basın fotoğrafı arar."""
+    cands = search_editorial_web_image_candidates(title, category, max_results=1)
+    return cands[0] if cands else None
+
+
+def is_synthetic_card_image(source) -> bool:
+    """
+    Sitenin fotoğraf bulamadığında kendi ürettiği tipografik kart görsellerini (create_thematic_editorial_card
+    veya eski koyu/kırmızı bantlı şablon kartlarını) piksel istatistikleriyle %100 tespit eder.
+    source: dosya yolu (str) veya ham görsel verisi (bytes).
+    """
+    try:
+        from PIL import ImageStat
+        if isinstance(source, (bytes, bytearray)):
+            im = Image.open(BytesIO(source)).convert("RGB").resize((128, 72))
+        elif isinstance(source, str) and os.path.exists(source):
+            im = Image.open(source).convert("RGB").resize((128, 72))
+        else:
+            return False
+        top_sd = max(ImageStat.Stat(im.crop((0, 1, 128, 3))).stddev)
+        bot_stat = ImageStat.Stat(im.crop((0, 69, 128, 71)))
+        bot_sd = max(bot_stat.stddev)
+        bot_m = bot_stat.mean
+        band1_sd = max(ImageStat.Stat(im.crop((15, 20, 113, 34))).stddev)
+        band2_sd = max(ImageStat.Stat(im.crop((15, 47, 113, 58))).stddev)
+        if top_sd < 4.5 and bot_sd < 4.5 and bot_m[0] < 42 and bot_m[1] < 48 and bot_m[2] < 68:
+            if band1_sd < 5.5 or band2_sd < 5.5:
+                return True
+        top_m = ImageStat.Stat(im.crop((0, 0, 128, 3))).mean
+        mid_sd = max(ImageStat.Stat(im.crop((20, 30, 108, 55))).stddev)
+        if top_m[0] > 170 and top_m[1] < 80 and top_m[2] < 80 and mid_sd < 18:
+            return True
+        return False
+    except Exception:
+        return False
 
 def create_thematic_editorial_card(output_path: str, title: str = "", category: str = "Gündem", width: int = 1280, height: int = 720) -> str:
     """Haber görseli bulunamadığında boş gri kutu yerine TV bülteni tarzında şık, tipografik son dakika haber kartı üretir."""
@@ -312,25 +351,24 @@ def create_news_visual(candidate_urls: list, output_filename: str, title: str = 
             cleaned_urls.append(u)
             
     # 1. Aday görseller varsa: Konunun tekil, orijinal ve kristal netliğindeki 16:9 HD basın görselini üret
-    # (Asla farklı konuları birbirine karıştıran yapay kolaj yapılmaz!)
     if cleaned_urls:
         for u in cleaned_urls:
             res = create_single_news_photo(u, output_path)
-            if res and os.path.exists(res):
+            if res and os.path.exists(res) and not is_synthetic_card_image(res):
                 return res
 
-    # 2. Görsel yoksa veya indirilemediyse: Haberin konusuna özel gerçek basın fotoğrafı ara
+    # 2. Görsel yoksa veya indirilemediyse: Haberin konusuna özel gerçek basın fotoğrafı adaylarını sırayla dene
     if title:
-        print(f"🔍 Habere özel görsel aranıyor: {title[:40]}...")
-        web_img = search_editorial_web_image(title, category)
-        if web_img:
-            print(f"📸 Gerçek haber görseli bulundu: {web_img[:60]}...")
+        print(f"🔍 Habere özel gerçek basın görseli aranıyor: {title[:40]}...")
+        for web_img in search_editorial_web_image_candidates(title, category, max_results=6):
             res = create_single_news_photo(web_img, output_path)
-            if res and os.path.exists(res):
+            if res and os.path.exists(res) and not is_synthetic_card_image(res):
+                print(f"📸 Gerçek haber görseli indirildi: {web_img[:60]}...")
                 return res
 
-    # 3. Son çare: TV bülteni tarzında şık, tipografik son dakika haber kartı üret (Asla boş logo kutusu olmaz!)
-    return create_thematic_editorial_card(output_path, title, category)
+    # 3. Gerçek haber fotoğrafı bulunamadıysa yapay yazılı kart ÜRETME (None dönerek fotoğrafsız haber yayınını engelle)
+    print(f"⏩ [Görsel Kalkanı] '{title[:40]}...' için gerçek basın fotoğrafı bulunamadı; yapay kart üretimi devre dışı.")
+    return None
 
 
 def wrap_text(text: str, font, max_width: int) -> list:
