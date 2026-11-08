@@ -10,7 +10,7 @@
         (function() {
             var c = null;
             try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
-            var g = (c === 'rejected') ? 'denied' : 'granted';
+            var g = (c === 'rejected' || c === 'essential') ? 'denied' : 'granted';
             gtag('consent', 'default', {
                 'ad_storage': g,
                 'ad_user_data': g,

@@ -175,9 +175,11 @@ async def lifespan(app: FastAPI):
         time.sleep(6)
         database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=True)
         _IMAGE_MEM_CACHE.clear()
-        _INDEX_MEMO.clear()
+        with _INDEX_LOCK:
+            _INDEX_MEMO.clear()
+            _INDEX_CACHE["rows"] = []
+            _INDEX_CACHE["ts"] = 0.0
         clear_turbo_cache()
-        _INDEX_CACHE["ts"] = 0.0
     threading.Thread(target=_bg_sanitize_and_heal, daemon=True).start()
     yield
 
@@ -2186,7 +2188,25 @@ async def article_detail(request: Request, slug: str):
 
     article = database.get_article_by_slug(slug)
     if not article:
-        raise HTTPException(status_code=404, detail="Haber bulunamadı")
+        from fastapi.responses import RedirectResponse
+        import urllib.parse
+        slug_low = (slug or "").lower()
+        # Silinen veya taşınan eski haber bağlantılarını kırık (404) bırakmak yerine ilgili kategoriye / ana sayfaya 301 yönlendir
+        _cat_map = [
+            ("Ekonomi", ("gumus", "altin", "dolar", "euro", "borsa", "enflasyon", "faiz", "merkez-bankasi", "yatirim", "halka-arz", "temettu", "kripto", "bitcoin", "vergi", "maas", "emekli", "kira", "konut", "ihracat", "ekonomi", "fiyat", "zam")),
+            ("Teknoloji", ("yapay-zeka", "google", "apple", "iphone", "i-os", "i-phone", "samsung", "android", "gta", "oyun", "raiden", "uzay", "siber", "yazilim", "teknoloji", "bilgisayar", "internet", "whatsapp", "instagram")),
+            ("Otomobil", ("otomobil", "elektrikli", "togg", "ford", "peugeot", "renault", "hyundai", "tesla", "byd", "chery", "omoda", "dacia", "tofas", "fiat", "menzil", "suv", "otv")),
+            ("Spor", ("fenerbahce", "galatasaray", "besiktas", "trabzonspor", "super-lig", "sampiyon", "transfer", "derbi", "salah", "lukaku", "mourinho", "okan-buruk", "milli-takim", "basketbol", "voleybol")),
+            ("Sağlık", ("saglik", "hastane", "doktor", "uzmanindan", "beyin", "kalp", "kanser", "beslenme", "uyku", "vitamin", "enfeksiyon", "grip", "bakan-memisoglu")),
+            ("Eğitim", ("meb", "egitim", "sinav", "kpss", "yks", "lgs", "universite", "ogrenci", "okul", "ogretmen", "staj", "burs", "mufredat")),
+            ("Dünya", ("iran", "israil", "gazze", "filistin", "abd", "trump", "rusya", "ukrayna", "zelenski", "almanya", "avrupa", "nato", "kuzey-kore", "cin", "suriye")),
+        ]
+        target_url = "/"
+        for _cname, _kw_list in _cat_map:
+            if any(_k in slug_low for _k in _kw_list):
+                target_url = f"/?kategori={urllib.parse.quote(_cname)}"
+                break
+        return RedirectResponse(url=target_url, status_code=301)
 
     article_id = article.get("id")
     category = article.get("category") or "Gündem"

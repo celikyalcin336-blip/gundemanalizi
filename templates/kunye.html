@@ -9,7 +9,7 @@
         (function() {
             var c = null;
             try { c = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
-            var g = (c === 'rejected') ? 'denied' : 'granted';
+            var g = (c === 'rejected' || c === 'essential') ? 'denied' : 'granted';
             gtag('consent', 'default', {
                 'ad_storage': g,
                 'ad_user_data': g,
@@ -19,8 +19,6 @@
             });
         })();
     </script>
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Resmi Standart) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Künye | Gündem Analizi</title>
     <meta name="description" content="Gündem Analizi resmi yayın künyesi, imtiyaz sahibi, sorumlu yazı işleri müdürü, editör kadrosu ve kurumsal iletişim bilgileri.">
