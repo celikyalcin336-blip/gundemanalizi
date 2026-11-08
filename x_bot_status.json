@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-08 16:38:29",
+  "last_check": "2026-11-08 17:23:52",
   "result": "posted",
-  "last_post": "2026-11-08 16:38:29",
-  "next_planned": "2026-11-08 17:23:29",
+  "last_post": "2026-11-08 17:23:52",
+  "next_planned": "2026-11-08 18:08:52",
   "runner": "github-actions",
-  "log_tail": "[2026-11-08 13:38:06] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Thomas Markle ABD'de Yürütülen Fede... (Özet/İçerik benzerliği (%91 aynı metin): Thomas Markle ABD'de Çocuk İstismar)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Balıkesir Edremit Yolu Üzerindeki T... (Birebir slug eşleşmesi: balikesir-edremit-yolu-uzerindeki-trafik-kazasinda-anne-ve-kizi-yasamini-yitirdi)\n🎯 [X Paylaşım Adayı] Kategori: Otomobil | Virallik/Duygu Skoru: 170 | Başlık: Hyundai, Elektrikli Mobilite Vizyonunda Ioniq 3 İçin Finansman Desteğini Başlattı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794145088.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/hyundai-elektrikli-mobilite-vizyonunda-ioniq-3-icin-finansman-destegini-baslatti\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Hyundai, Elektrikli Mobilite Vizyonunda Ioniq 3 İçin Finansman Desteğini Başlattı\n"
+  "log_tail": "[2026-11-08 14:23:30] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Thomas Markle ABD'de Yürütülen Fede... (Özet/İçerik benzerliği (%91 aynı metin): Thomas Markle ABD'de Çocuk İstismar)\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 160 | Başlık: Gaziantep İpek Yolu'ndaki Feci Kazada İki Kişi Yaşamını Yitirdi\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794147811.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/gaziantep-ipek-yolundaki-feci-kazada-iki-kisi-yasamini-yitirdi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Gaziantep İpek Yolu'ndaki Feci Kazada İki Kişi Yaşamını Yitirdi\n"
 }
