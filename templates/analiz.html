@@ -5,8 +5,8 @@
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gündem Analizi — Günlük Gündem Özeti, Ekonomi ve Kamuoyu Değerlendirmeleri</title>
-    <meta name="description" content="Türkiye gündemi, ekonomi kararları, maaş ve enflasyon gelişmeleri ile dış politika konularında her gün 10:00, 15:00 ve 19:00'da hazırlanan sade, anlaşılır gündem analizleri.">
+    <title>Gündem Analizi — Özel Dosyalar ve Gündem Değerlendirmeleri</title>
+    <meta name="description" content="Türkiye ve dünya gündeminde öne çıkan gelişmelerin kapsamlı analizleri, arka plan dosyaları ve değerlendirmeleri.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/analiz">
     <link rel="icon" type="image/png" href="/assets/logo.png">
@@ -35,9 +35,6 @@
                     <span class="text-xl font-black tracking-tight text-slate-900 flex items-center gap-1">
                         GÜNDEM <span class="text-red-600">ANALİZİ</span>
                     </span>
-                    <p class="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                        Günün Özeti • Ekonomi • Türkiye Gündemi
-                    </p>
                 </div>
             </a>
 
@@ -48,8 +45,9 @@
                 </a>
                 <a href="/?kategori=Gündem" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Gündem</a>
                 <a href="/?kategori=Ekonomi" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Ekonomi</a>
+                <a href="/?kategori=Teknoloji" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Teknoloji</a>
+                <a href="/?kategori=Otomobil" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Otomobil</a>
                 <a href="/?kategori=Dünya" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Dünya</a>
-                <a href="/?kategori=Eğitim" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Eğitim</a>
                 <a href="/piyasalar" class="px-2.5 py-1.5 rounded-lg hover:text-red-600 hover:bg-slate-100 transition">Piyasalar</a>
             </nav>
 
@@ -63,44 +61,32 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
 
-        <!-- SADE VE ANLAŞILIR ÜST BAŞLIK KUTUSU -->
+        <!-- SADE ÜST BAŞLIK -->
         <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-xs">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <span class="inline-block px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 text-xs font-extrabold uppercase tracking-wider mb-2">
-                        GÜNLÜK GÜNDEM &amp; EKONOMİ DEĞERLENDİRMELERİ
-                    </span>
-                    <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-                        Türkiye Gündemi ve Ekonomi Analizleri
-                    </h1>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 max-w-3xl leading-relaxed">
-                        Her gün saat <strong>10:00 (Sabah Gündemi)</strong>, <strong>15:00 (Gün Ortası Değerlendirmesi)</strong> ve <strong>19:00 (Akşam Özeti)</strong> dilimlerinde Türkiye'deki resmi kararların, ekonomik gelişmelerin ve dış politika başlıklarının sade, anlaşılır özet ve analizlerini burada okuyabilirsiniz.
-                    </p>
-                </div>
-
-                <!-- Sade Kategori Filtre Butonları (Sadece Gündem, Ekonomi, Dünya) -->
-                <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold shrink-0" id="dossier-filters">
-                    <button type="button" onclick="filterDossiers('ALL', this)" class="dossier-filter-btn px-3.5 py-2 rounded-xl bg-red-600 text-white font-extrabold shadow-xs cursor-pointer transition">Tümü</button>
-                    <button type="button" onclick="filterDossiers('Analiz', this)" class="dossier-filter-btn px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-red-400 cursor-pointer transition">Günlük Gündem Özeti</button>
-                    <button type="button" onclick="filterDossiers('Ekonomi', this)" class="dossier-filter-btn px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-red-400 cursor-pointer transition">Ekonomi &amp; Geçim</button>
-                    <button type="button" onclick="filterDossiers('Gündem', this)" class="dossier-filter-btn px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-red-400 cursor-pointer transition">Türkiye Gündemi</button>
-                    <button type="button" onclick="filterDossiers('Dünya', this)" class="dossier-filter-btn px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-red-400 cursor-pointer transition">Dünya &amp; Diplomasi</button>
-                </div>
+            <div class="flex items-center gap-2.5 mb-2">
+                <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
+                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 uppercase">
+                    GÜNDEM ANALİZİ
+                </h1>
             </div>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
+                Türkiye ve dünya gündeminde öne çıkan kararların, kritik gelişmelerin ve kamuoyunu ilgilendiren başlıkların kapsamlı analiz dosyaları.
+            </p>
         </section>
 
-        <!-- ANALİZ YAZILARI LİSTESİ (SADE, TEMİZ, KARIŞIK ROZET YOK) -->
+        <!-- ANALİZ YAZILARI LİSTESİ -->
         <section>
+            {% if radar.dossiers and radar.dossiers|length > 0 %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dossier-grid">
                 {% for d in radar.dossiers %}
-                <article class="dossier-card bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col justify-between shadow-xs" data-cat="{{ d.category }}">
+                <article class="dossier-card bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col justify-between shadow-xs">
                     <div>
                         <a href="/haber/{{ d.slug }}" class="block relative h-52 overflow-hidden bg-slate-100">
                             {% if d.image_path %}
                             <img src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" class="w-full h-full object-cover hover:scale-105 transition duration-500">
                             {% endif %}
                             <span class="absolute top-3 left-3 px-3 py-1 rounded-lg bg-red-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow">
-                                {{ 'Günün Özeti & Analiz' if d.category == 'Analiz' else d.category }}
+                                Gündem Analizi
                             </span>
                         </a>
 
@@ -123,15 +109,20 @@
                     </div>
 
                     <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between text-xs">
-                        <span class="font-bold text-slate-600">Gündem Analizi Masası</span>
+                        <span class="font-bold text-slate-600">Gündem Analizi</span>
                         <a href="/haber/{{ d.slug }}" class="font-extrabold text-red-600 hover:text-red-700 flex items-center gap-1">
-                            <span>Yazıyı Oku</span>
+                            <span>Analizi Oku</span>
                             <span>→</span>
                         </a>
                     </div>
                 </article>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-600 text-sm">
+                Yeni dönem Gündem Analizi dosyaları belirlenen yayın dilimlerinde burada yer alacaktır.
+            </div>
+            {% endif %}
         </section>
 
     </main>
@@ -141,8 +132,6 @@
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2">
                 <span class="font-black text-white">GÜNDEM ANALİZİ</span>
-                <span>•</span>
-                <span>Günlük Gündem ve Ekonomi Değerlendirmeleri</span>
             </div>
             <div class="flex flex-wrap items-center gap-4">
                 <a href="/" class="hover:text-white transition">Ana Sayfa</a>
@@ -152,26 +141,5 @@
             </div>
         </div>
     </footer>
-
-    <script>
-        function filterDossiers(cat, btnEl) {
-            var cards = document.querySelectorAll('#dossier-grid .dossier-card');
-            cards.forEach(function(c) {
-                var cCat = c.getAttribute('data-cat') || '';
-                if (cat === 'ALL' || cCat === cat) {
-                    c.style.display = 'flex';
-                } else {
-                    c.style.display = 'none';
-                }
-            });
-            var btns = document.querySelectorAll('#dossier-filters .dossier-filter-btn');
-            btns.forEach(function(b) {
-                b.className = 'dossier-filter-btn px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-red-400 cursor-pointer transition';
-            });
-            if (btnEl) {
-                btnEl.className = 'dossier-filter-btn px-3.5 py-2 rounded-xl bg-red-600 text-white font-extrabold shadow-xs cursor-pointer transition';
-            }
-        }
-    </script>
 </body>
 </html>

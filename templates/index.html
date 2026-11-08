@@ -523,14 +523,14 @@
             </div>
         </section>
 
-                <!-- 5.5 📋 GÜNDEM & EKONOMİ ANALİZİ (SADE, OKUNAKLI, SADECE GÜNDEM VE EKONOMİ DEĞERLENDİRMELERİ) -->
-        {% if radar and radar.dossiers and radar.dossiers|length >= 3 %}
+                        <!-- 5.5 📋 GÜNDEM ANALİZİ (SADECE GERÇEK GÜNDEM ANALİZİ YAZILARI) -->
+        {% if radar and radar.dossiers and radar.dossiers|length >= 1 %}
         <section class="pt-6 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
-                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
-                        GÜNDEM &amp; EKONOMİ ANALİZİ <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Sabah (10:00), Öğle (15:00) ve Akşam (19:00) Günün Özeti &amp; Değerlendirmeler</span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                        GÜNDEM ANALİZİ
                     </h2>
                 </div>
                 <a href="/analiz" class="text-xs font-extrabold text-red-600 hover:underline transition flex items-center gap-1">
@@ -547,7 +547,7 @@
                             <img src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
-                                {{ 'Gündem Analizi' if d.category == 'Analiz' else d.category }}
+                                Gündem Analizi
                             </span>
                         </a>
                         <div class="p-4">

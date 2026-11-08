@@ -1089,7 +1089,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
                 (cat_norm, cat_norm, category.strip(), limit, offset)
             )
             rows = [_row_to_dict(row) for row in cur.fetchall()]
-            if not rows and offset == 0:
+            if not rows and offset == 0 and cat_norm != 'Analiz':
                 kw = cat_norm.lower()
                 cur = conn.execute(
                     """SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles 
