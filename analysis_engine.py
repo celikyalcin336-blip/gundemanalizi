@@ -300,11 +300,17 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
 
     synth_pool = database.get_articles(limit=18, category="Analiz")
     if not synth_pool or not any((x.get("category") or "").strip() == "Analiz" for x in synth_pool):
-        try:
-            ensure_daily_synthesis_reports(force=True)
-            synth_pool = database.get_articles(limit=18, category="Analiz")
-        except Exception as _e:
-            print(f"İlk Analiz otomatik üretim uyarısı: {_e}")
+        if not globals().get("_BG_ANALIZ_RUNNING"):
+            globals()["_BG_ANALIZ_RUNNING"] = True
+            import threading
+            def _bg_gen():
+                try:
+                    ensure_daily_synthesis_reports(force=True)
+                except Exception as _e:
+                    print(f"İlk Analiz arka plan üretim uyarısı: {_e}")
+                finally:
+                    globals()["_BG_ANALIZ_RUNNING"] = False
+            threading.Thread(target=_bg_gen, daemon=True).start()
     dossiers = []
     for s in (synth_pool or []):
         # Çift güvenlik: Sadece gerçek kategorisi 'Analiz' olanları kabul et
@@ -406,10 +412,6 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
         img_p = (a.get("image_path") or "").strip()
         if not img_p:
             continue
-        img_name = img_p.replace("\\", "/").split("/")[-1]
-        raw_img = database.get_image(img_name)
-        if not raw_img or len(raw_img) < 8000:
-            continue
 
         # Öncelik puanı: Ekonomi, Gündem, Dünya, Eğitim ve rakam/veri içeren ciddi kararlar en üstte
         cat_weight = {"Ekonomi": 40, "Gündem": 35, "Dünya": 32, "Eğitim": 30, "Otomobil": 22, "Teknoloji": 20, "Sağlık": 20, "Spor": 10}.get(cat, 15)
@@ -427,11 +429,8 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
                 continue
             img_p = (a.get("image_path") or "").strip()
             if img_p:
-                img_name = img_p.replace("\\", "/").split("/")[-1]
-                raw_img = database.get_image(img_name)
-                if raw_img and len(raw_img) >= 8000:
-                    candidates.append((20, a))
-                    break
+                candidates.append((20, a))
+                break
 
     if not candidates:
         return None
