@@ -434,7 +434,7 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
         from google.genai import types as genai_types
         client = genai.Client(
             api_key=config.GEMINI_API_KEY,
-            http_options=genai_types.HttpOptions(timeout=40000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+            http_options=genai_types.HttpOptions(timeout=22000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
         )
     except Exception as e:
         print(f"❌ [Makale] Gemini istemcisi başlatılamadı: {e}")

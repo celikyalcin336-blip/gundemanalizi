@@ -392,7 +392,6 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
     en yüksekten en düşüğe sıralanmış paylaşılmaya hazır haberleri döner.
     Çapraz RSS mükerrerlik koruması ve 5 katmanlı dedup içerir.
     """
-    database.init_db()
     unposted_news = []
     seen_batch_slugs = set()
     seen_batch_titles = []

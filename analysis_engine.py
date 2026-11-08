@@ -675,7 +675,7 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
             from google.genai import types as genai_types
             client = genai.Client(
                 api_key=config.GEMINI_API_KEY,
-                http_options=genai_types.HttpOptions(timeout=40000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+                http_options=genai_types.HttpOptions(timeout=22000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
             )
             synth_prompt = f"""Sen 'Gündem Analizi' haber merkezinin başanalistisin.
 Aşağıdaki TEK ANA GÜNDEM KONUSUNU başka alakasız konularla karıştırmadan, kendi başına derinlemesine analiz eden

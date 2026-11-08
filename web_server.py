@@ -56,7 +56,7 @@ def bot_background_worker():
     - Harici subprocess açmaz (Render 512MB RAM sınırını aşmamak için bellek içi çalışır).
     - 60 saniyede bir kontrol eder, haber yayını sonrası gc.collect() ile RAM'i tamamen temizler.
     """
-    time.sleep(30)
+    time.sleep(8)
     print("🚀 [Otonom Bot] Arka plan haber işçisi aktif edildi (Hafif Bellek-İçi Mod)...")
     import gc
 
@@ -204,23 +204,6 @@ async def lifespan(app: FastAPI):
             _INDEX_CACHE["ts"] = 0.0
         clear_turbo_cache()
         gc.collect()
-        try:
-            import content_quality
-            with database.get_connection() as _conn:
-                _t_rows = _conn.execute("SELECT id, title FROM articles").fetchall()
-                _t_updates = []
-                for _r in _t_rows:
-                    _old_t = _r["title"] or ""
-                    _new_t = content_quality.clean_title_text(_old_t)
-                    if _new_t and _new_t != _old_t:
-                        _t_updates.append((_new_t, _r["id"]))
-                if _t_updates:
-                    with _conn:
-                        for _nt, _aid in _t_updates:
-                            _conn.execute("UPDATE articles SET title = ? WHERE id = ?", (_nt, _aid))
-                    print(f"✅ [Başlık Temizliği] {len(_t_updates)} başlık kurumsal gazetecilik diline güncellendi.")
-        except Exception as _te:
-            print(f"Başlık temizliği uyarısı: {_te}")
         try:
             import analysis_engine
             analysis_engine.seed_curated_analyses()

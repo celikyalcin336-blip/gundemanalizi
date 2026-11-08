@@ -289,13 +289,16 @@ def _run_bot_internal(max_items: int = 1, force: bool = False):
         selected_pool.extend(cat_items)
 
     processed_count = 0
+    tried_count = 0
+    MAX_CANDIDATE_ATTEMPTS = 6
     for item in selected_pool:
-        if processed_count >= max_items:
+        if processed_count >= max_items or tried_count >= MAX_CANDIDATE_ATTEMPTS:
             break
+        tried_count += 1
         title_snippet = item.get('title', '')[:45]
         cat = item.get('category', 'Gündem')
         score = item.get('score', 0)
-        print(f"🎯 [Otonom Bot] Sıradaki Kategoriden Seçilen Haber: [{cat}] {title_snippet}... (Puan: {score})")
+        print(f"🎯 [Otonom Bot] Sıradaki Kategoriden Seçilen Haber ({tried_count}/{MAX_CANDIDATE_ATTEMPTS}): [{cat}] {title_snippet}... (Puan: {score})")
         try:
             success = process_single_news(item)
             if success:
