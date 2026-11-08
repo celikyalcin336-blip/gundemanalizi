@@ -2422,7 +2422,7 @@ async def article_detail(request: Request, slug: str):
     )
 
     # Ekonomi haberlerinde sayfanın açıldığı andaki canlı piyasa verilerini göster (bizim verimiz → özgün katma değer)
-    if (article.get("category") or "") == "Ekonomi":
+    if False and (article.get("category") or "") == "Ekonomi":
         try:
             _rates = {r.get("key"): r for r in (get_market_rates().get("rates") or [])}
             _cells = ""
@@ -2452,7 +2452,7 @@ async def article_detail(request: Request, slug: str):
             print(f"Ekonomi piyasa kutusu atlandı: {_e}")
 
     # Spor haberlerinde sayfanın açıldığı andaki canlı Süper Lig İlk 5 Puan Durumu kutusunu göster (şans oyunları/emtia hariç)
-    if (article.get("category") or "") == "Spor" and not is_thin_article and not main.is_commodity_news(article.get("title", "")):
+    if False and (article.get("category") or "") == "Spor" and not is_thin_article and not main.is_commodity_news(article.get("title", "")):
         try:
             import live_services
             _sl = await asyncio.to_thread(live_services.get_live_superlig)

@@ -124,6 +124,29 @@ _BRAND_SAFETY_SUBS = [
     (re.compile(r"\bflaş\s+karar!?", re.I), "kritik karar"),
     (re.compile(r"\bflaş\s+açıklama!?", re.I), "önemli açıklama"),
     (re.compile(r"\bflaş\s+iddiası!?", re.I), "transfer iddiası"),
+    (re.compile(r"SATIŞTA!\s*BİM[’']E\s+BUGÜN\s+4\s+KAPAKLI\s+2\s+ÇEKMECELİ\s+GARDIROP\s+GELİYOR\s*\(28\s+EKİM-3\s+KASIM\)", re.I), "BİM 28 Ekim - 3 Kasım Aktüel Ürünler Kataloğu: 4 Kapaklı Gardırop Satışa Sunuldu"),
+    (re.compile(r"BİM[’']E\s+KAMP\s+TERMOSU\s+GELİYOR!?\s*BİM\s+25\s+EKİM\s+PAZAR\s+AKTÜEL\s+KATALOĞU!?\s*\(BİM\s+25-31\s+EKİM\)", re.I), "BİM 25-31 Ekim Aktüel Ürünler Kataloğu: Kamp Termosu ve Outdoor Ekipmanları"),
+    (re.compile(r"BİM[’']DE\s+SABAHIN\s+ERKEN\s+SAATLERİNDE\s+KUYRUK\s+OLACAK!?\s*İŞTE\s+O\s+LİSTE!?\s*\(BİM\s+27\s+EKİM-2\s+KASIM\)", re.I), "BİM 27 Ekim - 2 Kasım Aktüel Ürünler Kataloğu ve İndirimli Ürün Listesi"),
+    (re.compile(r"GALATASARAY\s+HABERİ:\s*Transferi\s+Lemina\s+bitirecek!?\s*Arkadaşını\s+getiriyor\.{0,3}", re.I), "Galatasaray'da Transfer Planlaması: Mario Lemina'dan Kadro Takviyesi Hamlesi"),
+    (re.compile(r"Fenerbahçe'de\s+Guendouzi-Kante\s+dönemi\s+bitiyor!?\s*Ocak\s+ayında\s+orta\s+sahaya\s+düşünülen\s+2\s+transfer\.{0,3}", re.I), "Fenerbahçe'de Guendouzi ve Kante Sonrası Ocak Ayı Orta Saha Transfer Planı"),
+    (re.compile(r"Galatasaray'a\s+Fenerbahçe\s+logosu\s+cezası!?\s*Derbideki\s+o\s+detay\.{0,3}", re.I), "Galatasaray'a PFDK'dan Derbi Sevk Kararı ve Disiplin Süreci"),
+    (re.compile(r"Emre\s+Belözoğlu'ndan\s+Fenerbahçe\s+kararı!?\s*Eğer\s+teklif\s+gelirse\.{0,3}", re.I), "Emre Belözoğlu'ndan Fenerbahçe ve Teknik Direktörlük Geleceği Hakkında Açıklama"),
+    (re.compile(r"Galatasaray'ın\s+radarında\s+50\s+milyon\s+euroluk\s+Alman\s+cevheri!?\s*Said\s+El\s+Mala\.{0,3}", re.I), "Galatasaray'ın Transfer Gündeminde Genç Yetenek Said El Mala İddiası"),
+    (re.compile(r"Fenerbahçe'de\s+hayal\s+kırıklığı\s+yaratan\s+gerçek!?\s*Greenwood\.{0,3}", re.I), "Fenerbahçe'nin Transfer Gündemindeki Mason Greenwood Dosyasında Son Durum"),
+    (re.compile(r"Fenerbahçe'de\s+Greenwood\s+sıkıntısı!?\s*Tıpkı\s+İngiltere'deki\s+gibi\.{0,3}", re.I), "Fenerbahçe'nin Mason Greenwood Transfer Girişiminde Maliyet ve Süreç Detayları"),
+    (re.compile(r"Beşiktaş'ta\s+orta\s+saha\s+problemi!?\s*Orkun\s+ve\s+Miretti'nin\s+sakatlığı\s+sonrası\.{0,3}", re.I), "Beşiktaş'ta Orkun ve Miretti'nin Sakatlığı Sonrası Orta Saha Rotasyonu"),
+    (re.compile(r"Bilgisayar\s+satışlarında\s+sert\s+düşüş:\s*Sadece\s+Apple\s+ve\s+ASUS\.{0,3}", re.I), "Küresel Bilgisayar Satışlarında Daralma: Apple ve ASUS Pazar Payını Korudu"),
+    (re.compile(r"Trafik\s+cezası,\s*pasaport,\s*MTV,\s*yurt\s+dışı\s+telefon\s+kaydı\.{0,3}\s*Cep\s+yakacak\s+zam\s+yolda!?", re.I), "Yeniden Değerleme Oranıyla Trafik Cezası, Pasaport, MTV ve IMEI Harçlarında Yeni Tarifeler"),
+    (re.compile(r"Eski\s+erkek\s+arkadaşı\s+uzaklaştırılamadı\.{0,3}\s*Kumsal'ı\s+da\s+kaybettik", re.I), "Uzaklaştırma Kararı Bulunan Şüpheli Hakkında Ağırlaştırılmış Adli Soruşturma"),
+    (re.compile(r"Araç\s+uçuruma\s+yuvarlandı\.{0,3}\s*Eylül\s+ve\s+Kerim\s+kaza\s+kurbanı!?", re.I), "Kontrolden Çıkan Aracın Uçuruma Yuvarlandığı Trafik Kazasında 2 Kişi Hayatını Kaybetti"),
+    (re.compile(r"Telefonların\s+kamerası\s+da\s+açıldı\.{0,3}\s*Vatandaşın\s+ölü\s+merakı", re.I), "Olay Yerlerinde Güvenlik Çemberi ve Adli İnceleme Sürecinde Yaşanan Yoğunluk"),
+    (re.compile(r"Yasa\s+dışı\s+üreme\s+hücresi\s+ticareti\s+soruşturması\s+sürüyor\.{0,3}.*", re.I), "İstanbul'da Yasa Dışı Biyolojik Materyal Ticareti Soruşturmasında İddianame Detayları"),
+    (re.compile(r"11\s+aylık\s+bebeği\s+vardı\.{0,3}\s*Bir\s+kadına\s+kıydılar", re.I), "Aile İçi Şiddet Soruşturmasında Şüpheli Gözaltına Alındı"),
+    (re.compile(r"Böyle\s+arkadaş\s+olmaz\s+olsun!?\s*Anahtarı\s+kopyaladılar", re.I), "Ev Anahtarını Kopyalayarak Hırsızlık Yaptığı İddia Edilen Şüphelilere Adli İşlem"),
+    (re.compile(r"Kamyon\s+evleri\s+yıktı!?\s*(?:Ağır|Dehşete\s+düşüren)\s+kazada\s+acı\s+haber!?", re.I), "Freni Boşalan Kamyonun Evlere Çarptığı Trafik Kazasında Adli Soruşturma Başlatıldı"),
+    (re.compile(r"Otomobil\s+dereye\s+uçtu!?\s*Korkunç\s+kaza!?", re.I), "Kontrolden Çıkan Otomobilin Dere Yatağına Devrildiği Kazada Ekipler Seferber Oldu"),
+    (re.compile(r"Doktorlar\s+['’]sabaha\s+çıkmaz['’]\s+demişti!?\s*Resim.*", re.I), "Yoğun Bakım Tedavisinin Ardından Sanata Yönelen Hastanın İyileşme Öyküsü"),
+    (re.compile(r"Kapanış\s+İbadı", re.I), "Kapanış İdmanı"),
     (re.compile(r"\bflaş\s+", re.I), "dikkat çeken "),
 ]
 
@@ -145,7 +168,14 @@ def clean_title_text(text: str) -> str:
     t = re.sub(r"```[a-zA-Z0-9_-]*", "", t).replace("```", "").replace("**", "")
     t = fix_brand_splits(t)
     t = soften_sensitive_terms(t)
-    t = re.sub(r"\s+", " ", t).strip(" -–—|:;,")
+    # Tık tuzağı üç nokta (...) ve ünlem (!) işaretlerini kurumsal noktalama ile değiştir
+    t = re.sub(r"\s*(?:\.{2,}|…)+\s*$", "", t)
+    t = re.sub(r"\s*(?:\.{2,}|…)+\s+", ": ", t)
+    t = re.sub(r"!+\s*$", "", t)
+    if "!" in t:
+        t = re.sub(r"!+\s+", ": " if ":" not in t else " — ", t)
+        t = t.replace("!", "")
+    t = re.sub(r"\s+", " ", t).strip(" -–—|:;,!")
     return t.strip()
 
 
@@ -317,9 +347,20 @@ def clean_article_html(content: str) -> str:
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p, c, flags=re.S)
 
     # 3.5) Ara başlıklardaki (h2/h3) marka bölünmelerini ve sembolleri düzelt
+    _GENERIC_H3_MAP = {
+        "giriş": "Olayın Ayrıntıları ve İlk Bulgular",
+        "gelişme": "Saha Verileri ve Sürecin Detayları",
+        "sonuç": "Resmi Süreç ve Beklenen Adımlar",
+        "değerlendirme": "Sektörel ve Toplumsal Yansımalar",
+        "neler oldu": "Gelişmenin Somut Detayları",
+        "arka plan": "Sürecin Arka Planı ve Önceki Kararlar",
+    }
     def _fix_heading(m):
         tag, attrs, inner = m.group(1), m.group(2), m.group(3)
         inner = clean_title_text(inner)
+        low_h = inner.strip(" ?:.-").lower()
+        if low_h in _GENERIC_H3_MAP:
+            inner = _GENERIC_H3_MAP[low_h]
         return f"<{tag}{attrs}>{inner}</{tag}>"
     c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _fix_heading, c, flags=re.S | re.I)
 
