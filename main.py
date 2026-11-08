@@ -35,10 +35,9 @@ def process_single_news(item: dict) -> bool:
     image_url = item.get("image_url")
     news_hash = item["hash"]
 
-    # 🛡️ ÇELİK MÜKERRER KALKANI: Haberi atomik olarak anında rezerve et (Pre-claim Lock)
-    # (Başka bir thread veya yeni deploy konteyneri 13.5 dk bekleme süresince ASLA aynı haberi alamaz!)
-    if not database.claim_news_for_processing(news_hash, title=title, source=source, link=link):
-        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış veya başka bir işlem tarafından rezerve edilmiş. Atlanıyor.")
+    # 🛡️ ÇELİK MÜKERRER KALKANI: Önce daha önce yayınlanıp yayınlanmadığını kontrol et
+    if database.is_already_posted(news_hash, title=title, link=link):
+        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış. Atlanıyor.")
         return False
 
     print("\n" + "="*60)
@@ -58,6 +57,7 @@ def process_single_news(item: dict) -> bool:
         candidate_images.append(image_url)
 
     if not candidate_images:
+        database.claim_news_for_processing(news_hash, title=title, source=source, link=link)
         print(f"⛔ [KESİN EMİR - GÖRSELSİZ HABER ENGELLENDİ] '{title[:50]}' kaynağında hiç fotoğraf adayı yok! Yayınlanmadı.")
         return False
 
@@ -74,6 +74,7 @@ def process_single_news(item: dict) -> bool:
         or os.path.getsize(visual_path) < 8000
         or image_generator.is_synthetic_card_image(visual_path)
     ):
+        database.claim_news_for_processing(news_hash, title=title, source=source, link=link)
         print(f"⛔ [KESİN EMİR - GÖRSEL KALİTE KALKANI] '{title[:50]}' için gerçek ve net haber fotoğrafı doğrulanamadı; görselsiz/kartlı paylaşım kesinlikle engellendi!")
         return False
     print(f"   ✅ [Gerçek Fotoğraf Doğrulandı: {visual_path} ({os.path.getsize(visual_path) // 1024} KB)]")
@@ -93,6 +94,11 @@ def process_single_news(item: dict) -> bool:
 
     if len(clean_t) < 15 or content_quality.visible_word_count(clean_c) < 250:
         print(f"⛔ [KESİN EMİR - YETERSİZ İÇERİK ENGELLENDİ] '{clean_t[:50]}' kelime/başlık barajını geçemedi; yayınlanmadı.")
+        return False
+
+    # Makale ve görsel tam hazır olduğunda atomik olarak rezerve et
+    if not database.claim_news_for_processing(news_hash, title=title, source=source, link=link):
+        print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' başka bir işlem tarafından rezerve edilmiş. Atlanıyor.")
         return False
 
     article_data["title"] = clean_t

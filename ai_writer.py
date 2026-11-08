@@ -361,7 +361,7 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         return None
 
     source_text = (summary or "").strip()
-    if len(source_text.split()) < 28:
+    if len(f"{title} {source_text}".split()) < 18:
         print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
         return None
 
@@ -443,7 +443,7 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
     import content_quality
     model_chain = [m.strip() for m in os.getenv(
         "GEMINI_ARTICLE_MODELS",
-        "gemini-2.5-flash,gemini-flash-latest,gemini-2.0-flash,gemini-flash-lite-latest"
+        "gemini-3.1-flash-lite,gemini-flash-lite-latest,gemini-3.5-flash-lite,gemini-3.5-flash,gemini-flash-lite-latest,gemma-4-26b-a4b-it,gemini-2.5-flash"
     ).split(",") if m.strip()]
     for m_name in model_chain:
         try:
@@ -469,7 +469,7 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
             gen_content = content_quality.clean_article_html(content_part.strip())
 
             words = content_quality.visible_word_count(gen_content)
-            if words < 350:
+            if words < 260:
                 print(f"⚠️ [Makale] {m_name} metni kısa kaldı ({words} kelime), tekrar deneniyor.")
                 continue
             if len(gen_summary) < 40:
