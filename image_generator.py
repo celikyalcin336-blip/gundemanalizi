@@ -199,13 +199,13 @@ def search_editorial_web_image_candidates(title: str, category: str = "", max_re
         if words:
             queries.append(words[0])
         for q in queries:
-            url = f'https://www.bing.com/images/search?q={urllib.parse.quote(q)}&first=1'
+            url = f'https://www.bing.com/images/search?q={urllib.parse.quote(q)}&qft=+filterui:aspect-wide+filterui:imagesize-large&first=1'
             r = requests.get(url, headers=headers, timeout=5)
             murls = re.findall(r'murl&quot;:&quot;(https?://[^&]+?\.(?:jpg|jpeg|png|webp))&quot;', r.text)
             if not murls:
                 murls = re.findall(r'"murl":"(https?://[^"]+?\.(?:jpg|jpeg|png|webp))"', r.text)
             for candidate in murls:
-                if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector', 'icon', 'logo', 'placeholder']):
+                if any(b in candidate.lower() for b in ['stock', 'alamy', 'shutterstock', 'dreamstime', 'vector', 'icon', 'logo', 'placeholder', 'pinimg', 'pinterest', 'blogspot', 'trendtesettur', 'alvina', 'sorsware', 'trendyol', 'hepsiburada', 'n11', 'ciceksepeti', 'yenibirlik', 'oncevatan', 'yeniakit', 'kose-yazisi', '/yazar/', 'köşe']):
                     continue
                 if candidate not in candidates:
                     candidates.append(candidate)

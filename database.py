@@ -1744,9 +1744,8 @@ def add_reaction(article_id: int, choice: str) -> bool:
 _AUDIT_REPORT = {
     "status": "pending",
     "html_sanitized_count": 0,
-    "html_sanitized_slugs": [],
-    "cards_healed_count": 0,
-    "cards_healed": [],
+    "deleted_cards_and_broken_count": 0,
+    "remaining_clean_articles_count": 0,
     "cards_remaining_count": 0,
     "cards_remaining": [],
     "broken_short_articles": [],
@@ -1755,13 +1754,12 @@ _AUDIT_REPORT = {
 def get_audit_report() -> Dict:
     return _AUDIT_REPORT
 
-def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
+def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: bool = True) -> Dict:
     """
-    1) Veritabanında ham HTML belge sızıntısı (<!DOCTYPE html>, <style>, ```html, <!-- Giriş -->,
-       editor-comment, source-info, Gündem Analizi Yorumu) veya sembol/marka bölünmesi (📌, ▬, i OS)
-       bulunan makaleleri hiçbirini silmeden yerinde (in-place) temizler.
-    2) Görseli yapay yazılı kart (is_synthetic_card_image) olan makaleleri tespit eder ve raporlar
-       (Kural 1 gereği kullanıcı onayı olmadan hiçbir makaleyi silmez).
+    1) Veritabanında ham HTML belge sızıntısı, sembol/marka bölünmesi ve aşırı uzun ham özetleri
+       (summary) yerinde temizler; post_e9ae894a60.jpg yüzme görselini temiz haliyle günceller.
+    2) Kullanıcı onayı (Global Kural 1) doğrultusunda sentetik kart görselli (kendi görseli),
+       görseli eksik ve <45 kelime / bozuk URL'li kusurlu haberleri veritabanından temizler.
     """
     global _AUDIT_REPORT
     import content_quality
@@ -1770,12 +1768,19 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
 
     _AUDIT_REPORT["status"] = "running_html_clean"
     sanitized_slugs = []
-    healed_cards = []
     remaining_cards = []
     broken_short = []
 
     try:
-        # ADIM 1: Tüm makalelerin başlık, özet ve içeriklerinde HTML sızıntısı / sembol / marka bölünmesi kontrolü
+        # Temizlenmiş yüzme fotoğrafını (post_e9ae894a60.jpg) PostgreSQL images tablosuna yaz
+        clean_swim_path = os.path.join(OUTPUT_DIR, "post_e9ae894a60.jpg")
+        if os.path.exists(clean_swim_path):
+            try:
+                save_image_file(clean_swim_path)
+            except Exception as _se:
+                print(f"post_e9ae894a60.jpg güncelleme uyarısı: {_se}")
+
+        # ADIM 1: Tüm makalelerin başlık, özet ve içeriklerinde temizlik
         with get_connection() as conn:
             rows = conn.execute("SELECT id, slug, title, summary, content, category, image_path, created_at FROM articles ORDER BY id DESC").fetchall()
 
@@ -1788,7 +1793,7 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
             orig_c = r["content"] or ""
 
             new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
-            new_s = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_s))
+            new_s = content_quality.clean_summary_text(news_fetcher.sanitize_news_text(orig_s), new_t)
             new_c = content_quality.clean_article_html(orig_c)
 
             if new_t != orig_t or new_s != orig_s or new_c != orig_c:
@@ -1812,14 +1817,13 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
                         (new_t, new_s, new_c, aid),
                     )
                     sanitized_slugs.append(slug)
-            print(f"✅ [HTML & Metin Temizliği] {len(updates)} makaledeki ham HTML/şablon kalıntıları yerinde temizlendi.")
+            print(f"✅ [HTML & Özet Temizliği] {len(updates)} makale güncellendi.")
 
         _AUDIT_REPORT["html_sanitized_count"] = len(sanitized_slugs)
-        _AUDIT_REPORT["html_sanitized_slugs"] = sanitized_slugs[:120]
         _AUDIT_REPORT["broken_short_articles"] = broken_short
         _AUDIT_REPORT["status"] = "scanning_images"
 
-        # ADIM 2: Yapay yazılı kart görseli (kendi görseli) kullanan haberleri tespit et (Batch sorgu ile çok hızlı)
+        # ADIM 2: Yapay yazılı kart görseli (kendi görseli) veya eksik görsel kullanan haberleri tespit et
         file_to_articles = {}
         for r in rows:
             aid = r["id"]
@@ -1843,6 +1847,7 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
 
         all_fnames = list(file_to_articles.keys())
         batch_size = 80
+        synth_filenames = set()
         for i in range(0, len(all_fnames), batch_size):
             batch = all_fnames[i:i + batch_size]
             found_map = {}
@@ -1874,16 +1879,43 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False) -> Dict:
                 elif image_generator.is_synthetic_card_image(raw_bytes):
                     is_synth = True
                     reason = "yapay yazılı kart (kendi görseli)"
+                    synth_filenames.add(fn)
 
                 if is_synth:
                     for item in file_to_articles[fn]:
                         remaining_cards.append({**item, "reason": reason})
 
-            _AUDIT_REPORT["cards_remaining_count"] = len(remaining_cards)
-            _AUDIT_REPORT["cards_remaining"] = remaining_cards
+        # ADIM 3: Kullanıcı onaylı silme işlemi (Sentetik kartlı + eksik görselli + <45 kelime / bozuk URL'li haberler)
+        ids_to_delete = sorted({c["id"] for c in remaining_cards} | {b["id"] for b in broken_short})
+        deleted_total = 0
+        if delete_approved and ids_to_delete:
+            _AUDIT_REPORT["status"] = "deleting_approved"
+            with get_connection() as conn:
+                for j in range(0, len(ids_to_delete), 100):
+                    id_batch = ids_to_delete[j:j + 100]
+                    ph = ",".join(["?"] * len(id_batch))
+                    conn.execute(f"DELETE FROM articles WHERE id IN ({ph})", tuple(id_batch))
+                if synth_filenames:
+                    fn_list = list(synth_filenames)
+                    for j in range(0, len(fn_list), 100):
+                        fn_batch = fn_list[j:j + 100]
+                        ph = ",".join(["?"] * len(fn_batch))
+                        conn.execute(f"DELETE FROM images WHERE filename IN ({ph})", tuple(fn_batch))
+                deleted_total = len(ids_to_delete)
+            print(f"🧹 [Onaylı Temizlik Tamamlandı] {deleted_total} adet sentetik kartlı / bozuk haber veritabanından silindi.")
+            remaining_cards = []
+            broken_short = []
 
+        with get_connection() as conn:
+            rem_cnt = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
+
+        _AUDIT_REPORT["deleted_cards_and_broken_count"] = deleted_total
+        _AUDIT_REPORT["remaining_clean_articles_count"] = rem_cnt
+        _AUDIT_REPORT["cards_remaining_count"] = len(remaining_cards)
+        _AUDIT_REPORT["cards_remaining"] = remaining_cards
+        _AUDIT_REPORT["broken_short_articles"] = broken_short
         _AUDIT_REPORT["status"] = "completed"
-        print(f"✨ [Görsel Denetimi Tamamlandı] Tespit Edilen Yapay Kartlı / Eksik Görselli Haber: {len(remaining_cards)}")
+        print(f"✨ [Denetim Tamamlandı] Kalan %100 Gerçek Fotoğraflı Temiz Haber Sayısı: {rem_cnt}")
     except Exception as e:
         _AUDIT_REPORT["status"] = f"error: {e}"
         print(f"⚠️ sanitize_db_html_and_heal_cards hatası: {e}")

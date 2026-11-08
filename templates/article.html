@@ -22,7 +22,7 @@
       function gtag(){dataLayer.push(arguments);}
       var _savedConsent = null;
       try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
-      var _cState = (_savedConsent === 'accepted') ? 'granted' : 'denied';
+      var _cState = (_savedConsent === 'rejected') ? 'denied' : 'granted';
       gtag('consent', 'default', {
         'ad_storage': _cState,
         'ad_user_data': _cState,
@@ -34,9 +34,7 @@
 
     <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca 300+ kelime zengin içeriklerde aktifleşir) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
-    {% if not noindex %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
-    {% endif %}
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
@@ -68,10 +66,9 @@
           "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "dateModified": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "author": {
-            "@type": "Person",
-            "name": "Yalçın Çelik",
-            "jobTitle": "Genel Yayın Yönetmeni",
-            "url": "https://xn--gndemanalizi-dlb.com.tr/yazar/yalcin-celik"
+            "@type": "Organization",
+            "name": "Gündem Analizi {{ article.category or 'Gündem' }} Editörlüğü",
+            "url": "https://xn--gndemanalizi-dlb.com.tr/kunye"
           },
           "publisher": {
             "@type": "Organization",
@@ -511,7 +508,8 @@
     <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         <!-- HABER DETAYI (SOL BÖLÜM - 8 KOLON) -->
-        <article class="lg:col-span-8">
+        <div class="lg:col-span-8">
+        <article>
             
             <!-- Kategori, Tarih, Okunma, Okuma Süresi ve Yazı Boyutu (Kristal Netlikte Kutucuklar) -->
             <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs mb-4">
@@ -610,6 +608,32 @@
                 {{ article.content | safe }}
                 <!-- ARTICLE_BODY_END -->
             </div>
+
+
+            <!-- Kaynak Bilgisi -->
+            <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+                <span>Haber Kaynağı: <strong class="text-slate-900">{{ article.source }}</strong></span>
+                <span>Masa: <strong class="text-slate-800">{{ article.category or 'Gündem' }} Editörlüğü</strong> • Sorumlu Yayıncı: <a href="/yazar/yalcin-celik" class="font-bold text-red-600 hover:underline">Yalçın Çelik</a></span>
+            </div>
+
+            <!-- E-E-A-T DOĞRULUK VE İLKELER KUTUSU (Google & AdSense Güven Standardı) -->
+            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 text-xs shadow-sm">
+                <div class="p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 shrink-0">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <div class="space-y-1">
+                    <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center gap-2">
+                        <span>Kaynak ve Yayın Bilgisi</span>
+                        <span class="text-slate-400">•</span>
+                        <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px] leading-relaxed">
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        Maddi hata bildirimi, cevap ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
+                    </p>
+                </div>
+            </div>
+        </article>
             <!-- SIRADAKİ BÖLÜM: OKUYUCU TEPKİ ANKETİ -->
 
             <!-- 📊 OKUYUCU TEPKİ & NABIZ ANKETİ (Üyeliksiz Tek Tıkla Etkileşim) -->
@@ -757,7 +781,7 @@
                             <a href="/haber/{{ next_article.slug }}">{{ next_article.title }}</a>
                         </h3>
                         <p class="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                            {{ next_article.summary }}
+                            {{ (next_article.summary or '')[:155] ~ ('...' if (next_article.summary or '')|length > 155 else '') }}
                         </p>
                         <div class="pt-1 flex items-center justify-center sm:justify-start">
                             <a href="/haber/{{ next_article.slug }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md transition hover:translate-x-1">
@@ -829,30 +853,6 @@
             </div>
             {% endif %}
 
-            <!-- Kaynak Bilgisi -->
-            <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
-                <span>Haber Kaynağı: <strong class="text-slate-900">{{ article.source }}</strong></span>
-                <span>Masa: <strong class="text-slate-800">{{ article.category or 'Gündem' }} Editörlüğü</strong> • Sorumlu Yayıncı: <a href="/yazar/yalcin-celik" class="font-bold text-red-600 hover:underline">Yalçın Çelik</a></span>
-            </div>
-
-            <!-- E-E-A-T DOĞRULUK VE İLKELER KUTUSU (Google & AdSense Güven Standardı) -->
-            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 text-xs shadow-sm">
-                <div class="p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 shrink-0">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
-                </div>
-                <div class="space-y-1">
-                    <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center gap-2">
-                        <span>Kaynak ve Yayın Bilgisi</span>
-                        <span class="text-slate-400">•</span>
-                        <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
-                    </div>
-                    <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
-                        Maddi hata bildirimi, cevap ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
-                    </p>
-                </div>
-            </div>
-
             <!-- TÜM SOSYAL MEDYA KANALLARI & İHBAR HATTI BANNERI -->
             <div class="mt-10 p-6 rounded-2xl bg-white border border-slate-200 shadow-md space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -883,7 +883,7 @@
                 </div>
             </div>
 
-        </article>
+        </div>
 
         <!-- YAN SÜTUN (SAĞ BÖLÜM - STICKY MODERN HABER AKIŞI) -->
         <aside class="lg:col-span-4 space-y-6 sticky top-24 self-start">

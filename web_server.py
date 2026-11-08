@@ -173,7 +173,9 @@ async def lifespan(app: FastAPI):
     threading.Thread(target=archive_rewriter.background_worker, daemon=True).start()
     def _bg_sanitize_and_heal():
         time.sleep(6)
-        database.sanitize_db_html_and_heal_cards(heal_cards=False)
+        database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=True)
+        _IMAGE_MEM_CACHE.clear()
+        _INDEX_MEMO.clear()
         clear_turbo_cache()
         _INDEX_CACHE["ts"] = 0.0
     threading.Thread(target=_bg_sanitize_and_heal, daemon=True).start()
@@ -2265,9 +2267,9 @@ async def article_detail(request: Request, slug: str):
     import content_quality
     import html as _html_mod
     article["title"] = content_quality.clean_title_text(article.get("title") or "")
-    article["summary"] = content_quality.clean_title_text(article.get("summary") or "")
+    article["summary"] = content_quality.clean_summary_text(article.get("summary") or "", article["title"])
     raw_content = content_quality.clean_article_html(raw_content)
-    is_thin_article = content_quality.visible_word_count(raw_content) < 300
+    is_thin_article = content_quality.is_thin(raw_content)
     # Loto/burç/maç saati gibi rutin "emtia" haberler sitede kalır ama Google dizinine alınmaz
     try:
         if main.is_commodity_news(article.get("title", "")):

@@ -416,3 +416,24 @@ def clean_source_name(source: str) -> str:
     if re.search(r"\s+Spor$", s, flags=re.I) and s.lower() not in ("a spor", "trt spor"):
         s = re.sub(r"\s+Spor$", "", s, flags=re.I).strip()
     return s or "Basın Kaynakları"
+
+
+def clean_summary_text(summary: str, fallback_title: str = "") -> str:
+    """
+    Özet (summary / meta description) metnini temizler; eski haberlerdeki 500-1500 karakterlik
+    ham kazınmış metin yığınlarını 1-2 cümlelik (<= 210 karakter) temiz özete indirger.
+    """
+    s = clean_title_text(summary or "")
+    s = re.sub(r"<[^>]+>", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    if len(s) > 220:
+        cut = s[:215]
+        last_dot = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+        if last_dot >= 70:
+            s = cut[:last_dot + 1].strip()
+        else:
+            last_sp = cut.rfind(" ")
+            s = (cut[:last_sp] if last_sp > 60 else cut).rstrip(" ,;:-") + "..."
+    if len(s) < 25 and fallback_title:
+        s = clean_title_text(fallback_title)
+    return s

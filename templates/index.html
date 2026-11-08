@@ -37,7 +37,7 @@
       function gtag(){dataLayer.push(arguments);}
       var _savedConsent = null;
       try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
-      var _cState = (_savedConsent === 'accepted') ? 'granted' : 'denied';
+      var _cState = (_savedConsent === 'rejected') ? 'denied' : 'granted';
       gtag('consent', 'default', {
         'ad_storage': _cState,
         'ad_user_data': _cState,

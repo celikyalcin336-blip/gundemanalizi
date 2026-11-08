@@ -29,10 +29,10 @@
         var _savedConsent = null;
         try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
         gtag('consent', 'default', {
-            'ad_storage': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
-            'ad_user_data': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
-            'ad_personalization': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
-            'analytics_storage': (_savedConsent === 'accepted' || _savedConsent === 'true') ? 'granted' : 'denied',
+            'ad_storage': (_savedConsent === 'rejected') ? 'denied' : 'granted',
+            'ad_user_data': (_savedConsent === 'rejected') ? 'denied' : 'granted',
+            'ad_personalization': (_savedConsent === 'rejected') ? 'denied' : 'granted',
+            'analytics_storage': (_savedConsent === 'rejected') ? 'denied' : 'granted',
             'wait_for_update': 500
         });
     </script>
