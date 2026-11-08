@@ -392,60 +392,119 @@ def ensure_daily_synthesis_reports() -> Optional[str]:
         f"günün en kritik {len(selected)} başlığının kapsamlı arka plan ve etki analizi."
     )
 
-    parts = []
-    parts.append(
-        f'<p class="lead font-medium text-lg text-slate-800 mb-6">'
-        f'Türkiye ve dünya gündeminde bugün takip edilen resmi kararlar, ekonomik göstergeler ve diplomatik gelişmeler '
-        f'kamuoyunun ana gündemini belirledi. Başta <strong>{_html.escape(selected[0].get("title") or "")}</strong> '
-        f'olmak üzere günün en kritik {len(selected)} gelişmesini, kararların arka planını ve toplumsal yansımalarını '
-        f'Gündem Analizi dosyasında mercek altına aldık.</p>'
-    )
-
-    parts.append('<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Gündemde Öne Çıkan Kritik Başlıklar</h3>')
-    parts.append(
-        '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
-        '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
-        '<th class="p-3 border border-slate-200">Kategori</th>'
-        '<th class="p-3 border border-slate-200">Gündem Başlığı</th>'
-        '<th class="p-3 border border-slate-200">Özet ve Bağlam</th>'
-        '</tr></thead><tbody>'
-    )
-    for item in selected:
+    table_rows = []
+    briefing_lines = []
+    for idx, item in enumerate(selected, 1):
         ic = _html.escape(item.get("category") or "Gündem")
         it = _html.escape(item.get("title") or "")
-        isum = _html.escape((item.get("summary") or "")[:140])
+        isum = _html.escape((item.get("summary") or "")[:150])
         islug = _html.escape(item.get("slug") or "")
-        parts.append(
+        table_rows.append(
             f'<tr class="border-b border-slate-200">'
             f'<td class="p-3 border border-slate-200 font-bold text-red-600">{ic}</td>'
             f'<td class="p-3 border border-slate-200 font-semibold"><a href="/haber/{islug}" class="text-slate-900 hover:text-red-600 underline">{it}</a></td>'
             f'<td class="p-3 border border-slate-200 text-slate-700">{isum}</td>'
             f'</tr>'
         )
-    parts.append('</tbody></table></div>')
-
-    for idx, item in enumerate(selected, 1):
-        it = _html.escape(item.get("title") or "")
-        isum = _html.escape(item.get("summary") or "")
-        islug = _html.escape(item.get("slug") or "")
-        ic = item.get("category") or "Gündem"
-        body_paras = []
-        for pm in re.finditer(r"<p[^>]*>(.*?)</p>", item.get("content") or "", re.S | re.I):
-            pt = _strip_tags(pm.group(1))
-            if len(pt) >= 60 and pt.lower() != (item.get("summary") or "").strip().lower():
-                body_paras.append(_html.escape(pt))
-            if len(body_paras) >= 2:
-                break
-
-        parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{idx}. {it}</h3>')
-        parts.append(
-            f'<p class="text-slate-800 leading-relaxed mb-4">{isum} '
-            f'({ic} gündemindeki bu gelişmenin tüm detaylarına <a href="/haber/{islug}" class="text-red-600 font-bold underline">ilgili haberimizden</a> ulaşabilirsiniz.)</p>'
+        briefing_lines.append(
+            f"{idx}. [{item.get('category')}] Başlık: {item.get('title')}\n"
+            f"   Link: /haber/{item.get('slug')}\n"
+            f"   Özet: {item.get('summary')}"
         )
-        if body_paras:
-            parts.append(f'<p class="text-slate-800 leading-relaxed mb-4">{" ".join(body_paras[:2])}</p>')
 
-    full_html = "\n".join(parts)
+    table_html = (
+        '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Gündemde Öne Çıkan Kritik Başlıklar ve Etki Tablosu</h3>'
+        '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+        '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+        '<th class="p-3 border border-slate-200">Alan</th>'
+        '<th class="p-3 border border-slate-200">Gündem Başlığı</th>'
+        '<th class="p-3 border border-slate-200">Temel Gelişme ve Önemi</th>'
+        '</tr></thead><tbody>'
+        + "".join(table_rows)
+        + '</tbody></table></div>'
+    )
+
+    ai_html = ""
+    try:
+        import config
+        import content_quality
+        if getattr(config, "GEMINI_API_KEY", ""):
+            from google import genai
+            from google.genai import types as genai_types
+            client = genai.Client(
+                api_key=config.GEMINI_API_KEY,
+                http_options=genai_types.HttpOptions(timeout=40000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+            )
+            synth_prompt = f"""Sen 'Gündem Analizi' haber merkezinin başanalistisin.
+Aşağıdaki {len(selected)} güncel gelişmeyi tek tek kopyalamadan; aralarındaki bağı, neden-sonuç ilişkisini,
+bu kararların Türkiye gündemine, vatandaşın günlük hayatına/bütçesine, piyasalara ve dış politikaya somut etkilerini
+sade, akıcı ve herkesin kolayca anlayabileceği bir gazetecilik diliyle analiz et.
+
+İNCELENECEK GÜNDEM BAŞLIKLARI:
+{chr(10).join(briefing_lines)}
+
+KURALLAR:
+1. En az 500-650 kelime uzunluğunda, 3 veya 4 özgün ara başlık (<h3>) ve 6-7 dolu paragraf (<p>) yaz.
+2. Haberlerin cümlelerini olduğu gibi kopyalama; bir köşe yazarı / gündem analisti gibi 'Bu gelişme ne anlama geliyor?', 'Vatandaşı ve Türkiye gündemini nasıl etkileyecek?', 'Bundan sonraki süreçte ne bekleniyor?' sorularını somut verilerle yanıtla.
+3. Metin içinde incelenen haberlere değinirken mutlaka doğal cümle içinde <a href="/haber/SLUG" class="text-red-600 font-bold underline">ilgili haber başlığı</a> şeklinde HTML iç link ver.
+4. Sadece <p>, <h3>, <strong> ve <a> HTML etiketlerini kullan. Markdown veya kod bloğu kullanma.
+
+ÇIKTI BİÇİMİ:
+[BAŞLIK]
+Gündem Analizi: (Günün en önemli gelişmesini ve genel çerçevesini yansıtan sade, güçlü başlık)
+[ÖZET]
+(2 cümlelik net analiz özeti)
+[İÇERİK]
+(HTML analiz metni)
+"""
+            for m_name in ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash"]:
+                try:
+                    res = client.models.generate_content(model=m_name, contents=synth_prompt)
+                    raw_t = (res.text or "").strip() if res else ""
+                    if raw_t and "[İÇERİK]" in raw_t:
+                        h_part, c_part = raw_t.split("[İÇERİK]", 1)
+                        if "[ÖZET]" in h_part:
+                            tp, sp = h_part.split("[ÖZET]", 1)
+                            cand_t = content_quality.clean_title_text(tp.replace("[BAŞLIK]", "").strip())
+                            cand_s = content_quality.clean_title_text(sp.strip())
+                            if 20 <= len(cand_t) <= 130:
+                                report_title = cand_t if "analiz" in cand_t.lower() else f"Gündem Analizi: {cand_t}"
+                            if len(cand_s) >= 45:
+                                lead_summary = cand_s
+                        ai_html = content_quality.clean_article_html(c_part.strip())
+                        if content_quality.visible_word_count(ai_html) >= 320:
+                            break
+                except Exception:
+                    continue
+    except Exception as _ai_e:
+        print(f"Gündem Analizi AI üretim uyarısı: {_ai_e}")
+
+    if ai_html:
+        first_p_end = ai_html.find("</p>")
+        if first_p_end != -1:
+            full_html = ai_html[: first_p_end + 4] + "\n" + table_html + "\n" + ai_html[first_p_end + 4 :]
+        else:
+            full_html = table_html + "\n" + ai_html
+    else:
+        parts = [
+            f'<p class="lead font-medium text-lg text-slate-800 mb-6">'
+            f'Türkiye ve dünya gündeminde bugün takip edilen resmi kararlar, ekonomik göstergeler ve diplomatik gelişmeler '
+            f'kamuoyunun ana gündemini belirledi. Başta <strong>{_html.escape(selected[0].get("title") or "")}</strong> '
+            f'olmak üzere günün en kritik {len(selected)} gelişmesini, kararların arka planını ve toplumsal yansımalarını '
+            f'Gündem Analizi dosyasında mercek altına aldık.</p>',
+            table_html,
+        ]
+        for idx, item in enumerate(selected, 1):
+            it = _html.escape(item.get("title") or "")
+            isum = _html.escape(item.get("summary") or "")
+            islug = _html.escape(item.get("slug") or "")
+            ic = item.get("category") or "Gündem"
+            parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{idx}. {it}</h3>')
+            parts.append(
+                f'<p class="text-slate-800 leading-relaxed mb-4">{isum} '
+                f'({ic} gündemindeki bu gelişmenin tüm detaylarına <a href="/haber/{islug}" class="text-red-600 font-bold underline">ilgili haberimizden</a> ulaşabilirsiniz.)</p>'
+            )
+        full_html = "\n".join(parts)
     slug = database.save_article(
         title=report_title,
         summary=lead_summary,
