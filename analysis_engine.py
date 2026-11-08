@@ -254,6 +254,44 @@ def compute_impact_matrix(article: Dict, clean_html: str, pills: List[Dict]) -> 
             {"label": scope_label, "pct": scope_score, "color": "bg-red-600"},
             {"label": "Veri, Rakam ve Kaynak Teyit Yoğunluğu", "pct": data_score, "color": "bg-blue-600"},
             {"label": f"Analitik Kapsam Derinliği ({wc} Kelime)", "pct": depth_score, "color": "bg-emerald-600"},
+            {
+                "title": "Onkolojide Nanoteknoloji ve Odaklanmış Ultrason Dönemi: Glioblastoma Tedavisinde Kan-Beyin Bariyeri Nasıl Aşılıyor?",
+                "summary": "Agresif beyin tümörlerinin tedavisinde kemoterapi ve immünoterapi ajanlarının etkinliğini sınırlayan kan-beyin bariyerinin, odaklanmış ultrason dalgaları ve lipid nanopartikül taşıyıcılarla aşılmasına yönelik klinik araştırmaların kapsamlı analizi.",
+                "image_path": _resolve_img("post_"),
+                "focus_slug": "glioblastoma-mucadelesinde-yeni-bir-ufuk-ultrason-ve-nanoteknoloji-birlesimi",
+                "content": (
+                    '<h3>Kan-Beyin Bariyeri: Nöro-Onkolojideki En Büyük Biyolojik Engel</h3>'
+                    '<p>Modern tıbbın ve onkolojinin son yirmi yılda akciğer, meme ve melanom gibi pek çok kanser türünde elde ettiği sağkalım başarıları, merkezi sinir sistemi tümörlerinde uzun süre aynı hızda ilerleyemedi. '
+                    'Klinik literatürde yakından takip edilen <a href="/haber/glioblastoma-mucadelesinde-yeni-bir-ufuk-ultrason-ve-nanoteknoloji-birlesimi" class="text-red-600 font-bold underline">Glioblastoma Mücadelesinde Yeni Bir Ufuk: Ultrason ve Nanoteknoloji Birleşimi</a> araştırması, '
+                    'bu direncin arkasındaki en temel fizyolojik kalkan olan kan-beyin bariyerini (BBB) cerrahi kesi olmadan geçici ve güvenli biçimde aralamanın yolunu açıyor. '
+                    'Normal şartlarda beyni toksinlerden ve patojenlerden koruyan sıkı endotel hücre bağlantıları, sistemik yolla verilen ilaç moleküllerinin %98&#39;inden fazlasının tümör dokusuna ulaşmasını engellemektedir.</p>'
+                    '<p>Özellikle yetişkinlerde en sık görülen ve hızlı seyreden primer beyin tümörü olan glioblastomada, cerrahi rezeksiyon sonrasında mikroskobik düzeyde kalan hücrelerin temizlenmesi hayati önem taşıyor. '
+                    'Standart kemoterapi protokollerinde ilacın beyin dokusunda terapötik (iyileştirici) konsantrasyona ulaşabilmesi için yüksek sistemik dozlar uygulanması gerekirken, bu durum sağlıklı organlarda ciddi yan etkilere yol açabiliyor. '
+                    'Odaklanmış ultrason (FUS) ve nanoteknoloji entegrasyonu, ilacı yalnızca hedeflenen milimetrik tümör bölgesine yoğunlaştırarak bu denklemi kökten değiştiriyor.</p>'
+                    '<h3>Mikrokabarcıklar, Akustik Kavitasyon ve Akıllı Nanopartiküller Nasıl Çalışıyor?</h3>'
+                    '<p>Geliştirilen yeni nesil biyomedikal protokol iki aşamalı bir mekanizma üzerine kuruludur. İlk aşamada hastaya damar yoluyla mikroskobik gaz kabarcıkları ve etken maddeyi taşıyan biyouyumlu nanopartiküller enjekte edilir. '
+                    'Ardından kafatası dışından MR (Manyetik Rezonans) rehberliğinde gönderilen düşük yoğunluklu odaklanmış ultrason dalgaları, yalnızca tümörün bulunduğu damar yatağındaki mikrokabarcıkları titreştirir. '
+                    'Akustik kavitasyon adı verilen bu mekanik etki, kan-beyin bariyerindeki sıkı hücre duvarlarını birkaç saatliğine mikro ölçekte esneterek nanopartiküllerin doğrudan tümör mikroçevresine sızmasını sağlar.</p>'
+                    '<p>İkinci aşamada ise beyin dokusuna geçen özel tasarımlı nanopartiküller devreye girer. Tümör hücrelerinin yüzeyindeki spesifik reseptörleri tanıyan bu taşıyıcılar, hem kemoterapi ajanlarını hem de bağışıklık sistemini uyaran immünoterapi sinyallerini doğrudan kanserli hücrenin çekirdeğine bırakır. '
+                    'Böylece sağlıklı nöronlar korunurken, tümör dokusu içindeki ilaç yoğunluğu klasik yöntemlere kıyasla katbekat artırılmış olur.</p>'
+                    '<div class="overflow-x-auto my-4"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">'
+                    '<thead><tr class="bg-slate-100 text-slate-900 font-bold">'
+                    '<th class="p-2.5 border border-slate-200">Tedavi Parametresi</th>'
+                    '<th class="p-2.5 border border-slate-200">Klasik Sistemik Kemoterapi</th>'
+                    '<th class="p-2.5 border border-slate-200">Odaklanmış Ultrason + Nanoteknoloji Yaklaşımı</th>'
+                    '</tr></thead><tbody>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Kan-Beyin Bariyeri Geçişi</td><td class="p-2.5 border border-slate-200">Çok düşük (%1-2 bandında sınırlı difüzyon)</td><td class="p-2.5 border border-slate-200">Hedefli bölgede geçici ve kontrollü geçirgenlik artışı</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Hedefleme Hassasiyeti</td><td class="p-2.5 border border-slate-200">Tüm vücuda dağılan sistemik maruziyet</td><td class="p-2.5 border border-slate-200">MR rehberliğinde milimetrik tümör yatağı odaklaması</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">İmmünoterapi Entegrasyonu</td><td class="p-2.5 border border-slate-200">Bariyer engeli nedeniyle düşük antikor geçişi</td><td class="p-2.5 border border-slate-200">Nanotaşıyıcılarla soğuk tümörleri bağışıklığa açık hale getirme</td></tr>'
+                    '<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-bold text-red-600">Uygulama Biçimi</td><td class="p-2.5 border border-slate-200">Tekrarlı yüksek doz infüzyon ve sistemik toksisite riski</td><td class="p-2.5 border border-slate-200">Cerrahi kesi gerektirmeyen (non-invaziv) akustik aktivasyon</td></tr>'
+                    '</tbody></table></div>'
+                    '<h3>Klinik Araştırma Süreci ve Nörolojik Hastalıklar İçin Gelecek Perspektifi</h3>'
+                    '<p>Tıp dünyasında heyecan uyandıran bu birleşik teknolojinin en önemli avantajlarından biri, odaklanmış ultrason sistemlerinin halihazırda esansiyel tremor ve Parkinson gibi bazı nörolojik tablolar için FDA ve Avrupa otoriteleri tarafından onaylanmış bir altyapıya sahip olmasıdır. '
+                    'Glioblastoma özelinde yürütülen Faz 1 ve Faz 2 klinik çalışmaların tamamlanmasıyla birlikte, yöntemin standart radyoterapi ve cerrahi protokollerine tamamlayıcı bir modül olarak eklenmesi hedefleniyor. '
+                    'Uzmanlar, kan-beyin bariyerini güvenli biçimde aşan bu nanotaşıyıcı platformunun yalnızca beyin tümörlerinde değil, ilerleyen yıllarda Alzheimer ve ALS gibi nörodejeneratif hastalıkların gen ve protein tedavilerinde de çığır açıcı bir standart oluşturacağına dikkat çekiyor.</p>'
+                    + _build_other_table("glioblastoma-mucadelesinde-yeni-bir-ufuk-ultrason-ve-nanoteknoloji-birlesimi")
+                ),
+            },
         ],
     }
 
@@ -315,7 +353,7 @@ def seed_curated_analyses() -> None:
             x for x in (database.get_articles(limit=10, category="Analiz") or [])
             if (x.get("category") or "").strip() == "Analiz"
         ]
-        if len(existing) >= 3:
+        if len(existing) >= 4:
             return
 
         pool = database.get_articles(limit=40) or []
@@ -606,7 +644,11 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
         win_start = f"{today_str} 15:00:00"
 
     used_slugs_raw = database.get_setting("ga_analiz_used_slugs", "") or ""
-    used_slugs = {x.strip() for x in used_slugs_raw.split(",") if x.strip()}
+    used_slugs = {x.strip() for x in used_slugs_raw.split(",") if x.strip()} | {
+        "bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu",
+        "ikinci-el-konutlarda-yuksek-fiyat-baskisi-satislari-yavaslatti",
+        "zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor",
+    }
 
     pool = database.get_articles(limit=50)
     candidates = []
