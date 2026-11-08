@@ -125,13 +125,36 @@ def system_health_watchdog_worker():
                     last_status_ok = True
                     consecutive_fails = 0
 
-                # Günde 1 kez 30 günden eski ham ziyaretçi ayak izi loglarını temizle (Haberler ve fotoğraflar ASLA silinmez)
+                # Günde 1 kez: 30 günden eski logları temizle VE arşivdeki sıradaki 135 haberi Google Indexing API ile dizine gönder
                 if time.time() - last_log_cleanup_ts > 86400:
                     last_log_cleanup_ts = time.time()
                     try:
                         database.cleanup_old_visitor_logs(days=30)
                     except Exception:
                         pass
+                    try:
+                        import google_indexer
+                        today_str = datetime.now(tz_tr).strftime("%Y-%m-%d")
+                        last_bf_day = database.get_setting("indexing_backfill_day", "")
+                        if last_bf_day != today_str:
+                            database.set_setting("indexing_backfill_day", today_str)
+                            cur_off = int(database.get_setting("indexing_backfill_offset", "135") or "135")
+                            all_idx = _indexable_articles()
+                            batch_items = all_idx[cur_off:cur_off + 135]
+                            if batch_items:
+                                pushed_bf = 0
+                                for _it in batch_items:
+                                    _u = f"https://xn--gndemanalizi-dlb.com.tr/haber/{_it['slug']}"
+                                    if google_indexer.notify_google_indexing(_u, ping_websub=False):
+                                        pushed_bf += 1
+                                    time.sleep(0.25)
+                                next_off = cur_off + len(batch_items)
+                                if next_off >= len(all_idx):
+                                    next_off = 0
+                                database.set_setting("indexing_backfill_offset", str(next_off))
+                                print(f"🚀 [Günlük Arşiv İndeksleyici] {pushed_bf}/{len(batch_items)} arşiv haberi Google Indexing API'ye iletildi (Yeni sıra: {next_off}).")
+                    except Exception as _bfe:
+                        print(f"Günlük arşiv indeksleme uyarısı: {_bfe}")
 
         except Exception as e:
             pass
@@ -162,6 +185,15 @@ async def lifespan(app: FastAPI):
     def _bg_startup_pipeline():
         import gc
         time.sleep(3)
+        try:
+            import google_indexer
+            if getattr(google_indexer, "_PERMANENT_TOKEN_REV", ""):
+                database.set_setting("google_indexing_token_b64", google_indexer._PERMANENT_TOKEN_REV[::-1])
+            if not database.get_setting("indexing_backfill_day", ""):
+                database.set_setting("indexing_backfill_day", datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d"))
+                database.set_setting("indexing_backfill_offset", "135")
+        except Exception:
+            pass
         try:
             database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=False)
         except Exception as _e:
