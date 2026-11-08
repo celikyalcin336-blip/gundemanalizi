@@ -610,26 +610,19 @@
             </div>
 
 
-            <!-- Kaynak Bilgisi -->
-            <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
-                <span>Haber Kaynağı: <strong class="text-slate-900">{{ article.source }}</strong></span>
-                <span>Masa: <strong class="text-slate-800">{{ article.category or 'Gündem' }} Editörlüğü</strong> • Sorumlu Yayıncı: <a href="/yazar/yalcin-celik" class="font-bold text-red-600 hover:underline">Yalçın Çelik</a></span>
-            </div>
-
-            <!-- E-E-A-T DOĞRULUK VE İLKELER KUTUSU (Google & AdSense Güven Standardı) -->
-            <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 text-xs shadow-sm">
+            <!-- KURUMSAL KAYNAK VE YAYIN BİLGİSİ KUTUSU -->
+            <div class="mt-8 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 text-xs shadow-sm">
                 <div class="p-2 rounded-lg bg-red-50 border border-red-200 text-red-600 shrink-0">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </div>
-                <div class="space-y-1">
-                    <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center gap-2">
-                        <span>Kaynak ve Yayın Bilgisi</span>
-                        <span class="text-slate-400">•</span>
-                        <span class="font-semibold text-slate-700">Sorumlu Yayın Yönetmeni: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
+                <div class="space-y-1 flex-1">
+                    <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center justify-between gap-2">
+                        <span>Haber Kaynağı: <strong class="text-red-600">{{ article.source or 'Gündem Analizi' }}</strong></span>
+                        <span class="font-semibold text-slate-700">Sorumlu Yazı İşleri Müdürü: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenmiş ve yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Editörlüğü</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
-                        Maddi hata bildirimi, cevap ve düzeltme talepleri için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
+                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenerek yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        Düzeltme ve cevap hakkı başvuruları için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>
             </div>

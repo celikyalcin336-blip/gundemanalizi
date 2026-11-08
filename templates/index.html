@@ -1004,7 +1004,7 @@
                             </p>
                         </div>
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[11px] text-slate-400 font-medium">3 dk okuma</span>
+                            <span class="text-[11px] text-slate-400 font-medium">{{ a.reading_time_min or 2 }} dk okuma</span>
                             <a href="/haber/{{ a.slug }}" class="text-xs font-bold text-red-600 hover:text-red-700 transition flex items-center gap-1">
                                 <span>Devamını Oku</span>
                                 <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
@@ -1135,7 +1135,7 @@
                                 <div class="flex items-center gap-3 text-xs text-slate-500 font-semibold mb-3">
                                     <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> {{ hero.created_at[:16] if hero.created_at else '' }}</span>
                                     <span>•</span>
-                                    <span class="flex items-center gap-1"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> 3 dk okuma</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> {{ hero.reading_time_min or 3 }} dk okuma</span>
                                 </div>
                                 <a href="/haber/{{ hero.slug }}" class="block">
                                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 group-hover:text-red-600 transition leading-snug tracking-tight mb-4">
@@ -1198,7 +1198,7 @@
                                 </p>
                             </div>
                             <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                                <span class="text-[11px] text-slate-400 font-medium">3 dk okuma</span>
+                                <span class="text-[11px] text-slate-400 font-medium">{{ a.reading_time_min or 2 }} dk okuma</span>
                                 <a href="/haber/{{ a.slug }}" class="text-xs font-bold text-red-600 hover:text-red-700 transition flex items-center gap-1">
                                     <span>Habere Git</span>
                                     <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>

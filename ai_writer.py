@@ -56,7 +56,7 @@ Maddeler: KESİNLİKLE EN AZ 3, EN FAZLA 4 ADET DOYURUCU MADDE (— ile başlaya
 6. Cümleleri dil bilgisi hatası olmadan, duru ve kusursuz Türkçe ile yaz.
 7. Yalnızca doğrudan paylaşılacak nihai metni yaz.
 """
-            for m_name in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"]:
+            for m_name in ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-flash-lite-latest"]:
                 try:
                     res = client.models.generate_content(model=m_name, contents=prompt)
                     if res and res.text:
@@ -179,7 +179,7 @@ UYULMASI ZORUNLU KURALLAR:
 8. Yalnızca doğrudan yayınlanacak nihai basın metnini yaz.
 """
             # Model denemesi (önce 2.5-flash, sonra 2.0-flash, sonra 1.5-flash)
-            for m_name in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"]:
+            for m_name in ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash", "gemini-flash-lite-latest"]:
                 try:
                     response = client.models.generate_content(
                         model=m_name,
@@ -270,6 +270,11 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
     disaster_regex = r'\b(kandilli\w*|afad\w*|deprem\w*|sarsıntı\w*|artçı sarsıntı\w*|fay hattı\w*|tsunami\w*|heyelan\w*|yangın söndürme\w*|sayısal loto\w*|süper loto\w*|şans topu\w*|on numara\w*|milli piyango\w*|çekiliş sonuç\w*)\b'
     if re.search(disaster_regex, lower_title, re.IGNORECASE):
         return "Gündem"
+
+    # 3.5. İÇ SİYASET & LİDER AÇIKLAMALARI KORUMASI ("boynumuzun borcu" vb. deyimlerin Ekonomi'ye kaçmasını önler)
+    if re.search(r'\b(bahçeli\w*|devlet bahçeli|özgür özel|cumhurbaşkanı erdoğan|tbmm|meclis genel kurulu|grup toplantısı|kardeşliğimizi)\b', lower_title, re.IGNORECASE):
+        if not re.search(r'\b(faiz|enflasyon|asgari ücret|emekli maaş|merkez bankası|tcmb|bütçe|vergi|kredi|borsa|dolar|altın)\b', lower_title, re.IGNORECASE):
+            return "Gündem"
 
     # 4. BAKAN İSTİFASI / DIŞ SİYASET / KKTC KORUMASI (KKTC Sağlık Bakanı istifa etti -> KESİNLİKLE DÜNYA)
     if "kktc" in lower_title or "kıbrıs" in lower_title:
@@ -432,7 +437,7 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
     import content_quality
     model_chain = [m.strip() for m in os.getenv(
         "GEMINI_ARTICLE_MODELS",
-        "gemini-flash-lite-latest,gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.5-flash,gemini-flash-latest,gemini-3.8-flash"
+        "gemini-2.5-flash,gemini-flash-latest,gemini-2.0-flash,gemini-flash-lite-latest"
     ).split(",") if m.strip()]
     for m_name in model_chain:
         try:

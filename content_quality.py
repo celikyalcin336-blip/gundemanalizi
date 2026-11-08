@@ -62,8 +62,12 @@ _BRAND_SAFETY_SUBS = [
     (re.compile(r"\bbahisler\s+oynadığı\b", re.I), "işlemler yaptığı"),
     (re.compile(r"\bAskeri\s+Unutlar\b"), "Askeri Unsurlar"),
     (re.compile(r"\baskeri\s+unutlar\b", re.I), "askeri unsurlar"),
+    (re.compile(r"\breflekimlerinin\b", re.I), "reflekslerinin"),
+    (re.compile(r"\breflekimleri\b", re.I), "refleksleri"),
+    (re.compile(r"\breflekim\b", re.I), "refleks"),
     (re.compile(r"F\.\s*Bahçe\s+Tarfin(?:'|&#39;|’)in\s+konuğu\s+Valencia!?", re.I), "Fenerbahçe Beko'nun Konuğu Valencia"),
     (re.compile(r"\bF\.\s*Bahçe\s+Tarfin\b", re.I), "Fenerbahçe Beko"),
+    (re.compile(r"BİM[’'ʻ`]?E\s+KUMTEL\s+CAM\s+ANKASTRE\s+SET\s+GELİYOR!?\s*\(BİM\s+1-7\s+KASIM\)", re.I), "Perakende Zincirlerinde Kasım Dönemi Ankastre ve Beyaz Eşya Kampanyaları"),
 ]
 
 
@@ -320,9 +324,12 @@ def _fast_clean_for_word_count(content: str) -> str:
         inner = re.sub(r"(?<![\"'=])https?://[^\s<]+", "", inner)
         inner = re.sub(r"pic\.twitter\.com/\S+", "", inner)
         inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’\-]+\s*", "", inner.strip())
+        inner = fix_brand_splits(inner)
+        inner = soften_sensitive_terms(inner)
         return f"{m.group(1)}{inner}</p>"
 
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p_fast, c, flags=re.S)
+    c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", lambda m: f"<{m.group(1)}{m.group(2)}>{clean_title_text(m.group(3))}</{m.group(1)}>", c, flags=re.S | re.I)
 
     seen_text = [""]
     seen_paras = []
@@ -356,13 +363,13 @@ def _fast_clean_for_word_count(content: str) -> str:
     return c
 
 
-def is_thin(content: str, threshold: int = 300) -> bool:
+def is_thin(content: str, threshold: int = 240) -> bool:
     if not content:
         return True
     key = (len(content), content[:80], content[-80:])
     wc = _THIN_WORD_MEMO.get(key)
     if wc is None:
-        if len(_THIN_WORD_MEMO) > 5000:
+        if len(_THIN_WORD_MEMO) > 1200:
             _THIN_WORD_MEMO.clear()
         wc = visible_word_count(_fast_clean_for_word_count(content))
         _THIN_WORD_MEMO[key] = wc

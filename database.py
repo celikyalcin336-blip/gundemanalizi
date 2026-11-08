@@ -60,7 +60,7 @@ if USE_PG:
             _PG_POOL_LAST_TRY = now
             try:
                 _PG_POOL = psycopg2.pool.ThreadedConnectionPool(
-                    minconn=1, maxconn=18, dsn=DATABASE_URL, connect_timeout=5
+                    minconn=1, maxconn=8, dsn=DATABASE_URL, connect_timeout=5
                 )
                 _PG_LAST_ERROR = None
                 print("✅ [PostgreSQL] Connection Pool başarıyla kuruldu.")
@@ -177,6 +177,20 @@ def _row_to_dict(row) -> Dict:
     if d.get("image_path"):
         base_img = str(d["image_path"]).split("?")[0]
         d["image_path"] = f"{base_img}?v=3"
+    try:
+        import content_quality
+        if d.get("title"):
+            d["title"] = content_quality.clean_title_text(str(d["title"]))
+        if d.get("summary"):
+            d["summary"] = content_quality.clean_summary_text(str(d["summary"]), d.get("title") or "")
+        raw_c = d.get("content") or ""
+        if raw_c:
+            wc = content_quality.visible_word_count(raw_c)
+            d["reading_time_min"] = max(2, min(6, round(wc / 150)))
+        else:
+            d["reading_time_min"] = 2 + (int(d.get("id") or 0) % 3)
+    except Exception:
+        d["reading_time_min"] = 3
     # created_at zaman damgasını daima Türkiye Yerel Saatine (TSİ, UTC+3) dönüştür
     if d.get("created_at") is not None:
         val = d["created_at"]
@@ -1204,10 +1218,20 @@ def get_article_by_id(article_id: int) -> Optional[Dict]:
 
 
 def get_trending_articles(limit: int = 5) -> List[Dict]:
-    """En çok okunan (views DESC) makaleleri listeler."""
+    """Son yayınlanan güncel haber havuzu içinden en çok okunan (views DESC) yüksek kaliteli makaleleri listeler."""
     with get_connection() as conn:
-        cur = conn.execute("SELECT * FROM articles ORDER BY views DESC, id DESC LIMIT ?", (limit,))
-        return [_row_to_dict(row) for row in cur.fetchall()]
+        cur = conn.execute(
+            """SELECT id, slug, title, summary, content, category, image_path, source, views, created_at
+               FROM (SELECT * FROM articles ORDER BY id DESC LIMIT 140) recent_pool
+               WHERE LOWER(title) NOT LIKE '%bim %' AND LOWER(title) NOT LIKE '%a101%' AND LOWER(title) NOT LIKE '%şok market%' AND LOWER(title) NOT LIKE '%aktüel%'
+               ORDER BY views DESC, id DESC LIMIT ?""",
+            (limit,),
+        )
+        rows = [_row_to_dict(row) for row in cur.fetchall()]
+        if len(rows) < limit:
+            cur2 = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ?", (limit,))
+            rows = [_row_to_dict(row) for row in cur2.fetchall()]
+        return rows
 
 
 def get_adjacent_articles(article_id: int) -> Tuple[Optional[Dict], Optional[Dict]]:
@@ -1780,7 +1804,7 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
             except Exception as _se:
                 print(f"post_e9ae894a60.jpg güncelleme uyarısı: {_se}")
 
-        # ADIM 0.5: Hassas veya yazım hatalı 5 URL slug'ını haberi silmeden kurumsal başlık ve URL'ye dönüştür
+        # ADIM 0.5: Hassas veya yazım hatalı URL slug'larını haberi silmeden kurumsal başlık ve URL'ye dönüştür
         _SLUG_UPGRADES = [
             (
                 "thomas-markle-abdde-cocuk-istismari-materyali-bulundurmak-suclamasiyla-yakalandi",
@@ -1807,6 +1831,11 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
                 "fenerbahce-bekonun-konugu-valencia",
                 "Fenerbahçe Beko'nun Konuğu Valencia",
             ),
+            (
+                "bime-kumtel-cam-ankastre-set-geliyor-bim-1-7-kasim",
+                "perakende-zincirlerinde-kasim-donemi-ankastre-ve-beyaz-esya-kampanyalari",
+                "Perakende Zincirlerinde Kasım Dönemi Ankastre ve Beyaz Eşya Kampanyaları",
+            ),
         ]
         try:
             with get_connection() as conn:
@@ -1815,51 +1844,73 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
                         "UPDATE articles SET slug = ?, title = ? WHERE slug = ?",
                         (new_sl, clean_h1, old_sl),
                     )
+                conn.execute(
+                    "UPDATE articles SET category = 'Ekonomi', title = ? WHERE slug = ?",
+                    ("Perakende Zincirlerinde Kasım Dönemi Ankastre ve Beyaz Eşya Kampanyaları", "perakende-zincirlerinde-kasim-donemi-ankastre-ve-beyaz-esya-kampanyalari"),
+                )
+                conn.execute(
+                    "UPDATE articles SET category = 'Gündem' WHERE category = 'Ekonomi' AND (LOWER(title) LIKE '%bahçeli%' OR LOWER(title) LIKE '%kardeşliğimizi%')",
+                )
         except Exception as _sue:
             print(f"Slug güncelleme uyarısı: {_sue}")
 
-        # ADIM 1: Tüm makalelerin başlık, özet ve içeriklerinde temizlik
+        # ADIM 1: Render 512MB RAM sınırını korumak için makaleleri 60'arlı küçük paketler halinde (batch) temizle
+        import gc
         with get_connection() as conn:
-            rows = conn.execute("SELECT id, slug, title, summary, content, category, image_path, created_at FROM articles ORDER BY id DESC").fetchall()
+            all_ids = [r["id"] for r in conn.execute("SELECT id FROM articles ORDER BY id DESC").fetchall()]
 
-        updates = []
-        for r in rows:
-            aid = r["id"]
-            slug = r["slug"] or ""
-            orig_t = r["title"] or ""
-            orig_s = r["summary"] or ""
-            orig_c = r["content"] or ""
-
-            new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
-            new_s = content_quality.clean_summary_text(news_fetcher.sanitize_news_text(orig_s), new_t)
-            new_c = content_quality.clean_article_html(orig_c)
-
-            if new_t != orig_t or new_s != orig_s or new_c != orig_c:
-                updates.append((new_t, new_s, new_c, aid, slug))
-
-            wc = content_quality.visible_word_count(new_c)
-            if wc < 45 or len(slug) < 15:
-                broken_short.append({
-                    "id": aid,
-                    "slug": slug,
-                    "title": new_t,
-                    "words": wc,
-                    "created_at": str(r["created_at"] or "")[:16],
-                })
-
-        if updates:
+        for b_idx in range(0, len(all_ids), 60):
+            batch_ids = all_ids[b_idx:b_idx + 60]
+            ph = ",".join(["?"] * len(batch_ids))
             with get_connection() as conn:
-                for new_t, new_s, new_c, aid, slug in updates:
-                    conn.execute(
-                        "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",
-                        (new_t, new_s, new_c, aid),
-                    )
-                    sanitized_slugs.append(slug)
-            print(f"✅ [HTML & Özet Temizliği] {len(updates)} makale güncellendi.")
+                b_rows = conn.execute(
+                    f"SELECT id, slug, title, summary, content FROM articles WHERE id IN ({ph})",
+                    tuple(batch_ids),
+                ).fetchall()
+            b_updates = []
+            for r in b_rows:
+                aid = r["id"]
+                slug = r["slug"] or ""
+                orig_t = r["title"] or ""
+                orig_s = r["summary"] or ""
+                orig_c = r["content"] or ""
+                new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
+                new_s = content_quality.clean_summary_text(news_fetcher.sanitize_news_text(orig_s), new_t)
+                new_c = content_quality.clean_article_html(orig_c)
+                if new_t != orig_t or new_s != orig_s or new_c != orig_c:
+                    b_updates.append((new_t, new_s, new_c, aid, slug))
+            if b_updates:
+                with get_connection() as conn:
+                    for new_t, new_s, new_c, aid, slug in b_updates:
+                        conn.execute(
+                            "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",
+                            (new_t, new_s, new_c, aid),
+                        )
+                        sanitized_slugs.append(slug)
+            del b_rows, b_updates
+            gc.collect()
+
+        if sanitized_slugs:
+            print(f"✅ [HTML & Özet Temizliği] {len(sanitized_slugs)} makale güncellendi.")
 
         _AUDIT_REPORT["html_sanitized_count"] = len(sanitized_slugs)
         _AUDIT_REPORT["broken_short_articles"] = broken_short
+
+        # Eğer heal_cards=False ise (normal sunucu açılışı), 1045 görselin binary verisini RAM'e çekme (512 MB OOM Koruması)
+        if not heal_cards:
+            with get_connection() as conn:
+                rem_cnt = conn.execute("SELECT COUNT(*) AS c FROM articles").fetchone()["c"]
+            _AUDIT_REPORT["remaining_clean_articles_count"] = rem_cnt
+            _AUDIT_REPORT["cards_remaining_count"] = 0
+            _AUDIT_REPORT["cards_remaining"] = []
+            _AUDIT_REPORT["status"] = "completed"
+            gc.collect()
+            print(f"✨ [Hafif Başlangıç Denetimi Tamamlandı] Kalan Temiz Haber Sayısı: {rem_cnt}")
+            return _AUDIT_REPORT
+
         _AUDIT_REPORT["status"] = "scanning_images"
+        with get_connection() as conn:
+            rows = conn.execute("SELECT id, slug, title, category, image_path, created_at FROM articles ORDER BY id DESC").fetchall()
 
         # ADIM 2: Yapay yazılı kart görseli (kendi görseli) veya eksik görsel kullanan haberleri tespit et
         file_to_articles = {}

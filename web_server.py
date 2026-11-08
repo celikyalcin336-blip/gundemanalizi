@@ -158,8 +158,24 @@ def _warmup_turbo_cache():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     database.init_db()
-    # cleanup_corrupted_articles açılışta çalıştırılmaz (CPU ve veritabanı kilitlenmesini önlemek için)
-    threading.Thread(target=_warmup_turbo_cache, daemon=True).start()
+    # Render 512MB RAM koruması: Başlangıç görevlerini aynı anda çakıştırmak yerine sırayla (sequential) çalıştır
+    def _bg_startup_pipeline():
+        import gc
+        time.sleep(3)
+        try:
+            database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=False)
+        except Exception as _e:
+            print(f"Başlangıç temizlik uyarısı: {_e}")
+        _IMAGE_MEM_CACHE.clear()
+        with _INDEX_LOCK:
+            _INDEX_MEMO.clear()
+            _INDEX_CACHE["rows"] = []
+            _INDEX_CACHE["ts"] = 0.0
+        clear_turbo_cache()
+        gc.collect()
+        _warmup_turbo_cache()
+        gc.collect()
+    threading.Thread(target=_bg_startup_pipeline, daemon=True).start()
     # Otonom haber botunu arka planda baslat
     threading.Thread(target=bot_background_worker, daemon=True).start()
     # Canli piyasa kurlarini arka planda tazeleyen isci (sayfa yanit suresini 0 ms yapar)
@@ -171,16 +187,6 @@ async def lifespan(app: FastAPI):
     # Eski kısa haberleri (hiçbirini silmeden) yavaşça özgün metinle yeniden yazan arşiv yenileyici
     import archive_rewriter
     threading.Thread(target=archive_rewriter.background_worker, daemon=True).start()
-    def _bg_sanitize_and_heal():
-        time.sleep(6)
-        database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=True)
-        _IMAGE_MEM_CACHE.clear()
-        with _INDEX_LOCK:
-            _INDEX_MEMO.clear()
-            _INDEX_CACHE["rows"] = []
-            _INDEX_CACHE["ts"] = 0.0
-        clear_turbo_cache()
-    threading.Thread(target=_bg_sanitize_and_heal, daemon=True).start()
     yield
 
 import secrets as _secrets
@@ -544,79 +550,46 @@ class CacheStaticFiles(StaticFiles):
 
 app.mount("/assets", CacheStaticFiles(directory=ASSETS_DIR), name="assets")
 
+_IMAGE_MEM_CACHE = {}
+
 @app.get("/images/{filename}")
 async def serve_image(filename: str, request: Request):
     safe_name = os.path.basename(filename).split("?")[0]
     local_path = os.path.join(OUTPUT_DIR, safe_name)
 
-    # 1. Kalıcı Neon veritabanında binary varsa çek (Maksimum 12 sn bekle)
-    if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
-        try:
-            data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=12.0)
-            if data and len(data) >= 6000:
-                try:
-                    with open(local_path, "wb") as f:
-                        f.write(data)
-                except Exception:
-                    pass
-        except Exception:
-            pass
+    _img_headers = {
+        "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+        "CDN-Cache-Control": "max-age=31536000",
+        "Cloudflare-CDN-Cache-Control": "max-age=31536000",
+    }
 
-    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
+    # 1. Video dosyaları için doğrudan sun
     if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
         if os.path.exists(local_path):
             return FileResponse(local_path, media_type="video/mp4")
         return PlainTextResponse("Video not found", status_code=404)
 
-    # 1.4. Video dosyaları için görsel onarımını atla ve doğrudan sun
-
-    if safe_name.lower().endswith((".mp4", ".mov", ".webm", ".m4v")):
-
-        if os.path.exists(local_path):
-
-            return FileResponse(local_path, media_type="video/mp4")
-
-        return PlainTextResponse("Video not found", status_code=404)
-
-
-
-    # 1.5. Eğer ne diskte ne de veritabanında varsa: Makale başlığından gerçek basın fotoğrafını anında kurtar!
-    if not os.path.exists(local_path) or os.path.getsize(local_path) < 6000:
-        try:
-            await asyncio.wait_for(asyncio.to_thread(database.heal_single_missing_image, safe_name), timeout=15.0)
-        except Exception:
-            pass
-
-    # 2. Resim diskte mevcutsa: Tarayıcı WebP destekliyorsa ultra hafif WebP formatında sun
+    # 2. Diskte hazır varsa doğrudan sun (Render overlayfs'e yeni WebP yazarak RAM tüketme)
     if os.path.exists(local_path) and os.path.getsize(local_path) >= 6000:
-        accept = request.headers.get("accept", "").lower()
-        if "image/webp" in accept and not safe_name.lower().endswith(".webp"):
-            name_no_ext = os.path.splitext(safe_name)[0]
-            webp_name = f"{name_no_ext}.webp"
-            webp_path = os.path.join(OUTPUT_DIR, webp_name)
-            if not os.path.exists(webp_path) or os.path.getsize(webp_path) < 2000:
-                try:
-                    from PIL import Image
-                    with Image.open(local_path) as img:
-                        img = img.convert("RGB")
-                        img.thumbnail((800, 450), Image.LANCZOS)
-                        img.save(webp_path, format="WEBP", quality=78, method=4)
-                except Exception:
-                    pass
-            if os.path.exists(webp_path) and os.path.getsize(webp_path) >= 2000:
-                return FileResponse(webp_path, media_type="image/webp", headers={
-                    "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
-                    "CDN-Cache-Control": "max-age=31536000",
-                    "Cloudflare-CDN-Cache-Control": "max-age=31536000",
-                    "Vary": "Accept"
-                })
+        return FileResponse(local_path, headers=_img_headers)
 
-        return FileResponse(local_path, headers={
-            "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
-            "CDN-Cache-Control": "max-age=31536000",
-            "Cloudflare-CDN-Cache-Control": "max-age=31536000",
-            "Vary": "Accept"
-        })
+    # 3. Hafif RAM önbelleğinde (en fazla 32 görsel, ~2 MB) varsa anında sun
+    cached_bytes = _IMAGE_MEM_CACHE.get(safe_name)
+    if cached_bytes:
+        mtype = "image/png" if safe_name.lower().endswith(".png") else ("image/webp" if safe_name.lower().endswith(".webp") else "image/jpeg")
+        return Response(content=cached_bytes, media_type=mtype, headers=_img_headers)
+
+    # 4. Kalıcı Neon PostgreSQL veritabanından çek (container diskine yazmadan doğrudan bellekle sun)
+    try:
+        data = await asyncio.wait_for(asyncio.to_thread(database.get_image, safe_name), timeout=12.0)
+        if data and len(data) >= 6000:
+            if len(_IMAGE_MEM_CACHE) >= 32:
+                _IMAGE_MEM_CACHE.pop(next(iter(_IMAGE_MEM_CACHE)), None)
+            _IMAGE_MEM_CACHE[safe_name] = data
+            mtype = "image/png" if safe_name.lower().endswith(".png") else ("image/webp" if safe_name.lower().endswith(".webp") else "image/jpeg")
+            return Response(content=data, media_type=mtype, headers=_img_headers)
+    except Exception:
+        pass
 
     # 3. Resim bulunamadıysa: görsel yer tutucu (logo) gösterilir ama durum kodu 404 olur (soft-404 önlemi)
     fallback_logo = os.path.join(ASSETS_DIR, "logo.png")
@@ -1099,11 +1072,11 @@ def get_turbo_page(key: str):
 def set_turbo_page(key: str, html: str):
     global _TURBO_PAGE_CACHE
     now = time.time()
-    if len(_TURBO_PAGE_CACHE) >= 800:
-        # 120 sn dolmuş eski önbellekleri ayıkla, aktif sayfaları koru
-        _TURBO_PAGE_CACHE = {k: v for k, v in _TURBO_PAGE_CACHE.items() if (now - v["ts"]) < 120}
-        if len(_TURBO_PAGE_CACHE) >= 700:
-            oldest_keys = sorted(_TURBO_PAGE_CACHE.keys(), key=lambda k: _TURBO_PAGE_CACHE[k]["ts"])[:100]
+    if len(_TURBO_PAGE_CACHE) >= 40:
+        # Render 512MB RAM koruması: en fazla 40 aktif sayfayı RAM'de tut (<8 MB)
+        _TURBO_PAGE_CACHE = {k: v for k, v in _TURBO_PAGE_CACHE.items() if (now - v["ts"]) < 90}
+        if len(_TURBO_PAGE_CACHE) >= 32:
+            oldest_keys = sorted(_TURBO_PAGE_CACHE.keys(), key=lambda k: _TURBO_PAGE_CACHE[k]["ts"])[:15]
             for k in oldest_keys:
                 _TURBO_PAGE_CACHE.pop(k, None)
     _TURBO_PAGE_CACHE[key] = {"html": html, "ts": now}
@@ -1127,10 +1100,10 @@ def _refresh_category_widgets_sync() -> dict:
             if not main.is_commodity_news(a.get("title", ""))
             and (not content_quality.is_thin(a["content"]) if a.get("content") else len((a.get("summary") or "").strip()) >= 35)
         ]
-        if len(rich) >= cap:
-            return rich[:cap]
-        non_comm = [a for a in items if not main.is_commodity_news(a.get("title", ""))]
-        return (rich + [a for a in non_comm if a not in rich])[:cap]
+        chosen = rich[:cap] if len(rich) >= cap else (rich + [a for a in items if not main.is_commodity_news(a.get("title", "")) and a not in rich])[:cap]
+        for item in chosen:
+            item.pop("content", None)
+        return chosen
 
     try:
         if not _ONE_TIME_CAT_CLEANUP_DONE:
@@ -1258,10 +1231,12 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
             non_c = [a for a in pool if not main.is_commodity_news(a.get("title", ""))]
             if page >= 1:
                 rich = [a for a in non_c if (not content_quality.is_thin(a["content"]) if a.get("content") else len((a.get("summary") or "").strip()) >= 35)]
-                if len(rich) >= cap:
-                    return rich[:cap]
-                return (rich + [a for a in non_c if a not in rich])[:cap]
-            return non_c[:cap]
+                res = rich[:cap] if len(rich) >= cap else (rich + [a for a in non_c if a not in rich])[:cap]
+            else:
+                res = non_c[:cap]
+            for item in res:
+                item.pop("content", None)
+            return res
 
         if norm_kategori == "Son Dakika":
             articles = _prefer_rich(database.get_articles(limit=limit + 16, offset=offset), limit)
@@ -2197,6 +2172,7 @@ async def article_detail(request: Request, slug: str):
             "istanbulda-canli-bahis-dolandiriciligi-8-supheli-gozaltinda": "/haber/istanbulda-spor-veri-altyapisina-siber-mudahale-8-supheli-gozaltinda",
             "umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unutlar-arasinda-hareketlilik-yasan": "/haber/umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unsurlar-arasinda-hareketlilik-yasa",
             "f-bahce-tarfinin-konugu-valencia": "/haber/fenerbahce-bekonun-konugu-valencia",
+            "bime-kumtel-cam-ankastre-set-geliyor-bim-1-7-kasim": "/haber/perakende-zincirlerinde-kasim-donemi-ankastre-ve-beyaz-esya-kampanyalari",
         }
         if slug_low in _direct_slug_map:
             return RedirectResponse(url=_direct_slug_map[slug_low], status_code=301)
