@@ -83,6 +83,24 @@ _BRAND_SAFETY_SUBS = [
     (re.compile(r"\bcinayet\b", re.I), "adli vaka"),
     (re.compile(r"\bVuruldu\b"), "Etkisiz Hale Getirildi"),
     (re.compile(r"\bvuruldu\b", re.I), "etkisiz hale getirildi"),
+    (re.compile(r"Silahlı\s+Saldırıda", re.I), "Asayiş Olayında"),
+    (re.compile(r"\bSilahlı\s+Saldırı\b"), "Asayiş Olayı"),
+    (re.compile(r"\bsilahlı\s+saldırı\b", re.I), "asayiş olayı"),
+    (re.compile(r"Dehşet\s+Saçtığı\s+Saldırı", re.I), "Asayiş"),
+    (re.compile(r"\bDehşete\s+düşüren\b"), "Ağır"),
+    (re.compile(r"\bdehşete\s+düşüren\b", re.I), "ağır"),
+    (re.compile(r"\bDehşet\b"), "Panik"),
+    (re.compile(r"\bdehşet\b", re.I), "panik"),
+    (re.compile(r"yılın\s+piyangosu\s+vurdu", re.I), "yılın fırsatı doğdu"),
+    (re.compile(r"\bpiyangosu\b", re.I), "fırsatı"),
+    (re.compile(r"\bUyuşturucu\s+Operasyonu\b"), "Yasaklı Madde Operasyonu"),
+    (re.compile(r"\buyuşturucu\s+operasyonu\b", re.I), "yasaklı madde operasyonu"),
+    (re.compile(r"\bUyuşturucu\b"), "Yasaklı Madde"),
+    (re.compile(r"\buyuşturucu\b", re.I), "yasaklı madde"),
+    (re.compile(r"\bKatil\s+İsrail\b", re.I), "İsrail"),
+    (re.compile(r"\bKatil\s+Netanyahu", re.I), "Netanyahu"),
+    (re.compile(r"\bKatil\b"), "Şüpheli"),
+    (re.compile(r"\bkatil\b", re.I), "şüpheli"),
 ]
 
 
@@ -157,9 +175,29 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
+_GENERIC_CONTAINS = (
+    "başlığı etrafında şekillenen gelişmeler, hanehalkı bütçesi, reel sektör maliyetleri",
+    "İlgili kurumların yayımlayacağı uygulama tebliğleri ve resmi istatistik bültenleri",
+    "kapsamında paylaşılan teknik veriler, dijital ekosistemde performans, siber güvenlik",
+    "Teknoloji pazarında artan rekabetle birlikte üretici ve geliştirici firmaların sunduğu yeni mimariler",
+    "gelişmesi, Türkiye ve küresel otomotiv pazarındaki model rekabeti, donanım standartları",
+    "Yetkili distribütörlerin ve üretici markaların açıklayacağı güncel donanım paketleri",
+    "gelişmesi, takımın sezon hedefleri, kadro derinliği ve fikstür yoğunluğu açısından",
+    "Önümüzdeki haftalarda oynanacak resmi karşılaşmalar, lig sıralaması ve Avrupa kupaları",
+    "konusu, koruyucu hekimlik, erken tanı ve günlük yaşam kalitesi açısından uzmanların",
+    "Sağlık otoriteleri, bireysel risk faktörlerine göre uzman hekim kontrolünde hareket edilmesini",
+    "başlığındaki düzenleme ve duyurular, öğrenciler, öğretmenler ve veliler açısından",
+    "Milli Eğitim Bakanlığı ve ÖSYM başta olmak üzere ilgili eğitim kurumlarının resmi internet siteleri",
+    "gelişmesi, uluslararası hukuk, bölgesel güvenlik mimarisi ve diplomatik müzakere trafiği",
+    "Dış politika uzmanları, bölgedeki enerji koridorları, ticaret hatları ve diplomatik dengelerin",
+    "başlığıyla gündeme gelen gelişme, ilgili kurumların yürüttüğü resmi süreçler ve kamuoyu yansımaları",
+    "Önümüzdeki günlerde yetkili merciler tarafından paylaşılacak yeni bilgiler ve resmi tutanaklar",
+)
+
+
 def _is_generic(text: str) -> bool:
     t = _norm(text)
-    return any(t.startswith(g) for g in _GENERIC_STARTS)
+    return any(t.startswith(g) for g in _GENERIC_STARTS) or any(sub in t for sub in _GENERIC_CONTAINS)
 
 
 def _strip_raw_html_document_leak(content: str) -> str:
@@ -393,61 +431,11 @@ def is_thin(content: str, threshold: int = 240) -> bool:
 
 def diversify_article_layout(content: str, article_id: int = 0) -> str:
     """
-    Mevcut ve yeni haberlerin tekdüze (her haberde 5 adet <h3>) görünmesini önler;
-    haber ID'sine göre 3 farklı editoryal mizanpaj (<h2>, <blockquote>, birleştirilmiş akıcı paragraflar) uygular.
+    Hiçbir ara başlığı (<h3>) silmeden, makalenin anlamsal bütünlüğünü ve tüm ara başlıklarını korur.
     """
     if not content:
         return content
-    c = content
-    mode = (article_id or 0) % 3
-
-    if mode == 0:
-        c = re.sub(
-            r"<h3([^>]*)>(.*?)</h3>",
-            r'<h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-7 mb-3"\1>\2</h2>',
-            c,
-            flags=re.S | re.I,
-        )
-        if "<blockquote" not in c.lower():
-            p_idx = [0]
-            def _p_to_bq(m):
-                p_idx[0] += 1
-                inner = m.group(1).strip()
-                if p_idx[0] == 3 and 90 <= len(_norm(inner)) <= 480:
-                    return f'<blockquote class="my-6 pl-4 border-l-4 border-red-600 italic text-slate-700 bg-slate-50/80 py-3 pr-4 rounded-r-xl">{inner}</blockquote>'
-                return m.group(0)
-            c = re.sub(r"<p[^>]*>(.*?)</p>", _p_to_bq, c, flags=re.S | re.I)
-
-    elif mode == 1:
-        h_idx = [0]
-        def _selective_h2(m):
-            h_idx[0] += 1
-            if h_idx[0] in (1, 3):
-                return f'<h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-7 mb-3"{m.group(1)}>{m.group(2)}</h2>'
-            return ""
-        if c.lower().count("<h3") >= 3:
-            c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _selective_h2, c, flags=re.S | re.I)
-
-    else:
-        h_idx = [0]
-        def _trim_extra_h3(m):
-            h_idx[0] += 1
-            if h_idx[0] in (2, 5):
-                return ""
-            return m.group(0)
-        if c.lower().count("<h3") >= 4:
-            c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _trim_extra_h3, c, flags=re.S | re.I)
-        if "<blockquote" not in c.lower() and (article_id or 0) % 2 == 0:
-            p_idx = [0]
-            def _p4_to_bq(m):
-                p_idx[0] += 1
-                inner = m.group(1).strip()
-                if p_idx[0] == 4 and 90 <= len(_norm(inner)) <= 480:
-                    return f'<blockquote class="my-6 pl-4 border-l-4 border-red-600 italic text-slate-700 bg-slate-50/80 py-3 pr-4 rounded-r-xl">{inner}</blockquote>'
-                return m.group(0)
-            c = re.sub(r"<p[^>]*>(.*?)</p>", _p4_to_bq, c, flags=re.S | re.I)
-
-    return c
+    return content
 
 
 def clean_source_name(source: str) -> str:
@@ -498,74 +486,5 @@ def clean_summary_text(summary: str, fallback_title: str = "") -> str:
 
 
 def ensure_indexable_depth(content: str, title: str = "", summary: str = "", category: str = "Gündem", article_id: int = 0) -> str:
-    """
-    Veritabanındaki temizlenmiş gerçek fotoğraflı haberlerden kelime sayısı 245'in altında kalan
-    birkaç haberi, başlık ve özet verilerini kullanarak kategoriye özgü editoryal çerçeveyle
-    260+ kelimeye tamamlar; böylece hiçbir haber noindex veya zayıf içerik durumuna düşmez.
-    """
-    c = (content or "").strip()
-    wc = visible_word_count(c)
-    if wc >= 245:
-        return c
-
-    t_clean = clean_title_text(title or "Gündemdeki Gelişme")
-    s_clean = clean_summary_text(summary or "", t_clean)
-    cat = (category or "Gündem").strip()
-
-    cat_frames = {
-        "Ekonomi": (
-            "Ekonomik Göstergeler ve Piyasa Çerçevesi",
-            f"{t_clean} başlığı etrafında şekillenen gelişmeler, hanehalkı bütçesi, reel sektör maliyetleri ve piyasa fiyatlamaları açısından yakından izleniyor. {s_clean} Ekonomistler, söz konusu adımların enflasyon beklentileri, likidite koşulları ve sektörel nakit akışı üzerindeki etkilerinin orta vadeli verilerle birlikte daha net ölçüleceğini vurguluyor.",
-            "Sektörel Beklentiler ve Takvim",
-            "İlgili kurumların yayımlayacağı uygulama tebliğleri ve resmi istatistik bültenleri, sürecin bir sonraki aşamasında belirleyici referans niteliği taşıyacak. Piyasa aktörleri, maliyet ve fiyat dengesini doğrudan etkileyen bu başlıkta resmi duyuruların takip edilmesini öneriyor.",
-        ),
-        "Teknoloji": (
-            "Teknolojik Altyapı ve Kullanıcı Deneyimine Etkisi",
-            f"{t_clean} kapsamında paylaşılan teknik veriler, dijital ekosistemde performans, siber güvenlik ve donanım-yazılım uyumluluğu açısından yeni bir standarda işaret ediyor. {s_clean} Sektör analistleri, güncelleme ve dağıtım takviminin son kullanıcı cihazlarına kademeli olarak yansıyacağını belirtiyor.",
-            "Küresel Rekabet ve Dağıtım Süreci",
-            "Teknoloji pazarında artan rekabetle birlikte üretici ve geliştirici firmaların sunduğu yeni mimariler, enerji verimliliği ve veri işleme hızında doğrudan fark yaratıyor. Türkiye pazarındaki erişim ve sürüm takvimi resmi kanallar üzerinden duyurulmaya devam edecek.",
-        ),
-        "Otomobil": (
-            "Otomotiv Pazarında Konumlandırma ve Teknik Detaylar",
-            f"{t_clean} gelişmesi, Türkiye ve küresel otomotiv pazarındaki model rekabeti, donanım standartları ve toplam sahip olma maliyeti açısından dikkat çekiyor. {s_clean} Motor verimliliği, menzil değerleri ve güvenlik donanımları tüketici tercihlerinde belirleyici rol oynuyor.",
-            "Tedarik, Fiyatlama ve Pazar Yansımaları",
-            "Yetkili distribütörlerin ve üretici markaların açıklayacağı güncel donanım paketleri ile vergi dilimi avantajları, segmentteki satış grafiğini doğrudan şekillendirecek.",
-        ),
-        "Spor": (
-            "Saha İçi Dengeler ve Teknik Heyet Planlaması",
-            f"{t_clean} gelişmesi, takımın sezon hedefleri, kadro derinliği ve fikstür yoğunluğu açısından kritik bir virajı temsil ediyor. {s_clean} Teknik heyetin antrenman verileri ve maç içi taktik kurgusu doğrultusunda kadro tercihlerini netleştirmesi bekleniyor.",
-            "Fikstür Takvimi ve Puan Tablosuna Yansıması",
-            "Önümüzdeki haftalarda oynanacak resmi karşılaşmalar, lig sıralaması ve Avrupa kupaları hedefi açısından belirleyici olacak. Kulüp cephesinden yapılacak resmi açıklamalar spor kamuoyu tarafından yakından takip ediliyor.",
-        ),
-        "Sağlık": (
-            "Klinik Değerlendirme ve Koruyucu Sağlık Önerileri",
-            f"{t_clean} konusu, koruyucu hekimlik, erken tanı ve günlük yaşam kalitesi açısından uzmanların dikkat çektiği başlıklar arasında yer alıyor. {s_clean} Tıbbi literatürdeki güncel bulgular, belirtilerin zamanında izlenmesinin ve yaşam tarzı düzenlemelerinin önemini ortaya koyuyor.",
-            "Uzman Görüşü ve Takip Süreci",
-            "Sağlık otoriteleri, bireysel risk faktörlerine göre uzman hekim kontrolünde hareket edilmesini ve resmi sağlık rehberlerinin esas alınmasını tavsiye ediyor.",
-        ),
-        "Eğitim": (
-            "Akademik Takvim ve Uygulama Esasları",
-            f"{t_clean} başlığındaki düzenleme ve duyurular, öğrenciler, öğretmenler ve veliler açısından eğitim-öğretim takvimini doğrudan ilgilendiriyor. {s_clean} Ölçme, değerlendirme ve başvuru süreçlerinde resmi kılavuzlarda yer alan tarihler esas alınıyor.",
-            "Başvuru ve Süreç Rehberi",
-            "Milli Eğitim Bakanlığı ve ÖSYM başta olmak üzere ilgili eğitim kurumlarının resmi internet siteleri üzerinden yayımlanacak duyuruların düzenli olarak kontrol edilmesi önem taşıyor.",
-        ),
-        "Dünya": (
-            "Uluslararası Diplomasi ve Bölgesel Dengeler",
-            f"{t_clean} gelişmesi, uluslararası hukuk, bölgesel güvenlik mimarisi ve diplomatik müzakere trafiği açısından küresel ölçekte yankı uyandırdı. {s_clean} Başkentler arasındaki resmi temasların ve çok taraflı kuruluşların açıklamalarının sahadaki tabloyu şekillendirmesi bekleniyor.",
-            "Jeopolitik Yansımalar ve Olası Senaryolar",
-            "Dış politika uzmanları, bölgedeki enerji koridorları, ticaret hatları ve diplomatik dengelerin önümüzdeki günlerde yapılacak üst düzey görüşmelerle yeni bir çerçeveye oturacağını değerlendiriyor.",
-        ),
-    }
-
-    h_a, p_a, h_b, p_b = cat_frames.get(
-        cat,
-        (
-            "Sürecin Arka Planı ve Kamuoyu Yansımaları",
-            f"{t_clean} başlığıyla gündeme gelen gelişme, ilgili kurumların yürüttüğü resmi süreçler ve kamuoyu yansımaları çerçevesinde yakından takip ediliyor. {s_clean} Sahadan paylaşılan veriler ve yetkili makamların açıklamaları, konunun idari ve toplumsal boyutlarını ortaya koyuyor.",
-            "Resmi Takvim ve Beklenen Adımlar",
-            "Önümüzdeki günlerde yetkili merciler tarafından paylaşılacak yeni bilgiler ve resmi tutanaklar doğrultusunda sürecin tüm ayrıntılarının netleşmesi bekleniyor.",
-        ),
-    )
-
-    addition = f"<h3>{h_a}</h3><p>{p_a}</p><h3>{h_b}</h3><p>{p_b}</p>"
-    return clean_article_html(f"{c}\n{addition}")
+    """Kalıp (boilerplate) paragraf ekleme devre dışı bırakıldı; yalnızca mevcut temiz metni döner."""
+    return clean_article_html((content or "").strip())

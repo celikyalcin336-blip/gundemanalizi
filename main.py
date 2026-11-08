@@ -90,7 +90,6 @@ def process_single_news(item: dict) -> bool:
     clean_s = content_quality.clean_summary_text(article_data.get("summary") or "", clean_t)
     clean_c = content_quality.clean_article_html(article_data.get("content") or "")
     category = database.normalize_category_name(article_data.get("category") or item_category or "Gündem") or "Gündem"
-    clean_c = content_quality.ensure_indexable_depth(clean_c, clean_t, clean_s, category, 0)
 
     if len(clean_t) < 15 or content_quality.visible_word_count(clean_c) < 250:
         print(f"⛔ [KESİN EMİR - YETERSİZ İÇERİK ENGELLENDİ] '{clean_t[:50]}' kelime/başlık barajını geçemedi; yayınlanmadı.")

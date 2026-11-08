@@ -1079,7 +1079,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
         if category:
             clean_cat = category.strip()
             if clean_cat.lower() in ["son dakika", "sondakika", "son-dakika", "breaking"]:
-                cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
+                cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles WHERE COALESCE(category, '') != 'Analiz' ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
                 return [_row_to_dict(row) for row in cur.fetchall()]
 
             cat_norm = normalize_category_name(category) or category
@@ -1101,7 +1101,7 @@ def get_articles(limit: int = 20, category: str = None, offset: int = 0) -> List
                 rows = [_row_to_dict(row) for row in cur.fetchall()]
             return rows
         else:
-            cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
+            cur = conn.execute("SELECT id, slug, title, summary, content, category, image_path, source, views, created_at FROM articles WHERE COALESCE(category, '') != 'Analiz' ORDER BY id DESC LIMIT ? OFFSET ?", (limit, offset))
             return [_row_to_dict(row) for row in cur.fetchall()]
 
 
@@ -1151,7 +1151,7 @@ def get_articles_total_count(category: str = None) -> int:
             if category:
                 clean_cat = category.strip()
                 if clean_cat.lower() in ["son dakika", "sondakika", "son-dakika", "breaking"]:
-                    cur = conn.execute("SELECT COUNT(*) AS c FROM articles")
+                    cur = conn.execute("SELECT COUNT(*) AS c FROM articles WHERE COALESCE(category, '') != 'Analiz'")
                     row = cur.fetchone()
                     return (row["c"] if row else 0) if isinstance(row, dict) else (row[0] if row else 0)
 
@@ -1174,7 +1174,7 @@ def get_articles_total_count(category: str = None) -> int:
                     return (row2["c"] if row2 else 0) if isinstance(row2, dict) else (row2[0] if row2 else 0)
                 return c
             else:
-                cur = conn.execute("SELECT COUNT(*) AS c FROM articles")
+                cur = conn.execute("SELECT COUNT(*) AS c FROM articles WHERE COALESCE(category, '') != 'Analiz'")
                 row = cur.fetchone()
                 return (row["c"] if row else 0) if isinstance(row, dict) else (row[0] if row else 0)
     except Exception as e:
@@ -1893,7 +1893,6 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
                 new_t = content_quality.clean_title_text(news_fetcher.sanitize_news_text(orig_t))
                 new_s = content_quality.clean_summary_text(news_fetcher.sanitize_news_text(orig_s), new_t)
                 new_c = content_quality.clean_article_html(orig_c)
-                new_c = content_quality.ensure_indexable_depth(new_c, new_t, new_s, orig_cat, aid)
                 if new_t != orig_t or new_s != orig_s or new_c != orig_c:
                     b_updates.append((new_t, new_s, new_c, aid, slug))
             if b_updates:

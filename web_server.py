@@ -1256,6 +1256,9 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     offset = (page - 1) * limit
 
     norm_kategori = database.normalize_category_name(kategori) if kategori else None
+    if norm_kategori == "Analiz":
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/analiz", status_code=301)
 
     if q and q.strip():
         if not _check_search_rate_limit(request):
@@ -3058,12 +3061,15 @@ def _indexable_articles() -> list:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
             meta = [dict(r) for r in conn.execute(
-                "SELECT id, slug, title, category, image_path, created_at FROM articles ORDER BY id DESC"
+                "SELECT id, slug, title, category, content, image_path, created_at FROM articles ORDER BY id DESC"
             ).fetchall()]
         rows = []
         for m in meta:
             slug_val = (m.get("slug") or "").strip()
             if not slug_val:
+                continue
+            cat_val = database.normalize_category_name(m.get("category") or "Gündem") or "Gündem"
+            if cat_val != "Analiz" and content_quality.is_thin(m.get("content") or "", threshold=220):
                 continue
             d = database._row_to_dict({
                 "id": m["id"],
@@ -3194,7 +3200,7 @@ async def news_sitemap(request: Request):
             for r in conn.execute(f"SELECT id, title FROM articles WHERE id IN ({','.join('?' * len(ids))})", tuple(ids)).fetchall():
                 by_id[dict(r)["id"]] = dict(r)["title"]
     for a in articles:
-        a["title"] = by_id.get(a["id"], "")
+        a["title"] = content_quality.clean_title_text(by_id.get(a["id"], "") or a.get("title") or "")
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     if _is_human_browser_request(request):
         rows = [

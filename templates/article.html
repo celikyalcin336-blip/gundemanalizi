@@ -92,7 +92,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": {{ article.category | tojson }},
-              "item": "https://xn--gndemanalizi-dlb.com.tr/?kategori={{ article.category }}"
+              "item": "https://xn--gndemanalizi-dlb.com.tr{% if article.category == 'Analiz' %}/analiz{% else %}/?kategori={{ article.category }}{% endif %}"
             },
             {
               "@type": "ListItem",
@@ -805,7 +805,7 @@
                         <span class="w-2.5 h-2.5 rounded-sm bg-red-600"></span>
                         {{ article.category }} Kategorisinden Benzer Haberler
                     </h3>
-                    <a href="/?kategori={{ article.category }}" class="text-xs font-bold text-red-600 hover:underline">Tümünü Gör →</a>
+                    <a href="{% if article.category == 'Analiz' %}/analiz{% else %}/?kategori={{ article.category }}{% endif %}" class="text-xs font-bold text-red-600 hover:underline">Tümünü Gör →</a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {% for rel in related_articles[:6] %}
