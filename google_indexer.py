@@ -96,9 +96,23 @@ def get_access_token() -> Optional[str]:
 
 def notify_google_indexing(url: str, action: str = "URL_UPDATED") -> bool:
     """
-    Google Indexing API'ye anlik indeksleme cagrisi gonderir.
-    action: URL_UPDATED veya URL_DELETED
+    Google Indexing API'ye ve Google Resmi WebSub (PubSubHubbub) Hub'ına anlık bildirim gönderir.
+    Yeni haber yayınlandığı saniyede /sitemap.xml, /news-sitemap.xml ve /rss.xml taranmak üzere tetiklenir.
     """
+    try:
+        for feed_url in (
+            "https://xn--gndemanalizi-dlb.com.tr/rss.xml",
+            "https://xn--gndemanalizi-dlb.com.tr/news-sitemap.xml",
+            "https://xn--gndemanalizi-dlb.com.tr/sitemap.xml",
+        ):
+            requests.post(
+                "https://pubsubhubbub.appspot.com/",
+                data={"hub.mode": "publish", "hub.url": feed_url},
+                timeout=6,
+            )
+        print("🔔 [Google WebSub Hub] Yeni haber ve site haritaları Google'a anlık bildirildi.")
+    except Exception as _we:
+        print(f"⚠️ [Google WebSub Hub] Uyarı: {_we}")
     access_token = get_access_token()
     if not access_token:
         print(f"⚠️ [Google Indexing API] Token alinamadigi icin atlandi: {url}")

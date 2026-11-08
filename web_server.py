@@ -3003,13 +3003,20 @@ def _format_w3c_lastmod(raw_dt: str, fallback_date: str) -> str:
 
 
 def _indexable_articles() -> list:
-    """Veritabanındaki tüm temiz haberleri (%100 kapsam) en yeniden eskiye hafif meta sözlükleri olarak döner."""
+    """Veritabanındaki tüm temiz haberleri (%100 kapsam) en yeniden eskiye hafif meta sözlükleri olarak döner.
+    Yeni haber eklendiği saniyede (MAX(id) değiştiğinde) 0 sn gecikmeyle anında güncellenir."""
     import content_quality
     now = time.time()
-    if _INDEX_CACHE["rows"] and now - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
+    try:
+        with database.get_connection() as conn:
+            chk = conn.execute("SELECT COALESCE(MAX(id), 0) AS mid, COUNT(*) AS cnt FROM articles").fetchone()
+            cur_sig = f"{chk['mid']}_{chk['cnt']}"
+    except Exception:
+        cur_sig = _INDEX_CACHE.get("sig", "")
+    if _INDEX_CACHE["rows"] and _INDEX_CACHE.get("sig") == cur_sig and now - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
         return _INDEX_CACHE["rows"]
     with _INDEX_LOCK:
-        if _INDEX_CACHE["rows"] and time.time() - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
+        if _INDEX_CACHE["rows"] and _INDEX_CACHE.get("sig") == cur_sig and time.time() - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
             meta = [dict(r) for r in conn.execute(
@@ -3031,6 +3038,7 @@ def _indexable_articles() -> list:
             rows.append(d)
         _INDEX_CACHE["rows"] = rows
         _INDEX_CACHE["ts"] = time.time()
+        _INDEX_CACHE["sig"] = cur_sig
         return rows
 
 
