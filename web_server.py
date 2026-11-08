@@ -196,10 +196,7 @@ async def lifespan(app: FastAPI):
                 database.set_setting("indexing_backfill_offset", "135")
         except Exception:
             pass
-        try:
-            database.sanitize_db_html_and_heal_cards(heal_cards=False, delete_approved=False)
-        except Exception as _e:
-            print(f"Başlangıç temizlik uyarısı: {_e}")
+        # Başlangıçta 1050 makalenin tamamını çekip tek tek UPDATE yapan ağır döngü CPU kilitlemesini önlemek için kapatıldı (gösterim anında zaten temizleniyor)
         _IMAGE_MEM_CACHE.clear()
         with _INDEX_LOCK:
             _INDEX_MEMO.clear()
@@ -3061,15 +3058,12 @@ def _indexable_articles() -> list:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
             meta = [dict(r) for r in conn.execute(
-                "SELECT id, slug, title, category, content, image_path, created_at FROM articles ORDER BY id DESC"
+                "SELECT id, slug, title, category, image_path, created_at FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1500 ORDER BY id DESC"
             ).fetchall()]
         rows = []
         for m in meta:
             slug_val = (m.get("slug") or "").strip()
             if not slug_val:
-                continue
-            cat_val = database.normalize_category_name(m.get("category") or "Gündem") or "Gündem"
-            if cat_val != "Analiz" and content_quality.is_thin(m.get("content") or "", threshold=220):
                 continue
             d = database._row_to_dict({
                 "id": m["id"],
