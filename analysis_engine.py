@@ -293,7 +293,7 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     """
     global _RADAR_CACHE
     now = time.time()
-    if not force_refresh and _RADAR_CACHE["data"] and (now - _RADAR_CACHE["ts"]) < 180:
+    if not force_refresh and _RADAR_CACHE["data"] and _RADAR_CACHE["data"].get("dossiers") and (now - _RADAR_CACHE["ts"]) < 180:
         return _RADAR_CACHE["data"]
 
     import database
@@ -447,7 +447,7 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
     focus_cat = (focus.get("category") or "Gündem").strip()
     lead_image = (focus.get("image_path") or "").strip()
 
-    report_title = f"Gündem Analizi: {focus_title}"
+    report_title = f"{focus_cat} Dosyası: {focus_title} — Arka Plan ve Etki Analizi"
     lead_summary = f"{focus_summary} Gelişmenin arka planı, sektörel ve toplumsal etkileriyle kapsamlı analizi."
 
     ai_html = ""

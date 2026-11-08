@@ -980,7 +980,10 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
             return (existing["slug"], False) if return_status else existing["slug"]
 
         # 2. Semantik Başlık Benzerliği (Son 150 makale içinde %68 üzeri benzerlik kontrolü)
-        cur = conn.execute("SELECT slug, title FROM articles ORDER BY id DESC LIMIT 150")
+        if (category or "").strip() == "Analiz":
+            cur = conn.execute("SELECT slug, title FROM articles WHERE category = 'Analiz' ORDER BY id DESC LIMIT 50")
+        else:
+            cur = conn.execute("SELECT slug, title FROM articles ORDER BY id DESC LIMIT 150")
         recent = cur.fetchall()
         clean_t = title.strip().lower()
         for r in recent:
@@ -996,18 +999,19 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
         print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' için image_path boş! Kayıt reddedildi.")
         return ("", False) if return_status else ""
     if not img_base.lower().endswith((".mp4", ".webm", ".mov")):
-        if not os.path.exists(image_path) or os.path.getsize(image_path) < 6000:
-            print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görsel dosyası eksik veya <6KB! Kayıt reddedildi.")
-            return ("", False) if return_status else ""
-    try:
-        save_image_file(image_path)
-    except Exception as e:
-        print(f"⚠️ save_image_file uyarısı: {e}")
-    if not img_base.lower().endswith((".mp4", ".webm", ".mov")):
         db_img_bytes = get_image(img_base)
         if not db_img_bytes or len(db_img_bytes) < 6000:
-            print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görseli PostgreSQL images tablosunda doğrulanamadı! Kayıt reddedildi.")
-            return ("", False) if return_status else ""
+            if not os.path.exists(image_path) or os.path.getsize(image_path) < 6000:
+                print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görsel dosyası eksik veya <6KB! Kayıt reddedildi.")
+                return ("", False) if return_status else ""
+            try:
+                save_image_file(image_path)
+            except Exception as e:
+                print(f"⚠️ save_image_file uyarısı: {e}")
+            db_img_bytes = get_image(img_base)
+            if not db_img_bytes or len(db_img_bytes) < 6000:
+                print(f"⛔ [VERİTABANI GÖRSEL KALKANI] '{title[:50]}' görseli PostgreSQL images tablosunda doğrulanamadı! Kayıt reddedildi.")
+                return ("", False) if return_status else ""
 
     slug = base_slug
     with get_connection() as conn:
