@@ -238,70 +238,77 @@
         </div>
     </div>
 
-        <!-- 2. ANA HEADER & 2 KATLI KURUMSAL KATEGORİ MENÜSÜ (TAŞMA YAPMAYAN MERKEZİ DÜZEN) -->
-    <header class="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur border-b border-brand-border shadow-md transition-all">
-        <!-- ÜST KAT: Sol Logo, Sağ Arama Kutusu & Erişilebilirlik -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+            <!-- 2. ANA HEADER & 2 KATLI KURUMSAL KATEGORİ MENÜSÜ (BEYAZ ÜST + KIRMIZI KATEGORİ ŞERİDİ) -->
+    <header class="sticky top-0 z-40 shadow-md transition-all" style="background-color: #ffffff !important; border-bottom: 1px solid #e2e8f0 !important;">
+        <!-- ÜST KAT (BEYAZ ZEMİN): Sol Logo, Sağ Arama Kutusu & Erişilebilirlik -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4" style="background-color: #ffffff !important;">
             <!-- Logo & Marka -->
-            <a href="/" class="flex items-center gap-3 group shrink-0">
-                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-red-600 shadow-md group-hover:scale-105 transition" onerror="this.onerror=null;this.src='/assets/logo.png';">
+            <a href="/" class="flex items-center gap-3 shrink-0" style="text-decoration: none !important;">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-red-600 shadow-sm transition" onerror="this.onerror=null;this.src='/assets/logo.png';">
                 <div>
-                    <span class="text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1">
-                        GÜNDEM <span class="text-red-500">ANALİZİ</span>
+                    <span class="text-lg sm:text-2xl font-black tracking-tight flex items-center gap-1" style="color: #0f172a !important;">
+                        <span style="color: #0f172a !important;">GÜNDEM</span>
+                        <span style="color: #dc2626 !important;">ANALİZİ</span>
                     </span>
-                    <p class="text-[9px] sm:text-[10px] font-semibold text-slate-400 tracking-wider uppercase hidden sm:block">
+                    <p class="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase hidden sm:block" style="color: #475569 !important;">
                         Doğru Haber • Tarafsız Analiz
                     </p>
                 </div>
             </a>
 
-            <!-- Sağ Taraf: Arama Kutusu (Ara butonu kaldırıldı) & Erişilebilirlik -->
+            <!-- Sağ Taraf: Arama Kutusu & Erişilebilirlik -->
             <div class="flex items-center gap-2.5 shrink-0">
                 <form action="/" method="GET" class="relative flex items-center">
                     <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Haber veya konu ara..." 
-                           class="bg-slate-900/90 border border-slate-700/80 hover:border-slate-500 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 w-36 sm:w-56 md:w-64 transition shadow-inner">
-                    <span class="absolute left-2.5 text-slate-400 text-xs pointer-events-none">🔍</span>
+                           style="background-color: #f1f5f9 !important; color: #0f172a !important; border: 1px solid #cbd5e1 !important;"
+                           class="rounded-xl pl-8 pr-3 py-1.5 text-xs font-semibold placeholder:text-slate-500 focus:outline-none focus:border-red-600 w-36 sm:w-56 md:w-64 transition shadow-xs">
+                    <span class="absolute left-2.5 text-xs pointer-events-none" style="color: #475569 !important;">🔍</span>
                 </form>
 
-                <button type="button" onclick="openA11yModal()" class="inline-flex items-center gap-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-white border border-blue-500/40 font-bold text-xs px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-sm cursor-pointer shrink-0" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
-                    <span class="text-sm">♿</span>
-                    <span class="hidden sm:inline">Erişilebilirlik</span>
+                <button type="button" onclick="openA11yModal()"
+                        style="background-color: #0f172a !important; color: #ffffff !important; border: 1px solid #0f172a !important;"
+                        class="inline-flex items-center gap-1.5 font-extrabold text-xs px-2.5 sm:px-3 py-1.5 rounded-xl transition shadow-xs cursor-pointer shrink-0" title="Erişilebilirlik ve Kolay Okuma Modu" aria-label="Erişilebilirlik Menüsü">
+                    <span class="text-sm" style="color: #ffffff !important;">♿</span>
+                    <span class="hidden sm:inline" style="color: #ffffff !important;">Erişilebilirlik</span>
                 </button>
             </div>
         </div>
 
-        <!-- ALT KAT: Tam Ortalanmış, Tek Satır, Mobilde Kaydırılabilir Kategori Barı (Tümü kaldırıldı) -->
-        <div class="border-t border-slate-800/80 bg-slate-950/60">
-            <nav class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 overflow-x-auto no-scrollbar flex items-center md:justify-center gap-1.5 sm:gap-2 whitespace-nowrap text-xs sm:text-sm font-bold text-slate-300">
-                <a href="/son-dakika" class="shrink-0 px-3 py-1 rounded-lg font-black transition flex items-center gap-1.5 {{ 'bg-red-600 text-white shadow-md' if active_category in ['Son Dakika', 'sondakika'] else 'text-red-400 hover:text-white hover:bg-red-950/40 border border-red-500/30' }}">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                    <span>Son Dakika</span>
+        <!-- ALT KAT (CANLI HABER KIRMIZISI ŞERİT): Tam Ortalanmış, Bembeyaz Kristal Netlikte Kategori Yazıları -->
+        <div class="bg-red-600" style="background-color: #dc2626 !important; border-top: 1px solid #b91c1c !important; border-bottom: 1px solid #991b1b !important;">
+            <nav class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 overflow-x-auto no-scrollbar flex items-center md:justify-center gap-1.5 sm:gap-2.5 whitespace-nowrap text-xs sm:text-sm font-extrabold">
+                <a href="/son-dakika"
+                   style="color: #ffffff !important; background-color: {{ 'rgba(0,0,0,0.35)' if active_category in ['Son Dakika', 'sondakika'] else 'rgba(0,0,0,0.2)' }} !important; border: 1px solid rgba(255,255,255,0.45) !important;"
+                   class="shrink-0 px-3 py-1 rounded-lg font-black transition flex items-center gap-1.5 hover:opacity-90">
+                    <span class="w-2 h-2 rounded-full bg-white animate-ping" style="background-color: #ffffff !important;"></span>
+                    <span style="color: #ffffff !important;">Son Dakika</span>
                 </a>
-                <a href="/analiz" class="shrink-0 px-3 py-1 rounded-lg font-extrabold transition flex items-center gap-1 bg-amber-500/15 text-amber-300 hover:bg-amber-500 hover:text-slate-950 border border-amber-400/40">
-                    <span>📊</span>
-                    <span>Analiz</span>
+                <a href="/analiz"
+                   style="color: #ffffff !important; background-color: rgba(0,0,0,0.22) !important; border: 1px solid rgba(255,255,255,0.45) !important;"
+                   class="shrink-0 px-3 py-1 rounded-lg font-extrabold transition flex items-center gap-1 hover:opacity-90">
+                    <span style="color: #ffffff !important;">📊</span>
+                    <span style="color: #ffffff !important;">Analiz</span>
                 </a>
-                <a href="/?kategori=Gündem" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Gündem' else '' }}">Gündem</a>
-                <a href="/?kategori=Ekonomi" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Ekonomi' else '' }}">Ekonomi</a>
-                <a href="/?kategori=Eğitim" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Eğitim' else '' }}">Eğitim</a>
-                <a href="/?kategori=Otomobil" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Otomobil' else '' }}">Otomobil</a>
-                <a href="/?kategori=Teknoloji" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Teknoloji' else '' }}">Teknoloji</a>
-                <a href="/?kategori=Sağlık" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Sağlık' else '' }}">Sağlık</a>
-                <a href="/?kategori=Spor" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Spor' else '' }}">Spor</a>
-                <a href="/?kategori=Dünya" class="shrink-0 px-3 py-1 rounded-lg hover:text-white hover:bg-slate-800 transition {{ 'bg-red-600 text-white font-extrabold' if active_category == 'Dünya' else '' }}">Dünya</a>
+                <a href="/?kategori=Gündem" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Gündem' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Gündem</a>
+                <a href="/?kategori=Ekonomi" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Ekonomi' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Ekonomi</a>
+                <a href="/?kategori=Eğitim" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Eğitim' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Eğitim</a>
+                <a href="/?kategori=Otomobil" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Otomobil' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Otomobil</a>
+                <a href="/?kategori=Teknoloji" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Teknoloji' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Teknoloji</a>
+                <a href="/?kategori=Sağlık" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Sağlık' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Sağlık</a>
+                <a href="/?kategori=Spor" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Spor' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Spor</a>
+                <a href="/?kategori=Dünya" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Dünya' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Dünya</a>
             </nav>
         </div>
     </header>
 
-    <!-- 3. CANLI PİYASA & FİNANS BANDI (Altın, Dolar, Euro, Bitcoin) -->
-    <section class="bg-brand-card/90 border-b border-brand-border/70 backdrop-blur py-2 px-3 sm:px-6 shadow-md relative z-30">
+    <!-- 3. CANLI PİYASA & FİNANS BANDI (FERAH AÇIK ZEMİN + KIRMIZI ETİKET) -->
+    <section class="py-2.5 px-3 sm:px-6 shadow-xs relative z-30" style="background-color: #f8fafc !important; border-bottom: 1px solid #e2e8f0 !important;">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-            <div class="flex items-center gap-2 shrink-0 pr-2">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <a href="/piyasalar" class="canli-piyasa-label text-[11px] sm:text-xs font-black tracking-wider uppercase text-white hover:text-red-600 transition drop-shadow-xs">CANLI PİYASA →</a>
+            <div class="flex items-center gap-2 shrink-0 pr-1">
+                <a href="/piyasalar" class="bg-red-600 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-black tracking-wider uppercase transition shadow-xs flex items-center gap-1.5" style="background-color: #dc2626 !important; color: #ffffff !important;">
+                    <span class="w-2 h-2 rounded-full bg-white animate-ping" style="background-color: #ffffff !important;"></span>
+                    <span style="color: #ffffff !important;">CANLI PİYASA →</span>
+                </a>
             </div>
             <div id="market-rates-bar" class="w-full grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs">
                 {% if market_rates %}
