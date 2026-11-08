@@ -2191,6 +2191,15 @@ async def article_detail(request: Request, slug: str):
         from fastapi.responses import RedirectResponse
         import urllib.parse
         slug_low = (slug or "").lower()
+        _direct_slug_map = {
+            "thomas-markle-abdde-cocuk-istismari-materyali-bulundurmak-suclamasiyla-yakalandi": "/haber/thomas-markle-abdde-yurutulen-federal-sorusturma-kapsaminda-gozaltina-alindi",
+            "fuhus-aginda-977-milyonluk-trafik": "/haber/yasa-disi-sebeke-operasyonunda-977-milyon-liralik-para-trafigi",
+            "istanbulda-canli-bahis-dolandiriciligi-8-supheli-gozaltinda": "/haber/istanbulda-spor-veri-altyapisina-siber-mudahale-8-supheli-gozaltinda",
+            "umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unutlar-arasinda-hareketlilik-yasan": "/haber/umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unsurlar-arasinda-hareketlilik-yasa",
+            "f-bahce-tarfinin-konugu-valencia": "/haber/fenerbahce-bekonun-konugu-valencia",
+        }
+        if slug_low in _direct_slug_map:
+            return RedirectResponse(url=_direct_slug_map[slug_low], status_code=301)
         # Silinen veya taşınan eski haber bağlantılarını kırık (404) bırakmak yerine ilgili kategoriye / ana sayfaya 301 yönlendir
         _cat_map = [
             ("Ekonomi", ("gumus", "altin", "dolar", "euro", "borsa", "enflasyon", "faiz", "merkez-bankasi", "yatirim", "halka-arz", "temettu", "kripto", "bitcoin", "vergi", "maas", "emekli", "kira", "konut", "ihracat", "ekonomi", "fiyat", "zam")),

@@ -1780,6 +1780,44 @@ def sanitize_db_html_and_heal_cards(heal_cards: bool = False, delete_approved: b
             except Exception as _se:
                 print(f"post_e9ae894a60.jpg güncelleme uyarısı: {_se}")
 
+        # ADIM 0.5: Hassas veya yazım hatalı 5 URL slug'ını haberi silmeden kurumsal başlık ve URL'ye dönüştür
+        _SLUG_UPGRADES = [
+            (
+                "thomas-markle-abdde-cocuk-istismari-materyali-bulundurmak-suclamasiyla-yakalandi",
+                "thomas-markle-abdde-yurutulen-federal-sorusturma-kapsaminda-gozaltina-alindi",
+                "Thomas Markle ABD'de Yürütülen Federal Soruşturma Kapsamında Gözaltına Alındı",
+            ),
+            (
+                "fuhus-aginda-977-milyonluk-trafik",
+                "yasa-disi-sebeke-operasyonunda-977-milyon-liralik-para-trafigi",
+                "Yasa Dışı Şebeke Operasyonunda 977 Milyon Liralık Para Trafiği",
+            ),
+            (
+                "istanbulda-canli-bahis-dolandiriciligi-8-supheli-gozaltinda",
+                "istanbulda-spor-veri-altyapisina-siber-mudahale-8-supheli-gozaltinda",
+                "İstanbul'da Spor Veri Altyapısına Siber Müdahale: 8 Şüpheli Gözaltında",
+            ),
+            (
+                "umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unutlar-arasinda-hareketlilik-yasan",
+                "umman-korfezinde-dokme-yuk-gemisi-ile-askeri-unsurlar-arasinda-hareketlilik-yasa",
+                "Umman Körfezi'nde Dökme Yük Gemisi ile Askeri Unsurlar Arasında Hareketlilik Yaşandı",
+            ),
+            (
+                "f-bahce-tarfinin-konugu-valencia",
+                "fenerbahce-bekonun-konugu-valencia",
+                "Fenerbahçe Beko'nun Konuğu Valencia",
+            ),
+        ]
+        try:
+            with get_connection() as conn:
+                for old_sl, new_sl, clean_h1 in _SLUG_UPGRADES:
+                    conn.execute(
+                        "UPDATE articles SET slug = ?, title = ? WHERE slug = ?",
+                        (new_sl, clean_h1, old_sl),
+                    )
+        except Exception as _sue:
+            print(f"Slug güncelleme uyarısı: {_sue}")
+
         # ADIM 1: Tüm makalelerin başlık, özet ve içeriklerinde temizlik
         with get_connection() as conn:
             rows = conn.execute("SELECT id, slug, title, summary, content, category, image_path, created_at FROM articles ORDER BY id DESC").fetchall()

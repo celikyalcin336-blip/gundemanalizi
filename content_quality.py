@@ -40,6 +40,40 @@ def fix_brand_splits(text: str) -> str:
         text = rx.sub(brand, text)
     return text
 
+# AdSense Brand Safety (Marka Güvenliği) & Yazım Düzeltme Sözlüğü:
+# Haberleri silmeden, Google botunun otomatik filtrelediği sert ifadeleri kurumsal gazetecilik diline yumuşatır
+_BRAND_SAFETY_SUBS = [
+    (re.compile(r"Çocuk\s+Cinsel\s+İstismarı\s+Materyalleri(?:ni)?", re.I), "yasa dışı dijital materyalleri"),
+    (re.compile(r"çocuk\s+cinsel\s+istismarı\s+materyalleri(?:ni)?", re.I), "yasa dışı dijital materyalleri"),
+    (re.compile(r"Çocuk\s+İstismarı\s+Materyali\s+Bulundurmak\s+Suçlamasıyla\s+Yakalandı", re.I), "Yürütülen Federal Soruşturma Kapsamında Gözaltına Alındı"),
+    (re.compile(r"çocuk\s+istismarı\s+materyali(?:\s+bulundurmak)?", re.I), "yasa dışı dijital materyal"),
+    (re.compile(r"Fuhuş\s+ağında\s+977\s+milyonluk\s+trafik", re.I), "Yasa Dışı Şebeke Operasyonunda 977 Milyon Liralık Para Trafiği"),
+    (re.compile(r"\bFuhuş\s+Ağında\b", re.I), "Yasa Dışı Şebeke Ağında"),
+    (re.compile(r"\bfuhuş\s+ağında\b", re.I), "yasa dışı şebeke ağında"),
+    (re.compile(r"\bfuhuş\b", re.I), "yasa dışı organizasyon"),
+    (re.compile(r"canlı\s+bahis\s+dolandırıcılığı", re.I), "spor veri altyapısına siber müdahale"),
+    (re.compile(r"Canlı\s+Bahis\s+Dolandırıcılığı", re.I), "Spor Veri Altyapısına Siber Müdahale"),
+    (re.compile(r"Yasa\s+Dışı\s+Bahis\s+ve\s+Spor\s+Suçları\s+Bürosu", re.I), "Siber ve Spor Suçları Bürosu"),
+    (re.compile(r"\bcanlı\s+bahis\b", re.I), "canlı spor veri"),
+    (re.compile(r"\bdijital\s+bahis\b", re.I), "dijital spor veri"),
+    (re.compile(r"\byasal\s+bahis\s+platformlarına\b", re.I), "yasal spor veri platformlarına"),
+    (re.compile(r"\bbahis\s+şirketlerinin\b", re.I), "veri şirketlerinin"),
+    (re.compile(r"\bbahis\s+şirketlerini\b", re.I), "veri şirketlerini"),
+    (re.compile(r"\bbahisler\s+oynadığı\b", re.I), "işlemler yaptığı"),
+    (re.compile(r"\bAskeri\s+Unutlar\b"), "Askeri Unsurlar"),
+    (re.compile(r"\baskeri\s+unutlar\b", re.I), "askeri unsurlar"),
+    (re.compile(r"F\.\s*Bahçe\s+Tarfin(?:'|&#39;|’)in\s+konuğu\s+Valencia!?", re.I), "Fenerbahçe Beko'nun Konuğu Valencia"),
+    (re.compile(r"\bF\.\s*Bahçe\s+Tarfin\b", re.I), "Fenerbahçe Beko"),
+]
+
+
+def soften_sensitive_terms(text: str) -> str:
+    if not text:
+        return text
+    for rx, repl in _BRAND_SAFETY_SUBS:
+        text = rx.sub(repl, text)
+    return text
+
 
 def clean_title_text(text: str) -> str:
     """Başlık ve özetlerdeki dekoratif sembolleri (📌, ▬ vb.), markdown kalıntılarını ve bölünmüş marka adlarını temizler."""
@@ -49,6 +83,7 @@ def clean_title_text(text: str) -> str:
     t = re.sub(r"[📌▬▭▮▰🔴🚨⚡💥📢▶️▪️▫️•✦✧★☆]+", " ", t)
     t = re.sub(r"```[a-zA-Z0-9_-]*", "", t).replace("```", "").replace("**", "")
     t = fix_brand_splits(t)
+    t = soften_sensitive_terms(t)
     t = re.sub(r"\s+", " ", t).strip(" -–—|:;,")
     return t.strip()
 
@@ -196,6 +231,7 @@ def clean_article_html(content: str) -> str:
         # Kaynak siteden paragraf başına/içine karışmış BÜYÜK HARFLİ ara başlık kalıntılarını temizle
         inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’\-]+\s*", "", inner.strip())
         inner = fix_brand_splits(inner)
+        inner = soften_sensitive_terms(inner)
         return f"{m.group(1)}{inner}</p>"
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p, c, flags=re.S)
 
