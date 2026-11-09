@@ -2797,5 +2797,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794243245.9740787
+  },
+  {
+    "slug": "potanin-perileri-yeni-teknik-yapilanmayla-avrupa-sampiyonasi-yolculuguna-hazirla",
+    "title": "Potanın Perileri Yeni Teknik Yapılanmayla Avrupa Şampiyonası Yolculuğuna Hazırlanıyor",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794245947.4955263
+  },
+  {
+    "slug": "yurt-disindan-teknoloji-alisverisinde-gizli-maliyetler-ve-sektorel-riskler",
+    "title": "Yurt Dışından Teknoloji Alışverişinde Gizli Maliyetler ve Sektörel Riskler",
+    "summary": "Yurt dışı kaynaklı teknolojik ürün tedariki, ilk bakışta fiyat avantajı sunuyor gibi görünse de uzun vadede garanti süreçleri ve donanım uyumsuzlukları gibi ciddi problemler yaratabiliyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794245970.041312
   }
 ]
