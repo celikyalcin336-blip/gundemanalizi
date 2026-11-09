@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-09 11:33:55",
+  "last_check": "2026-11-09 12:19:20",
   "result": "posted",
-  "last_post": "2026-11-09 11:33:55",
-  "next_planned": "2026-11-09 12:18:55",
+  "last_post": "2026-11-09 12:19:20",
+  "next_planned": "2026-11-09 13:04:20",
   "runner": "github-actions",
-  "log_tail": "[2026-11-09 08:33:31] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Hyundai, Elektrikli Mobilite Vizyon... (Birebir slug eşleşmesi: hyundai-elektrikli-mobilite-vizyonunda-ioniq-3-icin-finansman-destegini-baslatti)\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 160 | Başlık: Kağıthane'de Çocukların Oyun Oynadığı Midibüs Yangını Maddi Hasara Yol Açtı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794213212.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/kagithanede-cocuklarin-oyun-oynadigi-midibus-yangini-maddi-hasara-yol-acti\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Kağıthane'de Çocukların Oyun Oynadığı Midibüs Yangını Maddi Hasara Yol Açtı\n"
+  "log_tail": "[2026-11-09 09:18:55] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Hyundai, Elektrikli Mobilite Vizyon... (Birebir slug eşleşmesi: hyundai-elektrikli-mobilite-vizyonunda-ioniq-3-icin-finansman-destegini-baslatti)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Fon Soruşturmasında Eski Takasbank ... (Birebir slug eşleşmesi: fon-sorusturmasinda-eski-takasbank-genel-muduru-icin-yeniden-gozalti-karari)\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 150 | Başlık: Ekim Ayında Enflasyona Karşı Koruma Kalkanı Mevduat Faizi Oldu\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794215936.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/ekim-ayinda-enflasyona-karsi-koruma-kalkani-mevduat-faizi-oldu\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Ekim Ayında Enflasyona Karşı Koruma Kalkanı Mevduat Faizi Oldu\n"
 }
