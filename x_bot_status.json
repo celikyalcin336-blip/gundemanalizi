@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-09 19:08:43",
+  "last_check": "2026-11-09 19:54:05",
   "result": "posted",
-  "last_post": "2026-11-09 19:08:43",
-  "next_planned": "2026-11-09 19:53:43",
+  "last_post": "2026-11-09 19:54:05",
+  "next_planned": "2026-11-09 20:39:05",
   "runner": "github-actions",
-  "log_tail": "[2026-11-09 16:08:20] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Dünya | Virallik/Duygu Skoru: 185 | Başlık: Gazze’de İnsani Krizin Bilançosu: Can Kaybı 75 Bin Sınırına Dayandı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794240502.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/gazzede-insani-krizin-bilancosu-can-kaybi-75-bin-sinirina-dayandi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Gazze’de İnsani Krizin Bilançosu: Can Kaybı 75 Bin Sınırına Dayandı\n"
+  "log_tail": "[2026-11-09 16:53:43] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Sağlık | Virallik/Duygu Skoru: 165 | Başlık: İnek Sütü Alerjisiyle Mücadele Eden Çocuk İçin İmmünoterapi Umudu\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794243224.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/inek-sutu-alerjisiyle-mucadele-eden-cocuk-icin-immunoterapi-umudu\n🎉 [X Auto-Poster] Başarıyla tweetlendi: İnek Sütü Alerjisiyle Mücadele Eden Çocuk İçin İmmünoterapi Umudu\n"
 }
