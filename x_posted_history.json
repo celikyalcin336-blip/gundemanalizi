@@ -2583,5 +2583,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794180544.7428284
+  },
+  {
+    "slug": "marsilya-zorlu-lens-deplasmanindan-son-dakika-goluyle-galibiyet-cikardi",
+    "title": "Marsilya Zorlu Lens Deplasmanından Son Dakika Golüyle Galibiyet Çıkardı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794183245.6079857
+  },
+  {
+    "slug": "kahramanmarastaki-ortaokul-saldirisinda-supheli-iki-cocugun-goruntuleri-sorustur",
+    "title": "Kahramanmaraş’taki Ortaokul Saldırısında Şüpheli İki Çocuğun Görüntüleri Soruşturma Dosyasına Girdi",
+    "summary": "Kahramanmaraş’ta on kişinin hayatını kaybettiği okul baskınına dair hazırlanan inceleme tutanakları, saldırıdan kısa süre önce yaşanan şüpheli etkileşimleri gün yüzüne çıkardı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794183267.16511
   }
 ]
