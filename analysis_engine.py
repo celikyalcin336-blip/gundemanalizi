@@ -571,6 +571,20 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
         if t_norm in seen_titles:
             continue
         seen_titles.add(t_norm)
+        c_str = str(s.get("created_at") or "")[:16]
+        try:
+            _hr = int(c_str[11:13]) if len(c_str) >= 13 and c_str[11:13].isdigit() else 12
+        except Exception:
+            _hr = 12
+        if _hr < 13:
+            _slot_lbl = "Sabah Analizi · 10:00"
+        elif _hr < 18:
+            _slot_lbl = "Öğle Analizi · 15:00"
+        else:
+            _slot_lbl = "Akşam Analizi · 19:00"
+        _raw_body = s.get("content") or ""
+        _src_cnt = max(1, _raw_body.split('class="ga-sources"', 1)[-1].split("</ul>", 1)[0].count("<li>")) if 'class="ga-sources"' in _raw_body else 1
+        _ed_note = bool((database.get_setting(f"editor_note_{s.get('id')}", "") or "").strip()) if s.get("id") else False
         dossiers.append({
             "id": s.get("id"),
             "slug": s.get("slug"),
@@ -579,8 +593,11 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
             "category": "Analiz",
             "image_path": s.get("image_path"),
             "source": s.get("source") or "Gündem Analizi",
-            "created_at": str(s.get("created_at") or "")[:16],
+            "created_at": c_str,
             "reading_time_min": s.get("reading_time_min") or 4,
+            "slot_label": _slot_lbl,
+            "source_count": _src_cnt,
+            "has_editor_note": _ed_note,
         })
 
     result = {
@@ -710,15 +727,55 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
     lead_summary = f"{focus_summary} Gelişmenin arka planı, sektörel ve toplumsal etkileriyle kapsamlı analizi."
 
     ai_html = ""
+    # 1) Yeni çok kaynaklı analiz formatı (Ne oldu / Neden önemli / Arka plan / Türkiye'ye etkisi /
+    #    Senaryolar / Kaynaklar ne diyor / Rakamlarla / Bundan sonra)
+    try:
+        import multisource
+        import news_fetcher
+        try:
+            _live_pool = news_fetcher.fetch_latest_news(limit_per_feed=10) or []
+        except Exception:
+            _live_pool = []
+        _primary_link = ""
+        _primary_src = focus.get("source") or "Gündem Analizi"
+        _f_toks = multisource._tokens(focus_title)
+        for _lp in _live_pool:
+            _lp_toks = multisource._tokens(_lp.get("title", ""))
+            if _f_toks and _lp_toks and len(_f_toks & _lp_toks) >= max(3, int(min(len(_f_toks), len(_lp_toks)) * 0.6)):
+                _primary_link = _lp.get("link") or ""
+                if _lp.get("source"):
+                    _primary_src = _lp.get("source")
+                break
+        _primary = {
+            "title": focus_title,
+            "source": _primary_src,
+            "link": _primary_link,
+            "category": focus_cat,
+            "summary": focus_summary,
+        }
+        _ms = multisource.build_article(_primary, focus_content_plain[:3500], _live_pool, category=focus_cat, mode="analysis")
+        if _ms:
+            report_title = _ms["title"]
+            if len(_ms.get("summary") or "") >= 45:
+                lead_summary = _ms["summary"]
+            ai_html = _ms["content"] + (
+                f'\n<p class="text-slate-800 leading-relaxed mb-4"><strong>Bu analizin dayandığı haber:</strong> '
+                f'<a href="/haber/{_html.escape(focus_slug)}" class="text-red-600 font-bold underline">{_html.escape(focus_title)}</a></p>'
+            )
+    except Exception as _ms_e:
+        print(f"Çok kaynaklı analiz uyarısı: {_ms_e}")
+        ai_html = ""
+
+    # 2) Yedek: mevcut analiz akışı
     try:
         import config
         import content_quality
-        if getattr(config, "GEMINI_API_KEY", ""):
+        if not ai_html and getattr(config, "GEMINI_API_KEY", ""):
             from google import genai
             from google.genai import types as genai_types
             client = genai.Client(
                 api_key=config.GEMINI_API_KEY,
-                http_options=genai_types.HttpOptions(timeout=22000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
+                http_options=genai_types.HttpOptions(timeout=65000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
             )
             synth_prompt = f"""Sen 'Gündem Analizi' haber merkezinin başanalistisin.
 Aşağıdaki TEK ANA GÜNDEM KONUSUNU başka alakasız konularla karıştırmadan, kendi başına derinlemesine analiz eden
@@ -750,7 +807,7 @@ KURALLAR:
 [İÇERİK]
 (HTML analiz metni)
 """
-            for m_name in ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-flash-lite-latest", "gemma-4-26b-a4b-it"]:
+            for m_name in ["gemini-3.5-flash", "gemini-3.5-flash-lite"]:
                 try:
                     res = client.models.generate_content(model=m_name, contents=synth_prompt)
                     raw_t = (res.text or "").strip() if res else ""

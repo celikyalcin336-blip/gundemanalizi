@@ -1606,6 +1606,7 @@ async def panel_get_article(article_id: int, request: Request):
                 art["content"] = vm.group(1) + "\n" + (art.get("content") or "")
     except Exception:
         pass
+    art["editor_note"] = (database.get_setting(f"editor_note_{article_id}", "") or "").strip()
     return {"ok": True, "article": art}
 
 @app.post("/api/panel/edit/{article_id}")
@@ -1615,7 +1616,8 @@ async def panel_edit_article(
     title: str = Form(...),
     summary: str = Form(""),
     content: str = Form(""),
-    category: str = Form("Gündem")
+    category: str = Form("Gündem"),
+    editor_note: str = Form(None)
 ):
     require_admin_pin(request)
     updated = database.update_article(
@@ -1625,6 +1627,13 @@ async def panel_edit_article(
         content=content.strip(),
         category=category.strip()
     )
+    if editor_note is not None:
+        database.set_setting(f"editor_note_{article_id}", editor_note.strip())
+    try:
+        import analysis_engine
+        analysis_engine._RADAR_CACHE["ts"] = 0
+    except Exception:
+        pass
     global _CATEGORY_WIDGETS_CACHE_TIME
     clear_turbo_cache()
     _CATEGORY_WIDGETS_CACHE_TIME = 0
@@ -2230,12 +2239,8 @@ async def article_detail(request: Request, slug: str):
             ("Eğitim", ("meb", "egitim", "sinav", "kpss", "yks", "lgs", "universite", "ogrenci", "okul", "ogretmen", "staj", "burs", "mufredat")),
             ("Dünya", ("iran", "israil", "gazze", "filistin", "abd", "trump", "rusya", "ukrayna", "zelenski", "almanya", "avrupa", "nato", "kuzey-kore", "cin", "suriye")),
         ]
-        target_url = "/"
-        for _cname, _kw_list in _cat_map:
-            if any(_k in slug_low for _k in _kw_list):
-                target_url = f"/?kategori={urllib.parse.quote(_cname)}"
-                break
-        return RedirectResponse(url=target_url, status_code=301)
+        # Bilinmeyen adresler için gerçek 404 (Google "soft 404" saymasın); markalı 404 sayfası gösterilir
+        raise StarletteHTTPException(status_code=404)
 
     article_id = article.get("id")
     category = article.get("category") or "Gündem"
@@ -2528,7 +2533,10 @@ async def article_detail(request: Request, slug: str):
             "analysis_cockpit": __import__("analysis_engine").build_article_analysis_cockpit(
                 {**article, "source": clean_src}, raw_content, (related_articles or []) + (breaking_news or [])
             ),
-            "highlights": highlights,
+            "highlights": ([] if 'class="ga-multi"' in (raw_content or "") else highlights),
+            "is_multi_source": 'class="ga-multi"' in (raw_content or ""),
+            "source_count": max(1, (raw_content or "").split('class="ga-sources"', 1)[-1].split("</ul>", 1)[0].count("<li>")) if 'class="ga-sources"' in (raw_content or "") else 1,
+            "editor_note": (database.get_setting(f"editor_note_{article_id}", "") or "").strip() if article_id else "",
             "related_articles": related_articles,
             "other_articles": other_articles,
             "trending_articles": trending_articles,

@@ -927,22 +927,30 @@
                 <div>
                     <label class="block text-slate-300 font-bold mb-1">Kategori</label>
                     <select id="ed-category" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white">
+                        <option value="Analiz">📊 Analiz (Özel Dosya)</option>
                         <option value="Son Dakika">Son Dakika</option>
                         <option value="Gündem">Gündem</option>
                         <option value="Asayiş">Asayiş</option>
                         <option value="Ekonomi">Ekonomi</option>
-                                    <option value="Eğitim">Eğitim</option>
+                        <option value="Eğitim">Eğitim</option>
                         <option value="Dünya">Dünya</option>
                         <option value="Spor">Spor</option>
                         <option value="Teknoloji">Teknoloji</option>
                         <option value="Otomobil">Otomobil</option>
-    <option value="Sağlık">Sağlık</option>
-</select>
+                        <option value="Sağlık">Sağlık</option>
+                    </select>
                 </div>
             </div>
             <div>
                 <label class="block text-slate-300 font-bold mb-1">Kısa Özet</label>
                 <textarea id="ed-summary" rows="2" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-brand-border text-white"></textarea>
+            </div>
+            <div>
+                <label class="block text-amber-400 font-bold mb-1 flex items-center justify-between">
+                    <span>✍️ Editörün Notu — Yalçın Çelik (İsteğe Bağlı)</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Doluysa haberin en üstünde imzalı kutu olarak görünür</span>
+                </label>
+                <textarea id="ed-editor-note" rows="2" placeholder="Bu haber veya analiz hakkında 1-3 cümlelik kendi değerlendirmenizi yazabilirsiniz (boş bırakılırsa kutu çıkmaz)..." class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-amber-500/40 text-white"></textarea>
             </div>
             <div>
                 <label class="block text-slate-300 font-bold mb-1">Haber İçeriği (HTML / Metin)</label>
@@ -1639,6 +1647,9 @@
                 document.getElementById('ed-category').value = a.category || 'Gündem';
                 document.getElementById('ed-summary').value = a.summary || '';
                 document.getElementById('ed-content').value = a.content || '';
+                if (document.getElementById('ed-editor-note')) {
+                    document.getElementById('ed-editor-note').value = a.editor_note || '';
+                }
                 document.getElementById('edit-modal').classList.remove('hidden');
             } catch (e) {
                 alert('Hata: ' + e);
@@ -1660,6 +1671,9 @@
             fd.append('category', document.getElementById('ed-category').value);
             fd.append('summary', document.getElementById('ed-summary').value);
             fd.append('content', document.getElementById('ed-content').value);
+            if (document.getElementById('ed-editor-note')) {
+                fd.append('editor_note', document.getElementById('ed-editor-note').value);
+            }
 
             const res = await fetch('/api/panel/edit/' + id, {
                 method: 'POST',

@@ -19,13 +19,36 @@
             });
         })();
     </script>
+    {% if radar and radar.dossiers and radar.dossiers|length > 0 %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    {% endif %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gündem Analizi — Özel Dosyalar ve Gündem Değerlendirmeleri</title>
-    <meta name="description" content="Türkiye ve dünya gündeminde öne çıkan gelişmelerin kapsamlı analizleri, arka plan dosyaları ve değerlendirmeleri.">
+    <title>Gündem Analizi — Günlük Özel Dosyalar ve Karşılaştırmalı Analizler</title>
+    <meta name="description" content="Türkiye ve dünya gündeminde öne çıkan gelişmelerin her gün 10:00, 15:00 ve 19:00 dilimlerinde yayımlanan kapsamlı arka plan ve etki analizleri.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr/analiz">
     <link rel="icon" type="image/png" href="/assets/logo.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "name": "Gündem Analizi — Günlük Özel Dosyalar ve Karşılaştırmalı Analizler",
+          "url": "https://xn--gndemanalizi-dlb.com.tr/analiz",
+          "inLanguage": "tr-TR",
+          "isPartOf": { "@id": "https://xn--gndemanalizi-dlb.com.tr/#website" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://xn--gndemanalizi-dlb.com.tr/" },
+            { "@type": "ListItem", "position": 2, "name": "Analiz", "item": "https://xn--gndemanalizi-dlb.com.tr/analiz" }
+          ]
+        }
+      ]
+    }
+    </script>
     <link rel="stylesheet" href="/assets/style.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -89,17 +112,26 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
 
-        <!-- SADE ÜST BAŞLIK -->
+        <!-- KURUMSAL ANALİZ MERKEZİ VİTRİN BAŞLIĞI -->
         <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-xs">
-            <div class="flex items-center gap-2.5 mb-2">
-                <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
-                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 uppercase">
-                    GÜNDEM ANALİZİ
-                </h1>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2.5 mb-2">
+                        <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
+                        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 uppercase">
+                            GÜNDEM ANALİZİ DOSYALARI
+                        </h1>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
+                        Türkiye ve dünya gündeminde öne çıkan kritik gelişmelerin neden-sonuç ilişkileri, çoklu kaynak karşılaştırmaları, rakamsal tabloları ve Türkiye'ye olası yansımalarıyla hazırlanan derinlemesine analiz dosyaları.
+                    </p>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;font-weight:800;">
+                    <span style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:6px 12px;border-radius:10px;">🌅 10:00 Sabah Analizi</span>
+                    <span style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:6px 12px;border-radius:10px;">☀️ 15:00 Öğle Analizi</span>
+                    <span style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:6px 12px;border-radius:10px;">🌙 19:00 Akşam Analizi</span>
+                </div>
             </div>
-            <p class="text-xs sm:text-sm text-slate-600 max-w-3xl leading-relaxed">
-                Türkiye ve dünya gündeminde öne çıkan kararların, kritik gelişmelerin ve kamuoyunu ilgilendiren başlıkların kapsamlı analiz dosyaları.
-            </p>
         </section>
 
         <!-- ANALİZ YAZILARI LİSTESİ -->
@@ -114,8 +146,13 @@
                             <img width="800" height="450" src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" class="w-full h-full object-cover hover:scale-105 transition duration-500">
                             {% endif %}
                             <span class="absolute top-3 left-3 px-3 py-1 rounded-lg bg-red-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow">
-                                Gündem Analizi
+                                {{ d.slot_label or 'Gündem Analizi' }}
                             </span>
+                            {% if d.source_count and d.source_count > 1 %}
+                            <span style="position:absolute;top:12px;right:12px;background:rgba(15,23,42,0.88);color:#ffffff;font-weight:800;font-size:10px;padding:4px 9px;border-radius:6px;">
+                                {{ d.source_count }} kaynak
+                            </span>
+                            {% endif %}
                         </a>
 
                         <div class="p-5">
@@ -137,7 +174,7 @@
                     </div>
 
                     <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between text-xs">
-                        <span class="font-bold text-slate-600">Gündem Analizi</span>
+                        <a href="/yazar/yalcin-celik" class="font-bold text-slate-700 hover:text-red-600 transition">Editör: Yalçın Çelik</a>
                         <a href="/haber/{{ d.slug }}" class="font-extrabold text-red-600 hover:text-red-700 flex items-center gap-1">
                             <span>Analizi Oku</span>
                             <span>→</span>

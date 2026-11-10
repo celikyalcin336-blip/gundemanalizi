@@ -32,9 +32,11 @@
       });
     </script>
 
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca 300+ kelime zengin içeriklerde aktifleşir) -->
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca dizine açık zengin içeriklerde aktifleşir) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    {% if not noindex %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    {% endif %}
 
     {% if ad_settings and ad_settings.ga_tracking_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ ad_settings.ga_tracking_id }}"></script>
@@ -66,9 +68,9 @@
           "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "dateModified": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "author": {
-            "@type": "Organization",
-            "name": "Gündem Analizi {{ article.category or 'Gündem' }} Editörlüğü",
-            "url": "https://xn--gndemanalizi-dlb.com.tr/kunye"
+            "@type": "Person",
+            "name": "Yalçın Çelik",
+            "url": "https://xn--gndemanalizi-dlb.com.tr/yazar/yalcin-celik"
           },
           "publisher": {
             "@type": "Organization",
@@ -132,6 +134,31 @@
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <link rel="stylesheet" href="/assets/style.min.css">
+    <style>
+        /* Çok kaynaklı haber/analiz formatı & İmzalı Editör Notu */
+        .ga-multi .ga-box { border-radius: 14px; padding: 14px 18px; margin: 18px 0; }
+        .ga-multi .ga-box-title { font-weight: 800; font-size: 0.9rem; margin: 0 0 8px 0; letter-spacing: .02em; }
+        .ga-multi .ga-tldr { background: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; }
+        .ga-multi .ga-tldr .ga-box-title { color: #b91c1c !important; }
+        .ga-multi .ga-tldr ul { list-style: disc; padding-left: 1.2rem; margin: 0; }
+        .ga-multi .ga-tldr li { margin: 4px 0; font-weight: 600; color: #0f172a; font-size: 0.97rem; }
+        .ga-multi .ga-tr { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; }
+        .ga-multi .ga-tr .ga-box-title { color: #b45309 !important; }
+        .ga-multi .ga-tr p { margin: 0; color: #1e293b; line-height: 1.7; }
+        .ga-multi ul.ga-sources { list-style: none; padding: 0; margin: 0 0 16px 0; }
+        .ga-multi ul.ga-sources li { border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; margin: 8px 0; background: #fff; line-height: 1.6; }
+        .ga-multi .ga-src-link { color: #dc2626 !important; font-weight: 700; font-size: 0.85rem; white-space: nowrap; text-decoration: none; }
+        .ga-multi .ga-src-link:hover { text-decoration: underline; }
+        .ga-multi ol.ga-list { list-style: decimal; padding-left: 1.3rem; margin: 0 0 16px 0; }
+        .ga-multi ol.ga-list li { margin: 6px 0; line-height: 1.65; }
+        .ga-multi .ga-table-wrap { overflow-x: auto; margin: 8px 0 18px 0; }
+        .ga-multi table.ga-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .ga-multi table.ga-table td { border: 1px solid #e2e8f0; padding: 9px 12px; }
+        .ga-multi table.ga-table tr:nth-child(odd) td { background: #f8fafc; }
+        .ga-editor-note { background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0f172a; border-radius: 14px; padding: 14px 18px; margin: 0 0 20px 0; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04); }
+        .ga-editor-note-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 0.82rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .03em; }
+        .ga-editor-note-body { font-size: 0.96rem; color: #1e293b; line-height: 1.7; margin: 0; font-weight: 500; }
+    </style>
     <script src="/assets/lucide.min.js" defer></script>
     <style>
         
@@ -532,13 +559,15 @@
                 </span>
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 {% set _desk_map = {'Analiz': 'Gündem Analizi Masası', 'Ekonomi': 'Ekonomi Masası', 'Spor': 'Spor Servisi', 'Teknoloji': 'Teknoloji Editörlüğü', 'Otomobil': 'Otomobil Editörlüğü', 'Sağlık': 'Sağlık Editörlüğü', 'Eğitim': 'Eğitim Servisi', 'Dünya': 'Dış Haberler Servisi'} %}
-                <a href="/kunye" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Gündem Analizi Editöryal Masaları ve Yayın Künyesi">
-                    <i data-lucide="users" class="w-3.5 h-3.5 text-red-600"></i> {{ _desk_map.get(article.category, 'Gündem Haber Merkezi') }}
-                </a>
-                <span class="text-slate-400 hidden sm:inline">•</span>
                 <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Genel Yayın Yönetmeni ve Sorumlu Yazı İşleri Müdürü">
-                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Sorumlu YYY: Yalçın Çelik
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Editör: Yalçın Çelik
                 </a>
+                {% if is_multi_source and source_count and source_count > 1 %}
+                <span class="text-slate-400 hidden sm:inline">•</span>
+                <span class="inline-flex items-center gap-1 text-slate-700 font-bold text-xs">
+                    <i data-lucide="layers" class="w-3.5 h-3.5 text-red-600"></i> {{ source_count }} kaynak
+                </span>
+                {% endif %}
 
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 <span class="inline-flex items-center gap-1 text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full text-[11px] font-bold border border-slate-300 shadow-xs">
@@ -613,6 +642,16 @@
             </div>
             {% endif %}
 
+            {% if editor_note %}
+            <div class="ga-editor-note">
+                <div class="ga-editor-note-head">
+                    <span>✍️ Editörün Notu</span>
+                    <a href="/yazar/yalcin-celik" style="color: #dc2626 !important; text-decoration: none; font-weight: 800;">Yalçın Çelik →</a>
+                </div>
+                <p class="ga-editor-note-body">{{ editor_note }}</p>
+            </div>
+            {% endif %}
+
             <!-- Makale İçeriği -->
             <div class="text-slate-800 text-base sm:text-lg leading-relaxed font-normal article-body">
                 <!-- ARTICLE_BODY_START -->
@@ -627,11 +666,11 @@
                 </div>
                 <div class="space-y-1 flex-1">
                     <div class="font-extrabold text-slate-900 text-xs flex flex-wrap items-center justify-between gap-2">
-                        <span>Haber Kaynağı: <strong class="text-red-600">{{ article.source or 'Gündem Analizi' }}</strong></span>
+                        <span>{% if is_multi_source and source_count and source_count > 1 %}Haber Kaynakları: <strong class="text-red-600">{{ source_count }} farklı kaynak</strong>{% else %}Haber Kaynağı: <strong class="text-red-600">{{ article.source or 'Gündem Analizi' }}</strong>{% endif %}</span>
                         <span class="font-semibold text-slate-700">Sorumlu Yazı İşleri Müdürü: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenerek yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        {% if is_multi_source %}Bu içerik, yukarıda bağlantısı verilen kaynaklar karşılaştırılarak Gündem Analizi editörlüğünde <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde hazırlanmıştır.{% elif article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenerek yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
                         Düzeltme ve cevap hakkı başvuruları için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>

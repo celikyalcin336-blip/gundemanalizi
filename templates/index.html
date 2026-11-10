@@ -502,18 +502,21 @@
             </div>
         </section>
 
-                        <!-- 5.5 📋 GÜNDEM ANALİZİ (SADECE GERÇEK GÜNDEM ANALİZİ YAZILARI) -->
+                        <!-- 5.5 📋 GÜNDEM ANALİZİ (GÜNLÜK 3 VAKİT ÖZEL ANALİZ VİTRİNİ: 10:00 • 15:00 • 19:00) -->
         {% if radar and radar.dossiers and radar.dossiers|length >= 1 %}
         <section class="pt-6 border-t border-slate-200">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4">
+                <div class="flex flex-wrap items-center gap-2.5">
                     <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
                     <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
-                        GÜNDEM ANALİZİ
+                        GÜNÜN ANALİZLERİ
                     </h2>
+                    <span style="background-color:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-size:11px;font-weight:800;padding:3px 10px;border-radius:9999px;">
+                        Her Gün 10:00 • 15:00 • 19:00
+                    </span>
                 </div>
                 <a href="/analiz" class="text-xs font-extrabold text-red-600 hover:underline transition flex items-center gap-1">
-                    Tüm Gündem Analizleri →
+                    Tüm Analiz Dosyaları →
                 </a>
             </div>
 
@@ -526,23 +529,33 @@
                             <img width="800" height="450" src="/images/{{ d.image_path.replace('\\', '/').split('/')[-1] }}" alt="{{ d.title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500 aspect-[16/9]">
                             {% endif %}
                             <span class="absolute top-3 left-3 bg-red-600 text-white font-black text-[10px] px-2.5 py-1 rounded shadow uppercase">
-                                Gündem Analizi
+                                {{ d.slot_label or 'Gündem Analizi' }}
                             </span>
+                            {% if d.source_count and d.source_count > 1 %}
+                            <span style="position:absolute;top:12px;right:12px;background:rgba(15,23,42,0.88);color:#ffffff;font-weight:800;font-size:10px;padding:4px 9px;border-radius:6px;">
+                                {{ d.source_count }} kaynak karşılaştırmalı
+                            </span>
+                            {% endif %}
                         </a>
                         <div class="p-4">
-                            <span class="text-[11px] text-slate-500 font-medium">{{ d.created_at }}</span>
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                                <span>{{ d.created_at }}</span>
+                                {% if d.has_editor_note %}
+                                <span style="color:#b45309;font-weight:800;">✍️ Editör Notlu</span>
+                                {% endif %}
+                            </div>
                             <a href="/haber/{{ d.slug }}">
                                 <h3 class="text-sm sm:text-base font-extrabold text-slate-900 group-hover:text-red-600 transition mt-1 line-clamp-2 leading-snug">
                                     {{ d.title }}
                                 </h3>
                             </a>
                             <p class="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
-                                {{ ((d.summary or '')[:140]) ~ ('...' if (d.summary or '')|length > 140 else '') }}
+                                {{ ((d.summary or '')[:145]) ~ ('...' if (d.summary or '')|length > 145 else '') }}
                             </p>
                         </div>
                     </div>
                     <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span class="text-slate-500 font-semibold">{{ d.reading_time_min }} dk okuma</span>
+                        <span class="text-slate-600 font-semibold">Editör: Yalçın Çelik · {{ d.reading_time_min }} dk</span>
                         <a href="/haber/{{ d.slug }}" class="text-red-600 font-extrabold hover:underline">Analizi Oku →</a>
                     </div>
                 </article>

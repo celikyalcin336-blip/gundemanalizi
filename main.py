@@ -21,7 +21,7 @@ import threading
 
 _BOT_PROCESS_LOCK = threading.Lock()
 
-def process_single_news(item: dict) -> bool:
+def process_single_news(item: dict, pool: list = None) -> bool:
     """
     Tek bir haberi işler:
     1. AI veya şablon ile metin ve hashtag üretir.
@@ -82,7 +82,18 @@ def process_single_news(item: dict) -> bool:
     # 2. Özgün Analitik Makale ve Başlık Üretimi (Kesin Emir 2: En az 250 kelime ve alt başlıklı yapı)
     import content_quality
     item_category = item.get("category")
-    article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
+    article_data = None
+    # 2.a Yeni çok kaynaklı format (aynı olayı anlatan farklı kaynakları birleştirir)
+    try:
+        import multisource
+        ms_category = item_category if item_category in {"Gündem", "Ekonomi", "Eğitim", "Otomobil", "Teknoloji", "Sağlık", "Spor", "Dünya"} else ai_writer.classify_article(title, summary, item_category)
+        article_data = multisource.build_article(item, summary, pool or [], category=ms_category, mode="news")
+    except Exception as _ms_e:
+        print(f"⚠️ [Çok Kaynaklı] Hata, eski akışa dönülüyor: {_ms_e}")
+        article_data = None
+    # 2.b Yedek: mevcut tek kaynaklı yazım akışı (bot hiçbir koşulda durmaz)
+    if not article_data:
+        article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
     if not article_data:
         print(f"⛔ [KESİN EMİR - METİN KALİTE KALKANI] '{title[:50]}' için özgün makale üretilemedi; yayınlanmadı.")
         return False
@@ -133,6 +144,19 @@ def process_single_news(item: dict) -> bool:
     if not is_created:
         print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' sitemizde zaten mevcut ({slug}). İkinci kez eklenmedi ve Telegram'a bildirim GÖNDERİLMEDİ.")
         return False
+
+    # Çok kaynaklı birleştirmede kullanılan kardeş kaynak haberleri de işlenmiş işaretle (sonraki döngüde aynı olayı tekrar yazmasın)
+    for _sib in (article_data.get("sibling_items") or []):
+        try:
+            if _sib.get("hash"):
+                database.claim_news_for_processing(
+                    _sib["hash"],
+                    title=_sib.get("title", ""),
+                    source=_sib.get("source", ""),
+                    link=_sib.get("link", ""),
+                )
+        except Exception:
+            pass
 
     site_article_url = f"{config.SITE_URL}/haber/{slug}"
     print(f"   [Haber Linki: {site_article_url}]")
@@ -306,7 +330,7 @@ def _run_bot_internal(max_items: int = 1, force: bool = False):
         score = item.get('score', 0)
         print(f"🎯 [Otonom Bot] Sıradaki Kategoriden Seçilen Haber ({tried_count}/{MAX_CANDIDATE_ATTEMPTS}): [{cat}] {title_snippet}... (Puan: {score})")
         try:
-            success = process_single_news(item)
+            success = process_single_news(item, pool=news_items)
             if success:
                 processed_count += 1
                 database.set_setting("last_bot_category", cat)
