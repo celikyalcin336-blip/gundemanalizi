@@ -3223,5 +3223,12 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794366792.1389012
+  },
+  {
+    "slug": "kocaelisporun-yildiz-futbolcusu-showdan-kotu-haber-geldi",
+    "title": "Kocaelispor'un Yıldız Futbolcusu Show'dan Kötü Haber Geldi",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794369497.014356
   }
 ]
