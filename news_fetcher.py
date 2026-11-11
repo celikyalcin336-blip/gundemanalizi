@@ -218,7 +218,7 @@ def is_valueless_clickbait(title: str, text: str) -> bool:
     return False
 
 
-def fetch_article_details(link: str, max_paragraphs: int = 5) -> dict:
+def fetch_article_details(link: str, max_paragraphs: int = 10) -> dict:
     """
     Haberin orijinal web sayfasına gidip:
     1. Yüksek çözünürlüklü resmi og:image / twitter:image basın görselini ayıklar.
@@ -393,8 +393,8 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
     Çapraz RSS mükerrerlik koruması ve 5 katmanlı dedup içerir.
     """
     unposted_news = []
-    seen_batch_slugs = set()
-    seen_batch_titles = []
+    seen_slug_map = {}
+    seen_batch_items = []
     import difflib
 
     for feed_info in config.RSS_FEEDS:
@@ -433,30 +433,41 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                 if database.is_already_posted(news_hash, title=title, link=link):
                     continue
 
-                # 2. Aynı Tarama Döngüsünde Başka Bir Kaynak Aynı Haberi Verdi mi? (Çapraz RSS Koruması)
+                # 2. Aynı Tarama Döngüsünde Başka Bir Kaynak Aynı Haberi Verdi mi? (Çapraz RSS Koruması + Çok Kaynaklı Kardeş Haber Bağlama)
                 from database import slugify
                 item_slug = slugify(title)
                 norm_slug = re.sub(r'-\d+$', '', item_slug)
-                if norm_slug in seen_batch_slugs:
-                    continue
+                feed_cat = feed_info.get("category", "Gündem")
+                real_cat = feed_cat
 
-                is_batch_dup = False
-                for prev_title in seen_batch_titles:
-                    if difflib.SequenceMatcher(None, title.lower(), prev_title.lower()).ratio() > 0.72:
-                        is_batch_dup = True
-                        break
+                matched_prev = seen_slug_map.get(norm_slug)
+                if not matched_prev:
                     stopwords = {'ve', 'ile', 'bir', 'bu', 'da', 'de', 'icin', 'için', 'yeni', 'son', 'dakika'}
                     w1 = {w for w in re.findall(r'\w+', title.lower()) if len(w) > 2 and w not in stopwords}
-                    w2 = {w for w in re.findall(r'\w+', prev_title.lower()) if len(w) > 2 and w not in stopwords}
-                    if len(w1) >= 4 and len(w2) >= 4 and len(w1 & w2) / min(len(w1), len(w2)) >= 0.75:
-                        is_batch_dup = True
-                        break
+                    for prev_it in seen_batch_items:
+                        prev_title = prev_it["title"]
+                        if difflib.SequenceMatcher(None, title.lower(), prev_title.lower()).ratio() > 0.72:
+                            matched_prev = prev_it
+                            break
+                        w2 = {w for w in re.findall(r'\w+', prev_title.lower()) if len(w) > 2 and w not in stopwords}
+                        if len(w1) >= 4 and len(w2) >= 4 and len(w1 & w2) / min(len(w1), len(w2)) >= 0.75:
+                            matched_prev = prev_it
+                            break
 
-                if is_batch_dup:
+                if matched_prev is not None:
+                    # Mükerrer yayınlanmasın ama Çok Kaynaklı Sentez Motoru için kardeş kaynak olarak saklansın
+                    sibs = matched_prev.setdefault("siblings", [])
+                    if feed_name != matched_prev.get("source") and len(sibs) < 5 and all(s.get("source") != feed_name for s in sibs):
+                        sibs.append({
+                            "hash": news_hash,
+                            "title": title,
+                            "summary": summary,
+                            "link": link,
+                            "image_url": image_url,
+                            "source": feed_name,
+                            "category": real_cat,
+                        })
                     continue
-
-                seen_batch_slugs.add(norm_slug)
-                seen_batch_titles.append(title)
 
                 # Haberin viral/tüketici/cüzdan ilgi puanını hesapla
                 score = calculate_virality_score(title, summary, feed_name)
@@ -464,11 +475,7 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                 if image_url:
                     score += 10
 
-                feed_cat = feed_info.get("category", "Gündem")
-                # Her RSS kaynağı kendi resmi kategorisine kilitlidir (Teknoloji siteleri Ekonomi/Otomobil'e sızamaz!)
-                real_cat = feed_cat
-
-                unposted_news.append({
+                new_item = {
                     "hash": news_hash,
                     "title": title,
                     "summary": summary,
@@ -477,8 +484,12 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                     "source": feed_name,
                     "category": real_cat,
                     "published": published,
-                    "score": score
-                })
+                    "score": score,
+                    "siblings": [],
+                }
+                seen_slug_map[norm_slug] = new_item
+                seen_batch_items.append(new_item)
+                unposted_news.append(new_item)
         except Exception as e:
             print(f"[{feed_name}] RSS okunurken hata oluştu: {e}")
 
