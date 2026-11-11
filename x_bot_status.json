@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-11 11:57:32",
+  "last_check": "2026-11-11 12:42:56",
   "result": "posted",
-  "last_post": "2026-11-11 11:57:32",
-  "next_planned": "2026-11-11 12:42:32",
+  "last_post": "2026-11-11 12:42:56",
+  "next_planned": "2026-11-11 13:27:56",
   "runner": "github-actions",
-  "log_tail": "[2026-11-11 08:57:08] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Türkiye 10 Kasım’da Durdu: Ata’sına... (Birebir slug eşleşmesi: turkiye-10-kasimda-durdu-atasina-minnetle-saygi-durusunda-bulustu)\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 185 | Başlık: İzmit’te Ortaokul Öğrencisinin Vefatı Eğitim Kurumlarında Sağlık Önlemlerini Gündeme Taşıdı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794387429.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/izmitte-ortaokul-ogrencisinin-vefati-egitim-kurumlarinda-saglik-onlemlerini-gund\n🎉 [X Auto-Poster] Başarıyla tweetlendi: İzmit’te Ortaokul Öğrencisinin Vefatı Eğitim Kurumlarında Sağlık Önlemlerini Gündeme Taşıdı\n"
+  "log_tail": "[2026-11-11 09:42:33] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 195 | Başlık: TİHEK’ten İşitme Engelli Sürücüye Hizmet Vermeyen Araç Kiralama Şirketine İdari Cezai Yaptırım\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794390153.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/tihekten-isitme-engelli-surucuye-hizmet-vermeyen-arac-kiralama-sirketine-idari-c\n🎉 [X Auto-Poster] Başarıyla tweetlendi: TİHEK’ten İşitme Engelli Sürücüye Hizmet Vermeyen Araç Kiralama Şirketine İdari Cezai Yaptırım\n"
 }
