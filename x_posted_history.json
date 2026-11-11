@@ -3309,5 +3309,14 @@
     "status": "skipped",
     "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
     "ts": 1794398336.9481957
+  },
+  {
+    "slug": "milli-egitim-bakanligi-ortak-sinav-takviminde-kritik-hafta",
+    "title": "Milli Eğitim Bakanlığı Ortak Sınav Takviminde Kritik Hafta",
+    "summary": "Milli Eğitim Bakanlığı tarafından hayata geçirilen Ortak Yazılı Sınav Sistemi kapsamında ülke genelindeki ilk dönem sınavları için kritik haftaya girildi.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794400808.699641
   }
 ]
