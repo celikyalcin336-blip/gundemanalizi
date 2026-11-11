@@ -2,14 +2,15 @@
 """
 Çok Kaynaklı Haber & Analiz Motoru (Gündem Analizi)
 
-Aynı olayı anlatan 1-4 farklı kaynağın haberlerini sentezleyerek
-"⚡ 30 Saniyede Özet / Ne Oldu? / Neden Önemli? / Arka Plan ve Önceki Gelişmeler /
-🇹🇷 Türkiye'ye Etkisi / (Analizde: Olası Senaryolar) / Kaynaklar Ne Diyor? /
-Rakamlarla / Bundan Sonra Ne İzlenmeli?" yapısında özgün haber-analiz metni üretir.
+Aynı olayı anlatan 1-4 farklı kaynağın haberlerini sentezleyerek:
+- ⚡ 30 Saniyede Özet (3 sıkı madde)
+- Konuya Özgü Gazetecilik Ara Başlıkları (<h3>) — sabit kalıp ("Ne Oldu?" vb.) kullanılmaz
+- Konuya Uygun Etki / Yansıma Kutusu (zorlama bağlantı varsa basılmaz)
+- Analiz modunda Konuya Özgü Senaryo Bölümü
+- Şeffaf Kaynak Karşılaştırması / Kaynak Notu (Habere git → dış bağlantılı)
+- Yalnızca >= 3 farklı somut veri olduğunda gösterilen Öne Çıkan Veriler tablosu (veri tekrarını önler)
 
-- Model: yalnızca Gemini 3.5 ailesi (gemini-3.5-flash, yedek: gemini-3.5-flash-lite)
-- Etiketli düz metin (tagged plain-text) protokolü: JSON şema kısıtlamasının
-  lite modelde yol açtığı kısa metin ve Türkçe karakter düşmesi sorunlarını tamamen sıfırlar.
+Model: yalnızca Gemini 3.5 ailesi (gemini-3.5-flash, yedek: gemini-3.5-flash-lite)
 """
 import html as _html
 import json
@@ -26,8 +27,6 @@ MODELS = [
     if m.strip()
 ]
 
-# Günlük kota (429 RESOURCE_EXHAUSTED / quota) dolduğunda modeli geçici soğutmaya alır;
-# böylece her haberde boşuna 8 sn beklemek yerine anında aktif Gemini 3.5 modeline geçer.
 _MODEL_COOLDOWN_UNTIL: Dict[str, float] = {}
 
 _STOP = set(
@@ -75,7 +74,6 @@ def find_siblings(primary: Dict, pool: List[Dict], max_n: int = 3) -> List[Dict]
     seen_src = {p_src}
     out: List[Dict] = []
 
-    # 1) news_fetcher.fetch_latest_news sırasında yakalanan doğrudan kardeş haberler
     for pre_sib in (primary.get("siblings") or []):
         s_name = _clean_src_name(pre_sib.get("source", ""))
         if not s_name or s_name in seen_src:
@@ -85,7 +83,6 @@ def find_siblings(primary: Dict, pool: List[Dict], max_n: int = 3) -> List[Dict]
         if len(out) >= max_n:
             return out
 
-    # 2) Havuzdaki diğer haberler (ve onların alt kardeşleri) üzerinden kök örtüşmesi taraması
     p_tok = _tokens(primary.get("title", ""))
     if len(p_tok) < 3:
         return out
@@ -160,13 +157,30 @@ def gather_sources(primary: Dict, primary_body: str, pool: List[Dict], max_sibli
 
 
 _CAT_FOCUS = {
-    "Ekonomi": "Rakamların vatandaşın bütçesine, maaşına, kredi/mevduat koşullarına ve alım gücüne somut etkisini açıkla. Yatırım tavsiyesi verme.",
-    "Sağlık": "Uzman uyarılarını ve dikkat edilmesi gerekenleri sade anlat. Teşhis veya tedavi önerme; okuru uzman hekime yönlendir.",
-    "Eğitim": "Resmi takvimi, başvuru/sınav şartlarını ve öğrenci-veli-öğretmen açısından atılacak adımları net aktar.",
-    "Spor": "Gelişmenin puan durumu, fikstür, kadro derinliği ve takımın sezon hedeflerine etkisini spor gazeteciliği diliyle anlat.",
-    "Teknoloji": "Teknolojinin öne çıkan özelliklerini, rakiplerden farkını ve son kullanıcıya/sektöre somut karşılığını anlat.",
-    "Otomobil": "Aracın segmentteki konumunu, teknik mimarisini, Türkiye pazarı ve ÖTV/maliyet açısından yansımalarını anlat.",
-    "Dünya": "Gelişmenin bölgesel dengeler, uluslararası diplomasi ve Türkiye açısından olası yansımalarını abartmadan anlat.",
+    "Ekonomi": "Açıklanan verilerin vatandaşın bütçesine, kredi/mevduat koşullarına ve piyasa dengelerine somut etkisini anlat. Yatırım tavsiyesi verme.",
+    "Sağlık": "Uzman uyarılarını, belirtileri ve dikkat edilmesi gerekenleri sade anlat. Teşhis veya tedavi önerme; okuru uzman hekime yönlendir.",
+    "Eğitim": "Resmi takvimi, başvuru/sınav şartlarını ve öğrenci, veli ve öğretmenler açısından uygulama adımlarını net aktar.",
+    "Spor": "Gelişmenin puan durumu, fikstür, kadro derinliği ve takımın hedeflerine etkisini spor gazeteciliği diliyle anlat.",
+    "Teknoloji": "Teknolojinin öne çıkan özelliklerini, rakiplerden farkını ve kullanıcı/sektör açısından somut karşılığını anlat.",
+    "Otomobil": "Aracın segmentteki konumunu, teknik yapısını, Türkiye pazarı ve vergi/maliyet açısından yansımalarını anlat.",
+    "Dünya": "Gelişmenin bölgesel dengeler, diplomasi ve Türkiye açısından gerçekçi yansımalarını abartmadan anlat.",
+}
+
+_FORBIDDEN_TEMPLATE_HEADINGS = {
+    "ne oldu",
+    "neler oldu",
+    "neden önemli",
+    "neden onemli",
+    "arka plan",
+    "arka plan ve önceki gelişmeler",
+    "olası senaryolar",
+    "olasi senaryolar",
+    "bundan sonra ne izlenmeli",
+    "bundan sonra",
+    "giriş",
+    "gelişme",
+    "sonuç",
+    "değerlendirme",
 }
 
 
@@ -176,80 +190,101 @@ def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hi
         blocks.append(f"[{i}] KAYNAK: {s['name']}\nBaşlık: {s['title']}\nMetin: {s['body']}")
     focus = _CAT_FOCUS.get(
         category,
-        "Resmi açıklamaları, sahadaki durumu, hukuki/idari çerçeveyi ve kamuoyunu ilgilendiren yönlerini net bir gazetecilik diliyle aktar.",
+        "Resmi açıklamaları, sahadaki somut durumu, hukuki/idari çerçeveyi ve kamuoyunu ilgilendiren yönlerini berrak bir gazetecilik diliyle aktar.",
     )
     if mode == "analysis":
-        length_rule = "Toplam metin EN AZ 680, ideal 780-950 kelime olmalı. Bu bir GÜNLÜK ÖZEL ANALİZ dosyasıdır: neden-sonuç ilişkisini, etkileri ve olası senaryoları derinlemesine incele."
+        length_rule = "Toplam metin 520-720 kelime aralığında, sıkı ve bilgi dolu olsun. Bu bir GÜNLÜK ÖZEL ANALİZ dosyasıdır: neden-sonuç ilişkisini, etkileri ve olası senaryoları tekrara düşmeden incele."
         scen_section = """
+[SENARYO_BASLIK]
+Önümüzdeki sürece dair konuya özgü 4-8 kelimelik özgün ara başlık (kesinlikle "Olası Senaryolar" yazma)
+
 [SENARYOLAR]
-- 1. olası gelişme senaryosu (2-3 tam cümleyle açıkla)
-- 2. olası gelişme senaryosu (2-3 tam cümleyle açıkla)
-- 3. olası gelişme senaryosu (2-3 tam cümleyle açıkla)
+- 1. olası gelişme veya süreç ihtimali (2 tam cümle)
+- 2. olası gelişme veya süreç ihtimali (2 tam cümle)
+- 3. olası gelişme veya süreç ihtimali (2 tam cümle)
 """
     else:
-        length_rule = "Toplam metin EN AZ 450, ideal 520-680 kelime olmalı."
+        length_rule = "Toplam metin 380-540 kelime aralığında, sıkı, akıcı ve doyurucu olsun."
         scen_section = ""
 
     if extra_length_hint:
-        length_rule += " DİKKAT: Bir önceki deneme kısa kaldı; her paragrafı en az 4-5 tam ve doyurucu cümleyle ayrıntılı yaz."
+        length_rule += " DİKKAT: Bir önceki deneme çok kısa kaldı; tekrara düşmeden her paragrafı 3-5 tam cümleyle detaylandır."
 
     multi_rule = (
-        f"Aşağıda AYNI olayı anlatan {len(sources)} farklı kaynağın haberleri var. Bunları BİRLEŞTİR ve SENTEZLE; hiçbir kaynağı tek başına yeniden yazma."
+        f"Aşağıda AYNI olayı anlatan {len(sources)} farklı kaynağın haberleri var. Bunları BİRLEŞTİR ve SENTEZLE; hiçbir kaynağı tek başına kopyalama."
         if len(sources) > 1
-        else "Aşağıda bu olayı anlatan kaynak haber var. Yalnızca kısa bülten tekrarı yapma; kesinlikle uydurma bilgi/rakam eklemeden olayın hukuki/idari/sektörel bağlamını, önemini ve Türkiye açısından somut karşılığını analitik gazetecilik diliyle açıkla."
+        else "Aşağıda bu olayı anlatan kaynak haber var. Sadece kısa ajans tekrarı yapma; uydurma rakam/olay eklemeden konunun kurumsal, hukuki veya sektörel bağlamını analitik gazetecilik diliyle açıkla."
     )
 
-    src_instruction = (
-        "Her kaynağın olayı hangi açıdan verdiğini veya öne çıkardığı detayı ayrı satırda `Kaynak Adı | 1-2 cümlelik açıklama` biçiminde yaz."
-        if len(sources) > 1
-        else f"`{sources[0]['name']} | Bu kaynağın haberde aktardığı temel bilgi ve öne çıkan detay (1-2 cümle)` biçiminde yaz."
-    )
+    if len(sources) > 1:
+        src_instruction = "Her satırda ters tırnak kullanmadan düz metinle: Kaynak Adı | Bu kaynağın haberi hangi açıdan ele aldığı ve öne çıkardığı farklı detay (1 cümle)"
+    else:
+        src_instruction = f"Ters tırnak kullanmadan düz metinle: {sources[0]['name']} | Kaynağın aktardığı ana gelişme ve öne çıkan somut bilgi (1 cümle)"
 
-    return f"""Sen Türkçe haber ve analiz sitesi 'Gündem Analizi'nin kıdemli baş editörüsün.
+    return f"""Sen Türkçe ulusal haber ve analiz sitesi Gündem Analizi'nin kıdemli baş editörüsün.
 {multi_rule}
 Kategori: {category}. Kategori odağı: {focus}
 
 KESİN KURALLAR:
-1. DOĞRULUK: SADECE kaynaklarda geçen somut bilgi, isim, tarih ve rakamları kullan. Kaynakta olmayan rakam, kişi, alıntı veya iddia KESİNLİKLE UYDURMA. Kaynak metin kısa bir son dakika bülteni olsa bile hayali olay detayı uydurmadan konunun genel kabul görmüş kurumsal, hukuki, teknik veya toplumsal çerçevesini ve standart resmi prosedürleri anlatarak metni zenginleştir.
-2. ÖZGÜNLÜK: Kaynak cümlelerini kopyalama; tamamen kendi cümlelerinle, akıcı gazetecilik diliyle yaz.
-3. UZUNLUK: {length_rule} Paragrafları tek cümleyle geçiştirme; her paragraf en az 4-5 tam cümleden oluşsun.
-4. DİL VE TÜRKÇE İMLA: Kusursuz, duru, tarafsız Türkçe. Başlık dahil TÜM alanlarda Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) eksiksiz ve doğru kullan; kesinlikle İngilizce/ASCII harflerle ("Cip ureticisi", "Yatirim", "Basciligi", "Olum" gibi) yazma. Tık tuzağı, ünlem (!), üç nokta (...), emoji, hashtag ve yapay zeka ibaresi YOK.
-   "Sonuç olarak", "Özetle", "merakla bekleniyor", "yakından takip ediliyor", "büyük önem taşımaktadır" gibi klişeleri KULLANMA.
-5. ÇIKTI FORMATI: JSON veya ``` kod bloğu KULLANMA. Yanıtı SADECE aşağıdaki köşeli parantezli bölüm etiketleriyle düz metin olarak ver:
+1. DOĞRULUK: SADECE kaynaklarda geçen somut bilgi, isim, tarih ve rakamları kullan. Kaynakta olmayan rakam, kişi, alıntı veya iddia KESİNLİKLE UYDURMA. Kaynak kısa ise hayali detay uydurmadan olayın doğrulanabilir genel hukuki, kurumsal veya sektörel çerçevesini anlat.
+2. SIFIR VERİ TEKRARI (ÇOK KRİTİK): Özette (MADDELER), paragraflarda ve veri tablosunda (RAKAMLAR) aynı rakamları, aynı sıfat tamlamalarını veya aynı cümleleri evirip çevirip tekrarlama!
+   - Temel rakamları ve olayın 5N1K akışını BOLUM_1 içinde ver.
+   - BOLUM_2 içinde BOLUM_1'deki rakamları tekrar saymak yerine kararın/olayın neden kritik olduğunu ve etkisini analiz et.
+   - BOLUM_3 içinde önceki cümleleri tekrarlamadan konunun geçmişini veya yapısal çerçevesini anlat.
+   - SONRA bölümünde önceki paragraflarda yazılmış komisyon/süreç cümlelerini kopyalamadan yalnızca takvimdeki sıradaki somut adımı yaz.
+3. SABİT ŞABLON BAŞLIK YASAĞI (ÇOK KRİTİK): ARA_BASLIK_1, ARA_BASLIK_2, ARA_BASLIK_3, SENARYO_BASLIK ve SONRA_BASLIK alanlarında KESİNLİKLE "Ne Oldu?", "Neden Önemli?", "Arka Plan", "Olası Senaryolar", "Bundan Sonra Ne İzlenmeli?" gibi sabit şablon başlıklar KULLANMA! Her ara başlık doğrudan o haberdeki kurum, şehir, kişi, yasa veya projeye özel 4-8 kelimelik gerçek gazetecilik başlığı olsun.
+4. {length_rule}
+5. DİL VE TÜRKÇE İMLA: Kusursuz, duru Türkçe. Başlık dahil TÜM alanlarda Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) eksiksiz kullan; kesinlikle İngilizce/ASCII harflerle yazma. Tık tuzağı, ünlem, üç nokta, ters tırnak işareti, kod bloğu, hashtag ve yapay zeka ibaresi YOK. "Sonuç olarak", "Özetle", "merakla bekleniyor", "yakından takip ediliyor", "büyük önem taşımaktadır" klişelerini KULLANMA.
+6. ÇIKTI FORMATI: JSON veya kod bloğu KULLANMA. Yanıtı SADECE aşağıdaki köşeli parantezli etiketlerle düz metin olarak ver:
 
 [BASLIK]
-7-13 kelimelik, kaynak başlıkların hiçbiriyle birebir aynı olmayan, Türkçe harfleri eksiksiz ve olayın anlamını koruyan özgün başlık
+7-13 kelimelik, kaynak başlıklarla birebir aynı olmayan, Türkçe harfleri eksiksiz özgün haber başlığı
 
 [OZET]
-Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özet (meta açıklama olarak kullanılacak).
+Haberin özünü anlatan 2 cümlelik net özet.
 
 [MADDELER]
-- 30 saniyede özet 1. madde (tam ve somut cümle)
-- 30 saniyede özet 2. madde (tam ve somut cümle)
-- 30 saniyede özet 3. madde (tam ve somut cümle)
+- 1. özet maddesi (kısa, net, somut tek cümle)
+- 2. özet maddesi (farklı bir somut boyutu anlatan tek cümle)
+- 3. özet maddesi (sürecin etkisini veya takvimini özetleyen tek cümle)
 
-[NE_OLDU]
-Olayın kim, nerede, ne zaman ve nasıl gerçekleştiğini tüm somut verilerle anlatan 4-5 cümlelik birinci paragraf.
+[ARA_BASLIK_1]
+Olayın somut gelişmesini anlatan konuya özel 4-8 kelimelik özgün ara başlık
 
-Tarafların veya resmi makamların açıklamalarını, müdahale ya da uygulama ayrıntılarını aktaran 4-5 cümlelik ikinci paragraf.
+[BOLUM_1]
+Olayın kim, nerede, ne zaman ve nasıl gerçekleştiğini somut verilerle anlatan 3-4 cümlelik birinci paragraf.
 
-[NEDEN_ONEMLI]
-Bu gelişmenin neden önemli olduğunu, sektörel, hukuki, ekonomik veya toplumsal boyutunu inceleyen 4-5 cümlelik doyurucu paragraf.
+Yetkililerin/tarafların açıklamalarını veya müdahale/uygulama detaylarını aktaran 3-4 cümlelik ikinci paragraf.
 
-[ARKA_PLAN]
-Konunun doğrulanabilir genel arka planını, önceki benzer süreçleri veya mevzuat/sektör çerçevesini anlatan 4-5 cümlelik doyurucu paragraf.
+[ARA_BASLIK_2]
+Gelişmenin önemini ve etkisini yansıtan konuya özel 4-8 kelimelik özgün ara başlık
 
-[TURKIYE_ETKISI]
-Olay Türkiye'de yaşandıysa doğrudan vatandaş, kamu düzeni, bütçe veya ilgili kurumlar açısından somut etkisini; yurt dışı haberi ise Türkiye'ye olası yansımasını anlatan 3-4 cümlelik paragraf.
+[BOLUM_2]
+BOLUM_1'deki cümleleri ve rakamları tekrar etmeden, bu gelişmenin sektörel, ekonomik, hukuki veya toplumsal açıdan neden kritik olduğunu inceleyen 3-5 cümlelik paragraf.
+
+[ARA_BASLIK_3]
+Konunun geçmişini veya kurumsal çerçevesini yansıtan konuya özel 4-8 kelimelik özgün ara başlık
+
+[BOLUM_3]
+Önceki bölümleri tekrarlamadan, konunun doğrulanabilir arka planını veya önceki benzer adımları anlatan 3-4 cümlelik paragraf.
+
+[ETKI_BASLIK]
+Konuya doğal uyan kısa kutu başlığı (Yurt dışı haberi Türkiye ile bağlantılıysa: Türkiye ve Bölgesel Dengelere Yansıması | Yurt içi haberi ise konuya özel: Vatandaş ve Sektör Açısından Önemi, Öğrenci ve Veliler İçin Kritik Detay vb.)
+
+[ETKI_METNI]
+Olayın vatandaş, ilgili sektör veya Türkiye açısından somut karşılığını anlatan 2-3 cümlelik net değerlendirme (eğer bağlantı tamamen zorlama olacaksa yalnızca YOK yaz).
 {scen_section}
 [KAYNAKLAR]
 - {src_instruction}
 
 [RAKAMLAR]
-- Etiket | Kaynakta geçen somut sayısal veri (en fazla 6 satır; kaynakta hiç sayısal veri yoksa yalnızca YOK yaz)
+- Etiket | Somut sayısal veri (YALNIZCA haberde en az 3 FARKLI ve önemli sayısal veri varsa 3-5 satır yaz; 1-2 rakam varsa tekrara düşmemek için yalnızca YOK yaz)
+
+[SONRA_BASLIK]
+Takvimdeki sıradaki aşamayı anlatan konuya özel 4-8 kelimelik özgün ara başlık
 
 [SONRA]
-Bundan sonra izlenecek resmi süreci, soruşturma/uygulama adımlarını veya takvimdeki somut aşamaları anlatan 3-4 cümlelik paragraf.
+Önceki paragraflardaki cümleleri tekrarlamadan, bundan sonra izlenecek resmi süreci veya takvimi anlatan 3 cümlelik paragraf.
 
 KAYNAKLAR:
 """ + "\n\n".join(blocks)
@@ -262,26 +297,57 @@ _TAG_NORM_MAP = {
     "ÖZET": "OZET",
     "MADDELER": "MADDELER",
     "30_SANIYEDE_OZET": "MADDELER",
-    "NE_OLDU": "NE_OLDU",
-    "NEDEN_ONEMLI": "NEDEN_ONEMLI",
-    "NEDEN_ÖNEMLİ": "NEDEN_ONEMLI",
-    "NEDEN_ÖNEMLI": "NEDEN_ONEMLI",
-    "ARKA_PLAN": "ARKA_PLAN",
-    "TURKIYE_ETKISI": "TURKIYE_ETKISI",
-    "TÜRKİYE_ETKİSİ": "TURKIYE_ETKISI",
-    "TÜRKIYE_ETKISI": "TURKIYE_ETKISI",
+    "ARA_BASLIK_1": "ARA_BASLIK_1",
+    "ARA_BAŞLIK_1": "ARA_BASLIK_1",
+    "BOLUM_1": "BOLUM_1",
+    "BÖLÜM_1": "BOLUM_1",
+    "NE_OLDU": "BOLUM_1",
+    "ARA_BASLIK_2": "ARA_BASLIK_2",
+    "ARA_BAŞLIK_2": "ARA_BASLIK_2",
+    "BOLUM_2": "BOLUM_2",
+    "BÖLÜM_2": "BOLUM_2",
+    "NEDEN_ONEMLI": "BOLUM_2",
+    "NEDEN_ÖNEMLİ": "BOLUM_2",
+    "ARA_BASLIK_3": "ARA_BASLIK_3",
+    "ARA_BAŞLIK_3": "ARA_BASLIK_3",
+    "BOLUM_3": "BOLUM_3",
+    "BÖLÜM_3": "BOLUM_3",
+    "ARKA_PLAN": "BOLUM_3",
+    "ETKI_BASLIK": "ETKI_BASLIK",
+    "ETKİ_BAŞLIK": "ETKI_BASLIK",
+    "ETKI_METNI": "ETKI_METNI",
+    "ETKİ_METNİ": "ETKI_METNI",
+    "TURKIYE_ETKISI": "ETKI_METNI",
+    "TÜRKİYE_ETKİSİ": "ETKI_METNI",
+    "SENARYO_BASLIK": "SENARYO_BASLIK",
+    "SENARYO_BAŞLIK": "SENARYO_BASLIK",
     "SENARYOLAR": "SENARYOLAR",
     "OLASI_SENARYOLAR": "SENARYOLAR",
     "KAYNAKLAR": "KAYNAKLAR",
     "RAKAMLAR": "RAKAMLAR",
+    "SONRA_BASLIK": "SONRA_BASLIK",
+    "SONRA_BAŞLIK": "SONRA_BASLIK",
     "SONRA": "SONRA",
     "BUNDAN_SONRA": "SONRA",
 }
 
 _TAG_LINE_RE = re.compile(
-    r"^\s*(?:#{1,4}\s*)?(?:\*{1,2}\s*)?\[\s*([A-ZÇĞİÖŞÜ0-9_ ]{4,26})\s*\](?:\s*\*{1,2})?\s*:?\s*$",
+    r"^\s*(?:#{1,4}\s*)?(?:\*{1,2}\s*)?\[\s*([A-ZÇĞİÖŞÜ0-9_ ]{4,28})\s*\](?:\s*\*{1,2})?\s*:?\s*$",
     re.M,
 )
+
+
+def _strip_ticks(s: str) -> str:
+    return re.sub(r"\s+", " ", (s or "").replace("`", "")).strip()
+
+
+def _clean_heading_candidate(raw_h: str, fallback: str) -> str:
+    lines = [_strip_ticks(l).strip('"#*:- ') for l in (raw_h or "").splitlines() if _strip_ticks(l).strip('"#*:- ')]
+    h = lines[0] if lines else ""
+    low = h.lower().strip(" ?.!-:")
+    if not h or len(h) < 8 or len(h) > 115 or low in _FORBIDDEN_TEMPLATE_HEADINGS:
+        return fallback
+    return h
 
 
 def _parse_json_safe(raw: str) -> Optional[Dict]:
@@ -305,7 +371,7 @@ def _parse_json_safe(raw: str) -> Optional[Dict]:
 def _parse_tagged_or_json(raw: str) -> Optional[Dict]:
     if not raw:
         return None
-    cleaned = re.sub(r"^```[a-zA-Z0-9_-]*\s*|\s*```$", "", raw.strip())
+    cleaned = re.sub(r"^```[a-zA-Z0-9_-]*\s*|\s*```$", "", raw.strip()).replace("`", "")
     matches = []
     for m in _TAG_LINE_RE.finditer(cleaned):
         raw_key = re.sub(r"\s+", "_", m.group(1).strip().upper())
@@ -324,7 +390,7 @@ def _parse_tagged_or_json(raw: str) -> Optional[Dict]:
     def _bullets(txt: str) -> List[str]:
         out = []
         for line in (txt or "").splitlines():
-            line = re.sub(r"^\s*(?:[-•*—–]|\d+[\.\)])\s*", "", line).strip()
+            line = re.sub(r"^\s*(?:[-•*—–]|\d+[\.\)])\s*", "", _strip_ticks(line)).strip()
             if len(line) > 5 and line.upper() not in {"YOK", "YOK.", "-"}:
                 out.append(line)
         return out
@@ -332,11 +398,11 @@ def _parse_tagged_or_json(raw: str) -> Optional[Dict]:
     def _paras(txt: str) -> List[str]:
         out = []
         for p in re.split(r"\n\s*\n", txt or ""):
-            p = re.sub(r"\s+", " ", p).strip()
+            p = _strip_ticks(p)
             if len(p) > 15 and p.upper() not in {"YOK", "YOK."}:
                 out.append(p)
         if not out and (txt or "").strip():
-            single = re.sub(r"\s+", " ", txt).strip()
+            single = _strip_ticks(txt)
             if len(single) > 15 and single.upper() not in {"YOK", "YOK."}:
                 out.append(single)
         return out
@@ -351,12 +417,13 @@ def _parse_tagged_or_json(raw: str) -> Optional[Dict]:
             k, aci = b.split(" - ", 1)
         else:
             continue
-        k_clean = k.strip().strip("*[] ")
-        aci_clean = aci.strip()
+        k_clean = _strip_ticks(k).strip("*[]\"' ")
+        aci_clean = _strip_ticks(aci).strip("*\"' ")
         if k_clean and aci_clean:
             kaynaklar.append({"kaynak": k_clean, "aci": aci_clean})
 
     rakamlar = []
+    seen_vals = set()
     for b in _bullets(sec.get("RAKAMLAR", "")):
         if "|" in b:
             et, dg = b.split("|", 1)
@@ -364,23 +431,36 @@ def _parse_tagged_or_json(raw: str) -> Optional[Dict]:
             et, dg = b.split(":", 1)
         else:
             continue
-        et_clean = et.strip().strip("* ")
-        dg_clean = dg.strip().strip("* ")
-        if et_clean and dg_clean and dg_clean.upper() not in {"YOK", "YOK.", "BELİRTİLMEDİ", "BELIRTILMEDI"}:
+        et_clean = _strip_ticks(et).strip("*\"' ")
+        dg_clean = _strip_ticks(dg).strip("*\"' ")
+        val_key = dg_clean.lower()
+        if (
+            et_clean
+            and dg_clean
+            and dg_clean.upper() not in {"YOK", "YOK.", "BELİRTİLMEDİ", "BELIRTILMEDI"}
+            and val_key not in seen_vals
+        ):
+            seen_vals.add(val_key)
             rakamlar.append({"etiket": et_clean, "deger": dg_clean})
 
-    baslik_lines = [l.strip().strip('"#* ') for l in (sec.get("BASLIK") or "").splitlines() if l.strip()]
+    baslik_lines = [_strip_ticks(l).strip('"#* ') for l in (sec.get("BASLIK") or "").splitlines() if _strip_ticks(l).strip('"#* ')]
     return {
         "baslik": baslik_lines[0] if baslik_lines else "",
         "ozet": " ".join(_paras(sec.get("OZET", ""))),
         "maddeler": _bullets(sec.get("MADDELER", "")),
-        "ne_oldu": _paras(sec.get("NE_OLDU", "")),
-        "neden_onemli": _paras(sec.get("NEDEN_ONEMLI", "")),
-        "arka_plan": _paras(sec.get("ARKA_PLAN", "")),
-        "turkiye_etkisi": " ".join(_paras(sec.get("TURKIYE_ETKISI", ""))),
+        "h1": _clean_heading_candidate(sec.get("ARA_BASLIK_1", ""), "Gelişmenin Ayrıntıları ve Resmi Açıklamalar"),
+        "ne_oldu": _paras(sec.get("BOLUM_1", "")),
+        "h2": _clean_heading_candidate(sec.get("ARA_BASLIK_2", ""), "Kararın Sektörel ve Toplumsal Yansımaları"),
+        "neden_onemli": _paras(sec.get("BOLUM_2", "")),
+        "h3": _clean_heading_candidate(sec.get("ARA_BASLIK_3", ""), "Sürecin Geçmişi ve Kurumsal Çerçeve"),
+        "arka_plan": _paras(sec.get("BOLUM_3", "")),
+        "etki_baslik": _clean_heading_candidate(sec.get("ETKI_BASLIK", ""), "Sahaya ve Vatandaşa Yansıması"),
+        "turkiye_etkisi": " ".join(_paras(sec.get("ETKI_METNI", ""))),
+        "senaryo_baslik": _clean_heading_candidate(sec.get("SENARYO_BASLIK", ""), "Önümüzdeki Süreçte Öne Çıkan İhtimaller"),
         "senaryolar": _bullets(sec.get("SENARYOLAR", "")),
         "kaynaklar": kaynaklar,
         "rakamlar": rakamlar,
+        "sonra_baslik": _clean_heading_candidate(sec.get("SONRA_BASLIK", ""), "Takvimdeki Sıradaki Adımlar"),
         "sonra": " ".join(_paras(sec.get("SONRA", ""))),
     }
 
@@ -417,7 +497,7 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
         return None
 
     src_has_tr = bool(re.search(r"[çğıöşüÇĞİÖŞÜ]", " ".join(s.get("title", "") for s in sources)))
-    min_raw_words = 410 if mode == "analysis" else 245
+    min_raw_words = 360 if mode == "analysis" else 235
 
     now_ts = time.time()
     active_models = [m for m in MODELS if _MODEL_COOLDOWN_UNTIL.get(m, 0.0) <= now_ts]
@@ -446,7 +526,7 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
                 continue
             est_w = _estimate_data_words(data)
             if est_w < min_raw_words:
-                print(f"⚠️ [Çok Kaynaklı] {m_name} kısa yanıt verdi ({est_w} kelime < {min_raw_words}), daha uzun istenerek tekrar deneniyor.")
+                print(f"⚠️ [Çok Kaynaklı] {m_name} kısa yanıt verdi ({est_w} kelime < {min_raw_words}), tekrar deneniyor.")
                 continue
             data["_model"] = m_name
             return data
@@ -454,7 +534,6 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
             err_s = str(e)
             print(f"⚠️ [Çok Kaynaklı] {m_name} hatası: {err_s[:160]}")
             if "429" in err_s and ("quota" in err_s.lower() or "RESOURCE_EXHAUSTED" in err_s):
-                # Günlük/dakikalık kota doldu: bu modeli 20 dk soğutmaya alıp anında diğer Gemini 3.5 modeline geç
                 _MODEL_COOLDOWN_UNTIL[m_name] = time.time() + 1200
                 continue
             if step_i < len(attempt_chain) - 1 and ("503" in err_s or "UNAVAILABLE" in err_s):
@@ -465,21 +544,21 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
 
 def _as_list(v) -> List[str]:
     if isinstance(v, list):
-        return [str(x).strip() for x in v if str(x).strip()]
+        return [_strip_ticks(str(x)) for x in v if _strip_ticks(str(x))]
     if isinstance(v, str) and v.strip():
-        return [p.strip() for p in re.split(r"\n\s*\n", v) if p.strip()]
+        return [_strip_ticks(p) for p in re.split(r"\n\s*\n", v) if _strip_ticks(p)]
     return []
 
 
 def _e(s) -> str:
-    return _html.escape(str(s or "").strip(), quote=True)
+    return _html.escape(_strip_ticks(str(s or "")), quote=True)
 
 
 def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
-    """Yapılandırılmış veriyi sitenin şablonuna uygun, temiz .ga-multi HTML gövdesine çevirir."""
+    """Yapılandırılmış veriyi konuya özgü ara başlıklarla temiz .ga-multi HTML gövdesine çevirir."""
     parts = ['<div class="ga-multi">']
 
-    bullets = _as_list(data.get("maddeler"))[:4]
+    bullets = _as_list(data.get("maddeler"))[:3]
     if bullets:
         parts.append(
             '<div class="ga-box ga-tldr"><h4 class="ga-box-title">⚡ 30 Saniyede Özet</h4><ul>'
@@ -493,26 +572,44 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
             for p in paras:
                 parts.append(f'<p class="text-slate-800 leading-relaxed mb-4">{_e(p)}</p>')
 
-    section("Ne Oldu?", _as_list(data.get("ne_oldu")))
-    section("Neden Önemli?", _as_list(data.get("neden_onemli")))
-    section("Arka Plan ve Önceki Gelişmeler", _as_list(data.get("arka_plan")))
+    section(data.get("h1") or "Gelişmenin Ayrıntıları ve İlk Açıklamalar", _as_list(data.get("ne_oldu")))
+    section(data.get("h2") or "Kararın Sektörel ve Toplumsal Yansımaları", _as_list(data.get("neden_onemli")))
+    section(data.get("h3") or "Sürecin Geçmişi ve Kurumsal Çerçeve", _as_list(data.get("arka_plan")))
 
     tr = " ".join(_as_list(data.get("turkiye_etkisi")))
-    if tr:
+    if tr and tr.upper() not in {"YOK", "YOK."}:
+        etki_h = _strip_ticks(data.get("etki_baslik") or "Sahaya ve Vatandaşa Yansıması")
+        icon = "🇹🇷 " if ("türkiye" in etki_h.lower() and not etki_h.startswith("🇹🇷")) else ("📌 " if not re.match(r"^[\W_]", etki_h) else "")
         parts.append(
-            f'<div class="ga-box ga-tr"><h4 class="ga-box-title">🇹🇷 Türkiye\'ye Etkisi</h4><p>{_e(tr)}</p></div>'
+            f'<div class="ga-box ga-tr"><h4 class="ga-box-title">{icon}{_e(etki_h)}</h4><p>{_e(tr)}</p></div>'
         )
 
     if mode == "analysis":
         scen = _as_list(data.get("senaryolar"))[:4]
         if scen:
+            scen_h = data.get("senaryo_baslik") or "Önümüzdeki Süreçte Öne Çıkan İhtimaller"
             parts.append(
-                '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Olası Senaryolar</h3><ol class="ga-list">'
+                f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(scen_h)}</h3><ol class="ga-list">'
                 + "".join(f"<li>{_e(s)}</li>" for s in scen)
                 + "</ol>"
             )
 
-    # Kaynaklar ne diyor? / Kaynak ve Öne Çıkan Detay (şeffaf dış bağlantı ile)
+    # Yalnızca >= 3 farklı somut sayısal veri olduğunda veri tablosu göster (1-2 verilik haberlerde tekrarı önler)
+    nums = [
+        r
+        for r in (data.get("rakamlar") or [])
+        if isinstance(r, dict) and r.get("etiket") and r.get("deger")
+    ][:6]
+    if len(nums) >= 3:
+        parts.append(
+            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Öne Çıkan Veriler</h3><div class="ga-table-wrap"><table class="ga-table"><tbody>'
+            + "".join(f"<tr><td>{_e(r['etiket'])}</td><td><strong>{_e(r['deger'])}</strong></td></tr>" for r in nums)
+            + "</tbody></table></div>"
+        )
+
+    section(data.get("sonra_baslik") or "Takvimdeki Sıradaki Adımlar", _as_list(data.get("sonra")))
+
+    # Kaynak karşılaştırması / şeffaf kaynak bağlantısı (yazının sonunda, ters tırnaksız tertemiz kutu)
     link_by_name = {}
     for s in sources:
         link_by_name.setdefault((s.get("name") or "").strip().lower(), s.get("link") or "")
@@ -521,8 +618,8 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     for k in (data.get("kaynaklar") or []):
         if not isinstance(k, dict):
             continue
-        name = (k.get("kaynak") or "").strip()
-        aci = (k.get("aci") or "").strip()
+        name = _strip_ticks(k.get("kaynak") or "").strip("*[] ")
+        aci = _strip_ticks(k.get("aci") or "").strip()
         if not name or not aci:
             continue
         link = link_by_name.get(name.lower(), "")
@@ -540,11 +637,10 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
         )
         rows.append(f"<li><strong>{_e(name)}:</strong> {_e(aci)}{a}</li>")
 
-    # Model kaynak satırını boş bıraktıysa eldeki kaynaklardan şeffaf bağlantı üret
     if not rows and sources:
         for s in sources:
-            s_name = (s.get("name") or "").strip()
-            s_title = (s.get("title") or "").strip()
+            s_name = _strip_ticks(s.get("name") or "")
+            s_title = _strip_ticks(s.get("title") or "")
             s_link = (s.get("link") or "").strip()
             if not s_name or not s_title:
                 continue
@@ -557,30 +653,13 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
 
     if len(rows) >= 2:
         parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Kaynaklar Ne Diyor?</h3><ul class="ga-sources">'
+            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Kaynakların Öne Çıkardığı Detaylar</h3><ul class="ga-sources">'
             + "".join(rows)
             + "</ul>"
         )
     elif len(rows) == 1:
-        parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Kaynak ve Öne Çıkan Detay</h3><ul class="ga-sources">'
-            + rows[0]
-            + "</ul>"
-        )
+        parts.append('<ul class="ga-sources mt-6">' + rows[0] + "</ul>")
 
-    nums = [
-        r
-        for r in (data.get("rakamlar") or [])
-        if isinstance(r, dict) and r.get("etiket") and r.get("deger")
-    ][:6]
-    if nums:
-        parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Rakamlarla</h3><div class="ga-table-wrap"><table class="ga-table"><tbody>'
-            + "".join(f"<tr><td>{_e(r['etiket'])}</td><td><strong>{_e(r['deger'])}</strong></td></tr>" for r in nums)
-            + "</tbody></table></div>"
-        )
-
-    section("Bundan Sonra Ne İzlenmeli?", _as_list(data.get("sonra")))
     parts.append("</div>")
     return "\n".join(parts)
 
@@ -599,14 +678,14 @@ def build_article(primary: Dict, primary_body: str, pool: List[Dict], category: 
     data = generate(sources, category=category, mode=mode)
     if not data:
         return None
-    title = content_quality.clean_title_text(re.sub(r"\s+", " ", str(data.get("baslik") or "")).strip())
+    title = content_quality.clean_title_text(_strip_ticks(str(data.get("baslik") or "")))
     if not (15 <= len(title) <= 140):
         title = content_quality.clean_title_text(primary.get("title", ""))
-    summary = content_quality.clean_title_text(str(data.get("ozet") or "").strip())
+    summary = content_quality.clean_title_text(_strip_ticks(str(data.get("ozet") or "")))
     body = render_html(data, sources, mode=mode)
     content = content_quality.clean_article_html(body)
     words = content_quality.visible_word_count(content)
-    min_words = 420 if mode == "analysis" else 260
+    min_words = 380 if mode == "analysis" else 250
     if words < min_words:
         print(f"⚠️ [Çok Kaynaklı] Metin kısa kaldı ({words} kelime < {min_words}), eski akışa dönülüyor.")
         return None

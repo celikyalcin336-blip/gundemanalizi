@@ -269,9 +269,18 @@ def _strip_raw_html_document_leak(content: str) -> str:
     if re.search(r"<!\s*DOCTYPE|<html\b|```html|<!--\s*Giriş", c, flags=re.I):
         c = re.sub(r"^\s*<p\s+class=\"lead[^\"]*\"[^>]*>.*?</p>\s*", "", c, count=1, flags=re.S | re.I)
 
-    # 1) Markdown kod çitleri (```html, ```xml, ```)
+    # 1) Markdown kod çitleri (```html, ```xml, ```) ve satır içi ters tırnak (`) kalıntıları
     c = re.sub(r"```[a-zA-Z0-9_-]*\s*", "", c)
     c = c.replace("```", "")
+    c = c.replace("`", "")
+
+    # 1.5) Kendi iç ikiz sayfa referanslarını ("Bu analizin dayandığı haber:") temizle
+    c = re.sub(
+        r"<p[^>]*>\s*<strong>Bu analizin dayandığı haber:</strong>.*?</p>",
+        "",
+        c,
+        flags=re.S | re.I,
+    )
 
     # 2) İç içe sızmış <head>, <style>, <script>, <title> blokları
     c = re.sub(r"<head\b[^>]*>.*?</head>", "", c, flags=re.S | re.I)
@@ -353,7 +362,12 @@ def clean_article_html(content: str) -> str:
         "sonuç": "Resmi Süreç ve Beklenen Adımlar",
         "değerlendirme": "Sektörel ve Toplumsal Yansımalar",
         "neler oldu": "Gelişmenin Somut Detayları",
-        "arka plan": "Sürecin Arka Planı ve Önceki Kararlar",
+        "ne oldu": "Gelişmenin Ayrıntıları ve İlk Açıklamalar",
+        "neden önemli": "Kararın Etkileri ve Öne Çıkan Boyutlar",
+        "arka plan": "Sürecin Geçmişi ve Önceki Gelişmeler",
+        "arka plan ve önceki gelişmeler": "Sürecin Geçmişi ve Kurumsal Çerçeve",
+        "olası senaryolar": "Önümüzdeki Dönemde Masadaki İhtimaller",
+        "bundan sonra ne izlenmeli": "Takvimdeki Sıradaki Adımlar ve Resmi Süreç",
     }
     def _fix_heading(m):
         tag, attrs, inner = m.group(1), m.group(2), m.group(3)
@@ -364,8 +378,13 @@ def clean_article_html(content: str) -> str:
         return f"<{tag}{attrs}>{inner}</{tag}>"
     c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _fix_heading, c, flags=re.S | re.I)
 
-    # 4) Paragraflar arası tekrar eden cümleler ve mükerrer giriş (lead) paragrafı
+    # 4) Paragraflar arası tekrar eden cümleler ve özet kutusuyla birebir örtüşen cümleler
     seen_text = [""]
+    for _tldr_m in re.finditer(r'<div class="ga-box ga-tldr">.*?</div>', c, flags=re.S):
+        for _li_txt in re.findall(r"<li>(.*?)</li>", _tldr_m.group(0), flags=re.S):
+            _li_key = re.sub(r"\W+", "", _norm(_li_txt).lower())
+            if len(_li_key) > 40:
+                seen_text[0] += _li_key + "|"
     seen_paras = []
 
     def _dedupe(m):

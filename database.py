@@ -979,11 +979,8 @@ def save_article(title: str, summary: str, content: str, image_path: str, source
             print(f"⚠️ [Mükerrer Haber Engellendi] '{title[:50]}' zaten veritabanında mevcut ({existing['slug']}). İkinci kez eklenmedi.")
             return (existing["slug"], False) if return_status else existing["slug"]
 
-        # 2. Semantik Başlık Benzerliği (Son 150 makale içinde %68 üzeri benzerlik kontrolü)
-        if (category or "").strip() == "Analiz":
-            cur = conn.execute("SELECT slug, title FROM articles WHERE category = 'Analiz' ORDER BY id DESC LIMIT 50")
-        else:
-            cur = conn.execute("SELECT slug, title FROM articles ORDER BY id DESC LIMIT 150")
+        # 2. Semantik Başlık Benzerliği (Tüm kategorilerde son 150 makale içinde %68 üzeri benzerlik kontrolü - çift sayfa/kopya koruması)
+        cur = conn.execute("SELECT slug, title FROM articles ORDER BY id DESC LIMIT 150")
         recent = cur.fetchall()
         clean_t = title.strip().lower()
         for r in recent:

@@ -612,16 +612,35 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     return result
 
 
+import os
+import threading
+
+_ANALYSIS_LOCK = threading.Lock()
+
+
 def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
     """
-    Her gün 10:00 (dün 20:00 -> 10:00), 15:00 (10:00 -> 15:00) ve 19:00 (15:00 -> 19:00)
-    dilimlerinde; o saat aralığındaki EN ÖNEMLİ 1 ANA GELİŞMEYİ (Odak Konuyu) seçer,
-    farklı kategorileri birbirine karıştırmadan SADECE o tek konuyu derinlemesine (600+ kelime,
-    neden-sonuç, vatandaşa/sektöre etkisi ve veri tablosuyla) analiz eder; aynı dilimdeki
-    diğer haberleri ise yazının en altında 'Günün Diğer Öne Çıkan Başlıkları' tablosunda sunar.
+    Her gün 10:00, 15:00 ve 19:00 dilimlerinde çalışır.
+    ÇİFT SAYFA / KOPYA İÇERİK ÖNLEME KURALI:
+    - Sitede zaten yayınlanmış bir haberi ikinci bir URL'de tekrar yazmaz ("Bu analizin dayandığı haber" ikiz sayfa riskini sıfırlar).
+    - Doğrudan canlı RSS havuzundaki HENÜZ YAYINLANMAMIŞ, en çok farklı kaynağın konuştuğu en önemli gündem olayını seçer,
+      gerçek basın fotoğrafını doğrular, Gemini 3.5 ile çok kaynaklı derin Analiz Dosyası olarak TEK URL halinde yayınlar
+      ve kullanılan tüm kaynak linklerini işlenmiş işaretler ki normal haber botu aynı olayı ikinci kez paylaşmasın.
     """
+    if not _ANALYSIS_LOCK.acquire(blocking=False):
+        return None
+    try:
+        return _ensure_daily_synthesis_reports_locked(force=force)
+    finally:
+        _ANALYSIS_LOCK.release()
+
+
+def _ensure_daily_synthesis_reports_locked(force: bool = False) -> Optional[str]:
     from datetime import datetime, timezone, timedelta
     import database
+    import image_generator
+    import multisource
+    import news_fetcher
 
     tz_tr = timezone(timedelta(hours=3))
     now_tr = datetime.now(tz_tr)
@@ -652,188 +671,119 @@ def ensure_daily_synthesis_reports(force: bool = False) -> Optional[str]:
             slot_key = "10"
         setting_key = f"ga_analiz_{today_str}_{slot_key}"
 
-    yesterday_str = (now_tr - timedelta(days=1)).strftime("%Y-%m-%d")
-    if slot_key == "10":
-        win_start = f"{yesterday_str} 20:00:00"
-    elif slot_key == "15":
-        win_start = f"{today_str} 10:00:00"
-    else:
-        win_start = f"{today_str} 15:00:00"
+    try:
+        import main as bot_main
+        _is_comm = bot_main.is_commodity_news
+    except Exception:
+        _is_comm = lambda _t: False
 
-    used_slugs_raw = database.get_setting("ga_analiz_used_slugs", "") or ""
-    used_slugs = {x.strip() for x in used_slugs_raw.split(",") if x.strip()} | {
-        "bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu",
-        "ikinci-el-konutlarda-yuksek-fiyat-baskisi-satislari-yavaslatti",
-        "zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor",
-        "glioblastoma-mucadelesinde-yeni-bir-ufuk-ultrason-ve-nanoteknoloji-birlesimi",
-    }
+    try:
+        live_pool = news_fetcher.fetch_latest_news(limit_per_feed=10) or []
+    except Exception as _fe:
+        print(f"Analiz RSS tarama uyarısı: {_fe}")
+        live_pool = []
 
-    pool = database.get_articles(limit=50)
-    candidates = []
-    for a in (pool or []):
-        cat = (a.get("category") or "Gündem").strip()
-        if cat == "Analiz":
+    scored_fresh = []
+    for item in live_pool:
+        t = (item.get("title") or "").strip()
+        sm = (item.get("summary") or "").strip()
+        cat = (item.get("category") or "Gündem").strip()
+        if not t or _CRIME_ACCIDENT_SKIP.search(t) or _is_comm(t):
             continue
-        art_slug = (a.get("slug") or "").strip()
-        if not art_slug or art_slug in used_slugs:
-            continue
-        created_str = str(a.get("created_at") or "").strip()
-        if created_str and created_str < win_start:
-            continue
-        t = (a.get("title") or "").strip()
-        sm = (a.get("summary") or "").strip()
-        if not t or not sm or len(sm) < 40:
-            continue
-        if _CRIME_ACCIDENT_SKIP.search(t):
-            continue
-        img_p = (a.get("image_path") or "").strip()
-        if not img_p:
-            continue
-
-        # Öncelik puanı: Ekonomi, Gündem, Dünya, Eğitim ve rakam/veri içeren ciddi kararlar en üstte
-        cat_weight = {"Ekonomi": 40, "Gündem": 35, "Dünya": 32, "Eğitim": 30, "Otomobil": 22, "Teknoloji": 20, "Sağlık": 20, "Spor": 10}.get(cat, 15)
+        sib_cnt = len(item.get("siblings") or [])
+        cat_weight = {
+            "Ekonomi": 42,
+            "Gündem": 36,
+            "Dünya": 34,
+            "Eğitim": 32,
+            "Teknoloji": 26,
+            "Otomobil": 24,
+            "Sağlık": 22,
+            "Spor": 12,
+        }.get(cat, 20)
         num_bonus = 15 if re.search(r"\d", f"{t} {sm}") else 0
-        candidates.append((cat_weight + num_bonus, a))
+        img_bonus = 10 if item.get("image_url") else 0
+        # Birden fazla kaynağın geçtiği çok kaynaklı büyük gelişmelere en yüksek öncelik
+        total_score = (sib_cnt * 55) + cat_weight + num_bonus + img_bonus
+        scored_fresh.append((total_score, item))
 
-    # Eğer o saat diliminde hiç uygun haber yoksa, henüz analiz edilmemiş en son ciddi haberi yedek olarak al (boş geçmesin)
-    if not candidates:
-        for a in (pool or [])[:15]:
-            cat = (a.get("category") or "Gündem").strip()
-            art_slug = (a.get("slug") or "").strip()
-            t = (a.get("title") or "").strip()
-            sm = (a.get("summary") or "").strip()
-            if cat == "Analiz" or not art_slug or art_slug in used_slugs or _CRIME_ACCIDENT_SKIP.search(t):
-                continue
-            img_p = (a.get("image_path") or "").strip()
-            if img_p:
-                candidates.append((20, a))
-                break
+    scored_fresh.sort(key=lambda x: x[0], reverse=True)
 
-    if not candidates:
+    chosen_item = None
+    chosen_ms = None
+    chosen_visual = ""
+
+    for _, cand in scored_fresh[:6]:
+        c_title = cand.get("title", "")
+        c_link = cand.get("link", "")
+        c_hash = cand.get("hash", "")
+        c_source = cand.get("source", "")
+        c_cat = cand.get("category") or "Gündem"
+        if database.is_already_posted(c_hash, title=c_title, link=c_link):
+            continue
+
+        details = news_fetcher.fetch_article_details(c_link, max_paragraphs=10)
+        scraped_body = details.get("body", "") or ""
+        raw_sum = cand.get("summary", "") or ""
+        best_body = scraped_body if len(scraped_body) > len(raw_sum) else raw_sum
+
+        cand_imgs = list(details.get("images") or [])
+        if cand.get("image_url") and cand["image_url"] not in cand_imgs:
+            cand_imgs.append(cand["image_url"])
+        for _sb in (cand.get("siblings") or []):
+            if _sb.get("image_url") and _sb["image_url"] not in cand_imgs:
+                cand_imgs.append(_sb["image_url"])
+
+        if not cand_imgs:
+            continue
+
+        img_filename = f"analiz_{c_hash[:10]}.jpg"
+        visual_path = image_generator.create_news_visual(
+            candidate_urls=cand_imgs,
+            output_filename=img_filename,
+            title=c_title,
+            category=c_cat,
+        )
+        if (
+            not visual_path
+            or not os.path.exists(visual_path)
+            or os.path.getsize(visual_path) < 8000
+            or image_generator.is_synthetic_card_image(visual_path)
+        ):
+            continue
+
+        ms_res = multisource.build_article(cand, best_body, live_pool, category=c_cat, mode="analysis")
+        if ms_res and ms_res.get("content"):
+            chosen_item = cand
+            chosen_ms = ms_res
+            chosen_visual = visual_path
+            break
+
+    if not chosen_item or not chosen_ms or not chosen_visual:
         return None
 
-    candidates.sort(key=lambda x: x[0], reverse=True)
-    focus = candidates[0][1]
-    other_items = [x[1] for x in candidates[1:5]]
+    report_title = chosen_ms["title"]
+    lead_summary = chosen_ms["summary"]
+    ai_html = chosen_ms["content"]
 
-    focus_title = (focus.get("title") or "").strip()
-    focus_summary = (focus.get("summary") or "").strip()
-    focus_content_plain = _strip_tags(focus.get("content") or "")
-    focus_slug = (focus.get("slug") or "").strip()
-    focus_cat = (focus.get("category") or "Gündem").strip()
-    lead_image = (focus.get("image_path") or "").strip()
+    # Sitedeki FARKLI konulardaki son haberlere sağlıklı iç bağlantı kutusu (aynı konu asla eklenmez)
+    rep_toks = multisource._tokens(report_title)
+    recent_pool = database.get_articles(limit=18) or []
+    other_items = []
+    for a in recent_pool:
+        if (a.get("category") or "").strip() == "Analiz":
+            continue
+        at = (a.get("title") or "").strip()
+        aslug = (a.get("slug") or "").strip()
+        if not at or not aslug or _CRIME_ACCIDENT_SKIP.search(at):
+            continue
+        a_toks = multisource._tokens(at)
+        if rep_toks and a_toks and len(rep_toks & a_toks) >= 2:
+            continue
+        other_items.append(a)
+        if len(other_items) >= 4:
+            break
 
-    report_title = f"{focus_cat} Dosyası: {focus_title} — Arka Plan ve Etki Analizi"
-    lead_summary = f"{focus_summary} Gelişmenin arka planı, sektörel ve toplumsal etkileriyle kapsamlı analizi."
-
-    ai_html = ""
-    # 1) Yeni çok kaynaklı analiz formatı (Ne oldu / Neden önemli / Arka plan / Türkiye'ye etkisi /
-    #    Senaryolar / Kaynaklar ne diyor / Rakamlarla / Bundan sonra)
-    try:
-        import multisource
-        import news_fetcher
-        try:
-            _live_pool = news_fetcher.fetch_latest_news(limit_per_feed=10) or []
-        except Exception:
-            _live_pool = []
-        _primary_link = ""
-        _primary_src = focus.get("source") or "Gündem Analizi"
-        _f_toks = multisource._tokens(focus_title)
-        for _lp in _live_pool:
-            _lp_toks = multisource._tokens(_lp.get("title", ""))
-            if _f_toks and _lp_toks and len(_f_toks & _lp_toks) >= max(3, int(min(len(_f_toks), len(_lp_toks)) * 0.6)):
-                _primary_link = _lp.get("link") or ""
-                if _lp.get("source"):
-                    _primary_src = _lp.get("source")
-                break
-        _primary = {
-            "title": focus_title,
-            "source": _primary_src,
-            "link": _primary_link,
-            "category": focus_cat,
-            "summary": focus_summary,
-        }
-        _ms = multisource.build_article(_primary, focus_content_plain[:3500], _live_pool, category=focus_cat, mode="analysis")
-        if _ms:
-            report_title = _ms["title"]
-            if len(_ms.get("summary") or "") >= 45:
-                lead_summary = _ms["summary"]
-            ai_html = _ms["content"] + (
-                f'\n<p class="text-slate-800 leading-relaxed mb-4"><strong>Bu analizin dayandığı haber:</strong> '
-                f'<a href="/haber/{_html.escape(focus_slug)}" class="text-red-600 font-bold underline">{_html.escape(focus_title)}</a></p>'
-            )
-    except Exception as _ms_e:
-        print(f"Çok kaynaklı analiz uyarısı: {_ms_e}")
-        ai_html = ""
-
-    # 2) Yedek: mevcut analiz akışı
-    try:
-        import config
-        import content_quality
-        if not ai_html and getattr(config, "GEMINI_API_KEY", ""):
-            from google import genai
-            from google.genai import types as genai_types
-            client = genai.Client(
-                api_key=config.GEMINI_API_KEY,
-                http_options=genai_types.HttpOptions(timeout=65000, retry_options=genai_types.HttpRetryOptions(attempts=1)),
-            )
-            synth_prompt = f"""Sen 'Gündem Analizi' haber merkezinin başanalistisin.
-Aşağıdaki TEK ANA GÜNDEM KONUSUNU başka alakasız konularla karıştırmadan, kendi başına derinlemesine analiz eden
-kapsamlı bir analiz yazısı hazırla.
-
-ANALİZ EDİLECEK ANA KONU:
-Kategori: {focus_cat}
-Başlık: {focus_title}
-Haber Linki: /haber/{focus_slug}
-Özet: {focus_summary}
-Detaylar: {focus_content_plain[:3500]}
-
-KURALLAR:
-1. Yalnızca bu konuyu incele; başka kategorilerdeki alakasız haberleri metne karıştırma.
-2. En az 500-650 kelime uzunluğunda, 3 özgün ara başlık (<h3>) ve 6-7 dolu paragraf (<p>) yaz.
-3. Haberin cümlelerini olduğu gibi kopyalama. Bir analist gözüyle:
-   - Bu gelişmenin/kararın neden önemli olduğunu ve arka planını,
-   - Vatandaşın bütçesine, günlük hayatına, ilgili sektöre veya Türkiye gündemine somut etkilerini,
-   - Önümüzdeki süreçte neler beklendiğini sade, akıcı bir Türkçe ile anlat.
-4. Yazının içinde konuya ait temel verileri/boyutları özetleyen 3-4 satırlık şık bir HTML <table> (Başlık / Detay & Etki sütunlu) oluştur.
-5. Metin içinde en az 1 kez <a href="/haber/{focus_slug}" class="text-red-600 font-bold underline">{focus_title}</a> şeklinde asıl habere iç link ver.
-6. Sadece <p>, <h3>, <strong>, <a>, <table>, <thead>, <tbody>, <tr>, <th>, <td> HTML etiketlerini kullan. Markdown kullanma.
-
-ÇIKTI BİÇİMİ:
-[BAŞLIK]
-(Konunun neden-sonuç ve etki boyutunu yansıtan özgün analiz başlığı, 6-12 kelime)
-[ÖZET]
-(2 cümlelik net analiz özeti)
-[İÇERİK]
-(HTML analiz metni)
-"""
-            for m_name in ["gemini-3.5-flash", "gemini-3.5-flash-lite"]:
-                try:
-                    res = client.models.generate_content(model=m_name, contents=synth_prompt)
-                    raw_t = (res.text or "").strip() if res else ""
-                    if raw_t and "[İÇERİK]" in raw_t:
-                        h_part, c_part = raw_t.split("[İÇERİK]", 1)
-                        if "[ÖZET]" in h_part:
-                            tp, sp = h_part.split("[ÖZET]", 1)
-                            cand_t = content_quality.clean_title_text(tp.replace("[BAŞLIK]", "").strip())
-                            cand_s = content_quality.clean_title_text(sp.strip())
-                            if 20 <= len(cand_t) <= 130:
-                                report_title = cand_t
-                            if len(cand_s) >= 45:
-                                lead_summary = cand_s
-                        ai_html = content_quality.clean_article_html(c_part.strip())
-                        if content_quality.visible_word_count(ai_html) >= 320:
-                            break
-                except Exception:
-                    continue
-    except Exception as _ai_e:
-        print(f"Gündem Analizi AI üretim uyarısı: {_ai_e}")
-
-    if not ai_html:
-        # AdSense Kalite Kuralı: AI üretimi kota nedeniyle başarısız olursa kaynak haberden cümle kopyalayan şablon basma; bir sonraki döngüde gerçek AI ile üret.
-        return None
-
-    # Eğer aynı saat diliminde başka haberler de varsa, yazının en altına birbirine karıştırmadan şık bir 'Aynı Saat Dilimindeki Diğer Başlıklar' kutusu ekle
     if other_items:
         other_rows = []
         for item in other_items:
@@ -860,23 +810,51 @@ KURALLAR:
     else:
         full_html = ai_html
 
-    slug = database.save_article(
+    slug, is_created = database.save_article(
         title=report_title,
         summary=lead_summary,
         content=full_html,
-        image_path=lead_image,
+        image_path=chosen_visual,
         source="Gündem Analizi",
         category="Analiz",
+        return_status=True,
     )
-    if slug:
+    if slug and is_created:
+        # Ana kaynağı ve birleştirilen tüm kardeş kaynakları işlenmiş işaretle (normal haber botu ikinci kez ayrı URL açmasın!)
+        try:
+            database.claim_news_for_processing(
+                chosen_item["hash"],
+                title=chosen_item.get("title", ""),
+                source=chosen_item.get("source", ""),
+                link=chosen_item.get("link", ""),
+            )
+            database.mark_as_posted(
+                news_hash=chosen_item["hash"],
+                title=report_title,
+                source=chosen_item.get("source", ""),
+                link=chosen_item.get("link", ""),
+            )
+        except Exception:
+            pass
+        for _sib in (chosen_ms.get("sibling_items") or chosen_item.get("siblings") or []):
+            try:
+                if _sib.get("hash"):
+                    database.claim_news_for_processing(
+                        _sib["hash"],
+                        title=_sib.get("title", ""),
+                        source=_sib.get("source", ""),
+                        link=_sib.get("link", ""),
+                    )
+            except Exception:
+                pass
+
         database.set_setting(setting_key, "1")
-        new_used = list(used_slugs) + [focus_slug]
-        database.set_setting("ga_analiz_used_slugs", ",".join(new_used[-60:]))
         _RADAR_CACHE["ts"] = 0.0
-        print(f"✅ [Gündem Analizi] Saat {hour}:00 tek konu odaklı analiz yayınlandı: /haber/{slug}")
+        print(f"✅ [Gündem Analizi] Saat {hour}:00 tekil URL çok kaynaklı analiz yayınlandı: /haber/{slug}")
         try:
             import google_indexer
             google_indexer.notify_google_indexing(f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}")
         except Exception:
             pass
-    return slug
+        return slug
+    return None
