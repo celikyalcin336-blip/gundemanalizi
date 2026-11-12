@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "porsche-audinin-aksine-abdde-fabrika-kurmayi-reddediyor",
-    "title": "Porsche, Audi'nin aksine ABD'de fabrika kurmayı reddediyor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793306233.3814292
-  },
-  {
     "slug": "cumhurbaskanligi-kultur-ve-sanat-buyuk-odullerinin-sahipleri-belli-oldu",
     "title": "Cumhurbaşkanlığı Kültür ve Sanat Büyük Ödülleri'nin sahipleri belli oldu",
     "status": "posted",
@@ -3550,5 +3543,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794523684.6814873
+  },
+  {
+    "slug": "uluslararasi-para-fonu-kuresel-enflasyon-tahminini-uzun-vadeye-yaydi",
+    "title": "Uluslararası Para Fonu Küresel Enflasyon Tahminini Uzun Vadeye Yaydı",
+    "summary": "Uluslararası Para Fonu, Amerika Birleşik Devletleri'nde enflasyonun hedeflenen orana ulaşma takvimini ileri bir tarihe erteledi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794526408.517494
   }
 ]
