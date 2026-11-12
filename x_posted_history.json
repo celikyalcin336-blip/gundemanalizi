@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "ankarada-dogalgaz-patlamasi-panigi",
-    "title": "Ankara'da doğalgaz patlaması paniği",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793303026.8182359
-  },
-  {
     "slug": "porsche-audinin-aksine-abdde-fabrika-kurmayi-reddediyor",
     "title": "Porsche, Audi'nin aksine ABD'de fabrika kurmayı reddediyor",
     "status": "posted",
@@ -3548,5 +3541,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794520960.0009542
+  },
+  {
+    "slug": "anadolu-efes-avrupa-ligi-randevusunda-virtus-bolognayi-agirliyor",
+    "title": "Anadolu Efes Avrupa Ligi Randevusunda Virtus Bologna'yı Ağırlıyor",
+    "summary": "Anadolu Efes, Basketbol Avrupa Ligi on birinci hafta mücadelesinde yarın İtalyan temsilcisi Virtus Bologna ile sahasında karşılaşacak.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794523684.6814873
   }
 ]
