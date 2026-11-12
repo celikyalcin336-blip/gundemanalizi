@@ -1,12 +1,5 @@
 [
   {
-    "slug": "fenerbahcede-hayal-kirikligi-yaratan-gercek-greenwood",
-    "title": "Fenerbahçe'de hayal kırıklığı yaratan gerçek! Greenwood...",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793198512.753325
-  },
-  {
     "slug": "manyetik-anahtarli-razer-reclusa-mini-65-tanitildi",
     "title": "Manyetik anahtarlı Razer Reclusa Mini 65% tanıtıldı",
     "status": "posted",
@@ -3522,5 +3515,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794475077.963057
+  },
+  {
+    "slug": "avrupa-kupalarinin-turkiye-yayin-haklarinda-exxen-ve-tivibu-ortakligi-iddiasi",
+    "title": "Avrupa Kupalarının Türkiye Yayın Haklarında Exxen ve Tivibu Ortaklığı İddiası",
+    "summary": "UEFA kulüp turnuvalarının Türkiye yayın haklarının dört sezonluğuna Exxen ve Tivibu ortaklığı tarafından devralındığı öne sürüldü.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794481487.783284
   }
 ]
