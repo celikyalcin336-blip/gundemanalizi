@@ -1,12 +1,5 @@
 [
   {
-    "slug": "ulkeyi-ayaga-kaldiran-cinayet-70-yil-sonra-gelen-cita-vuruldu",
-    "title": "Ülkeyi ayağa kaldıran cinayet. 70 yıl sonra gelen çita vuruldu",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793193029.0398839
-  },
-  {
     "slug": "fenerbahcede-greenwood-sikintisi-tipki-ingilteredeki-gibi",
     "title": "Fenerbahçe'de Greenwood sıkıntısı! Tıpkı İngiltere'deki gibi...",
     "status": "posted",
@@ -3518,5 +3511,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794469616.9172678
+  },
+  {
+    "slug": "abd-gida-ve-ilac-dairesinden-zayiflama-ignelerinde-gorme-kaybi-uyarisi",
+    "title": "ABD Gıda ve İlaç Dairesinden Zayıflama İğnelerinde Görme Kaybı Uyarısı",
+    "summary": "ABD Gıda ve İlaç Dairesi, kullanımı yaygınlaşan zayıflama iğnelerinin etiketlerine ciddi göz hastalığı ve görme kaybı riski uyarısının eklenmesini talep etti.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794472341.4835343
   }
 ]
