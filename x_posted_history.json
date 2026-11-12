@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "volkswagen-grubundan-3-ceyrekte-zarar",
-    "title": "Volkswagen Grubu'ndan 3. çeyrekte zarar",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793299244.9450212
-  },
-  {
     "slug": "ankarada-dogalgaz-patlamasi-panigi",
     "title": "Ankara'da doğalgaz patlaması paniği",
     "status": "posted",
@@ -3546,5 +3539,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794518236.350579
+  },
+  {
+    "slug": "abd-bebek-mamasi-piyasasinda-rekor-fiyat-artisi-ve-sektorel-yapilanma-dalgasi",
+    "title": "ABD Bebek Maması Piyasasında Rekor Fiyat Artışı ve Sektörel Yapılanma Dalgası",
+    "summary": "Amerika Birleşik Devletleri'nde bebek maması ve gıdalarında ekim ayında tarihi bir fiyat artışı yaşanırken, üretici şirketler maliyet ile güvenlik krizleri nedeniyle kurumsal yapılarını değiştiriyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794520960.0009542
   }
 ]
