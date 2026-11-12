@@ -1,12 +1,5 @@
 [
   {
-    "slug": "vandaki-kazada-yaralanan-polis-memuru-sehit-oldu",
-    "title": "Van'daki kazada yaralanan polis memuru şehit oldu",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793230793.4697893
-  },
-  {
     "slug": "super-ligde-10-haftanin-hakemleri-belli-oldu",
     "title": "Süper Lig'de 10. haftanın hakemleri belli oldu",
     "status": "skipped",
@@ -3528,5 +3521,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794486940.5758457
+  },
+  {
+    "slug": "trump-meksika-sinirindaki-gocmen-hareketliligi-nedeniyle-ek-gumruk-vergisi-tehdi",
+    "title": "Trump Meksika Sınırındaki Göçmen Hareketliliği Nedeniyle Ek Gümrük Vergisi Tehdidinde Bulundu",
+    "summary": "ABD Başkanı Donald Trump, sınır hattına ilerleyen göçmen gruplarının durdurulmaması halinde Meksika'ya uygulanan gümrük vergilerini iki katına çıkaracağını duyurdu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794489664.352507
   }
 ]
