@@ -1,12 +1,5 @@
 [
   {
-    "slug": "ankaranin-mamak-ilcesinde-gece-saatlerinde-baslayan-tartisma-kisa-surede-silahli",
-    "title": "Ankara’nın Mamak ilçesinde gece saatlerinde başlayan tartışma, kısa sürede silahlı kavgaya dönüştü.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793209214.6029463
-  },
-  {
     "slug": "vandaki-kazada-yaralanan-polis-memuru-sehit-oldu",
     "title": "Van'daki kazada yaralanan polis memuru şehit oldu",
     "status": "posted",
@@ -3526,5 +3519,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794484215.5610619
+  },
+  {
+    "slug": "dirk-kuyt-icin-eredivisie-temsilcisi-utrecht-iddiasi",
+    "title": "Dirk Kuyt İçin Eredivisie Temsilcisi Utrecht İddiası",
+    "summary": "Fenerbahçe ile yolları ayrılan Dirk Kuyt'ın, futbola başladığı Utrecht kulübüyle teknik direktörlük görevi için görüşebileceği iddia edildi.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794486940.5758457
   }
 ]
