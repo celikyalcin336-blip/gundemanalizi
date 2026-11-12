@@ -578,21 +578,17 @@ def create_x_editorial_card(image_input: str, title: str, category: str = "Günd
     canvas.paste(Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB"), (0, 0))
     draw = ImageDraw.Draw(canvas)
 
-    # 2. Sol Üst: Kategori Rozeti
-    category_emojis = {
-        "Ekonomi": "📊", "Gündem": "🚨", "Teknoloji": "🚀", "Otomobil": "🚗",
-        "Dünya": "🌍", "Sağlık": "🩺", "Spor": "⚽", "Eğitim": "🎓"
-    }
-    cat_clean = category.strip().capitalize() if category else "Gündem"
-    cat_emoji = category_emojis.get(cat_clean, "🔴")
-    cat_text = f"{cat_emoji} {cat_clean.upper()}"
+    # 2. Sol Üst: Kategori Rozeti (Fontta bulunmayan emojiler yerine temiz beyaz nokta + Türkçe büyük harf)
+    cat_clean = category.strip() if category else "Gündem"
+    cat_upper = cat_clean.replace("i", "İ").replace("ı", "I").upper()
 
     cat_font = get_font(FONT_BOLD_PATH, 22)
-    cat_bbox = cat_font.getbbox(cat_text)
-    cat_w = cat_bbox[2] - cat_bbox[0] + 32
+    cat_bbox = cat_font.getbbox(cat_upper)
+    cat_w = cat_bbox[2] - cat_bbox[0] + 50
     cat_h = 44
     draw.rounded_rectangle([50, 45, 50 + cat_w, 45 + cat_h], radius=10, fill=(220, 38, 38))
-    draw.text((66, 54), cat_text, font=cat_font, fill=(255, 255, 255))
+    draw.ellipse([64, 62, 74, 72], fill=(255, 255, 255))
+    draw.text((84, 54), cat_upper, font=cat_font, fill=(255, 255, 255))
 
     # 3. Manşet Başlığı (Cevabı veren net başlık)
     clean_title = title.strip()

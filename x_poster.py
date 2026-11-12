@@ -55,6 +55,7 @@ PRIORITY_KEYWORDS = [
     "cumhurbaşkanı", "erdoğan", "bakanlık", "tbmm", "meclis", "yasa teklifi", "kanun",
     "togg", "elektrikli araç", "yapay zeka", "apple", "iphone", "tesla", "deprem",
     "baykar", "kızılelma", "kaan", "savunma sanayii", "milli takım", "şampiyonlar ligi",
+    "avrupa ligi", "euroleague", "anadolu efes", "süper lig", "uefa",
     "derbi", "fenerbahçe", "galatasaray", "beşiktaş", "trabzonspor"
 ]
 

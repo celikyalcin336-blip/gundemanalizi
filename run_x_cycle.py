@@ -144,15 +144,20 @@ def extract_key_entities(text: str) -> set:
     acronyms = re.findall(r'\b[A-ZÇĞİÖŞÜ]{2,}\b', text)
     res = set(normalize_text_loose(p).strip() for p in proper_nouns + acronyms if p)
     common_stops = {
-        "turkiye", "bakan", "baskani", "bakanligi", "haber", "bugun", "resmi", "karar", "sayisi",
-        "yeni", "donem", "icin", "yuksek", "milli", "egitim", "saglik", "ekonomi", "teknoloji",
+        "turkiye", "bakan", "baskan", "baskani", "bakanligi", "haber", "bugun", "resmi", "karar", "sayisi",
+        "yeni", "eski", "donem", "icin", "yuksek", "milli", "egitim", "saglik", "ekonomi", "teknoloji",
         "otomobil", "otomotiv", "dunya", "gundem", "spor", "super", "sampiyonlar", "ligi", "ligde",
         "avrupa", "uefa", "fifa", "futbol", "basketbol", "voleybol", "kadin", "erkek", "cocuk",
         "cocuklar", "genel", "merkez", "merkezi", "kurulu", "kurumu", "birligi", "federasyonu",
-        "universitesi", "belediyesi", "valiligi", "emniyet", "mudurlugu", "istanbul", "ankara",
+        "universitesi", "fakultesi", "belediyesi", "valiligi", "emniyet", "mudurlugu", "istanbul", "ankara",
         "izmir", "bursa", "antalya", "adana", "konya", "gaziantep", "hatay", "model", "modelleri",
-        "serisi", "devlet", "kuresel", "uluslararasi", "ulusal", "buyuk", "kucuk", "orta", "uzun",
+        "serisi", "devlet", "devletleri", "birlesik", "amerika", "abd", "ingiltere", "almanya", "fransa",
+        "rusya", "ukrayna", "iran", "israil", "filistin", "meksika", "cin", "japonya", "irlanda",
+        "kuresel", "uluslararasi", "ulusal", "buyuk", "kucuk", "orta", "uzun",
         "kisa", "ozel", "kritik", "onemli", "tarihi", "rekor", "rekoru", "satis", "fiyat", "fiyatlari",
+        "piyasa", "piyasasinda", "sektor", "sektorel", "bolge", "bolgesinde", "ucuncu", "ikinci", "ceyrek", "ceyrekte",
+        "arastirma", "arastirmasi", "rapor", "raporu", "hamle", "hamlesi", "hamlesiyle",
+        "yapay", "zeka", "yari", "iletken", "devi", "devleri", "sirket", "sirketi", "girisim", "girisimleri", "girisimlerine",
         "olarak", "sonra", "once", "karsi", "arasinda", "uzerinde", "altinda", "icinde", "boyunca",
         "kadar", "gore", "daha", "cok", "ilk", "son", "tum", "her", "bir", "iki", "uc", "dort",
         "bes", "alti", "yedi", "sekiz", "dokuz", "on", "yil", "yillik", "aylik", "gunluk", "saat",
@@ -163,16 +168,26 @@ def extract_key_entities(text: str) -> set:
     return {w for w in (res - common_stops) if len(w) >= 3}
 
 
+_SUMMARY_STOPWORDS = {
+    "olarak", "sonra", "once", "karsi", "arasinda", "uzerinde", "altinda", "icinde", "boyunca",
+    "kadar", "gore", "daha", "cok", "ilk", "son", "tum", "her", "bir", "iki", "uc", "dort",
+    "bes", "alti", "yedi", "sekiz", "dokuz", "on", "yil", "yillik", "aylik", "gunluk", "saat",
+    "icin", "olan", "oldu", "oldugu", "edildi", "etti", "yapildi", "yapti", "verdi", "aldi",
+    "devam", "yeni", "buyuk", "onemli", "kritik", "kuresel", "turkiye", "tarafindan", "birlikte",
+    "kapsaminda", "nedeniyle", "ragmen", "iliskin", "konusunda", "hakkinda", "uzere"
+}
+
+
 def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_slug: str, history: list) -> tuple:
     """
     Haberin başlığı tamamen farklı olsa bile; içerik, özet, kişi ve kurum adlarını
     tarayarak aynı olayın ikinci kez paylaşılmasını %100 engeller.
     """
     cand_norm_title = normalize_text_loose(candidate_title)
-    cand_title_words = set(w for w in cand_norm_title.split() if len(w) >= 4)
+    cand_title_words = set(w for w in cand_norm_title.split() if len(w) >= 4 and w not in _SUMMARY_STOPWORDS)
     cand_entities = extract_key_entities(candidate_title + " " + candidate_summary)
-    cand_norm_summary = normalize_text_loose(candidate_summary)[:200]
-    cand_sum_words = set(w for w in cand_norm_summary.split() if len(w) >= 4)
+    cand_norm_summary = normalize_text_loose(candidate_summary)[:220]
+    cand_sum_words = set(w for w in cand_norm_summary.split() if len(w) >= 4 and w not in _SUMMARY_STOPWORDS)
 
     for h in history:
         if not isinstance(h, dict):
@@ -198,27 +213,27 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
             if len(h_norm_title) > 20 and h_norm_title in cand_norm_title:
                 return True, f"Başlık içerme: {h_title[:35]}"
 
-        # 2. Başlık Kelime Benzerliği (%70+)
-        if cand_title_words:
-            h_title_words = set(w for w in h_norm_title.split() if len(w) >= 4)
-            if h_title_words:
-                common = cand_title_words & h_title_words
-                if len(common) / max(len(cand_title_words), 1) >= 0.7:
-                    return True, f"Başlık kelime benzerliği ({len(common)} kelime): {h_title[:35]}"
+        # 2. Başlık Kelime Benzerliği (%65+ ve en az 3 ortak anlamlı kelime)
+        h_title_words = set(w for w in h_norm_title.split() if len(w) >= 4 and w not in _SUMMARY_STOPWORDS)
+        title_common = (cand_title_words & h_title_words) if (cand_title_words and h_title_words) else set()
+        if len(title_common) >= 3 and len(title_common) / max(len(cand_title_words), 1) >= 0.65:
+            return True, f"Başlık kelime benzerliği ({len(title_common)} kelime): {h_title[:35]}"
 
-        # 3. İÇERİK & ÖZET BENZERLİĞİ (Farklı başlıkla aynı haber tekrar gelirse!)
+        # 3. İÇERİK & ÖZET BENZERLİĞİ (Gerçek kelime kesişimi + kelime dizisi benzerliği)
         if h_summary and candidate_summary:
             import difflib
-            h_norm_summary = normalize_text_loose(h_summary)[:200]
-            ratio = difflib.SequenceMatcher(None, cand_norm_summary, h_norm_summary).ratio()
-            if ratio >= 0.45:
-                return True, f"Özet/İçerik benzerliği (%{int(ratio*100)} aynı metin): {h_title[:35]}"
+            h_norm_summary = normalize_text_loose(h_summary)[:220]
+            h_sum_words = set(w for w in h_norm_summary.split() if len(w) >= 4 and w not in _SUMMARY_STOPWORDS)
+            sum_common = (cand_sum_words & h_sum_words) if (cand_sum_words and h_sum_words) else set()
 
-            h_sum_words = set(w for w in h_norm_summary.split() if len(w) >= 4)
-            if cand_sum_words and h_sum_words:
-                sum_common = cand_sum_words & h_sum_words
-                if len(sum_common) >= 7 and len(sum_common) / max(len(cand_sum_words), 1) >= 0.45:
-                    return True, f"Özet ortak terimleri ({len(sum_common)} kelime): {h_title[:35]}"
+            # Karakter bazlı SequenceMatcher alakasız Türkçe cümlelerde %45-52 ürettiği için
+            # kelime dizisi bazlı SequenceMatcher + anlamlı kelime kesişimi birlikte kontrol edilir
+            word_seq_ratio = difflib.SequenceMatcher(None, cand_norm_summary.split(), h_norm_summary.split()).ratio()
+            if word_seq_ratio >= 0.55 and len(sum_common) >= 5:
+                return True, f"Özet/İçerik benzerliği (%{int(word_seq_ratio*100)} aynı metin): {h_title[:35]}"
+
+            if len(sum_common) >= 7 and len(sum_common) / max(len(cand_sum_words), 1) >= 0.50 and len(title_common) >= 1:
+                return True, f"Özet ortak terimleri ({len(sum_common)} kelime): {h_title[:35]}"
 
         # 4. KİŞİ / KURUM / OLAY VARLIK EŞLEŞMESİ (Yalnızca son 24 saatteki haberlerle ve başlık bağlamıyla kontrol edilir)
         try:
@@ -229,9 +244,8 @@ def is_duplicate_story(candidate_title: str, candidate_summary: str, candidate_s
             h_entities = extract_key_entities(h_title + " " + h_summary)
             if cand_entities and h_entities:
                 common_ent = cand_entities & h_entities
-                h_title_words_ent = set(w for w in h_norm_title.split() if len(w) >= 4)
-                title_overlap = len(cand_title_words & h_title_words_ent) if cand_title_words else 0
-                if len(common_ent) >= 3 or (len(common_ent) >= 2 and title_overlap >= 2):
+                title_overlap = len(title_common)
+                if (len(common_ent) >= 3 and title_overlap >= 2) or (len(common_ent) >= 2 and title_overlap >= 3):
                     return True, f"Ortak varlıklar ({', '.join(list(common_ent)[:3])}): {h_title[:35]}"
 
         # 5. SPOR KULÜBÜ KORUMASI: Son 6 saatte aynı kulüp hakkında haber paylaşıldıysa mükerrer say
