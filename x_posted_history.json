@@ -1,12 +1,5 @@
 [
   {
-    "slug": "yks-ne-zaman-saat-kacta",
-    "title": "YKS ne zaman? Saat kaçta?",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793188258.747151
-  },
-  {
     "slug": "ulkeyi-ayaga-kaldiran-cinayet-70-yil-sonra-gelen-cita-vuruldu",
     "title": "Ülkeyi ayağa kaldıran cinayet. 70 yıl sonra gelen çita vuruldu",
     "status": "posted",
@@ -3516,5 +3509,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794466586.2171948
+  },
+  {
+    "slug": "arlington-ulusal-mezarligindaki-torende-pete-hegseth-vakasi",
+    "title": "Arlington Ulusal Mezarlığındaki Törende Pete Hegseth Vakası",
+    "summary": "Gaziler Günü anma töreninde yüksek sesle konuşan Savunma Bakanı Pete Hegseth anıtın nöbetçi askeri tarafından uyarıldı. Yaşanan bu protokol ihlali kameralar aracılığıyla kamuoyuna yansıdı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794469616.9172678
   }
 ]
