@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "eski-devlet-bakani-unal-erkan-yasamini-yitirdi",
-    "title": "Eski Devlet Bakanı Ünal Erkan yaşamını yitirdi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793281465.7369893
-  },
-  {
     "slug": "gta-6-icin-south-parkta-cok-kisa-bir-oynanis-videosu-paylasildi",
     "title": "GTA 6 için South Park’ta çok kısa bir oynanış videosu paylaşıldı",
     "status": "posted",
@@ -3536,5 +3529,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794497844.4060943
+  },
+  {
+    "slug": "ingiltere-ekonomisi-enerji-krizine-ragmen-ucuncu-ceyrekte-buyudu",
+    "title": "İngiltere Ekonomisi Enerji Krizine Rağmen Üçüncü Çeyrekte Büyüdü",
+    "summary": "İngiltere ekonomisi, enerji maliyetleri ve tedarik aksaklıklarına rağmen teknoloji harcamalarının desteğiyle üçüncü çeyrekte beklentiler doğrultusunda ivme kazandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794505184.3187711
   }
 ]
