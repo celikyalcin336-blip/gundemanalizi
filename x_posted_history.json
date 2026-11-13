@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "market-ve-yemek-teslimatinda-yeni-donem-iki-dev-guclerini-birlestiriyor",
-    "title": "Market ve yemek teslimatında yeni dönem: İki dev güçlerini birleştiriyor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793316603.127932
-  },
-  {
     "slug": "yks-19-20-haziranda",
     "title": "YKS 19-20 Haziran’da",
     "status": "skipped",
@@ -3556,5 +3549,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794531857.815497
+  },
+  {
+    "slug": "bes-ilde-tasinmaz-satisi-ve-orduda-kiralama-ihalesi-basliyor",
+    "title": "Beş İlde Taşınmaz Satışı ve Ordu'da Kiralama İhalesi Başlıyor",
+    "summary": "Beş farklı ildeki yerel yönetimler ile Milli Emlak birimleri, toplam muhammen bedeli 1 milyar 621 milyon lirayı aşan yirmi beş gayrimenkulü satışa sunarken Ordu'da on sekiz taşınmaz kiraya verilecek.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794534581.5899785
   }
 ]
