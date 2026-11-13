@@ -21,13 +21,6 @@
     "ts": 1793325107.4776242
   },
   {
-    "slug": "trump-mobile-t1-dayaniklilik-testi-ici-htc-u24-pro-cikti",
-    "title": "Trump Mobile T1 Dayanıklılık Testi: İçi HTC U24 Pro Çıktı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793338757.9620144
-  },
-  {
     "slug": "galaxy-w27-tanitildi-samsungun-cine-ozel-katlanabilir-telefonu",
     "title": "Galaxy W27 Tanıtıldı – Samsung’un Çin’e Özel Katlanabilir Telefonu",
     "status": "posted",
@@ -3575,5 +3568,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794548198.9564502
+  },
+  {
+    "slug": "meteoroloji-genel-mudurlugu-sonbahar-donemi-sicaklik-tahminlerini-acikladi",
+    "title": "Meteoroloji Genel Müdürlüğü Sonbahar Dönemi Sıcaklık Tahminlerini Açıkladı",
+    "summary": "Meteoroloji Genel Müdürlüğü, ülke genelindeki güncel hava tahmin raporunu paylaşarak belirli kıyı ve Karadeniz illeri için sağanak yağış uyarısında bulundu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794550938.618222
   }
 ]
