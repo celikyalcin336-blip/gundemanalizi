@@ -35,13 +35,6 @@
     "ts": 1793371743.6003795
   },
   {
-    "slug": "lavrov-krizi-g20-aile-fotografini-iptal-ettirdi",
-    "title": "Lavrov krizi G20 aile fotoğrafını iptal ettirdi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793378476.3324692
-  },
-  {
     "slug": "bakan-gurlek-duyurdu-4-faili-mechul-cinayet-daha-aydinlatildi",
     "title": "Bakan Gürlek duyurdu: 4 faili meçhul cinayet daha aydınlatıldı",
     "status": "posted",
@@ -3604,5 +3597,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794578166.624186
+  },
+  {
+    "slug": "ingiltere-gida-sektorunde-folik-asit-zorunlulugu-basliyor",
+    "title": "İngiltere Gıda Sektöründe Folik Asit Zorunluluğu Başlıyor",
+    "summary": "İngiltere yönetimi, halk sağlığını korumak amacıyla unlu mamullerde yeni bir vitamin zenginleştirme zorunluluğunu hayata geçiriyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794580889.4815695
   }
 ]
