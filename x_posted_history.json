@@ -21,13 +21,6 @@
     "ts": 1793325107.4776242
   },
   {
-    "slug": "konyaya-gitmemisti-iste-osimhenin-durumu",
-    "title": "Konya'ya gitmemişti: İşte Osimhen'in durumu!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793331680.8031442
-  },
-  {
     "slug": "binancedeki-guvenlik-endisesi-bitcoini-78-bin-dolarin-altina-cekti",
     "title": "Binance'deki güvenlik endişesi Bitcoin'i 78 bin doların altına çekti",
     "status": "posted",
@@ -3571,5 +3564,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794542752.1293921
+  },
+  {
+    "slug": "samil-tayyardan-fon-skandali-ve-kisisel-haklar-cikisi",
+    "title": "Şamil Tayyar'dan Fon Skandalı ve Kişisel Haklar Çıkışı",
+    "summary": "Eski milletvekili Şamil Tayyar, fon mağduriyeti iddialarına ilişkin listede yer alan isimlerin gizliliğini ve kamuoyuna yansıma biçimini eleştirdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794545475.4822767
   }
 ]
