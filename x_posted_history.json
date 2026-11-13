@@ -35,13 +35,6 @@
     "ts": 1793371743.6003795
   },
   {
-    "slug": "mate-rimacin-kendi-bugatti-chironu-calindi",
-    "title": "Mate Rimac'in kendi Bugatti Chiron'u çalındı!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793385523.7578835
-  },
-  {
     "slug": "arda-turanli-shakhtar-2-yarida-acildi",
     "title": "Arda Turan'lı Shakhtar, 2. yarıda açıldı!",
     "status": "skipped",
@@ -3608,5 +3601,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794583612.87141
+  },
+  {
+    "slug": "xiaomi-redmi-note-serisi-yeni-modelleriyle-sertifika-surecinde",
+    "title": "Xiaomi Redmi Note Serisi Yeni Modelleriyle Sertifika Sürecinde",
+    "summary": "Xiaomi'nin yeni Redmi Note serisine ait cihazlar Çin'in zorunlu güvenlik sertifikası kayıtlarında görülürken, serinin en üst modelinde büyük batarya kapasitesi olacağı iddia ediliyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794586336.059937
   }
 ]
