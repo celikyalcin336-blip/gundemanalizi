@@ -28,13 +28,6 @@
     "ts": 1793359865.0822856
   },
   {
-    "slug": "kemik-tumorunu-yenen-milli-yuzucuden-42-turkiye-rekoru",
-    "title": "Kemik tümörünü yenen milli yüzücüden, 42 Türkiye rekoru",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793364087.2903984
-  },
-  {
     "slug": "iktisatcilar-uyardi-avrupada-buyume-surse-de-stagflasyon-riski-var",
     "title": "İktisatçılar uyardı. Avrupa'da büyüme sürse de stagflasyon riski var",
     "status": "posted",
@@ -3589,5 +3582,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794567276.6058626
+  },
+  {
+    "slug": "berlin-konferansinda-luks-otomobil-rekabeti-ve-elektrikli-arac-stratejileri-cati",
+    "title": "Berlin Konferansında Lüks Otomobil Rekabeti Ve Elektrikli Araç Stratejileri Çatıştı",
+    "summary": "Porsche CEO'su Michael Leiters, Berlin'de gerçekleşen konferansta Tesla'nın pazarlama yöntemlerini eleştirerek markanın Mission S konseptiyle somut teknolojilere odaklandığını vurguladı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794569999.001825
   }
 ]
