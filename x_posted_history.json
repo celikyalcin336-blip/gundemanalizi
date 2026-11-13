@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "sakaryada-yol-calismasinda-antik-yazitli-tas-blok-bulundu",
-    "title": "Sakarya'da yol çalışmasında antik yazıtlı taş blok bulundu",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793411465.6200562
-  },
-  {
     "slug": "muthis-bir-performans-ortaya-koyduk",
     "title": "\"Müthiş bir performans ortaya koyduk\"",
     "status": "posted",
@@ -3629,5 +3622,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794602682.2965682
+  },
+  {
+    "slug": "jeremy-clarksonin-teksastaki-tesla-cybercab-deneyiminde-yasanan-otonom-surus-aks",
+    "title": "Jeremy Clarkson'ın Teksas'taki Tesla Cybercab Deneyiminde Yaşanan Otonom Sürüş Aksaklıkları",
+    "summary": "Otomobil gazetecisi Jeremy Clarkson, Teksas'ta deneyimlediği sürücüsüz Tesla Cybercab yolculuklarında ciddi yazılım hataları ve güvenlik sorunlarıyla karşılaştığını duyurdu.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794605404.5808294
   }
 ]
