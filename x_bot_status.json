@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-13 03:18:53",
+  "last_check": "2026-11-13 04:04:17",
   "result": "posted",
-  "last_post": "2026-11-13 03:18:53",
-  "next_planned": "2026-11-13 04:03:53",
+  "last_post": "2026-11-13 04:04:17",
+  "next_planned": "2026-11-13 04:49:17",
   "runner": "github-actions",
-  "log_tail": "[2026-11-13 00:18:28] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: İstanbul Merkezli Kara Para Aklama ... (Birebir slug eşleşmesi: istanbul-merkezli-kara-para-aklama-operasyonunda-yedi-gozalti)\n🎯 [X Paylaşım Adayı] Kategori: Gündem | Virallik/Duygu Skoru: 160 | Başlık: Malatya'daki Askeri Helikopter Kazasında Dört Personel Şehit Oldu\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794529109.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/malatyadaki-askeri-helikopter-kazasinda-dort-personel-sehit-oldu\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Malatya'daki Askeri Helikopter Kazasında Dört Personel Şehit Oldu\n"
+  "log_tail": "[2026-11-13 01:03:53] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Teknoloji | Virallik/Duygu Skoru: 175 | Başlık: Uykusuzluğun Siber Güvenlik Açıkları Üzerindeki Kritik Etkisi\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794531834.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/uykusuzlugun-siber-guvenlik-aciklari-uzerindeki-kritik-etkisi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Uykusuzluğun Siber Güvenlik Açıkları Üzerindeki Kritik Etkisi\n"
 }

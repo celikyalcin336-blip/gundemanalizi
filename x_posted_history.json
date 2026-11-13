@@ -7,13 +7,6 @@
     "ts": 1793270667.3397987
   },
   {
-    "slug": "babasindan-kok-hucre-nakli-ile-losemiyi-yendi",
-    "title": "Babasından kök hücre nakli ile lösemiyi yendi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793313238.160647
-  },
-  {
     "slug": "market-ve-yemek-teslimatinda-yeni-donem-iki-dev-guclerini-birlestiriyor",
     "title": "Market ve yemek teslimatında yeni dönem: İki dev güçlerini birleştiriyor",
     "status": "posted",
@@ -3554,5 +3547,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794529133.1020968
+  },
+  {
+    "slug": "uykusuzlugun-siber-guvenlik-aciklari-uzerindeki-kritik-etkisi",
+    "title": "Uykusuzluğun Siber Güvenlik Açıkları Üzerindeki Kritik Etkisi",
+    "summary": "California Üniversitesi araştırmacıları, çalışanların uyku eksikliği yaşadığı dönemlerde sahte e-postalardaki oltalama bağlantılarına karşı daha savunmasız hale geldiğini ortaya koydu.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794531857.815497
   }
 ]
