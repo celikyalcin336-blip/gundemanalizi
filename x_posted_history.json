@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "monako-kara-para-aklamayla-mucadelede-fatfin-gri-listesinden-cikarildi",
-    "title": "Monako, kara para aklamayla mücadelede FATF'ın gri listesinden çıkarıldı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793421448.552725
-  },
-  {
     "slug": "meteoroloji-saat-verdi-2-kent-icin-sari-alarm-7-bolgede-yagis-var",
     "title": "Meteoroloji saat verdi! 2 kent için \"sarı\" alarm! 7 bölgede yağış var",
     "status": "posted",
@@ -3635,5 +3628,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794610873.4140291
+  },
+  {
+    "slug": "inme-sonrasi-robotik-rehabilitasyon-tedavisi-hastalara-yeniden-hareket-ozgurlugu",
+    "title": "İnme Sonrası Robotik Rehabilitasyon Tedavisi Hastalara Yeniden Hareket Özgürlüğü Sunuyor",
+    "summary": "İnme veya ağır travma sonrası kısmi ya da tam hareket kaybı yaşayan hastalar için erken dönemde başlatılan robotik rehabilitasyon uygulamaları iyileşme şansını artırıyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794613597.9858842
   }
 ]
