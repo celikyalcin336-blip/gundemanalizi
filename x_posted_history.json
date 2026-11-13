@@ -28,13 +28,6 @@
     "ts": 1793359865.0822856
   },
   {
-    "slug": "iktisatcilar-uyardi-avrupada-buyume-surse-de-stagflasyon-riski-var",
-    "title": "İktisatçılar uyardı. Avrupa'da büyüme sürse de stagflasyon riski var",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793368410.95547
-  },
-  {
     "slug": "10-gozalti-daha",
     "title": "10 gözaltı daha",
     "status": "skipped",
@@ -3591,5 +3584,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794569999.001825
+  },
+  {
+    "slug": "milli-egitim-bakanligindan-okullara-yerli-robotik-kit-ve-yenilikci-sinif-hamlesi",
+    "title": "Milli Eğitim Bakanlığından Okullara Yerli Robotik Kit ve Yenilikçi Sınıf Hamlesi",
+    "summary": "Milli Eğitim Bakanlığı, dijital dönüşüm çalışmaları doğrultusunda okullardaki bilişim teknolojileri laboratuvarı ve yenilikçi sınıf sayılarını artırarak teknoloji odaklı eğitimi yaygınlaştırmayı hedefliyor.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794572721.3266113
   }
 ]
