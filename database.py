@@ -337,24 +337,32 @@ def init_db():
             conn.execute("""
                 UPDATE visitor_logs
                 SET device = '🤖 Arama Botu', referrer = '🤖 Arama Botu', is_first_visit = 0
-                WHERE device = 'Masaüstü'
-                  AND referrer = 'Doğrudan'
-                  AND (
-                      created_at IN (
-                          SELECT created_at
-                          FROM visitor_logs
-                          WHERE device = 'Masaüstü' AND referrer = 'Doğrudan'
-                          GROUP BY created_at
-                          HAVING COUNT(*) >= 4
-                      )
-                      OR visitor_hash IN (
-                          SELECT visitor_hash
-                          FROM visitor_logs
-                          WHERE device = 'Masaüstü' AND referrer = 'Doğrudan' AND page LIKE '/haber/%'
-                          GROUP BY visitor_hash
-                          HAVING COUNT(*) >= 6
-                      )
-                  )
+                WHERE (
+                    device = 'Masaüstü'
+                    AND referrer = 'Doğrudan'
+                    AND (
+                        created_at IN (
+                            SELECT created_at
+                            FROM visitor_logs
+                            WHERE device = 'Masaüstü' AND referrer = 'Doğrudan'
+                            GROUP BY created_at
+                            HAVING COUNT(*) >= 4
+                        )
+                        OR visitor_hash IN (
+                            SELECT visitor_hash
+                            FROM visitor_logs
+                            WHERE device = 'Masaüstü' AND referrer = 'Doğrudan' AND page LIKE '/haber/%'
+                            GROUP BY visitor_hash
+                            HAVING COUNT(*) >= 6
+                        )
+                    )
+                ) OR (
+                    device IN ('Masaüstü', 'Mobil', 'Tablet')
+                    AND referrer = 'Site İçi Tıklama'
+                    AND is_first_visit = 1
+                    AND COALESCE(country, 'TR') != 'TR'
+                    AND page LIKE '/haber/%'
+                )
             """)
     except Exception:
         pass
@@ -1203,16 +1211,17 @@ def increment_article_view_by_slug(slug: str):
             _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
 
 
-def get_article_by_slug(slug: str) -> Optional[Dict]:
-    """Slug'a göre makale detayını çeker ve okunma sayısını RAM'de sıfır gecikmeyle biriktirir (0 ms bekleme, 0 thread)."""
+def get_article_by_slug(slug: str, count_view: bool = True) -> Optional[Dict]:
+    """Slug'a göre makale detayını çeker ve yalnızca gerçek insan ziyaretinde okunma sayısını RAM'de artırır."""
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM articles WHERE slug = ?", (slug,)).fetchone()
         if row:
             art_id = row["id"]
             _SLUG_TO_ID_CACHE[slug] = art_id
-            _start_db_buffer_worker()
-            with _RAM_ARTICLE_VIEWS_LOCK:
-                _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
+            if count_view:
+                _start_db_buffer_worker()
+                with _RAM_ARTICLE_VIEWS_LOCK:
+                    _RAM_ARTICLE_VIEWS[art_id] = _RAM_ARTICLE_VIEWS.get(art_id, 0) + 1
             return _row_to_dict(row)
     return None
 
@@ -1454,6 +1463,23 @@ def delete_revenue_record(rec_id: int):
         pass
 
 
+def _utc_to_tr_str(val) -> str:
+    """UTC olarak saklanan ziyaretçi zamanını panel gösterimi için Türkiye saatine (+03:00) çevirir."""
+    if not val:
+        return ""
+    try:
+        if isinstance(val, datetime):
+            dt = val if val.tzinfo else val.replace(tzinfo=timezone.utc)
+            return dt.astimezone(TR_TZ).strftime("%Y-%m-%d %H:%M:%S")
+        s = str(val).strip()
+        if len(s) >= 19:
+            dt = datetime.strptime(s[:19].replace("T", " "), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+            return dt.astimezone(TR_TZ).strftime("%Y-%m-%d %H:%M:%S")
+        return s
+    except Exception:
+        return str(val)
+
+
 def get_dashboard_summary() -> Dict:
     """Yönetim paneli (/panel) için tüm ayrıntılı canlı analitik ve istatistikleri döner (8 sn RAM önbellekli)."""
     global _DASHBOARD_CACHE
@@ -1667,6 +1693,7 @@ def get_dashboard_summary() -> Dict:
                     seen_lv_ids.add(rid)
                     if "computed_first" in d:
                         d["is_first_visit"] = d["computed_first"]
+                    d["created_at"] = _utc_to_tr_str(d.get("created_at"))
                     merged_lv.append(d)
                 merged_lv.sort(key=lambda x: x.get("id") or 0, reverse=True)
                 live_visitors = merged_lv

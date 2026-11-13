@@ -240,8 +240,16 @@ _API_RATE_LIMIT = {}             # ip -> [ts, ...] (genel /api/ hız sınırı)
 def _client_ip(request: Request) -> str:
     return (request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "unknown")).split(",")[0].strip()
 
+def _is_internal_bot_request(request: Request) -> bool:
+    """Kendi X botu, günlük bülten ve sağlık işçisi isteklerini doğrular."""
+    tok = (request.headers.get(config.INTERNAL_BOT_HEADER) or "").strip()
+    return bool(tok and tok == config.INTERNAL_BOT_TOKEN)
+
+
 def _is_exempt_from_rate_limit(request: Request) -> bool:
-    """Yönetici oturumlarını ve resmi arama/reklam motoru botlarını (Googlebot, AdSense vb.) hız sınırından muaf tutar."""
+    """Yönetici oturumlarını, iç servis botlarımızı ve resmi arama/reklam motoru botlarını (Googlebot, AdSense vb.) hız sınırından muaf tutar."""
+    if _is_internal_bot_request(request):
+        return True
     if request.cookies.get("ga_admin") == "1":
         return True
     tok = request.cookies.get("ga_panel_auth", "")
@@ -372,6 +380,22 @@ _CSP_REPORT_ONLY = (
 )
 _VISITOR_BURST_HITS = {}          # vis_hash -> [ts, ...] (otomatik kazıyıcı hız tespiti)
 _DIRECT_ARTICLE_BURST_TS = []     # [ts, ...] (yurt dışı doğrudan /haber/ toplu tarama tespiti)
+_FAKE_INTERNAL_BURST_TS = []      # [ts, ...] (çerezsiz sahte Site İçi Tıklama bot tespiti)
+
+
+def _is_internal_referer(ref_low: str) -> bool:
+    return any(tok in ref_low for tok in ("gndemanalizi", "gundemanalizi", "gündemanalizi", "g%c3%bcndemanalizi"))
+
+
+def _apply_security_headers(resp):
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "SAMEORIGIN"
+    resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
+    resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
+    resp.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'self'"
+    return resp
 
 @app.middleware("http")
 async def track_visitors_middleware(request: Request, call_next):
@@ -397,17 +421,11 @@ async def track_visitors_middleware(request: Request, call_next):
     if is_malicious_probe:
         return PlainTextResponse("Not Found", status_code=404)
 
-    # 0. Yönetici (Admin) kendi tarayıcısından gezerken ziyaretçi listesine ASLA ekleme
+    # 0. Yönetici (Admin) kendi tarayıcısından gezerken ziyaretçi listesine ve okunma sayacına ASLA ekleme
     if request.cookies.get("ga_admin") == "1":
+        request.state.is_human_visitor = False
         resp = await call_next(request)
-        resp.headers["X-Content-Type-Options"] = "nosniff"
-        resp.headers["X-Frame-Options"] = "SAMEORIGIN"
-        resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
-        resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
-        resp.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'self'"
-        return resp
+        return _apply_security_headers(resp)
 
     # 1. Panel, yönetim sayfaları ve tüm API çağrılarını sayaca ASLA dahil etme
     is_api_or_admin = (
@@ -428,7 +446,8 @@ async def track_visitors_middleware(request: Request, call_next):
         if len(_API_RATE_LIMIT) > 2000:
             for k in [k for k, v in _API_RATE_LIMIT.items() if not v or now_api - v[-1] > 60]:
                 _API_RATE_LIMIT.pop(k, None)
-    # 2. Statik dosyaları ve sistem uçlarını sayaca dahil etme
+    # 2. Statik dosyaları, sistem uçlarını ve kendi iç otomasyon botlarımızı ziyaretçi sayacına dahil etme
+    is_internal_bot = _is_internal_bot_request(request)
     is_static_or_system = (
         path.startswith("/assets") or
         path.startswith("/images") or
@@ -436,14 +455,18 @@ async def track_visitors_middleware(request: Request, call_next):
         path.startswith("/sitemap") or
         path in ("/favicon.ico", "/robots.txt", "/sitemap.xml", "/news-sitemap.xml", "/video-sitemap.xml", "/rss.xml", "/health", "/manifest.json", "/sw.js") or (path == "/ads.txt" and not any(k in (request.headers.get("user-agent") or "").lower() for k in ("google", "adsense", "mediapartners", "adsbot")))
     )
-    if not (is_api_or_admin or is_static_or_system):
+    bot_type = None
+    is_adsense = False
+    request.state.is_human_visitor = False
+    if not (is_api_or_admin or is_static_or_system or is_internal_bot):
         try:
-            global _DIRECT_ARTICLE_BURST_TS
+            global _DIRECT_ARTICLE_BURST_TS, _FAKE_INTERNAL_BURST_TS
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
             ip = ip.split(",")[0].strip()
             ua = request.headers.get("user-agent", "")
             ua_low = ua.lower()
             ref = request.headers.get("referer", "").lower()
+            is_internal_ref = _is_internal_referer(ref)
             accept_lang = (request.headers.get("accept-language") or "").strip()
             accept_hdr = (request.headers.get("accept") or "").lower()
             sec_fetch_mode = (request.headers.get("sec-fetch-mode") or "").lower()
@@ -455,8 +478,6 @@ async def track_visitors_middleware(request: Request, call_next):
             vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
 
             # 1. 💰 Google AdSense Botları ve AdSense İnceleme Girişleri (Ayrı ve Net Tespit)
-            bot_type = None
-            is_adsense = False
             if any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense", "google-adstxt")) or (path == "/ads.txt" and "google" in ua_low):
                 bot_type = "AdSense Bot"
                 is_adsense = True
@@ -494,12 +515,22 @@ async def track_visitors_middleware(request: Request, call_next):
             )):
                 bot_type = "Arama Botu"
 
-            # 3. 🛡️ Sahte Masaüstü / Veri Merkezi Kazıyıcı (Scraper) Tespiti
+            # 3. 🛡️ Sahte Masaüstü / Proxy Kazıyıcı (Scraper) Tespiti (Sayfayı engellemez, istatistikten ayırır)
             # Gerçek tarayıcılar her zaman Mozilla/5.0, Accept-Language ve text/html (veya Sec-Fetch-Mode) gönderir
             now_v = time.time()
             if not bot_type:
                 if "mozilla/5.0" not in ua_low or not accept_lang or ("text/html" not in accept_hdr and sec_fetch_mode != "navigate"):
                     bot_type = "Arama Botu"
+                elif is_internal_ref and path.startswith("/haber/") and not has_cookie:
+                    # Gerçek ziyaretçi site içinden tıklamadan önce önceki sayfada ga_vis çerezi alır;
+                    # yurt dışından çerezsiz "Site İçi Tıklama" proxy kazıyıcılarının imzasıdır.
+                    if country != "TR":
+                        bot_type = "Arama Botu"
+                    else:
+                        _FAKE_INTERNAL_BURST_TS = [t for t in _FAKE_INTERNAL_BURST_TS if now_v - t < 45]
+                        _FAKE_INTERNAL_BURST_TS.append(now_v)
+                        if len(_FAKE_INTERNAL_BURST_TS) >= 3:
+                            bot_type = "Arama Botu"
                 else:
                     vh_hits = [t for t in _VISITOR_BURST_HITS.get(vis_hash, []) if now_v - t < 60]
                     vh_hits.append(now_v)
@@ -512,7 +543,7 @@ async def track_visitors_middleware(request: Request, call_next):
                     if len(vh_hits) >= 10 or (not ref and path.startswith("/haber/") and len(recent_30s) >= 4):
                         bot_type = "Arama Botu"
                     elif not ref and path.startswith("/haber/") and not has_cookie and country != "TR":
-                        _DIRECT_ARTICLE_BURST_TS = [t for t in _DIRECT_ARTICLE_BURST_TS if now_v - t < 20]
+                        _DIRECT_ARTICLE_BURST_TS = [t for t in _DIRECT_ARTICLE_BURST_TS if now_v - t < 45]
                         _DIRECT_ARTICLE_BURST_TS.append(now_v)
                         if len(_DIRECT_ARTICLE_BURST_TS) >= 3:
                             bot_type = "Arama Botu"
@@ -524,6 +555,7 @@ async def track_visitors_middleware(request: Request, call_next):
                 device = f"🤖 {bot_type}"
                 source = f"🤖 {bot_type}"
             else:
+                request.state.is_human_visitor = True
                 if any(m in ua_low for m in ("mobile", "android", "iphone", "ipod")):
                     device = "Mobil"
                 elif "ipad" in ua_low or "tablet" in ua_low:
@@ -545,7 +577,7 @@ async def track_visitors_middleware(request: Request, call_next):
                     source = "X (Twitter)"
                 elif "whatsapp" in ref or "wa.me" in ref:
                     source = "WhatsApp"
-                elif "gndemanalizi" in ref or "gundemanalizi" in ref:
+                elif is_internal_ref:
                     source = "Site İçi Tıklama"
                 elif ref:
                     source = "Diğer Web"
@@ -559,14 +591,8 @@ async def track_visitors_middleware(request: Request, call_next):
         except Exception:
             pass
     resp = await call_next(request)
-    resp.headers["X-Content-Type-Options"] = "nosniff"
-    resp.headers["X-Frame-Options"] = "SAMEORIGIN"
-    resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    resp.headers["Permissions-Policy"] = _PERMISSIONS_POLICY
-    resp.headers["Content-Security-Policy-Report-Only"] = _CSP_REPORT_ONLY
-    resp.headers["Content-Security-Policy"] = "upgrade-insecure-requests; frame-ancestors 'self'"
-    if not (is_api_or_admin or is_static_or_system) and not bot_type and not request.cookies.get("ga_vis"):
+    _apply_security_headers(resp)
+    if not (is_api_or_admin or is_static_or_system or is_internal_bot) and not bot_type and not request.cookies.get("ga_vis"):
         try:
             resp.set_cookie("ga_vis", "1", max_age=31536000, httponly=True, samesite="lax", path="/")
         except Exception:
@@ -876,7 +902,7 @@ def keep_alive_background_worker():
     time.sleep(30)
     while True:
         try:
-            requests.get("https://xn--gndemanalizi-dlb.com.tr/health", timeout=10)
+            requests.get("https://xn--gndemanalizi-dlb.com.tr/health", headers=config.get_internal_bot_headers(), timeout=10)
         except Exception:
             pass
         time.sleep(180)
@@ -1240,11 +1266,11 @@ async def home(request: Request, kategori: str = None, q: str = None, sayfa: int
     if cache_key:
         cached_html = get_turbo_page(cache_key)
         if cached_html:
-            if request.cookies.get("ga_admin") != "1":
+            if getattr(request.state, "is_human_visitor", False):
                 database.record_visit("home_visits")
             return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=60, s-maxage=60", "CDN-Cache-Control": "max-age=60", "Cloudflare-CDN-Cache-Control": "max-age=60"})
 
-    if request.cookies.get("ga_admin") != "1":
+    if getattr(request.state, "is_human_visitor", False):
         database.record_visit("home_visits")
     import math
     import urllib.parse
@@ -1787,7 +1813,7 @@ def _process_viral_video_job(
             )
             clear_turbo_cache()
             site_url = f"{config.SITE_URL}/haber/{slug}"
-            art_obj = database.get_article_by_slug(slug)
+            art_obj = database.get_article_by_slug(slug, count_view=False)
             if art_obj:
                 article_id = art_obj.get("id")
 
@@ -2206,14 +2232,15 @@ def extract_clean_highlights(content: str, summary: str, title: str) -> list:
 @app.api_route("/haber/{slug}", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def article_detail(request: Request, slug: str):
     cache_key = f"art_{slug}"
+    is_human_visit = bool(getattr(request.state, "is_human_visitor", False))
     if request.cookies.get("ga_admin") != "1":
         cached_html = get_turbo_page(cache_key)
         if cached_html:
-            if _is_human_browser_request(request):
+            if is_human_visit:
                 database.increment_article_view_by_slug(slug)
             return HTMLResponse(content=cached_html, headers={"X-Turbo-Cache": "HIT", "Cache-Control": "public, max-age=120, s-maxage=120", "CDN-Cache-Control": "max-age=120", "Cloudflare-CDN-Cache-Control": "max-age=120"})
 
-    article = database.get_article_by_slug(slug)
+    article = database.get_article_by_slug(slug, count_view=is_human_visit)
     if not article:
         from fastapi.responses import RedirectResponse
         import urllib.parse
@@ -2906,14 +2933,46 @@ async def ads_txt():
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots(request: Request):
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
-    content = f"""User-agent: *
-Allow: /
-Disallow: /arama
-Disallow: /api/
-Sitemap: {base_url}/sitemap.xml
-Sitemap: {base_url}/news-sitemap.xml
-"""
-    return PlainTextResponse(content=content)
+    blocked_ai_and_scrapers = [
+        "GPTBot",
+        "CCBot",
+        "ClaudeBot",
+        "Claude-Web",
+        "anthropic-ai",
+        "Bytespider",
+        "AhrefsBot",
+        "SemrushBot",
+        "MJ12bot",
+        "DotBot",
+        "BLEXBot",
+        "DataForSeoBot",
+        "PetalBot",
+    ]
+    lines = [
+        "# Google AdSense ve Reklam Dogrulama Botlari Tam Yetkili",
+        "User-agent: Mediapartners-Google",
+        "Allow: /",
+        "",
+        "User-agent: AdsBot-Google",
+        "Allow: /",
+        "",
+        "# Yapay Zeka Veri Toplayicilari ve Ticari Kaziyici Botlar Yasakli",
+    ]
+    for bot_ua in blocked_ai_and_scrapers:
+        lines.append(f"User-agent: {bot_ua}")
+        lines.append("Disallow: /")
+        lines.append("")
+    lines.extend([
+        "# Arama Motorlari (Googlebot, Bingbot, Yandex) ve Sosyal Onizleme Botlari Acik",
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /arama",
+        "Disallow: /api/",
+        f"Sitemap: {base_url}/sitemap.xml",
+        f"Sitemap: {base_url}/news-sitemap.xml",
+        "",
+    ])
+    return PlainTextResponse(content="\n".join(lines))
 
 @app.get("/site-haritasi", response_class=HTMLResponse)
 async def html_sitemap(request: Request):
@@ -2950,9 +3009,11 @@ async def sitemap_xsl():
 def _is_human_browser_request(request: Request) -> bool:
     if request.query_params.get("raw") == "1" or request.query_params.get("format") == "xml":
         return False
+    if _is_internal_bot_request(request):
+        return False
     ua = (request.headers.get("user-agent") or "").lower()
     accept = (request.headers.get("accept") or "").lower()
-    if any(b in ua for b in ("bot", "google", "bing", "yandex", "slurp", "duckduck", "baidu", "crawler", "spider", "curl", "python", " lighthouse", " inspection")):
+    if any(b in ua for b in ("bot", "google", "bing", "yandex", "slurp", "duckduck", "baidu", "crawler", "spider", "curl", "python", " lighthouse", " inspection", "gundemanalizi")):
         return False
     return "text/html" in accept and "mozilla" in ua
 

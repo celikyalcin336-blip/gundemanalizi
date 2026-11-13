@@ -38,6 +38,22 @@ SITE_URL = "https://xn--gndemanalizi-dlb.com.tr"
 # Instagram gibi servislerin videoyu indirebilmesi için ASCII (punycode) adres
 PUBLIC_MEDIA_BASE = os.getenv("PUBLIC_MEDIA_BASE", "https://xn--gndemanalizi-dlb.com.tr")
 
+# İç otomasyon servislerinin (X botu, bülten, health bekçisi) kendi sitemize yaptığı isteklerde
+# istatistiklere ve hız/bot filtrelerine karışmaması için paylaşılan kimlik başlığı
+INTERNAL_BOT_HEADER = "X-GA-Internal-Bot"
+INTERNAL_BOT_TOKEN = os.getenv("INTERNAL_BOT_TOKEN", "ga-internal-2026").strip()
+
+
+def get_internal_bot_headers(extra: dict = None) -> dict:
+    """Kendi iç servislerimizin canlı site isteklerinde kullanacağı standart güvenli başlıkları döner."""
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        INTERNAL_BOT_HEADER: INTERNAL_BOT_TOKEN,
+    }
+    if extra:
+        headers.update(extra)
+    return headers
+
 # AI (Google Gemini) Ayarı
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 

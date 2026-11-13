@@ -29,6 +29,7 @@ import numpy as np
 import requests
 from moviepy import AudioFileClip, VideoClip
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+import config
 
 if sys.stdout.encoding != "utf-8":
     try:
@@ -147,7 +148,7 @@ def load_story_image(image_path_str: str) -> Image.Image:
                 pass
         url = f"https://xn--gndemanalizi-dlb.com.tr/images/{safe_name}?v=3"
         try:
-            r = requests.get(url, timeout=12, headers={"User-Agent": "Mozilla/5.0"})
+            r = requests.get(url, timeout=12, headers=config.get_internal_bot_headers())
             if r.status_code == 200 and len(r.content) > 6000:
                 img = Image.open(BytesIO(r.content)).convert("RGB")
                 img = ImageEnhance.Contrast(img).enhance(1.12)
@@ -164,7 +165,7 @@ def fetch_stories_for_bulletin() -> list:
     try:
         req = urllib.request.Request(
             "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=100",
-            headers={"User-Agent": "Mozilla/5.0"}
+            headers=config.get_internal_bot_headers()
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             live_articles = json.loads(resp.read().decode("utf-8"))

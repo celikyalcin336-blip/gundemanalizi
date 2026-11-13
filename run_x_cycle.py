@@ -69,7 +69,7 @@ def get_latest_articles_pool() -> list:
     try:
         req = urllib.request.Request(
             "https://xn--gndemanalizi-dlb.com.tr/api/articles?limit=60",
-            headers={"User-Agent": "Mozilla/5.0"}
+            headers=config.get_internal_bot_headers()
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
@@ -361,7 +361,7 @@ def run_cycle(force: bool = False, max_attempts: int = 3) -> bool:
         local_img = art.get("image_path")
         if not local_img and art.get("image_url"):
             try:
-                img_resp = requests.get(art["image_url"], timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+                img_resp = requests.get(art["image_url"], timeout=15, headers=config.get_internal_bot_headers())
                 if img_resp.status_code == 200 and len(img_resp.content) > 4000:
                     temp_img_path = os.path.join(TEMP_IMG_DIR, f"x_temp_{slug[:20]}.jpg")
                     with open(temp_img_path, "wb") as f:

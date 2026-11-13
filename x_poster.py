@@ -238,7 +238,7 @@ def fetch_full_article_text(site_url: str) -> str:
         return ""
     try:
         import html as _html
-        resp = requests.get(site_url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(site_url, timeout=20, headers=config.get_internal_bot_headers())
         if resp.status_code != 200:
             return ""
         page = resp.text
