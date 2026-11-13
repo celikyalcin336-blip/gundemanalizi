@@ -28,13 +28,6 @@
     "ts": 1793359865.0822856
   },
   {
-    "slug": "hmdden-yeni-tuslu-cep-telefonu-nokia-2360-flip",
-    "title": "HMD’den yeni tuşlu cep telefonu: “Nokia 2360 Flip”",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793359879.7341096
-  },
-  {
     "slug": "kemik-tumorunu-yenen-milli-yuzucuden-42-turkiye-rekoru",
     "title": "Kemik tümörünü yenen milli yüzücüden, 42 Türkiye rekoru",
     "status": "posted",
@@ -3587,5 +3580,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794564553.7394607
+  },
+  {
+    "slug": "irlanda-merkezli-fly4-airlines-green-mali-kriz-nedeniyle-tasfiye-surecini-baslat",
+    "title": "İrlanda Merkezli Fly4 Airlines Green Mali Kriz Nedeniyle Tasfiye Sürecini Başlattı",
+    "summary": "Dublin merkezli bölgesel havayolu firması Fly4 Airlines Green, artan yakıt maliyetleri ve zararlar gerekçesiyle İrlanda Yüksek Mahkemesine başvurarak tasfiye sürecine girdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794567276.6058626
   }
 ]
