@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "daltonlar-sorusturmasi-76-kisi-icin-tutuklama-talebi",
-    "title": "Daltonlar soruşturması. 76 kişi için tutuklama talebi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793395807.2621276
-  },
-  {
     "slug": "metrobus-hattinda-korkutan-yangin",
     "title": "Metrobüs hattında korkutan yangın",
     "status": "posted",
@@ -3621,5 +3614,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794591787.381177
+  },
+  {
+    "slug": "hindistanin-golaghat-bolgesinde-meydana-gelen-trafik-kazasi-can-aldi",
+    "title": "Hindistan'ın Golaghat Bölgesinde Meydana Gelen Trafik Kazası Can Aldı",
+    "summary": "Hindistan'ın Assam eyaletine bağlı Golaghat bölgesinde bir minibüs ile kamyonun çarpışması sonucu ilk belirlemelere göre yirmi üç kişi hayatını kaybetti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794594511.368644
   }
 ]
