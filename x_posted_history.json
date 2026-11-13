@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "voyager-1-48-saatlik-sessizligi-atlatti-enerji-omru-uzadi",
-    "title": "Voyager 1 48 Saatlik Sessizliği Atlattı, Enerji Ömrü Uzadı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793402921.7043614
-  },
-  {
     "slug": "bingol-merkezli-uyusturucu-operasyonu-20-tutuklama",
     "title": "Bingöl merkezli uyuşturucu operasyonu: 20 tutuklama",
     "status": "posted",
@@ -3625,5 +3618,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794597236.018154
+  },
+  {
+    "slug": "cafer-mahiroglu-sorusturmasinda-alti-supheli-icin-tutuklama-talebi",
+    "title": "Cafer Mahiroğlu Soruşturmasında Altı Şüpheli İçin Tutuklama Talebi",
+    "summary": "Yürütülen soruşturmanın ikinci dalga operasyonunda, aralarında eski İzmir Büyükşehir Belediyesi Genel Sekreteri Ramazan Tezcan'ın da bulunduğu altı şüpheli tutuklama talebiyle mahkemeye sevk edildi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794599959.130406
   }
 ]
