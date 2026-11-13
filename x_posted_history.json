@@ -14,13 +14,6 @@
     "ts": 1793320847.5862968
   },
   {
-    "slug": "inme-tedavisinde-zamana-karsi-yarista-101-birim-gorev-yapiyor",
-    "title": "İnme tedavisinde zamana karşı yarışta 101 birim görev yapıyor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793320871.262789
-  },
-  {
     "slug": "cristiano-ronaldodan-hat-trick-al-nassrdan-5-gollu-galibiyet",
     "title": "Cristiano Ronaldo'dan hat-trick! Al Nassr'dan 5 gollü galibiyet",
     "status": "skipped",
@@ -3558,5 +3551,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794534581.5899785
+  },
+  {
+    "slug": "ispanya-deplasmanda-cekya-macini-kazanarak-grupta-fire-vermedi",
+    "title": "İspanya Deplasmanda Çekya Maçını Kazanarak Grupta Fire Vermedi",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794537282.7398193
+  },
+  {
+    "slug": "ingiliz-otomotiv-devi-jaguar-yeni-ultra-luks-model-icin-sinyal-verdi",
+    "title": "İngiliz Otomotiv Devi Jaguar Yeni Ultra Lüks Model İçin Sinyal Verdi",
+    "summary": "İngiliz üretici Jaguar, Type 01 ile başlattığı dönüşüm sürecinin ardından serinin ikinci aracı olan Type 02 için Avrupa Birliği'nde marka tescil başvurusunda bulundu.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794537305.2471912
   }
 ]
