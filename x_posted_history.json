@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "bingol-merkezli-uyusturucu-operasyonu-20-tutuklama",
-    "title": "Bingöl merkezli uyuşturucu operasyonu: 20 tutuklama",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793407639.880779
-  },
-  {
     "slug": "sakaryada-yol-calismasinda-antik-yazitli-tas-blok-bulundu",
     "title": "Sakarya'da yol çalışmasında antik yazıtlı taş blok bulundu",
     "status": "posted",
@@ -3627,5 +3620,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794599959.130406
+  },
+  {
+    "slug": "adalet-bakanligindan-faili-mechul-dosyalarda-yeni-cozumler",
+    "title": "Adalet Bakanlığından Faili Meçhul Dosyalarda Yeni Çözümler",
+    "summary": "Adalet Bakanı Akın Gürlek, Bursa ve Bitlis'te yıllardır çözülemeyen üç ayrı adli vaka dosyasının aydınlatıldığını ve operasyonlar yapıldığını duyurdu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794602682.2965682
   }
 ]
