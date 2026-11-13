@@ -35,13 +35,6 @@
     "ts": 1793371743.6003795
   },
   {
-    "slug": "bakan-gurlek-duyurdu-4-faili-mechul-cinayet-daha-aydinlatildi",
-    "title": "Bakan Gürlek duyurdu: 4 faili meçhul cinayet daha aydınlatıldı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793381805.238224
-  },
-  {
     "slug": "mate-rimacin-kendi-bugatti-chironu-calindi",
     "title": "Mate Rimac'in kendi Bugatti Chiron'u çalındı!",
     "status": "posted",
@@ -3606,5 +3599,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794580889.4815695
+  },
+  {
+    "slug": "chicago-federal-rezerv-bankasi-baskani-goolsbee-enflasyon-mesaji",
+    "title": "Chicago Federal Rezerv Bankası Başkanı Goolsbee Enflasyon Mesajı",
+    "summary": "Goolsbee, merkez bankasının fiyat istikrarı karnesinde güven unsurunu pekiştirmesi gerektiğini belirtti. Yetkili, enflasyonist baskıların öngörülenden daha kalıcı bir seyir izlediğini ifade etti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794583612.87141
   }
 ]
