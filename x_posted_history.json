@@ -21,13 +21,6 @@
     "ts": 1793325107.4776242
   },
   {
-    "slug": "trump-sylvianin-bilgi-sizdirdigini-soyledi",
-    "title": "Trump, Sylvia'nın \"bilgi sızdırdığını\" söyledi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793325129.9157827
-  },
-  {
     "slug": "nvidia-rtx-remix-16-yayinlandi-yeni-ozellikler-neler",
     "title": "NVIDIA RTX Remix 1.6 Yayınlandı: Yeni Özellikler Neler?",
     "status": "posted",
@@ -3567,5 +3560,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794537305.2471912
+  },
+  {
+    "slug": "ingilterede-yuz-tanima-teknolojisi-haksiz-tutuklama-riskini-artiriyor",
+    "title": "İngiltere'de Yüz Tanıma Teknolojisi Haksız Tutuklama Riskini Artırıyor",
+    "summary": "İngiltere'de hazırlanan resmi bir denetçi raporu, polisin geriye dönük yüz tanıma sistemini kullanırken veri doğruluğunu yeterince teyit etmediğini ortaya koydu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794540028.5711493
   }
 ]
