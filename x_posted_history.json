@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "metrobus-hattinda-korkutan-yangin",
-    "title": "Metrobüs hattında korkutan yangın",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793399557.1819882
-  },
-  {
     "slug": "voyager-1-48-saatlik-sessizligi-atlatti-enerji-omru-uzadi",
     "title": "Voyager 1 48 Saatlik Sessizliği Atlattı, Enerji Ömrü Uzadı",
     "status": "posted",
@@ -3623,5 +3616,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794594511.368644
+  },
+  {
+    "slug": "samsung-ve-google-ortakligiyla-gelistirilen-intelligent-eyewear-modelleri-cikti",
+    "title": "Samsung ve Google Ortaklığıyla Geliştirilen Intelligent Eyewear Modelleri Çıktı",
+    "summary": "Google ve Samsung iş birliğiyle geliştirilen yeni nesil Intelligent Eyewear akıllı gözlük serisi, Android XR işletim sistemiyle vitrine çıkarken pazar rekabetini kızıştırıyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794597236.018154
   }
 ]
