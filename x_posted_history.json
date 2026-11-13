@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "toparlanip-yolumuza-devam-etmeliyiz",
-    "title": "\"Toparlanıp yolumuza devam etmeliyiz\"",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793417892.6258128
-  },
-  {
     "slug": "monako-kara-para-aklamayla-mucadelede-fatfin-gri-listesinden-cikarildi",
     "title": "Monako, kara para aklamayla mücadelede FATF'ın gri listesinden çıkarıldı",
     "status": "posted",
@@ -3633,5 +3626,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794608149.860175
+  },
+  {
+    "slug": "toronto-zirvesinde-yapay-zeka-denetimi-icin-kritik-uc-yil-uyarisi",
+    "title": "Toronto Zirvesinde Yapay Zeka Denetimi İçin Kritik Üç Yıl Uyarısı",
+    "summary": "Toronto’da düzenlenen Hinton Konferansları’nda, gelişmiş yapay zekalar üzerindeki insan denetiminin üç yıl içinde kaybedilebileceği ihtimali dile getirildi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794610873.4140291
   }
 ]
