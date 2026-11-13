@@ -21,13 +21,6 @@
     "ts": 1793325107.4776242
   },
   {
-    "slug": "nagel-amb-gerekirse-kararli-adimlar-atacak",
-    "title": "Nagel: AMB gerekirse kararlı adımlar atacak",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793356919.699593
-  },
-  {
     "slug": "de-yapilacak",
     "title": "'de yapılacak",
     "status": "skipped",
@@ -3585,5 +3578,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794561830.4028761
+  },
+  {
+    "slug": "istanbul-merkezli-yuksek-kazanc-vaatli-kripto-varlik-dolandiriciligi-operasyonun",
+    "title": "İstanbul merkezli yüksek kazanç vaatli kripto varlık dolandırıcılığı operasyonunda dört gözaltı",
+    "summary": "Kripto para yatırımı vaadiyle vatandaşları mağdur eden suç örgütü, emniyet birimlerinin çalışmasıyla çökertildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794564553.7394607
   }
 ]
