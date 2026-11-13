@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "fedmusalem-yakinda-ilave-sikilasma-gerekecek",
-    "title": "Fed/Musalem: Yakında ilave sıkılaşma gerekecek",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793392302.7267332
-  },
-  {
     "slug": "daltonlar-sorusturmasi-76-kisi-icin-tutuklama-talebi",
     "title": "Daltonlar soruşturması. 76 kişi için tutuklama talebi",
     "status": "posted",
@@ -3612,5 +3605,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794589063.7799685
+  },
+  {
+    "slug": "formula-1in-yildizi-lewis-hamiltondan-refah-sinir-kapisindaki-engellemelere-sert",
+    "title": "Formula 1’in Yıldızı Lewis Hamilton’dan Refah Sınır Kapısı’ndaki Engellemelere Sert Tepki",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794591764.9883463
+  },
+  {
+    "slug": "diyabet-ve-kilo-verme-ilaclarina-gorme-kaybi-uyarisi",
+    "title": "Diyabet ve Kilo Verme İlaçlarına Görme Kaybı Uyarısı",
+    "summary": "Amerika Birleşik Devletleri Gıda ve İlaç Dairesi, popüler diyabet ve obezite ilaçlarının güvenlik etiketlerinde kalıcı görme kaybı riskine karşı güncelleme yapılmasına karar verdi.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794591787.381177
   }
 ]
