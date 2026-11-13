@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "vance-iranla-sonsuz-savas-icinde-olmayacagiz",
-    "title": "Vance: İran'la 'sonsuz' savaş içinde olmayacağız",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793389299.0179794
-  },
-  {
     "slug": "fedmusalem-yakinda-ilave-sikilasma-gerekecek",
     "title": "Fed/Musalem: Yakında ilave sıkılaşma gerekecek",
     "status": "posted",
@@ -3610,5 +3603,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794586336.059937
+  },
+  {
+    "slug": "volkswagen-yeni-t-roc-r-modeli-guclu-ozellikleriyle-tanitiliyor",
+    "title": "Volkswagen Yeni T-Roc R Modeli Güçlü Özellikleriyle Tanıtılıyor",
+    "summary": "Volkswagen, yeni performans SUV modeli T-Roc R için hazırlanan kamuflajlı prototip fotoğraflarını yayımladı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794589063.7799685
   }
 ]
