@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "sosyal-medyada-yas-sinirlamasina-iliskin-yonetmelik-yarin-yururluge-giriyor",
-    "title": "Sosyal medyada yaş sınırlamasına ilişkin yönetmelik yarın yürürlüğe giriyor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793454064.9602022
-  },
-  {
     "slug": "telefonunuza-gelen-ve-goremediginiz-bir-sms-cihazinizi-kullanilamaz-hale-getireb",
     "title": "Telefonunuza gelen ve göremediğiniz bir SMS, cihazınızı kullanılamaz hale getirebilir",
     "status": "posted",
@@ -3653,5 +3646,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794635396.6638503
+  },
+  {
+    "slug": "avrupa-birligi-yapay-zeka-bagimsizligi-icin-dev-yatirim-hedefini-ilan-etti",
+    "title": "Avrupa Birliği Yapay Zeka Bağımsızlığı İçin Dev Yatırım Hedefini İlan Etti",
+    "summary": "Avrupa Birliği yönetimi, kıtanın teknolojik özerkliğini güçlendirmek amacıyla yapay zeka alanında yarım trilyon avroluk devasa bir finansman ihtiyacı bulunduğunu açıkladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794638120.602952
   }
 ]
