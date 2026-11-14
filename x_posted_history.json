@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "sehit-piyade-sozlesmeli-er-yusuf-sait-unlu-son-yolculuguna-ugurlandi",
-    "title": "Şehit Piyade Sözleşmeli Er Yusuf Sait Ünlü son yolculuğuna uğurlandı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793464236.1357105
-  },
-  {
     "slug": "misirda-kaza-10-olu-24-yarali",
     "title": "Mısır'da kaza: 10 ölü 24 yaralı",
     "status": "posted",
@@ -3659,5 +3652,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794643567.483836
+  },
+  {
+    "slug": "rahim-agzi-kanseri-taramalarinda-hpv-testi-ve-kolposkopi-sureci",
+    "title": "Rahim Ağzı Kanseri Taramalarında HPV Testi ve Kolposkopi Süreci",
+    "summary": "Kadın Hastalıkları ve Doğum Uzmanı Prof. Dr. Muzaffer Temur, rahim ağzı kanseri erken teşhisinde kritik rol oynayan HPV ve smear testlerinin işleyişini aktardı.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794646312.8129401
   }
 ]
