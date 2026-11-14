@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "rtx-5090in-kilidi-acildi-mi-64-ve-96-gb-bellek-iddiasi",
-    "title": "RTX 5090'ın Kilidi Açıldı mı? 64 ve 96 GB Bellek İddiası",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793498116.921289
-  },
-  {
     "slug": "kolelik-krizi-kral-topu-hukumete-atti",
     "title": "Kölelik krizi. Kral topu hükümete attı",
     "status": "posted",
@@ -3677,5 +3670,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794668104.7774599
+  },
+  {
+    "slug": "universitelerden-iklim-degisikligini-konu-alan-dijital-harita-projesi",
+    "title": "Üniversitelerden İklim Değişikliğini Konu Alan Dijital Harita Projesi",
+    "summary": "İki üniversiteden yedi akademisyenin ortaklaşa yürüttüğü çalışmayla kentin iklim dönüşümü belgeselleştirildi. Hazırlanan dijital harita ve görsel materyaller uluslararası iklim konferansında katılımcılara tanıtılacak.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794670828.5409467
   }
 ]
