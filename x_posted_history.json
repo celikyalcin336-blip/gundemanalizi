@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "misirda-kaza-10-olu-24-yarali",
-    "title": "Mısır'da kaza: 10 ölü 24 yaralı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793467639.2680147
-  },
-  {
     "slug": "biz-hastalik-degil-saglik-bakanligiyiz",
     "title": "'Biz hastalık değil, Sağlık Bakanlığıyız'",
     "status": "posted",
@@ -3661,5 +3654,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794646312.8129401
+  },
+  {
+    "slug": "elon-muskin-casusluk-iddialariyla-nvidiadan-ayrilan-jensen-huanga-acik-ise-alim-",
+    "title": "Elon Musk'ın Casusluk İddialarıyla Nvidia'dan Ayrılan Jensen Huang'a Açık İşe Alım Daveti",
+    "summary": "Nvidia firmasındaki görevinden casusluk ile çıkar çatışması iddiaları yüzünden ayrılan Jensen Huang için Elon Musk destek açıklamasında bulundu.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794649035.8482993
   }
 ]
