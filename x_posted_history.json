@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "mimar-muhendis-ve-tasarimcilar-icin-yuksek-butceli-profesyonel-bilgisayar-tavsiy",
-    "title": "Mimar, Mühendis ve Tasarımcılar İçin Yüksek Bütçeli Profesyonel Bilgisayar Tavsiyeleri",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793475188.3244438
-  },
-  {
     "slug": "lexus-cinde-yerli-uretime-geciyor-ilk-model-elektrikli-suv-olacak",
     "title": "Lexus Çin’de Yerli Üretime Geçiyor: İlk Model Elektrikli SUV Olacak",
     "status": "posted",
@@ -3665,5 +3658,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794651758.2960107
+  },
+  {
+    "slug": "openai-yapay-zeka-ajanlari-icin-chatgpt-wallet-dijital-cuzdan-altyapisini-tanitt",
+    "title": "OpenAI Yapay Zeka Ajanları İçin ChatGPT Wallet Dijital Cüzdan Altyapısını Tanıttı",
+    "summary": "OpenAI, Dots yapay zeka ajanlarının otonom finansal işlemler gerçekleştirebilmesini sağlayan ChatGPT Wallet aracını duyurdu.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794654481.6169283
   }
 ]
