@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "biz-hastalik-degil-saglik-bakanligiyiz",
-    "title": "'Biz hastalık değil, Sağlık Bakanlığıyız'",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793471585.1217222
-  },
-  {
     "slug": "mimar-muhendis-ve-tasarimcilar-icin-yuksek-butceli-profesyonel-bilgisayar-tavsiy",
     "title": "Mimar, Mühendis ve Tasarımcılar İçin Yüksek Bütçeli Profesyonel Bilgisayar Tavsiyeleri",
     "status": "posted",
@@ -3663,5 +3656,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794649035.8482993
+  },
+  {
+    "slug": "corludaki-biyogaz-tesisinde-is-kazasi-sonrasi-dort-yonetici-tutuklandi",
+    "title": "Çorlu'daki Biyogaz Tesisinde İş Kazası Sonrası Dört Yönetici Tutuklandı",
+    "summary": "Tekirdağ’ın Çorlu ilçesinde bulunan katı atık bertaraf ve biyogaz tesisinde sulu çamur çukuruna düşen işçinin yaşamını yitirmesinin ardından adli süreç başlatıldı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794651758.2960107
   }
 ]
