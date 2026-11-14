@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "yapay-zeka-rallisi-bitti-mi-teknoloji-hisselerinde-sert-satis",
-    "title": "Yapay zeka rallisi bitti mi? Teknoloji hisselerinde sert satış",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793450346.6364908
-  },
-  {
     "slug": "sosyal-medyada-yas-sinirlamasina-iliskin-yonetmelik-yarin-yururluge-giriyor",
     "title": "Sosyal medyada yaş sınırlamasına ilişkin yönetmelik yarın yürürlüğe giriyor",
     "status": "posted",
@@ -3651,5 +3644,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794632673.6649399
+  },
+  {
+    "slug": "ulusal-egitim-politikasinda-pisa-sinavi-ile-gelen-kuresel-basari",
+    "title": "Ulusal Eğitim Politikasında PISA Sınavı ile Gelen Küresel Başarı",
+    "summary": "Milli Eğitim Bakanı Yusuf Tekin, TBMM Plan ve Bütçe Komisyonunda yaptığı açıklamada Türkiye'nin PISA değerlendirmelerinde tarihsel bir sıçrama kaydettiğini duyurdu.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794635396.6638503
   }
 ]
