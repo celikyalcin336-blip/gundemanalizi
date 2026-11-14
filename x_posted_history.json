@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "galatasaray-mct-technic-rahat-kazandi",
-    "title": "Galatasaray MCT Technic rahat kazandı!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793489372.5685995
-  },
-  {
     "slug": "honor-win-tablet-satisa-cikti-10000-m-ah-pil-ve-315-gram",
     "title": "Honor WIN Tablet Satışa Çıktı: 10.000 m Ah Pil ve 315 Gram",
     "status": "posted",
@@ -3673,5 +3666,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794662650.4545145
+  },
+  {
+    "slug": "yok-baskanliginda-universite-hastaneleri-icin-yeni-koordinasyon-ve-mali-denetim-",
+    "title": "YÖK Başkanlığında Üniversite Hastaneleri İçin Yeni Koordinasyon ve Mali Denetim Mekanizması Kuruldu",
+    "summary": "Resmi Gazete’de yayımlanan kararla devlet ve vakıf üniversitelerinin sağlık uygulama merkezlerini kapsayan Üniversite Hastaneleri Koordinasyon Komitesi hayata geçirildi.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794665381.7566361
   }
 ]
