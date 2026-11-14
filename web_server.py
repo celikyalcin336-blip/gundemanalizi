@@ -379,8 +379,12 @@ _CSP_REPORT_ONLY = (
     "frame-ancestors 'self';"
 )
 _VISITOR_BURST_HITS = {}          # vis_hash -> [ts, ...] (otomatik kazıyıcı hız tespiti)
-_DIRECT_ARTICLE_BURST_TS = []     # [ts, ...] (yurt dışı doğrudan /haber/ toplu tarama tespiti)
+_DIRECT_ARTICLE_BURST_TS = []     # [ts, ...] (yurt dışı doğrudan alt sayfa toplu tarama tespiti)
 _FAKE_INTERNAL_BURST_TS = []      # [ts, ...] (çerezsiz sahte Site İçi Tıklama bot tespiti)
+_DIASPORA_HUMAN_COUNTRIES = {
+    "TR", "DE", "NL", "FR", "GB", "UK", "BE", "AT", "CH",
+    "AZ", "US", "CA", "SE", "DK", "NO", "AU", "CY"
+}
 
 
 def _is_internal_referer(ref_low: str) -> bool:
@@ -446,7 +450,7 @@ async def track_visitors_middleware(request: Request, call_next):
         if len(_API_RATE_LIMIT) > 2000:
             for k in [k for k, v in _API_RATE_LIMIT.items() if not v or now_api - v[-1] > 60]:
                 _API_RATE_LIMIT.pop(k, None)
-    # 2. Statik dosyaları, sistem uçlarını ve kendi iç otomasyon botlarımızı ziyaretçi sayacına dahil etme
+    # 2. Statik dosyaları ve sistem uçlarını ziyaretçi sayacına dahil etme; siteye giren tüm sayfa isteklerini %100 şeffaf logla
     is_internal_bot = _is_internal_bot_request(request)
     is_static_or_system = (
         path.startswith("/assets") or
@@ -457,8 +461,9 @@ async def track_visitors_middleware(request: Request, call_next):
     )
     bot_type = None
     is_adsense = False
+    is_sys_bot = False
     request.state.is_human_visitor = False
-    if not (is_api_or_admin or is_static_or_system or is_internal_bot):
+    if not (is_api_or_admin or is_static_or_system):
         try:
             global _DIRECT_ARTICLE_BURST_TS, _FAKE_INTERNAL_BURST_TS
             ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for") or (request.client.host if request.client else "127.0.0.1")
@@ -477,8 +482,12 @@ async def track_visitors_middleware(request: Request, call_next):
             import hashlib
             vis_hash = hashlib.md5(f"{ip}_{ua[:60]}".encode()).hexdigest()[:16]
 
+            # 0. ⚙️ Kendi İç Otomasyon Botlarımız (X Paylaşım / Günlük Bülten) — Gizlenmez, şeffafça etiketlenir
+            if is_internal_bot:
+                bot_type = "Sistem Botu"
+                is_sys_bot = True
             # 1. 💰 Google AdSense Botları ve AdSense İnceleme Girişleri (Ayrı ve Net Tespit)
-            if any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense", "google-adstxt")) or (path == "/ads.txt" and "google" in ua_low):
+            elif any(a in ua_low for a in ("mediapartners-google", "adsbot-google", "google-adwords", "adwords-instant", "google-adsense", "google-adstxt")) or (path == "/ads.txt" and "google" in ua_low):
                 bot_type = "AdSense Bot"
                 is_adsense = True
             elif any(a in ref for a in ("adsense.google", "partnerdash.google", "googlesyndication.com", "doubleclick.net", "googleads.")):
@@ -515,22 +524,21 @@ async def track_visitors_middleware(request: Request, call_next):
             )):
                 bot_type = "Arama Botu"
 
-            # 3. 🛡️ Sahte Masaüstü / Proxy Kazıyıcı (Scraper) Tespiti (Sayfayı engellemez, istatistikten ayırır)
-            # Gerçek tarayıcılar her zaman Mozilla/5.0, Accept-Language ve text/html (veya Sec-Fetch-Mode) gönderir
+            # 3. 🛡️ Gizli / Çerezsiz Otomatik Tarama Tespiti (Sayfayı ASLA engellemez, %100 şeffaf etiketler ve insan sayacından ayırır)
             now_v = time.time()
             if not bot_type:
                 if "mozilla/5.0" not in ua_low or not accept_lang or ("text/html" not in accept_hdr and sec_fetch_mode != "navigate"):
-                    bot_type = "Arama Botu"
-                elif is_internal_ref and path.startswith("/haber/") and not has_cookie:
+                    bot_type = "Otomatik Tarama"
+                elif is_internal_ref and path != "/" and not has_cookie:
                     # Gerçek ziyaretçi site içinden tıklamadan önce önceki sayfada ga_vis çerezi alır;
                     # yurt dışından çerezsiz "Site İçi Tıklama" proxy kazıyıcılarının imzasıdır.
                     if country != "TR":
-                        bot_type = "Arama Botu"
+                        bot_type = "Otomatik Tarama"
                     else:
                         _FAKE_INTERNAL_BURST_TS = [t for t in _FAKE_INTERNAL_BURST_TS if now_v - t < 45]
                         _FAKE_INTERNAL_BURST_TS.append(now_v)
                         if len(_FAKE_INTERNAL_BURST_TS) >= 3:
-                            bot_type = "Arama Botu"
+                            bot_type = "Otomatik Tarama"
                 else:
                     vh_hits = [t for t in _VISITOR_BURST_HITS.get(vis_hash, []) if now_v - t < 60]
                     vh_hits.append(now_v)
@@ -540,17 +548,23 @@ async def track_visitors_middleware(request: Request, call_next):
                             _VISITOR_BURST_HITS.pop(k, None)
 
                     recent_30s = [t for t in vh_hits if now_v - t < 30]
-                    if len(vh_hits) >= 10 or (not ref and path.startswith("/haber/") and len(recent_30s) >= 4):
-                        bot_type = "Arama Botu"
-                    elif not ref and path.startswith("/haber/") and not has_cookie and country != "TR":
-                        _DIRECT_ARTICLE_BURST_TS = [t for t in _DIRECT_ARTICLE_BURST_TS if now_v - t < 45]
-                        _DIRECT_ARTICLE_BURST_TS.append(now_v)
-                        if len(_DIRECT_ARTICLE_BURST_TS) >= 3:
-                            bot_type = "Arama Botu"
+                    if len(vh_hits) >= 10 or (not ref and path != "/" and len(recent_30s) >= 3):
+                        bot_type = "Otomatik Tarama"
+                    elif not ref and path != "/" and not has_cookie and country != "TR":
+                        if country not in _DIASPORA_HUMAN_COUNTRIES:
+                            bot_type = "Otomatik Tarama"
+                        else:
+                            _DIRECT_ARTICLE_BURST_TS = [t for t in _DIRECT_ARTICLE_BURST_TS if now_v - t < 180]
+                            _DIRECT_ARTICLE_BURST_TS.append(now_v)
+                            if len(_DIRECT_ARTICLE_BURST_TS) >= 2:
+                                bot_type = "Otomatik Tarama"
 
             if is_adsense:
                 device = f"💰 {bot_type}"
                 source = "💰 Google AdSense"
+            elif is_sys_bot:
+                device = "⚙️ Sistem Botu"
+                source = "⚙️ Kendi Otomasyonumuz"
             elif bot_type:
                 device = f"🤖 {bot_type}"
                 source = f"🤖 {bot_type}"
