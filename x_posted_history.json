@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "yok-kirgizistanda-bilim-kafe-etkinligi-duzenledi",
-    "title": "YÖK, Kırgızistan'da Bilim Kafe etkinliği düzenledi!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793439130.996563
-  },
-  {
     "slug": "soykirimci-israilin-saldirilari-altindaki-gazzede-can-kaybi-74-bin-594e-yukseldi",
     "title": "Soykırımcı İsrail'in saldırıları altındaki Gazze'de can kaybı 74 bin 594'e yükseldi",
     "status": "posted",
@@ -3645,5 +3638,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794624492.0969427
+  },
+  {
+    "slug": "israil-ordusunun-gazze-hastanelerini-haritada-isaretlemesi-uluslararasi-hukuk-ta",
+    "title": "İsrail Ordusunun Gazze Hastanelerini Haritada İşaretlemesi Uluslararası Hukuk Tartışmasını Alevlendirdi",
+    "summary": "İsrail ordusu Gazze Şeridi genelindeki ana tıp merkezlerini askeri gerekçelerle işaretlediği yeni bir harita yayımladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794627229.3162732
   }
 ]
