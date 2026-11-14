@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "mustakil-evde-faciadan-donuldu",
-    "title": "Müstakil evde faciadan dönüldü!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793535445.3529727
-  },
-  {
     "slug": "thomas-reis-mac-icinde-karar-verecegiz",
     "title": "Thomas Reis: Maç içinde karar vereceğiz!",
     "status": "posted",
@@ -3699,5 +3692,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794698073.3740025
+  },
+  {
+    "slug": "yuce-auto-skoda-karadeniz-rotali-mobil-sarj-saha-turunu-tamamladi",
+    "title": "Yüce Auto-Škoda Karadeniz Rotalı Mobil Şarj Saha Turunu Tamamladı",
+    "summary": "Yüce Auto-Škoda'nın 2025 yılında hayata geçirdiği Mobil Şarj hizmeti, Karadeniz Bölgesi'ni kapsayan ilk saha yolculuğunu başarıyla sonlandırdı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794700796.6634314
   }
 ]
