@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "resmi-gazetede-bugun-01112026",
-    "title": "Resmi Gazete'de bugün (01.11.2026)",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793522538.0070822
-  },
-  {
     "slug": "batrakov-icin-siraya-girdiler-4-avrupa-devi-istiyor",
     "title": "Batrakov için sıraya girdiler! 4 Avrupa devi istiyor",
     "status": "posted",
@@ -3691,5 +3684,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794687181.6329715
+  },
+  {
+    "slug": "besiktasta-kiralik-oynayan-fabio-mirettinin-gelecegi-masada",
+    "title": "Beşiktaş'ta Kiralık Oynayan Fabio Miretti'nin Geleceği Masada",
+    "summary": "Beşiktaş'ın kiralık kadrosuna kattığı Fabio Miretti, siyah-beyazlı formayla gösterdiği performansla kulübün ve bonservisini elinde bulunduran Juventus'un yakın takibinde bulunuyor.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794689905.1753569
   }
 ]
