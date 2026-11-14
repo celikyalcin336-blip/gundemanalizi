@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "markete-silahli-saldiri-ekmek-vermeye-gitmisti",
-    "title": "Markete silahlı saldırı! Ekmek vermeye gitmişti",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793446070.4560668
-  },
-  {
     "slug": "yapay-zeka-rallisi-bitti-mi-teknoloji-hisselerinde-sert-satis",
     "title": "Yapay zeka rallisi bitti mi? Teknoloji hisselerinde sert satış",
     "status": "posted",
@@ -3649,5 +3642,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794629951.6997588
+  },
+  {
+    "slug": "cin-yapimi-yeni-enerjili-tasitlarin-kuresel-ihracatinda-ekim-ayi-tarihi-rekoru",
+    "title": "Çin Yapımı Yeni Enerjili Taşıtların Küresel İhracatında Ekim Ayı Tarihi Rekoru",
+    "summary": "Çinli otomotiv üreticileri, iç pazardaki daralmayı aşmak amacıyla dış sevkiyatlarını artırarak yeni enerjili araç ihracatında tüm zamanların en yüksek seviyesine ulaştı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794632673.6649399
   }
 ]
