@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "moreira-yildizlasti-derbiyi-inter-karsisinda-milan-kazandi",
-    "title": "Moreira yıldızlaştı, derbiyi Inter karşısında Milan kazandı!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793485729.960001
-  },
-  {
     "slug": "galatasaray-mct-technic-rahat-kazandi",
     "title": "Galatasaray MCT Technic rahat kazandı!",
     "status": "posted",
@@ -3671,5 +3664,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794659927.8200173
+  },
+  {
+    "slug": "trump-pekin-temaslarinda-nvidia-casusluk-iddialari-yerine-ticaret-anlasmasina-od",
+    "title": "Trump Pekin Temaslarında Nvidia Casusluk İddiaları Yerine Ticaret Anlaşmasına Odaklanıyor",
+    "summary": "ABD Başkanı Donald Trump'ın Asya-Pasifik Ekonomik İşbirliği Zirvesi için gerçekleştireceği Çin ziyaretinde Nvidia'nın eski yöneticisine yönelik casusluk iddialarını masaya getirmeyeceği bildirildi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794662650.4545145
   }
 ]
