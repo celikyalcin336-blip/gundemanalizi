@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "meteoroloji-saat-verdi-2-kent-icin-sari-alarm-7-bolgede-yagis-var",
-    "title": "Meteoroloji saat verdi! 2 kent için \"sarı\" alarm! 7 bölgede yağış var",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793424797.0570815
-  },
-  {
     "slug": "open-ai-destekli-thrive-holdings-adtyi-76-milyar-dolara-satin-almak-icin-anlasti",
     "title": "Open AI destekli Thrive Holdings, ADT’yi 7,6 milyar dolara satın almak için anlaştı",
     "status": "posted",
@@ -3637,5 +3630,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794613597.9858842
+  },
+  {
+    "slug": "canakkale-bayramicte-lokanta-isletmecisi-kadin-cinayete-kurban-gitti",
+    "title": "Çanakkale Bayramiç'te Lokanta İşletmecisi Kadın Cinayete Kurban Gitti",
+    "summary": "Çanakkale'nin Bayramiç ilçesinde işlettiği lokantada eski eşi tarafından bıçaklı saldırıya uğrayan kadın, hastanede yapılan tüm müdahalelere rağmen kurtarılamadı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794616322.0244334
   }
 ]
