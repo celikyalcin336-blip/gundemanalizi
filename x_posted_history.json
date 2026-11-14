@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "otv-muafiyetli-araclar-2026-kasim-fiyat-listesi-limit-ve-alim-sartlari",
-    "title": "ÖTV muafiyetli araçlar 2026: kasım fiyat listesi, limit ve alım şartları",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793530187.9486861
-  },
-  {
     "slug": "kahramanmaras-ve-yozgattan-gelen-aileler-umudu-ankarada-buldu-hayat-kurtaran-cap",
     "title": "Kahramanmaraş ve Yozgat'tan gelen aileler umudu Ankara'da buldu: Hayat kurtaran çapraz böbrek nakli",
     "status": "posted",
@@ -3695,5 +3688,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794692627.7823157
+  },
+  {
+    "slug": "samsung-kuresel-pazarda-haber-uygulamasini-kapatma-karari-aldi",
+    "title": "Samsung Küresel Pazarda Haber Uygulamasını Kapatma Kararı Aldı",
+    "summary": "Teknoloji devi Samsung, dijital içerik stratejisinde değişikliğe giderek popüler haber platformunu belirli pazarlarda sonlandırma kararı aldı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794695350.3958423
   }
 ]
