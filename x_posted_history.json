@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "cocuklari-dijital-dunyadan-korumak-icin-yas-siniri-yeterli-mi",
-    "title": "Çocukları dijital dünyadan korumak için yaş sınırı yeterli mi?",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793460506.1879172
-  },
-  {
     "slug": "sehit-piyade-sozlesmeli-er-yusuf-sait-unlu-son-yolculuguna-ugurlandi",
     "title": "Şehit Piyade Sözleşmeli Er Yusuf Sait Ünlü son yolculuğuna uğurlandı",
     "status": "posted",
@@ -3657,5 +3650,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794640843.9347434
+  },
+  {
+    "slug": "halic-koprusunde-makas-atma-nedeniyle-zincirleme-kaza-yasandi",
+    "title": "Haliç Köprüsünde Makas Atma Nedeniyle Zincirleme Kaza Yaşandı",
+    "summary": "İstanbul Haliç Köprüsü üzerinde seyir halindeki bir otomobilin makas atması sonucu beş aracın karıştığı zincirleme trafik kazasında iki kişi yaralandı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794643567.483836
   }
 ]
