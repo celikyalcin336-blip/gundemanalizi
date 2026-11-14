@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "batrakov-icin-siraya-girdiler-4-avrupa-devi-istiyor",
-    "title": "Batrakov için sıraya girdiler! 4 Avrupa devi istiyor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793525937.4344246
-  },
-  {
     "slug": "otv-muafiyetli-araclar-2026-kasim-fiyat-listesi-limit-ve-alim-sartlari",
     "title": "ÖTV muafiyetli araçlar 2026: kasım fiyat listesi, limit ve alım şartları",
     "status": "posted",
@@ -3693,5 +3686,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794689905.1753569
+  },
+  {
+    "slug": "ak-parti-mugla-bulusmasinda-emekli-maaslari-ve-asgari-ucret-calismasini-duyurdu",
+    "title": "AK Parti Muğla Buluşmasında Emekli Maaşları ve Asgari Ücret Çalışmasını Duyurdu",
+    "summary": "AK Parti Genel Başkan Yardımcısı Mustafa Şen, Muğla'da düzenlenen basın toplantısında emekli maaşları ile asgari ücretin artırılmasına yönelik Ankara'da hazırlıklar yapıldığını söyledi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794692627.7823157
   }
 ]
