@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "katar-basinindan-abd-ile-iran-arasindaki-muzakerelerde-ilerleme-kaydedildigi-idd",
-    "title": "Katar basınından ABD ile İran arasındaki müzakerelerde ilerleme kaydedildiği iddiası",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793435867.7377694
-  },
-  {
     "slug": "yok-kirgizistanda-bilim-kafe-etkinligi-duzenledi",
     "title": "YÖK, Kırgızistan'da Bilim Kafe etkinliği düzenledi!",
     "status": "posted",
@@ -3643,5 +3636,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794621768.478525
+  },
+  {
+    "slug": "apple-kamera-tedarikinde-samsung-donemine-gecerken-standart-iphone-modelini-erte",
+    "title": "Apple Kamera Tedarikinde Samsung Dönemine Geçerken Standart iPhone Modelini Erteliyor",
+    "summary": "Apple, yeni akıllı telefon serisinde yer alması beklenen standart modelin tanıtımını görüntü sensörlerindeki tedarikçi değişimi sebebiyle ileri bir tarihe itti.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794624492.0969427
   }
 ]
