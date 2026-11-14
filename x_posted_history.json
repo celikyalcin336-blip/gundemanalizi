@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "open-ai-destekli-thrive-holdings-adtyi-76-milyar-dolara-satin-almak-icin-anlasti",
-    "title": "Open AI destekli Thrive Holdings, ADT’yi 7,6 milyar dolara satın almak için anlaştı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793428830.9386842
-  },
-  {
     "slug": "ahmet-cakardan-flas-galatasaray-yorumu-sampiyonlugun-en-buyuk-favorisi",
     "title": "Ahmet Çakar'dan flaş Galatasaray yorumu! \"Şampiyonluğun en büyük favorisi...\"",
     "status": "posted",
@@ -3639,5 +3632,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794616322.0244334
+  },
+  {
+    "slug": "otomotiv-sektorunde-kritik-yangin-riski-ve-geri-cagirma-sureci",
+    "title": "Otomotiv Sektöründe Kritik Yangın Riski ve Geri Çağırma Süreci",
+    "summary": "Otomotiv üreticisi BMW, potansiyel yangın tehlikesi barındıran yüz binlerce aracı için resmi geri çağrı operasyonu başlattı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794619045.2540112
   }
 ]
