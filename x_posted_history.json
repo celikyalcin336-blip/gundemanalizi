@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "otomobil-dereye-uctu-korkunc-kaza",
-    "title": "Otomobil dereye uçtu! Korkunç kaza!",
-    "summary": "Balıkesir'de dereye uçan otomobildeki sürücü hayatını kaybederken, yaralı 2 yolcu hastaneye sevk edildi.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793605556.0018935
-  },
-  {
     "slug": "bir-ayda-iki-skandal-japonyadan-amerikan-uslerine-disiplin-cagrisi",
     "title": "Bir ayda iki skandal. Japonya'dan Amerikan üslerine disiplin çağrısı",
     "summary": "Japonya Savunma Bakanı Şinciro Koizumi, bir ABD askerinin cinayet suçlamasıyla tutuklanmasının hemen ardından sokağa çıkma yasağını delen ikinci bir askerin yakalanması üzerine Washington yönetimine disiplin çağrısı yaptı.",
@@ -3737,5 +3729,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794752571.4792213
+  },
+  {
+    "slug": "istanbul-bilim-zirvesi-sonrasinda-cocuk-beslenmesinin-toplumsal-ve-ekonomik-boyu",
+    "title": "İstanbul Bilim Zirvesi Sonrasında Çocuk Beslenmesinin Toplumsal Ve Ekonomik Boyutu Değerlendirildi",
+    "summary": "Sabri Ülker Vakfı ile The Nutrition Society ortaklığında düzenlenen İstanbul Bilim Zirvesi sonrasında değerlendirmelerde bulunan Murat Ülker, çocuk beslenmesinin bütçelerde sadece bir gider kalemi olarak",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794755293.5480092
   }
 ]
