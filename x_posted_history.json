@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "elektrikli-arac-sahiplerine-epdk-uyarisi-faturalar-artabilir",
-    "title": "Elektrikli araç sahiplerine EPDK uyarısı: Faturalar artabilir",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793542168.3442714
-  },
-  {
     "slug": "otomobiller-carpisti-can-kayiplari-var",
     "title": "Otomobiller çarpıştı! Can kayıpları var!",
     "status": "posted",
@@ -3703,5 +3696,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794703527.2578504
+  },
+  {
+    "slug": "emtia-piyasalarinda-kahve-fiyatlari-uretim-fazlasi-ve-guclu-dolar-uc-aydir-dusuy",
+    "title": "Emtia Piyasalarında Kahve Fiyatları Üretim Fazlası Ve Güçlü Dolar Üç Aydır Düşüyor",
+    "summary": "Uluslararası emtia piyasalarında kahve fiyatları; dolar endeksindeki yükseliş, rekolte artışı ve küresel talepteki yavaşlama gerekçesiyle üç aydır gerileme kaydediyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794706250.3418374
   }
 ]
