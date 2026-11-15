@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "yeni-cozumler-bulmak-zorundayiz",
-    "title": "\"Yeni çözümler bulmak zorundayız\"",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793554013.1702952
-  },
-  {
     "slug": "ernest-muci-galibiyet-serisini-surdurmeliyiz",
     "title": "Ernest Muçi: Galibiyet serisini sürdürmeliyiz",
     "status": "posted",
@@ -3713,5 +3706,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794717143.9102368
+  },
+  {
+    "slug": "aston-martin-ve-star-wars-elli-yil-kutlamalarinda-bulusuyor",
+    "title": "Aston Martin ve Star Wars Elli Yıl Kutlamalarında Buluşuyor",
+    "summary": "Lüks otomobil üreticisi Aston Martin, sinema tarihinin önemli serilerinden Star Wars'un yarım asırlık yıl dönümü etkinlikleri için küresel bir ortaklığa imza attı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794719867.435175
   }
 ]
