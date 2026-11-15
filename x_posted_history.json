@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "iki-yil-once-calinan-veriler-bugun-sahte-faturalarda-kullanilabiliyor",
-    "title": "İki yıl önce çalınan veriler, bugün sahte faturalarda kullanılabiliyor",
-    "summary": "Veri sızıntıları, olayın üzerinden yıllar geçse bile dolandırıcılık girişimlerine zemin hazırlayabiliyor.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793650716.1229398
-  },
-  {
     "slug": "32-ilde-feto-operasyonu-41-tutuklama",
     "title": "32 ilde FETÖ operasyonu: 41 tutuklama",
     "summary": "İçişleri Bakanlığı, Jandarma Genel Komutanlığı TEM Daire Başkanlığı ile Cumhuriyet Başsavcılıkları koordinesinde İl Jandarma Komutanlıklarınca 32 ilde FETÖ'ye yönelik operasyon düzenlendiğini duyurdu.",
@@ -3751,5 +3743,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794771639.2837272
+  },
+  {
+    "slug": "porsche-markasinin-yeni-konsept-super-otomobili-nurburgring-pistinde-goruntulend",
+    "title": "Porsche Markasının Yeni Konsept Süper Otomobili Nürburgring Pistinde Görüntülendi",
+    "summary": "Porsche'nin 911 modelinin üzerinde konumlandırılması planlanan ve Mission S adıyla anılan yeni orta motorlu süper otomobili Nürburgring pistinde görüntülendi.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794774362.4150677
   }
 ]
