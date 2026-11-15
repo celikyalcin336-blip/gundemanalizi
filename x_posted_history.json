@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "430-euro-siniri-yurt-disindan-getirilen-hangi-esyalari-kapsiyor-bakanlik-aciklad",
-    "title": "430 euro sınırı yurt dışından getirilen hangi eşyaları kapsıyor? Bakanlık açıkladı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793575750.6173224
-  },
-  {
     "slug": "trabzonspor-seriye-devam-ediyor",
     "title": "Trabzonspor seriye devam ediyor",
     "status": "posted",
@@ -3725,5 +3718,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794733487.4700572
+  },
+  {
+    "slug": "yuksekogretimde-uc-yillik-lisans-egitimi-donemi-icin-mufredat-sadelestirme-adimi",
+    "title": "Yükseköğretimde Üç Yıllık Lisans Eğitimi Dönemi İçin Müfredat Sadeleştirme Adımı",
+    "summary": "Yükseköğretim Kurulu, bazı lisans bölümlerinde eğitim süresini dörtten üç yıla düşürmeye yönelik teknik çalışma yürütüyor.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794736210.2074506
   }
 ]
