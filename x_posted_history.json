@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "32-ilde-feto-operasyonu-41-tutuklama",
-    "title": "32 ilde FETÖ operasyonu: 41 tutuklama",
-    "summary": "İçişleri Bakanlığı, Jandarma Genel Komutanlığı TEM Daire Başkanlığı ile Cumhuriyet Başsavcılıkları koordinesinde İl Jandarma Komutanlıklarınca 32 ilde FETÖ'ye yönelik operasyon düzenlendiğini duyurdu.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793654092.206356
-  },
-  {
     "slug": "android-autoya-is-modu-geliyor-mesainiz-yakinda-arac-icine-tasinabilir",
     "title": "Android Auto'ya \"İş Modu\" Geliyor (Mesainiz Yakında Araç İçine Taşınabilir)",
     "summary": "Android Auto'nun son güncellemesinde ortaya çıkan yeni bir özellik, iş yaşamını otomobillere taşımaya hazırlanıyor.",
@@ -3752,5 +3744,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794774362.4150677
+  },
+  {
+    "slug": "a-milli-takimin-fransa-deplasmanindaki-tartismali-pozisyonu",
+    "title": "A Milli Takım'ın Fransa Deplasmanındaki Tartışmalı Pozisyonu",
+    "summary": "A Milli Takım'ın UEFA Uluslar A Ligi 1. Grup son maçında Fransa'ya konuk olduğu karşılaşmada, kaleyi bulan şut çizgi tartışması yarattı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794777085.5545502
   }
 ]
