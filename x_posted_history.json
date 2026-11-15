@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "babacandan-cagri-o-yoneticilerin-tamamini-gorevden-alin",
-    "title": "Babacan'dan çağrı: O yöneticilerin tamamını görevden alın",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793561028.6033742
-  },
-  {
     "slug": "siri-cinde-alibabanin-qwen-modelini-alacak",
     "title": "Siri, Çin'de Alibaba'nın Qwen modelini alacak",
     "status": "posted",
@@ -3717,5 +3710,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794722592.2433326
+  },
+  {
+    "slug": "is-dunyasinda-deneyimli-emekli-calisanlara-yonelen-istihdam-egilimi",
+    "title": "İş Dünyasında Deneyimli Emekli Çalışanlara Yönelen İstihdam Eğilimi",
+    "summary": "Piyasadaki işveren tercihleri, tecrübesiz genç adaylar yerine kırk beş altmış yaş aralığındaki deneyimli emekli personelden yana değişiyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794725316.324128
   }
 ]
