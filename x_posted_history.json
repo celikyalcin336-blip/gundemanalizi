@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "bir-ayda-iki-skandal-japonyadan-amerikan-uslerine-disiplin-cagrisi",
-    "title": "Bir ayda iki skandal. Japonya'dan Amerikan üslerine disiplin çağrısı",
-    "summary": "Japonya Savunma Bakanı Şinciro Koizumi, bir ABD askerinin cinayet suçlamasıyla tutuklanmasının hemen ardından sokağa çıkma yasağını delen ikinci bir askerin yakalanması üzerine Washington yönetimine disiplin çağrısı yaptı.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793611345.962761
-  },
-  {
     "slug": "kamyon-evleri-yikti-dehsete-dusuren-kazada-aci-haber",
     "title": "Kamyon evleri yıktı! Dehşete düşüren kazada acı haber!",
     "summary": "Bursa'nın Mustafakemalpaşa ilçesinde, kontrolden çıkıp 2 eve çarptıktan sonra yan yatan kamyonun sürücüsü Ender Z. yaralandı.",
@@ -3738,5 +3730,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794755293.5480092
+  },
+  {
+    "slug": "emre-belozoglu-yonetimindeki-fenerbahce-milli-arada-kocaelispor-mesaisine-odakla",
+    "title": "Emre Belözoğlu Yönetimindeki Fenerbahçe Milli Arada Kocaelispor Mesaisine Odaklandı",
+    "summary": "Milli ara öncesinde Arca Çorum FK deplasmanından net bir galibiyetle dönen Fenerbahçe, yeni teknik direktörüyle yakaladığı ivmeyi sürdürmeyi hedefliyor.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794758016.5502648
   }
 ]
