@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "thomas-reis-mac-icinde-karar-verecegiz",
-    "title": "Thomas Reis: Maç içinde karar vereceğiz!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793539356.8280203
-  },
-  {
     "slug": "elektrikli-arac-sahiplerine-epdk-uyarisi-faturalar-artabilir",
     "title": "Elektrikli araç sahiplerine EPDK uyarısı: Faturalar artabilir",
     "status": "posted",
@@ -3701,5 +3694,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794700796.6634314
+  },
+  {
+    "slug": "adalet-bakanligindan-faili-mechul-cinayetler-icin-dis-tahlili-hamlesi",
+    "title": "Adalet Bakanlığından Faili Meçhul Cinayetler İçin Diş Tahlili Hamlesi",
+    "summary": "Adalet Bakanı Akın Gürlek, faili meçhul dosyaların aydınlatılması amacıyla yürütülen çalışmalar kapsamında çok sayıda cinayetin çözüldüğünü duyurdu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794703527.2578504
   }
 ]
