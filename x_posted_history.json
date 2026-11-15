@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "gaziantepte-yolcu-minibusu-devrildi-15-yarali",
-    "title": "Gaziantep'te yolcu minibüsü devrildi: 15 yaralı",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793568550.373263
-  },
-  {
     "slug": "fenerbahcede-flas-teknik-direktor-gelismesi-goztepe-yenilgisi-planlari-degistird",
     "title": "Fenerbahçe'de flaş teknik direktör gelişmesi! Göztepe yenilgisi planları değiştirdi",
     "status": "posted",
@@ -3721,5 +3714,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794728039.6642709
+  },
+  {
+    "slug": "almanyada-cinko-bromur-temelli-yeni-enerji-depolama-tesisine-onay",
+    "title": "Almanya'da Çinko Bromür Temelli Yeni Enerji Depolama Tesisine Onay",
+    "summary": "Almanya'nın Gaggenau kentinde çinko-bromür teknolojisine dayalı yeni bir enerji depolama tesisi kurulması için harekete geçildi.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794730762.800328
   }
 ]
