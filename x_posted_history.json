@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "samsung-csot-hissesini-892-milyon-dolara-aldi",
-    "title": "Samsung, CSOT hissesini 892 milyon dolara aldı",
-    "summary": "Samsung Electronics, grup bünyesindeki yapılandırma kapsamında Çinli panel üreticisi CSOT'un hisselerini yaklaşık 892 milyon dolar ödeyerek devraldı. Bu hamleyle teknoloji devi, televizyon ve mobil ürünlerinde kullanılan bileşenlerin tedarik hatların",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793664888.0576382
-  },
-  {
     "slug": "turk-universiteleri-cin-egitim-fuarina-katildi",
     "title": "Türk Üniversiteleri Çin Eğitim Fuarı'na katıldı",
     "summary": "Türkiye Ulusal Ajansı’nın ev sahipliğinde Pekin’de düzenlenen Çin Eğitim Fuarı’na katılan 52 Türk üniversitesi ve 2 kamu kurumu, \"Study in Türkiye\" pavilyonu altında uluslararası temaslar gerçekleştirdi. Diplomatik ilişkilerin yıl dönümüne denk gelen",
@@ -3755,5 +3747,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794782539.603013
+  },
+  {
+    "slug": "google-yapay-zeka-asistani-gemini-belge-duzenleme-ozelligine-kavustu",
+    "title": "Google Yapay Zeka Asistanı Gemini Belge Düzenleme Özelliğine Kavuştu",
+    "summary": "Google, Gemini yapay zeka aracına sohbet penceresinden çıkmadan doğrudan belge ve tablo oluşturma yeteneği ekledi.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794785261.6440694
   }
 ]
