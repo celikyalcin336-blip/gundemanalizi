@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "otomobiller-carpisti-can-kayiplari-var",
-    "title": "Otomobiller çarpıştı! Can kayıpları var!",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793544532.3348198
-  },
-  {
     "slug": "trabzonspor-taraftarindan-filistine-destek",
     "title": "Trabzonspor taraftarından Filistin'e destek!",
     "status": "posted",
@@ -3705,5 +3698,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794706250.3418374
+  },
+  {
+    "slug": "kasim-ayi-farkindalik-calismalarinda-akciger-kanseri-tedavisinde-multidisipliner",
+    "title": "Kasım Ayı Farkındalık Çalışmalarında Akciğer Kanseri Tedavisinde Multidisipliner Yaklaşım Vurgulandı",
+    "summary": "Kasım ayı Akciğer Kanseri Farkındalık Ayı kapsamında değerlendirmelerde bulunan uzmanlar, hastalığın teşhis ve tedavisinde ortak aklın rolüne dikkat çekti.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794708974.6649282
   }
 ]
