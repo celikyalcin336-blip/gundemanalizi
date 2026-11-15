@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "ernest-muci-galibiyet-serisini-surdurmeliyiz",
-    "title": "Ernest Muçi: Galibiyet serisini sürdürmeliyiz",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793558528.0960488
-  },
-  {
     "slug": "babacandan-cagri-o-yoneticilerin-tamamini-gorevden-alin",
     "title": "Babacan'dan çağrı: O yöneticilerin tamamını görevden alın",
     "status": "posted",
@@ -3715,5 +3708,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794719867.435175
+  },
+  {
+    "slug": "uzmanlardan-glp-1-igneleri-ve-diyabet-tedavisi-uyarisi",
+    "title": "Uzmanlardan GLP-1 İğneleri Ve Diyabet Tedavisi Uyarısı",
+    "summary": "Endokrinoloji uzmanları, artış gösteren diyabet vakalarına karşı erken tanının ve kişiye özel tedavilerin hayati önem taşıdığına dikkat çekti.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794722592.2433326
   }
 ]
