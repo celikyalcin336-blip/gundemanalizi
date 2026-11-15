@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "fenerbahcede-sergio-conceicao-sesleri",
-    "title": "Fenerbahçe'de Sergio Conceiçao sesleri!",
-    "summary": "İsmail Kartal'ın istifası sonrası teknik direktör arayışlarını sürdüren Fenerbahçe'de flaş bir isim gündeme geldi.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793601208.900095
-  },
-  {
     "slug": "otomobil-dereye-uctu-korkunc-kaza",
     "title": "Otomobil dereye uçtu! Korkunç kaza!",
     "summary": "Balıkesir'de dereye uçan otomobildeki sürücü hayatını kaybederken, yaralı 2 yolcu hastaneye sevk edildi.",
@@ -3736,5 +3728,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794749842.399782
+  },
+  {
+    "slug": "bursa-karacabeydeki-trafik-kazasinda-universite-ogrencisi-hayatini-kaybetti-soru",
+    "title": "Bursa Karacabey'deki Trafik Kazasında Üniversite Öğrencisi Hayatını Kaybetti Soruşturma Başlatıldı",
+    "summary": "Bursa'nın Karacabey ilçesinde hafif ticari aracın TIR ile çarpışması sonucu meydana gelen kazada üniversite öğrencisi Sudenaz Yiğit yaşamını yitirdi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794752571.4792213
   }
 ]
