@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "cocuklarda-siddet-davranisi-bir-gunde-ortaya-cikmiyor",
-    "title": "Çocuklarda şiddet davranışı bir günde ortaya çıkmıyor!",
-    "summary": "Çocuk ve Egen Psikiyatri Uzmanı Doç. Dr. Özlem Hekim, çocuk ve ergenlerde şiddet davranışının gelişiminde etkili olan risk faktörleri, erken uyarı işaretleri ve şiddeti önlemede aile, okul ve ruh sağlığı uzmanlarının üstlenmesi gereken sorumluluklar ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793645273.2861888
-  },
-  {
     "slug": "yakit-faturasi-kabardi-ryanair-bilet-fiyatlarina-cift-haneli-zam-yapacak",
     "title": "Yakıt faturası kabardı. Ryanair bilet fiyatlarına çift haneli zam yapacak",
     "status": "skipped",
@@ -3742,5 +3734,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794766192.608018
+  },
+  {
+    "slug": "gaziantep-futbol-kulubunde-volkan-demirel-donemi-basliyor",
+    "title": "Gaziantep Futbol Kulübünde Volkan Demirel Dönemi Başlıyor",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794768893.3206584
+  },
+  {
+    "slug": "borsa-istanbul-sirketlerinde-ucuncu-ceyrek-bilanco-dinamikleri",
+    "title": "Borsa İstanbul Şirketlerinde Üçüncü Çeyrek Bilanço Dinamikleri",
+    "summary": "Borsa İstanbul'da açıklanan üçüncü çeyrek bilanço sonuçları şirket faaliyetlerinde toparlanma sinyalleri verirken henüz kârlılığa tam anlamıyla yansımadığını ortaya koydu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794768915.6429727
   }
 ]
