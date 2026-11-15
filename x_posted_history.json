@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "wsj-abd-rus-gazi-icin-baski-yapiyor",
-    "title": "WSJ: ABD, Rus gazı için baskı yapıyor",
-    "summary": "Gazete ABD’li, Avrupalı ve Ukraynalı yetkililere atıfta bulunarak, bu fikrin Eylül ayında Moskova ve Kiev’e yapılan ziyaretler sırasında ABD’li temsilciler Jared Kushner ve Steve Witkoff tarafından gündeme getirildiğini ve Avrupa’daki kısıtlamalardan",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793597031.5637586
-  },
-  {
     "slug": "fenerbahcede-sergio-conceicao-sesleri",
     "title": "Fenerbahçe'de Sergio Conceiçao sesleri!",
     "summary": "İsmail Kartal'ın istifası sonrası teknik direktör arayışlarını sürdüren Fenerbahçe'de flaş bir isim gündeme geldi.",
@@ -3735,5 +3727,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794747120.2597022
+  },
+  {
+    "slug": "abd-cip-kisitlamalarini-asma-iddialari-golgesinde-megaspeed-sirketinden-casusluk",
+    "title": "ABD Çip Kısıtlamalarını Aşma İddiaları Gölgesinde Megaspeed Şirketinden Casusluk Açıklaması",
+    "summary": "Singapur merkezli Megaspeed firması, Nvidia çiplerini ABD ihracat kısıtlamalarını ihlal ederek Çin'e aktardığı ve eski yöneticisinin ajanlık faaliyetlerinde bulunduğu iddialarına ilişkin resmi savunma yaptı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794749842.399782
   }
 ]
