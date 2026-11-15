@@ -42,13 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "spkda-yeni-donem-denetim-tecrubesi-ve-piyasa-birikimi-ayni-masada",
-    "title": "SPKda yeni dönem: Denetim tecrübesi ve piyasa birikimi aynı masada",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793593757.1887634
-  },
-  {
     "slug": "wsj-abd-rus-gazi-icin-baski-yapiyor",
     "title": "WSJ: ABD, Rus gazı için baskı yapıyor",
     "summary": "Gazete ABD’li, Avrupalı ve Ukraynalı yetkililere atıfta bulunarak, bu fikrin Eylül ayında Moskova ve Kiev’e yapılan ziyaretler sırasında ABD’li temsilciler Jared Kushner ve Steve Witkoff tarafından gündeme getirildiğini ve Avrupa’daki kısıtlamalardan",
@@ -3733,5 +3726,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794744397.44757
+  },
+  {
+    "slug": "akciger-kanserinde-onleyici-mucadele-ve-sigara-birakma-hizmetlerinde-rekor-basvu",
+    "title": "Akciğer Kanserinde Önleyici Mücadele ve Sigara Bırakma Hizmetlerinde Rekor Başvuru",
+    "summary": "Sağlık Bakanlığı, tütün ve tütün ürünlerinin akciğer kanseri vakalarının büyük çoğunluğuna neden olduğunu belirterek uzman uyarılarını paylaştı.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794747120.2597022
   }
 ]
