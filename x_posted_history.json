@@ -42,14 +42,6 @@
     "ts": 1793389275.3250382
   },
   {
-    "slug": "kamyon-evleri-yikti-dehsete-dusuren-kazada-aci-haber",
-    "title": "Kamyon evleri yıktı! Dehşete düşüren kazada acı haber!",
-    "summary": "Bursa'nın Mustafakemalpaşa ilçesinde, kontrolden çıkıp 2 eve çarptıktan sonra yan yatan kamyonun sürücüsü Ender Z. yaralandı.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793614505.4764156
-  },
-  {
     "slug": "15-temmuz-sehitler-koprusu-girisinde-kaza",
     "title": "15 Temmuz Şehitler Köprüsü girişinde kaza",
     "summary": "15 Temmuz Şehitler Köprüsü girişinde, Avrupa Yakası'ndan Anadolu Yakası'na geçiş güzergahında üç otomobil ile iki cip henüz bilinmeyen bir nedenle çarpıştı.",
@@ -3739,5 +3731,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794758016.5502648
+  },
+  {
+    "slug": "alman-otomotiv-devinde-yeni-nesil-elektrikli-model-takvimi-degisti",
+    "title": "Alman Otomotiv Devinde Yeni Nesil Elektrikli Model Takvimi Değişti",
+    "summary": "Audi, SSP mimarisini kullanacak olan elektrikli A4 modelinin üretim takvimini ileri bir tarihe öteledi.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794760746.086234
   }
 ]
