@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "iranin-stratejik-adasinda-art-arda-patlama-sesleri-kaydedildi",
-    "title": "İran'ın Stratejik Adasında Art Arda Patlama Sesleri Kaydedildi",
-    "summary": "İran'ın stratejik öneme sahip Keşm Adası'nda peş peşe patlama sesleri duyulurken, bölge sakinleri gökyüzünde hareket eden hava araçları gördüklerini bildirdi. Olayın ardından Tahran yönetiminden henüz resmi bir açıklama yapılmazken, patlamaların kayn",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793673050.1486053
-  },
-  {
     "slug": "dev-halka-arza-hazirlanan-anthropicin-zarari-belli-oldu",
     "title": "Dev halka arza hazırlanan Anthropic'in zararı belli oldu",
     "summary": "Yapay zeka devi Anthropic, dev halka arz hazırlıkları sürerken yılın ilk dokuz ayında 104 milyar doları aşan net zarar açıkladı.",
@@ -3758,5 +3750,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794790706.7318747
+  },
+  {
+    "slug": "vilniusta-tarihi-kiliseden-calinan-isa-heykelinin-tahrip-edilmesi-tepki-cekti",
+    "title": "Vilnius'ta Tarihi Kiliseden Çalınan İsa Heykelinin Tahrip Edilmesi Tepki Çekti",
+    "summary": "Litvanya'nın başkenti Vilnius'ta 15. yüzyıldan kalma tarihi kiliseden çıkarılan altın kaplama İsa heykeli sokak ortasında parçalandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794793430.313476
   }
 ]
