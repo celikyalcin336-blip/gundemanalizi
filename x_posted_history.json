@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "bmw-bunyesindeki-ilk-alpina-modelinin-yuksek-hiz-testleri-basladi",
-    "title": "BMW Bünyesindeki İlk Alpina Modelinin Yüksek Hız Testleri Başladı",
-    "summary": "BMW çatısı altında geliştirilen ilk Alpina modeline ait prototip, İtalya'daki test merkezinde 300 kilometre saat sınırını aştı. V8 motorlu lüks sedanın, 2027 yılında görücüye çıkması ve otomobil pazarındaki iddialı rakiplerine karşı konumlandırılması",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793732955.1697345
-  },
-  {
     "slug": "samsung-kuresel-marka-siralamasinda-istikrarli-konumunu-korudu",
     "title": "Samsung Küresel Marka Sıralamasında İstikrarlı Konumunu Korudu",
     "summary": "Uluslararası marka değerlendirme kuruluşu Interbrand'in açıkladığı yeni rapora göre Samsung, yüz milyar doları aşan marka değeriyle üst üste yedinci defa ilk beş içerisindeki yerini korudu. Özellikle yapay zekâ odaklı donanım yatırımları ve tüketici ",
@@ -3779,5 +3771,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794850639.4202352
+  },
+  {
+    "slug": "kiliste-karbonmonoksit-zehirlenmesi-faciasi-yasandi",
+    "title": "Kilis'te Karbonmonoksit Zehirlenmesi Faciası Yaşandı",
+    "summary": "Kilis'te ev içerisinde yakılan mangaldan sızan karbonmonoksit gazından zehirlenen bir kişi hayatını kaybetti, üvey oğlu ise tedavi altına alındı. Olayla ilgili resmi tahkikat sürdürülüyor.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794853364.436216
   }
 ]
