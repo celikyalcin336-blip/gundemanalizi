@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "abdde-insaat-harcamalari-beklentilerin-aksine-geriledi",
-    "title": "ABD'de inşaat harcamaları beklentilerin aksine geriledi",
-    "summary": "ABD Ticaret Bakanlığı verilerine göre, eylül ayında inşaat harcamaları öngörülen artışın aksine gerileyerek 2,18 trilyon dolara düştü. Hem kamu hem de özel sektör yatırımlarındaki bu belirgin yavaşlama, ekonomideki dönemsel dalgalanmaları ve sermaye ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793678491.8252392
-  },
-  {
     "slug": "denizli-baskete-abdli-forvet",
     "title": "Denizli Basket’e ABD’li forvet",
     "status": "skipped",
@@ -3760,5 +3752,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794796153.0746765
+  },
+  {
+    "slug": "qnb-leasing-ve-proparco-arasinda-yesil-enerji-kredisi-imzalandi",
+    "title": "QNB Leasing ve Proparco Arasında Yeşil Enerji Kredisi İmzalandı",
+    "summary": "QNB Leasing, sürdürülebilir enerji projelerini desteklemek amacıyla Proparco ile önemli bir kredi sözleşmesi yaptı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794798888.971734
   }
 ]
