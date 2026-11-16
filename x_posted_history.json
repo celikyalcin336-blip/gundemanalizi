@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "zonguldakta-saglik-altyapisini-guclendiren-yeni-tesisler-hizmete-girdi",
-    "title": "Zonguldak'ta Sağlık Altyapısını Güçlendiren Yeni Tesisler Hizmete Girdi",
-    "summary": "Zonguldak'ta Alaplı Devlet Hastanesi ile Karadeniz Ereğli Ağız ve Diş Sağlığı Merkezi düzenlenen törenlerle resmi olarak açıldı. Sağlık yatırımlarının artarak devam edeceğini belirten yetkililer, kentin yatak kapasitesinin ve uzman hekim sayısının ön",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793724755.9348376
-  },
-  {
     "slug": "biontech-ucuncu-ceyrekte-kara-gecerek-2026-gelir-hedefini-yukseltti",
     "title": "BioNTech Üçüncü Çeyrekte Kâra Geçerek 2026 Gelir Hedefini Yükseltti",
     "summary": "Alman biyoteknoloji şirketi BioNTech, Temmuz-Eylül döneminde 184,5 milyon euro net kâr açıklayarak geçen yılın aynı dönemindeki zarar tablosunu tersine çevirdi. Aşılara yönelik küresel talebin azalmasına rağmen hukuki giderlerin ortadan kalkması kârl",
@@ -3776,5 +3768,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794842468.6298137
+  },
+  {
+    "slug": "avrupa-birligi-komisyonundan-unicredit-ve-commerzbank-birlesmesine-kosulsuz-onay",
+    "title": "Avrupa Birliği Komisyonundan UniCredit ve Commerzbank Birleşmesine Koşulsuz Onay Kararı",
+    "summary": "Avrupa Birliği Komisyonu, UniCredit şirketinin Commerzbank firmasını devralma talebine ilişkin yürüttüğü rekabet değerlendirmesini tamamlayarak işleme onay verdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794845191.870092
   }
 ]
