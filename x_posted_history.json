@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "kiev-yakinlarindaki-askeri-tesiste-zorla-alikonulma-ve-baskin-sorusturmasi",
-    "title": "Kiev Yakınlarındaki Askeri Tesiste Zorla Alıkonulma ve Baskın Soruşturması",
-    "summary": "Ukrayna'nın başkenti yakınlarında askerlerin zorla tutulduğu ve kötü muameleye uğradığı iddia edilen bir tesise operasyon düzenlendi. Olay yerinden çok sayıda kişi kurtarılırken, aralarında çocukların da bulunduğu yaralılar hastaneye sevk edildi ve r",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793713870.8144112
-  },
-  {
     "slug": "applein-finansal-basarisina-bellek-cipi-ve-maliyet-baskisi-golgesi",
     "title": "Apple'ın Finansal Başarısına Bellek Çipi ve Maliyet Baskısı Gölgesi",
     "summary": "Apple, güçlü çeyrek gelirlerine karşın bellek yarı iletkenlerindeki rekor fiyat artışları ve yapay zekâ altyapı harcamaları nedeniyle gelecek döneme dair kâr marjı beklentilerini aşağı çekti. Şirket yöneticileri, mevcut stok avantajlarının tükenmesiy",
@@ -3772,5 +3764,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794831573.120704
+  },
+  {
+    "slug": "karadenizde-misir-seyrindeki-bugday-yuklu-gemide-patlama-sonrasi-murettebat-kurt",
+    "title": "Karadeniz’de Mısır Seyrindeki Buğday Yüklü Gemide Patlama Sonrası Mürettebat Kurtarıldı",
+    "summary": "Romanya’dan Mısır’a gitmekte olan Somali bayraklı yük gemisi Bulgaristan açıklarında meydana gelen patlama sonucu batarken, 12 kişilik mürettebat kurtarıldı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794834296.0392368
   }
 ]
