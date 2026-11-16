@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "samsung-kuresel-marka-siralamasinda-istikrarli-konumunu-korudu",
-    "title": "Samsung Küresel Marka Sıralamasında İstikrarlı Konumunu Korudu",
-    "summary": "Uluslararası marka değerlendirme kuruluşu Interbrand'in açıkladığı yeni rapora göre Samsung, yüz milyar doları aşan marka değeriyle üst üste yedinci defa ilk beş içerisindeki yerini korudu. Özellikle yapay zekâ odaklı donanım yatırımları ve tüketici ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793735676.0481496
-  },
-  {
     "slug": "yalovanin-cinarcik-ilcesinde-yataga-bagimli-hastalara-kurumsal-bakim-destegi",
     "title": "Yalova'nın Çınarcık İlçesinde Yatağa Bağımlı Hastalara Kurumsal Bakım Desteği",
     "summary": "Çınarcık Belediyesi, evlerinde yatağa bağımlı olarak yaşayan vatandaşların yaşam kalitesini artırmak için yeni bir sosyal destek mekanizması kurdu. Başvuruların ardından evlere ulaştırılan özel yatak ve ekipmanlar, hem hastaların bakımını üstlenen ai",
@@ -3780,5 +3772,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794853364.436216
+  },
+  {
+    "slug": "fed-baskani-warsh-yapay-zekanin-para-politikasina-etkisini-acikladi",
+    "title": "Fed Başkanı Warsh Yapay Zekanın Para Politikasına Etkisini Açıkladı",
+    "summary": "ABD Merkez Bankası Başkanı Kevin Warsh, yapay zeka teknolojisinin para politikasının geleceğini şekillendireceğini belirtti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794856100.439246
   }
 ]
