@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "elektrikli-arac-satislari-bmwnin-guclu-v8-motorlarini-yasatiyor",
-    "title": "Elektrikli Araç Satışları BMW'nin Güçlü V8 Motorlarını Yaşatıyor",
-    "summary": "Alman otomotiv üreticisi BMW, emisyon sınırlarına uyum sağlamak amacıyla elektrikli araç satışlarını artırarak içten yanmalı yüksek performanslı motorları ürün gamında tutmaya devam ediyor. Şirket yöneticileri, esnek üretim stratejisi ve teknolojik t",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793719312.6613123
-  },
-  {
     "slug": "brukselden-londraya-yesil-isik-uyelik-sartlarinda-muafiyet-sinyali",
     "title": "Brüksel'den Londra'ya Yeşil Işık: Üyelik Şartlarında Muafiyet Sinyali",
     "summary": "Avrupa Birliği yönetiminin, İngiltere'nin yeniden birliğe katılması durumunda ortak para birimi ve sınır anlaşması kurallarında esneklik tanıyabileceği ifade ediliyor. Henüz masada resmi bir müracaat olmasa da, Brüksel cephesinden gelen bu sinyaller ",
@@ -3774,5 +3766,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794837022.6319518
+  },
+  {
+    "slug": "applein-katlanabilir-telefon-serisinde-ikinci-nesil-mesaisi-basladi",
+    "title": "Apple'ın Katlanabilir Telefon Serisinde İkinci Nesil Mesaisi Başladı",
+    "summary": "İlk katlanabilir modelinde yüksek fiyatına rağmen biyometrik kilit olarak Touch ID tercih eden Apple, seri üretiminin ikinci halkasında Face ID teknolojisine geçiş yapmaya hazırlanıyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794839745.1176038
   }
 ]
