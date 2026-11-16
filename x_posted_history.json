@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "yarim-asirlik-hayalin-pesindeki-ingiliz-gezgin-yuruyerek-evine-dondu",
-    "title": "Yarım Asırlık Hayalin Peşindeki İngiliz Gezgin Yürüyerek Evine Döndü",
-    "summary": "Şili'den başladığı kıtalararası yürüyüşünü çeyrek asırdan uzun bir sürede tamamlayan eski asker Karl Bushby, memleketi Hull'a ulaştı. Hiçbir taşıt kullanmama ve yolculuğu bitirmeden dönmeme kurallarına sadık kalan gezgin, kesintisiz en uzun yürüyüş r",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793752014.4442806
-  },
-  {
     "slug": "stuttgart-kalecisi-bredlowdan-galatasaray-maglubiyeti-sonrasi-taraftarlarina-duy",
     "title": "Stuttgart Kalecisi Bredlow'dan Galatasaray Mağlubiyeti Sonrası Taraftarlarına Duygusal Veda",
     "summary": "UEFA Şampiyonlar Ligi'nde Galatasaray’a 2-0 mağlup olan Stuttgart, bu sonuçla gruptaki puanını artırma şansını değerlendiremedi. Alman ekibinin kalecisi Fabian Bredlow, maç sonu yaptığı değerlendirmede deplasmana kadar gelen taraftarlarının çabasına ",
@@ -3786,5 +3778,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794869716.1632998
+  },
+  {
+    "slug": "senator-cantwellden-bakan-lutnicke-nvidia-cipi-mektubu",
+    "title": "Senatör Cantwell'den Bakan Lutnick'e Nvidia çipi mektubu",
+    "summary": "ABD Senatörü Maria Cantwell, Ticaret Bakanı Howard Lutnick'e hitaben kaleme aldığı mektupta, Nvidia çiplerinin Çin bağlantılı şirketlerin eline geçmesine izin verildiğini iddia etti.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794872440.7472463
   }
 ]
