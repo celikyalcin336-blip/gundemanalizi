@@ -56,14 +56,6 @@
     "ts": 1793681192.999158
   },
   {
-    "slug": "elon-musk-ackladi-neuralink-blindsight-implanti-muhendislik-olarak-tamamlandi",
-    "title": "Elon Musk Açıkladı: Neuralink Blindsight İmplantı Mühendislik Olarak Tamamlandı",
-    "summary": "Neuralink şirketinin kurucusu Elon Musk, görme engelli bireylere umut ışığı olabilecek Blindsight adlı beyin çipi projesinde mühendislik aşamasının geride kaldığını duyurdu. Dış dünyadan alınan kamera görüntülerini sinirsel uyarıcılara çevirmeyi hede",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793692095.5844202
-  },
-  {
     "slug": "2027-yeniden-degerleme-orani-ile-ehliyet-harclari-ve-arac-vergileri-zamlaniyor",
     "title": "2027 Yeniden Değerleme Oranı İle Ehliyet Harçları ve Araç Vergileri Zamlanıyor",
     "summary": "TÜİK tarafından açıklanan ekim ayı enflasyon verileriyle birlikte 2027 yılı için uygulanacak Yeniden Değerleme Oranı yüzde 27,83 olarak netleşti. Bu gelişme, ehliyet harç bedellerinden motorlu taşıtlar vergisine kadar birçok kalemde yeni yıl itibarıy",
@@ -3765,5 +3757,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794809780.0819354
+  },
+  {
+    "slug": "qwen4-max-yapay-zeka-modelinin-maliyet-avantaji-sektorde-yanki-uyandirdi",
+    "title": "Qwen4 Max Yapay Zeka Modelinin Maliyet Avantajı Sektörde Yankı Uyandırdı",
+    "summary": "Qwen4-Max yapay zeka modeli, Token Plan önizlemesinin ardından genel kullanıma sunuldu ve önceki sürüme kıyasla dikkat çekici maliyet düşüşleri sağladı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794812503.6709664
   }
 ]
