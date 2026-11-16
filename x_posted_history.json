@@ -77,14 +77,6 @@
     "ts": 1793746555.4869468
   },
   {
-    "slug": "mevsim-gecislerinde-sikca-karistirilan-grip-ile-soguk-alginliginin-farklari",
-    "title": "Mevsim Geçişlerinde Sıkça Karıştırılan Grip ile Soğuk Algınlığının Farkları",
-    "summary": "Samsun’da son bir buçuk aydır artış gösteren gribal vakalar, uzmanların uyarılarını yeniden gündeme getirdi. Enfeksiyon Hastalıkları Uzmanı Prof. Dr. Özgür Günal, hafif seyreden soğuk algınlığı ile yatağa düşüren ağır grip tablosunun sıklıkla birbiri",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793749294.4561648
-  },
-  {
     "slug": "tj-shorts-ekim-ayinda-sergiledigi-ustun-performansla-mvp-odulunu-kazandi",
     "title": "TJ Shorts Ekim Ayında Sergilediği Üstün Performansla MVP Ödülünü Kazandı",
     "status": "skipped",
@@ -3785,5 +3777,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794866992.5746586
+  },
+  {
+    "slug": "bursa-inegol-mahallesinde-cikan-yangin-bes-evi-kul-etti",
+    "title": "Bursa İnegöl Mahallesinde Çıkan Yangın Beş Evi Kül Etti",
+    "summary": "Bursa İnegölün kırsal Turgutalp Mahallesinde bir evde başlayarak bitişikteki yapılara sıçrayan alevler, çok sayıda kurumun müdahalesiyle söndürüldü.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794869716.1632998
   }
 ]
