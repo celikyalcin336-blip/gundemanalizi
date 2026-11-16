@@ -56,14 +56,6 @@
     "ts": 1793681192.999158
   },
   {
-    "slug": "cevdet-yilmazdan-ekim-ayi-enflasyon-rakamlari-ve-program-kararliligi-aciklamasi",
-    "title": "Cevdet Yılmaz'dan Ekim Ayı Enflasyon Rakamları ve Program Kararlılığı Açıklaması",
-    "summary": "Cumhurbaşkanı Yardımcısı Cevdet Yılmaz, ekim ayında tüketici enflasyonunun yüzde 2,58 oranında gerçekleştiğini ve yıllık oranın yüzde 29,77 seviyesinde yatay seyrettiğini duyurdu. Küresel enerji maliyetleri ve gıda kalemlerindeki hareketliliğin fiyat",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793705698.954329
-  },
-  {
     "slug": "yenilenebilir-enerji-yatirimlarinda-yeni-donem-755-milyon-euroluk-katki-bedeli",
     "title": "Yenilenebilir Enerji Yatırımlarında Yeni Dönem: 75,5 Milyon Euroluk Katkı Bedeli",
     "summary": "Yenilenebilir Enerji Kaynak Alanları kapsamındaki rüzgar enerjisi yarışmaları sonucunda KDV dahil 75,5 milyon euro katkı bedeli sağlandı. Toplam 1500 megavatlık bu yeni kapasitenin, milyonlarca hanenin elektrik ihtiyacını karşılaması ve enerji ithala",
@@ -3770,5 +3762,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794823400.8216457
+  },
+  {
+    "slug": "togg-kasim-ayi-finansman-ve-kredi-kampanyalari-duyuruldu",
+    "title": "Togg Kasım Ayı Finansman ve Kredi Kampanyaları Duyuruldu",
+    "summary": "Yerli otomobil üreticisi Togg, T10X ve T10F modelleri için Kasım ayı boyunca geçerli finansman ve kredi kampanyalarını devreye soktu.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794826125.07545
   }
 ]
