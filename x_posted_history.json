@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "yalovanin-cinarcik-ilcesinde-yataga-bagimli-hastalara-kurumsal-bakim-destegi",
-    "title": "Yalova'nın Çınarcık İlçesinde Yatağa Bağımlı Hastalara Kurumsal Bakım Desteği",
-    "summary": "Çınarcık Belediyesi, evlerinde yatağa bağımlı olarak yaşayan vatandaşların yaşam kalitesini artırmak için yeni bir sosyal destek mekanizması kurdu. Başvuruların ardından evlere ulaştırılan özel yatak ve ekipmanlar, hem hastaların bakımını üstlenen ai",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793738400.0303288
-  },
-  {
     "slug": "standart-altinin-kilogram-fiyati-yukselis-egilimini-surdurdu",
     "title": "Standart Altının Kilogram Fiyatı Yükseliş Eğilimini Sürdürdü",
     "summary": "Borsa İstanbul Kıymetli Madenler ve Kıymetli Taşlar Piyasası'nda standart altının kilogram fiyatı yüzde 0,5 oranında değer kazanarak 6 milyon 305 bin liraya ulaştı. Gün boyunca 1800 kilogramın üzerinde fiziki işlem hacmi gerçekleşirken, piyasada en a",
@@ -3781,5 +3773,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794856100.439246
+  },
+  {
+    "slug": "apple-yapay-zeka-destekli-saglik-arastirmasi-projesini-baslatti",
+    "title": "Apple Yapay Zekâ Destekli Sağlık Araştırması Projesini Başlattı",
+    "summary": "Teknoloji devi Apple, kullanıcıların yapay zekâ tabanlı sağlık araçlarıyla etkileşimini incelemek üzere yeni bir araştırma çalışması başlattı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794858823.739173
   }
 ]
