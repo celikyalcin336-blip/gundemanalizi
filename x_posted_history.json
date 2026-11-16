@@ -70,15 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "tesla-turkiye-sarj-agi-yatirimlarini-akdeniz-bolgesine-tasidi",
-    "title": "Tesla Türkiye Şarj Ağı Yatırımlarını Akdeniz Bölgesine Taşıdı",
-    "summary": "Elektrikli araç üreticisi Tesla, Türkiye genelindeki şarj altyapısını genişletme hamleleri kapsamında Antalya Konyaaltı'nda yeni bir Supercharger istasyonunu devreye soktu. Bölgedeki elektrikli otomobil sahiplerine hızlı ve erişilebilir enerji ikmali",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "note": "uncertain",
-    "ts": 1793711150.090521
-  },
-  {
     "slug": "kiev-yakinlarindaki-askeri-tesiste-zorla-alikonulma-ve-baskin-sorusturmasi",
     "title": "Kiev Yakınlarındaki Askeri Tesiste Zorla Alıkonulma ve Baskın Soruşturması",
     "summary": "Ukrayna'nın başkenti yakınlarında askerlerin zorla tutulduğu ve kötü muameleye uğradığı iddia edilen bir tesise operasyon düzenlendi. Olay yerinden çok sayıda kişi kurtarılırken, aralarında çocukların da bulunduğu yaralılar hastaneye sevk edildi ve r",
@@ -3772,5 +3763,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794828849.2355072
+  },
+  {
+    "slug": "bahcesehir-koleji-avrupa-sahnesinde-liderligini-roma-deplasmaninda-korumayi-hede",
+    "title": "Bahçeşehir Koleji Avrupa Sahnesinde Liderliğini Roma Deplasmanında Korumayı Hedefliyor",
+    "summary": "Bahçeşehir Koleji, Eurocup D Grubu sekizinci hafta mücadelesinde İtalya temsilcisi Roma Basketbol ile deplasmanda karşı karşıya gelecek.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794831573.120704
   }
 ]
