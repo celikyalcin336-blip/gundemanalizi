@@ -70,14 +70,6 @@
     "ts": 1793711120.7039068
   },
   {
-    "slug": "bursa-temsilcisi-tofas-sahasinda-konuk-ettigi-neptunas-klaipedayi-farkli-gecti",
-    "title": "Bursa Temsilcisi TOFAŞ, Sahasında Konuk Ettiği Neptunas Klaipeda'yı Farklı Geçti",
-    "summary": "TOFAŞ, Eurocup'ın altıncı hafta mücadelesinde Litvanya ekibi Neptunas Klaipeda'yı kendi salonunda 94-79 mağlup etmeyi başardı. Etkili bir hücum performansı sergileyen Bursa temsilcisi, Avrupa organizasyonundaki iddiasını bu galibiyetle bir kez daha g",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793743854.4742475
-  },
-  {
     "slug": "togg-ekim-ayinda-zirveye-yerlesirken-otomobil-pazarinda-daralma-egilimi-derinles",
     "title": "Togg Ekim Ayında Zirveye Yerleşirken Otomobil Pazarında Daralma Eğilimi Derinleşti",
     "status": "skipped",
@@ -3783,5 +3775,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794861546.2741306
+  },
+  {
+    "slug": "almanya-baskenti-berlinde-tarihi-siginak-ihale-usuluyle-satista",
+    "title": "Almanya Başkenti Berlin'de Tarihi Sığınak İhale Usulüyle Satışta",
+    "summary": "Almanya'nın başkenti Berlin'de bulunan İkinci Dünya Savaşı dönemine ait tarihi bir sığınak açık artırma yöntemiyle satışa sunuldu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794864269.5989697
   }
 ]
