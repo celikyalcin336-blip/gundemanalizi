@@ -49,14 +49,6 @@
     "ts": 1793647975.5930333
   },
   {
-    "slug": "dev-halka-arza-hazirlanan-anthropicin-zarari-belli-oldu",
-    "title": "Dev halka arza hazırlanan Anthropic'in zararı belli oldu",
-    "summary": "Yapay zeka devi Anthropic, dev halka arz hazırlıkları sürerken yılın ilk dokuz ayında 104 milyar doları aşan net zarar açıkladı.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793675770.9025962
-  },
-  {
     "slug": "abdde-insaat-harcamalari-beklentilerin-aksine-geriledi",
     "title": "ABD'de inşaat harcamaları beklentilerin aksine geriledi",
     "summary": "ABD Ticaret Bakanlığı verilerine göre, eylül ayında inşaat harcamaları öngörülen artışın aksine gerileyerek 2,18 trilyon dolara düştü. Hem kamu hem de özel sektör yatırımlarındaki bu belirgin yavaşlama, ekonomideki dönemsel dalgalanmaları ve sermaye ",
@@ -3759,5 +3751,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794793430.313476
+  },
+  {
+    "slug": "bursa-osmangazi-mahallesinde-alkollu-surucu-dehseti",
+    "title": "Bursa Osmangazi Mahallesinde Alkollü Sürücü Dehşeti",
+    "summary": "Bursa merkez Osmangazi ilçesinde yaya geçidinden geçen kişilere çarpan sürücünün ehliyetsiz ve alkollü olduğu tespit edildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794796153.0746765
   }
 ]
