@@ -56,14 +56,6 @@
     "ts": 1793681192.999158
   },
   {
-    "slug": "2027-yeniden-degerleme-orani-ile-ehliyet-harclari-ve-arac-vergileri-zamlaniyor",
-    "title": "2027 Yeniden Değerleme Oranı İle Ehliyet Harçları ve Araç Vergileri Zamlanıyor",
-    "summary": "TÜİK tarafından açıklanan ekim ayı enflasyon verileriyle birlikte 2027 yılı için uygulanacak Yeniden Değerleme Oranı yüzde 27,83 olarak netleşti. Bu gelişme, ehliyet harç bedellerinden motorlu taşıtlar vergisine kadar birçok kalemde yeni yıl itibarıy",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793694816.3061557
-  },
-  {
     "slug": "devlet-bahcelinin-kiz-kardesi-serpil-bahceli-hayatini-kaybetti",
     "title": "Devlet Bahçeli'nin Kız Kardeşi Serpil Bahçeli Hayatını Kaybetti",
     "summary": "Milliyetçi Hareket Partisi Genel Başkanı Devlet Bahçeli'nin kız kardeşi Serpil Bahçeli vefat etti. Memleketi Osmaniye'de son yolculuğuna uğurlanan merhume için devlet erkânından çok sayıda taziye mesajı paylaşıldı. Bu acı kaybın ardından siyaset ve d",
@@ -3766,5 +3758,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794812503.6709664
+  },
+  {
+    "slug": "elektrikli-arac-sarj-altyapisinda-sharznet-ve-ovolt-birlesmesi",
+    "title": "Elektrikli Araç Şarj Altyapısında Sharz.net ve Ovolt Birleşmesi",
+    "summary": "Sharz.net ile Ovolt şarj altyapısı alanında birleşerek ortak ağlarını 53 ile taşıdı. Gerçekleşen operasyon sonucunda toplam soket sayısı 707 adede ulaştı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794815226.1759007
   }
 ]
