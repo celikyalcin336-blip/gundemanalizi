@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "fenerbahce-beko-avrupa-arenasinda-baskonia-engelini-kayipsiz-gecmeyi-hedefliyor",
-    "title": "Fenerbahçe Beko Avrupa Arenasında Baskonia Engelini Kayıpsız Geçmeyi Hedefliyor",
-    "summary": "Turkish Airlines EuroLeague'in 10. haftasında Fenerbahçe, kendi evinde İspanyol temsilcisi Baskonia ile kritik bir mücadeleye çıkıyor. Lig sıralamasında üst basamakları zorlayan sarı-lacivertliler, zayıf rakibi karşısında hata yapmadan galibiyet seri",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793777732.8134458
-  },
-  {
     "slug": "adanada-eski-esin-dehset-sactigi-saldiri-davasi-oncesi-carpici-ifadeler",
     "title": "Adana'da Eski Eşin Dehşet Saçtığı Saldırı Davası Öncesi Çarpıcı İfadeler",
     "summary": "Adana’da üç yıl önce boşandığı Ali Kaplan tarafından çocuklarının gözü önünde bacağından vurulan biyolog Dilan Öztürk, dava öncesinde olayın yaşandığı noktada yaşadıklarını anlattı. Silahın tutukluk yapmasıyla hayatta kalan Öztürk, eski eşinin eylemi",
@@ -3795,5 +3787,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794894242.7387955
+  },
+  {
+    "slug": "sozcu-medya-grubuna-yonelik-operasyon-ve-kayyum-atamasi",
+    "title": "Sözcü Medya Grubuna Yönelik Operasyon ve Kayyum Ataması",
+    "summary": "Sözcü TV binasına sabah saatlerinde polis ekipleri tarafından operasyon düzenlenirken, Tasarruf Mevduatı Sigorta Fonu kanala kayyum olarak atandı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794896966.0357983
   }
 ]
