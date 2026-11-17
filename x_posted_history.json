@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "yeni-zelanda-goklerinde-uzay-trafigini-gorunur-kilan-uzun-pozlama-calismasi",
-    "title": "Yeni Zelanda Göklerinde Uzay Trafiğini Görünür Kılan Uzun Pozlama Çalışması",
-    "summary": "Fotoğrafçı Larsen’in Taranaki Dağı üzerinde gerçekleştirdiği uzun süreli çekimler, yörüngedeki yoğun uydu trafiğini çarpıcı bir şekilde belgeledi. Dijital düzenlemelerle birleştirilen 14 bin farklı uydu izi, modern dünyanın uzay kirliliği sorununu so",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793766843.5051718
-  },
-  {
     "slug": "modern-otomobillerin-dijital-donusumu-beraberinde-ciddi-siber-guvenlik-risklerin",
     "title": "Modern Otomobillerin Dijital Dönüşümü Beraberinde Ciddi Siber Güvenlik Risklerini Getiriyor",
     "summary": "Göteborg Üniversitesi tarafından yürütülen geniş kapsamlı bir araştırma, günümüzün ağa bağlı otomobillerindeki siber güvenlik açıklarının kritik seviyelere ulaştığını ortaya koydu. İncelenen 413 farklı güvenlik zafiyeti, özellikle harici yazılım ente",
@@ -3791,5 +3783,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794883340.2568855
+  },
+  {
+    "slug": "cleveland-fed-baskani-hammack-siki-para-politikasi-vurgusu-yapti",
+    "title": "Cleveland Fed Başkanı Hammack Sıkı Para Politikası Vurgusu Yaptı",
+    "summary": "Cleveland Fed Başkanı Beth Hammack, ekonominin ek sıkılaşmaya dayanıklı olduğunu savunarak para politikasında kararlı bir duruş sergilenmesi gerektiğini bildirdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794886064.8645532
   }
 ]
