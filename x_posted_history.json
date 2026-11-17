@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "abd-secim-sonuclari-tahvil-piyasalarinda-sert-faiz-dususunu-tetikledi",
-    "title": "ABD Seçim Sonuçları Tahvil Piyasalarında Sert Faiz Düşüşünü Tetikledi",
-    "summary": "ABD ara seçimlerinden gelen ilk veriler, bütçe disiplini beklentisini güçlendirerek tahvil getirilerinde kayda değer bir geri çekilmeye neden oldu. Beş ve on yıllık vadelerdeki faiz oranlarının gerilemesi, dolar endeksindeki zayıflama ile birleşerek ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793772286.5024657
-  },
-  {
     "slug": "applein-2027-model-iphone-18-serisi-icin-ilk-teknik-detaylar-netlesiyor",
     "title": "Apple’ın 2027 Model iPhone 18 Serisi İçin İlk Teknik Detaylar Netleşiyor",
     "summary": "2027 yılı başında tanıtılması beklenen iPhone 18 serisi, 2 nanometre mimarili A20 işlemcisiyle yüksek verimlilik hedefliyor. Serinin standart modelinin yanı sıra 18e ve Air 2 gibi yeni varyantların da piyasaya sürülmesi planlanıyor.",
@@ -3793,5 +3785,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794888788.9158766
+  },
+  {
+    "slug": "fenerbahce-ara-transfer-doneminde-orta-saha-takviyesi-icin-harekete-gecti",
+    "title": "Fenerbahçe Ara Transfer Döneminde Orta Saha Takviyesi İçin Harekete Geçti",
+    "summary": "Teknik direktör Emre Belözoğlu yönetimindeki Fenerbahçe, ara transfer döneminde orta saha hattını güçlendirmek amacıyla üç yabancı oyuncuyu radarına aldı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794891512.270954
   }
 ]
