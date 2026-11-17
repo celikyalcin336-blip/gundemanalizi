@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "yeni-nesil-arac-sahiplerinin-bakim-bilgi-duzeyi-masaya-yatirildi",
-    "title": "Yeni Nesil Araç Sahiplerinin Bakım Bilgi Düzeyi Masaya Yatırıldı",
-    "summary": "PETRONAS Madeni Yağlar tarafından gerçekleştirilen geniş kapsamlı bir araştırma, sürücülerin elektrikli ve hibrit araçların bakım süreçleri hakkında ciddi bilgi eksiklikleri yaşadığını ortaya koydu. Otomobil sahiplerinin önemli bir kesimi geleneksel ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793783190.1109698
-  },
-  {
     "slug": "soguk-hava-kosullarinda-surus-guvenligi-icin-arac-donanim-rehberi",
     "title": "Soğuk Hava Koşullarında Sürüş Güvenliği İçin Araç Donanım Rehberi",
     "summary": "Yılın soğuk dönemleri yaklaşırken otomobil sahiplerinin alması gereken önlemler arasında ilk sırayı kış lastikleri alıyor. Düşük sıcaklıklarda zemin tutuşunu artıran bu özel donanımların etkinliği; diş derinliği, basınç değerleri ve üretim yılı gibi ",
@@ -3797,5 +3789,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794899689.2312253
+  },
+  {
+    "slug": "kuresel-piyasalarin-baskisiyla-altin-fiyatlarinda-son-bir-yilin-en-dusuk-seviyes",
+    "title": "Küresel Piyasaların Baskısıyla Altın Fiyatlarında Son Bir Yılın En Düşük Seviyesi",
+    "summary": "Küresel piyasalarda artan tahvil getirileri ve döviz gücü, değerli maden fiyatlarını son bir yılın en düşük seviyesine çekti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794902412.4754467
   }
 ]
