@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "teknoloji-devi-hpnin-zirvesine-emma-walmsley-getirildi",
-    "title": "Teknoloji Devi HP'nin Zirvesine Emma Walmsley Getirildi",
-    "summary": "Küresel bilgisayar üreticisi HP, uzun süredir ilaç ve teknoloji sektörlerinde kritik yönetim tecrübesine sahip olan Emma Walmsley'yi yeni icra kurulu başkanı olarak duyurdu. Walmsley, donanım pazarını sarsan tedarik sıkıntıları ve maliyet artışlarını",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793815830.224216
-  },
-  {
     "slug": "mercedes-otomobil-camlarini-dogrudan-aydinlatan-yeni-ekran-teknolojileri-gelisti",
     "title": "Mercedes Otomobil Camlarını Doğrudan Aydınlatan Yeni Ekran Teknolojileri Geliştiriyor",
     "summary": "Alman otomotiv üreticisi Mercedes, araç camlarını işlevsel birer ekrana dönüştürmeyi amaçlayan yeni bir teknoloji üzerinde çalışıyor. Lamine LED sistemleri kullanarak ön camı holografik bir arayüze çevirmeyi planlayan şirket, dış dünya ile iletişimi ",
@@ -3809,5 +3801,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794932372.6819296
+  },
+  {
+    "slug": "2026-2027-egitim-ogretim-yili-ilk-ara-tatil-takvimi-netlesti",
+    "title": "2026-2027 Eğitim Öğretim Yılı İlk Ara Tatil Takvimi Netleşti",
+    "summary": "Milli Eğitim Bakanlığı iş takvimi çerçevesinde uygulanan kasım ara tatili kasım ayında başladı. Öğrenci ve öğretmenler için dinlenme fırsatı sunan bu dönemin ardından ders zili pazartesi günü çalacak.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794935098.10873
   }
 ]
