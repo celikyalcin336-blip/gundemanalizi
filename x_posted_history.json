@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "koruma-altindaki-cocuklar-icin-yurutulen-destek-programindan-binlerce-kisi-yarar",
-    "title": "Koruma Altındaki Çocuklar İçin Yürütülen Destek Programından Binlerce Kişi Yararlandı",
-    "summary": "Devlet korumasındaki çocukların psikolojik ve sosyal gelişimini desteklemek amacıyla hayata geçirilen özel program, bugüne kadar on binlerce gence ulaştı. Elde edilen saha verileri doğrultusunda kapsamı genişletilen uygulama, çocukların geçmişteki ol",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793788630.3708088
-  },
-  {
     "slug": "eski-ilkokul-ogretmeninden-sanayi-devlerine-uzanan-basari-hikayesi-crown-new-mat",
     "title": "Eski İlkokul Öğretmeninden Sanayi Devlerine Uzanan Başarı Hikayesi: Crown New Materials",
     "summary": "Crown New Materials kurucusu Michael Mai, şirketin Shenzhen borsasındaki halka arzıyla bir günde milyarderler arasına katıldı. Hisselerin piyasadaki ilk gününde gösterdiği dramatik yükseliş, şirketin teknoloji sektöründeki kritik bağlayıcı madde üret",
@@ -3799,5 +3791,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794905135.2090228
+  },
+  {
+    "slug": "ak-partiden-fon-krizi-ve-iklim-zirvesi-aciklamasi",
+    "title": "AK Parti'den Fon Krizi ve İklim Zirvesi Açıklaması",
+    "summary": "AK Parti Sözcüsü Ömer Çelik, Cumhurbaşkanı Erdoğan başkanlığında toplanan Merkez Yürütme Kurulu toplantısının ardından gündeme dair açıklamalarda bulundu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794907857.8977177
   }
 ]
