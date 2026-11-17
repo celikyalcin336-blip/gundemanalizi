@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "applein-2027-model-iphone-18-serisi-icin-ilk-teknik-detaylar-netlesiyor",
-    "title": "Apple’ın 2027 Model iPhone 18 Serisi İçin İlk Teknik Detaylar Netleşiyor",
-    "summary": "2027 yılı başında tanıtılması beklenen iPhone 18 serisi, 2 nanometre mimarili A20 işlemcisiyle yüksek verimlilik hedefliyor. Serinin standart modelinin yanı sıra 18e ve Air 2 gibi yeni varyantların da piyasaya sürülmesi planlanıyor.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793775007.599944
-  },
-  {
     "slug": "fenerbahce-beko-avrupa-arenasinda-baskonia-engelini-kayipsiz-gecmeyi-hedefliyor",
     "title": "Fenerbahçe Beko Avrupa Arenasında Baskonia Engelini Kayıpsız Geçmeyi Hedefliyor",
     "summary": "Turkish Airlines EuroLeague'in 10. haftasında Fenerbahçe, kendi evinde İspanyol temsilcisi Baskonia ile kritik bir mücadeleye çıkıyor. Lig sıralamasında üst basamakları zorlayan sarı-lacivertliler, zayıf rakibi karşısında hata yapmadan galibiyet seri",
@@ -3794,5 +3786,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794891512.270954
+  },
+  {
+    "slug": "gazzedeki-insani-krizde-hipotermi-tehlikesi-ve-barinma-sorunu",
+    "title": "Gazze'deki İnsani Krizde Hipotermi Tehlikesi ve Barınma Sorunu",
+    "summary": "Dünya Sağlık Örgütü Genel Direktörü Tedros Adhanom Ghebreyesus, Gazze'de bir bebeğin hipotermi nedeniyle yaşamını yitirdiğini belirterek acil yardım çağrısında bulundu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794894242.7387955
   }
 ]
