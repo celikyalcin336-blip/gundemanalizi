@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "modern-otomobillerin-dijital-donusumu-beraberinde-ciddi-siber-guvenlik-risklerin",
-    "title": "Modern Otomobillerin Dijital Dönüşümü Beraberinde Ciddi Siber Güvenlik Risklerini Getiriyor",
-    "summary": "Göteborg Üniversitesi tarafından yürütülen geniş kapsamlı bir araştırma, günümüzün ağa bağlı otomobillerindeki siber güvenlik açıklarının kritik seviyelere ulaştığını ortaya koydu. İncelenen 413 farklı güvenlik zafiyeti, özellikle harici yazılım ente",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793769565.129189
-  },
-  {
     "slug": "abd-secim-sonuclari-tahvil-piyasalarinda-sert-faiz-dususunu-tetikledi",
     "title": "ABD Seçim Sonuçları Tahvil Piyasalarında Sert Faiz Düşüşünü Tetikledi",
     "summary": "ABD ara seçimlerinden gelen ilk veriler, bütçe disiplini beklentisini güçlendirerek tahvil getirilerinde kayda değer bir geri çekilmeye neden oldu. Beş ve on yıllık vadelerdeki faiz oranlarının gerilemesi, dolar endeksindeki zayıflama ile birleşerek ",
@@ -3792,5 +3784,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794886064.8645532
+  },
+  {
+    "slug": "oppo-reno-17-ve-17-pro-modelleri-cin-piyasasinda-tanitildi",
+    "title": "Oppo Reno 17 ve 17 Pro Modelleri Çin Piyasasında Tanıtıldı",
+    "summary": "Oppo, Çin pazarında gerçekleştirdiği resmi etkinlikte Reno 17 ve Reno 17 Pro akıllı telefon serisini görücüye çıkardı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794888788.9158766
   }
 ]
