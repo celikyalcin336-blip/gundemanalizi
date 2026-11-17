@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "toggda-mulkiyet-donusumu-sanayi-devleri-cekilirken-kamu-ve-turkcell-guc-kazaniyo",
-    "title": "TOGG’da Mülkiyet Dönüşümü: Sanayi Devleri Çekilirken Kamu ve Turkcell Güç Kazanıyor",
-    "summary": "Türkiye’nin yerli elektrikli otomobil projesi TOGG’un ortaklık yapısında önemli bir sadeleşme süreci başladı. Anadolu Grubu ve Vestel'in hisselerini devretmesiyle Türkiye Varlık Fonu ve Turkcell projenin yeni ana kontrolörleri haline geldi.",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793758668.5708206
-  },
-  {
     "slug": "turkiye-ve-guney-kore-arasinda-enerji-ve-maden-ortakligi-hamlesi",
     "title": "Türkiye ve Güney Kore Arasında Enerji ve Maden Ortaklığı Hamlesi",
     "summary": "Cumhurbaşkanı Erdoğan'ın Güney Kore ziyareti kapsamında enerji ve madencilik sektörlerini kapsayan üç önemli iş birliği anlaşması imzalandı. Ankara ve Seul arasındaki bu stratejik hamle, Türkiye’nin teknolojik birikimini ortak projelerle küresel ölçe",
@@ -3788,5 +3780,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794875167.445763
+  },
+  {
+    "slug": "abd-new-york-fed-imalat-endeksi-kasim-ayinda-sert-yavaslama-gosterdi",
+    "title": "ABD New York Fed İmalat Endeksi Kasım Ayında Sert Yavaşlama Gösterdi",
+    "summary": "New York Fed tarafından açıklanan kasım ayı imalat endeksi raporu bölgedeki imalat faaliyetlerinin ivme kaybettiğini gösterdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794877891.9413543
   }
 ]
