@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "mercedes-otomobil-camlarini-dogrudan-aydinlatan-yeni-ekran-teknolojileri-gelisti",
-    "title": "Mercedes Otomobil Camlarını Doğrudan Aydınlatan Yeni Ekran Teknolojileri Geliştiriyor",
-    "summary": "Alman otomotiv üreticisi Mercedes, araç camlarını işlevsel birer ekrana dönüştürmeyi amaçlayan yeni bir teknoloji üzerinde çalışıyor. Lamine LED sistemleri kullanarak ön camı holografik bir arayüze çevirmeyi planlayan şirket, dış dünya ile iletişimi ",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793818551.8874183
-  },
-  {
     "slug": "redmi-note-17-pro-max-dev-bataryasiyla-pil-algisini-degistiriyor",
     "title": "Redmi Note 17 Pro Max Dev Bataryasıyla Pil Algısını Değiştiriyor",
     "summary": "Redmi Note 17 Pro Max 5G modeli, bünyesinde barındırdığı devasa 10.000 mAh kapasiteli batarya ile akıllı telefon pazarındaki standart şarj alışkanlıklarını kökten sarsmaya hazırlanıyor. CHIP Online ekibinin masaya yatırdığı bu yeni nesil cihaz, olağa",
@@ -3810,5 +3802,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794935098.10873
+  },
+  {
+    "slug": "eski-android-surumleri-kurulum-gerektirmeden-dogrudan-tarayicida-calistiriliyor",
+    "title": "Eski Android Sürümleri Kurulum Gerektirmeden Doğrudan Tarayıcıda Çalıştırılıyor",
+    "summary": "Android Time Machine adlı platform, kullanıcıların sekiz eski mobil işletim sistemini tarayıcı üzerinden deneyimlemesine imkan tanıyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794937822.1370788
   }
 ]
