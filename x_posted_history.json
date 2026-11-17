@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "otomotiv-sektorunde-yaprak-dokumu-yerli-efsane-egeanin-uretim-seruveni-tarih-olu",
-    "title": "Otomotiv Sektöründe Yaprak Dökümü: Yerli Efsane Egea’nın Üretim Serüveni Tarih Oluyor",
-    "summary": "Türkiye otomotiv pazarında uzun yıllardır zirveyi kimseye kaptırmayan Fiat Egea modelinin Bursa fabrikasındaki üretim bantlarından ineceği nihai tarih netleşti. Toplamda 1,4 milyonu aşkın satış adedine ulaşarak rekor kıran popüler model, 30 Haziran 2",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793826712.9421146
-  },
-  {
     "slug": "skoda-karoq-modelinde-yeni-prestige-donanim-seviyesi-satisa-sunuldu",
     "title": "Skoda Karoq Modelinde Yeni Prestige Donanım Seviyesi Satışa Sunuldu",
     "summary": "Çek üretici Skoda, kompakt SUV segmentindeki temsilcisi Karoq için hazırladığı yeni Prestige donanım paketini Türkiye'deki yetkili satıcılarında müşterilerle buluşturdu. Lansmana özel olarak 2.999.800 TL'den başlayan fiyatlarla bayilerdeki yerini ala",
@@ -3813,5 +3805,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794943272.5583231
+  },
+  {
+    "slug": "saglik-bakanligindan-premature-dogum-ve-yenidogan-taramasi-verileri",
+    "title": "Sağlık Bakanlığından Prematüre Doğum ve Yenidoğan Taraması Verileri",
+    "summary": "Sağlık Bakanlığı tarafından yapılan açıklamada, bu yıl 703 bin 506 bebeğe yeni doğan taraması gerçekleştirildiği bildirildi.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794945999.477631
   }
 ]
