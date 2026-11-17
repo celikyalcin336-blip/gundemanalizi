@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "yale-akilli-kapi-zili-samsung-smartthings-ekosistemine-dahil-oldu",
-    "title": "Yale Akıllı Kapı Zili Samsung SmartThings Ekosistemine Dahil Oldu",
-    "summary": "Akıllı ev güvenliği alanında faaliyet gösteren Yale, görüntülü kapı zili modelini Samsung SmartThings platformuna entegre ederek iki marka arasındaki iş birliğini büyüttü. Bu entegrasyon sayesinde kullanıcılar, ev güvenliği denetimlerini tek bir mobi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793810389.4715254
-  },
-  {
     "slug": "ankarada-yeni-nesil-organize-suc-orgutlerine-yonelik-safak-operasyonu",
     "title": "Ankara'da Yeni Nesil Organize Suç Örgütlerine Yönelik Şafak Operasyonu",
     "summary": "Ankara Cumhuriyet Başsavcılığı koordinesinde yürütülen soruşturma çerçevesinde, iş insanlarını hedef alan ve tefecilik faaliyetleriyle tanınan yeni nesil suç ağlarına operasyon düzenlendi. Başkent genelinde gerçekleştirilen eş zamanlı baskınlarda, ha",
@@ -3807,5 +3799,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794926923.882202
+  },
+  {
+    "slug": "turk-kizilay-elbistan-asevine-gunes-enerjisi-sistemi-entegre-edildi",
+    "title": "Türk Kızılay Elbistan Aşevine Güneş Enerjisi Sistemi Entegre Edildi",
+    "summary": "Türk Kızılay, Kahramanmaraş'ın Elbistan ilçesindeki aşevinin çatısına yenilenebilir enerji kaynağı kurarak yerelde sürdürülebilir bir model oluşturdu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794929647.3512712
   }
 ]
