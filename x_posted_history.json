@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "ispanya-basbakani-pedro-sanchezden-kuresel-siyaset-ve-asiri-sag-dalga-cikisi",
-    "title": "İspanya Başbakanı Pedro Sanchez'den Küresel Siyaset ve Aşırı Sağ Dalga Çıkışı",
-    "summary": "İspanya Başbakanı Pedro Sanchez, Brezilya'daki seçim sonuçları ile ABD'deki ara seçim dinamiklerinin benzerlik taşıdığını belirterek, dünyada yükselen aşırı sağ politikaların ivme kaybettiğini savundu. İspanyol hükümeti, bu küresel siyasi eğilimin ke",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793807669.6152909
-  },
-  {
     "slug": "yale-akilli-kapi-zili-samsung-smartthings-ekosistemine-dahil-oldu",
     "title": "Yale Akıllı Kapı Zili Samsung SmartThings Ekosistemine Dahil Oldu",
     "summary": "Akıllı ev güvenliği alanında faaliyet gösteren Yale, görüntülü kapı zili modelini Samsung SmartThings platformuna entegre ederek iki marka arasındaki iş birliğini büyüttü. Bu entegrasyon sayesinde kullanıcılar, ev güvenliği denetimlerini tek bir mobi",
@@ -3806,5 +3798,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794924201.3631396
+  },
+  {
+    "slug": "avrupa-birliginden-pankreas-kanserine-karsi-yeni-ilac-onayi",
+    "title": "Avrupa Birliği'nden Pankreas Kanserine Karşı Yeni İlaç Onayı",
+    "summary": "Avrupa Birliği Komisyonu, metastatik pankreas kanserinin tedavisinde kullanılacak Daraxonrasib adlı yeni ilaç için pazarlama izni çıkardığını duyurdu.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794926923.882202
   }
 ]
