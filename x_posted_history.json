@@ -84,14 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "cimerin-eylul-bulteni-vatandaslardan-gelen-takdir-mesajlariyla-kamu-hizmetine-is",
-    "title": "CİMER'in Eylül Bülteni Vatandaşlardan Gelen Takdir Mesajlarıyla Kamu Hizmetine Işık Tutuyor",
-    "summary": "Cumhurbaşkanlığı İletişim Merkezi (CİMER), bünyesine ulaşan teşekkür ve memnuniyet bildirimlerini derlediği bülteninin eylül sayısını erişime açtı. Yayınlanan içerik, kamu hizmetlerinde vatandaş odaklı yaklaşımı kurumsal hafızaya kaydederek örnek uyg",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793764122.0798774
-  },
-  {
     "slug": "yeni-zelanda-goklerinde-uzay-trafigini-gorunur-kilan-uzun-pozlama-calismasi",
     "title": "Yeni Zelanda Göklerinde Uzay Trafiğini Görünür Kılan Uzun Pozlama Çalışması",
     "summary": "Fotoğrafçı Larsen’in Taranaki Dağı üzerinde gerçekleştirdiği uzun süreli çekimler, yörüngedeki yoğun uydu trafiğini çarpıcı bir şekilde belgeledi. Dijital düzenlemelerle birleştirilen 14 bin farklı uydu izi, modern dünyanın uzay kirliliği sorununu so",
@@ -3790,5 +3782,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794880616.2501485
+  },
+  {
+    "slug": "ekim-ayinda-ikinci-el-cevrim-ici-otomobil-piyasasi-buyudu",
+    "title": "Ekim Ayında İkinci El Çevrim İçi Otomobil Piyasası Büyüdü",
+    "summary": "Otomotiv sektöründe eylül ayındaki durgunluğun ardından ekim ayında ikinci el çevrim içi araç satışlarında belirgin bir canlanma kaydedildi.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794883340.2568855
   }
 ]
