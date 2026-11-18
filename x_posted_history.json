@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "fransada-egitim-politikalarina-karsi-duzenlenen-eylemlere-polis-mudahalesi",
-    "title": "Fransa'da Eğitim Politikalarına Karşı Düzenlenen Eylemlere Polis Müdahalesi",
-    "summary": "Fransa genelinde sendikaların grev çağrısıyla hareketlenen öğrenciler, eğitim reformlarını ve yetersiz bütçe taahhütlerini protesto etmek amacıyla lise ve üniversite binalarında kuşatma eylemleri başlattı. Başkent Paris başta olmak üzere pek çok merk",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793919236.9316816
-  },
-  {
     "slug": "openai-yazilim-gelistirme-yeteneklerini-guclendirmek-icin-pierre-sirketini-bunye",
     "title": "OpenAI Yazılım Geliştirme Yeteneklerini Güçlendirmek İçin Pierre Şirketini Bünyesine Katıyor",
     "summary": "Yapay zeka devi OpenAI, kod depolama ve inceleme araçlarıyla tanınan Pierre Computer Company’yi satın alma kararı aldı. Bu hamleyle birlikte, şirketin yapay zeka temelli kodlama asistanı Codex’in teknik kapasitesinin genişletilmesi ve geliştirici iş ",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795035916.5180047
+  },
+  {
+    "slug": "tesla-cybercab-robotaksi-filosu-ilk-iki-ayinda-sekiz-kazaya-karisti",
+    "title": "Tesla Cybercab Robotaksi Filosu İlk İki Ayında Sekiz Kazaya Karıştı",
+    "summary": "Tesla tarafından geliştirilen Cybercab robotaksi araçları, faaliyetteki ilk iki aylık dönemde toplam sekiz kazaya karıştı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795038641.6749578
   }
 ]
