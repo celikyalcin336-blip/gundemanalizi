@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "siber-guvenlik-baskanligindan-iphone-ve-whatsapp-uzerinden-yapilan-dolandiricili",
-    "title": "Siber Güvenlik Başkanlığından iPhone ve WhatsApp Üzerinden Yapılan Dolandırıcılıklara Karşı Uyarı",
-    "summary": "Cumhurbaşkanlığı Siber Güvenlik Başkanlığı, güncellenmeyen iOS işletim sistemlerinin güvenlik açıklarını hedef alan siber saldırılar konusunda uyarıda bulundu. Dolandırıcıların ele geçirdikleri WhatsApp hesapları üzerinden kullanıcıların yakınlarında",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793856653.5473247
-  },
-  {
     "slug": "trabzonspor-avrupa-serisini-freiburg-karsisinda-galibiyetle-taclandirmak-istiyor",
     "title": "Trabzonspor Avrupa Serisini Freiburg Karşısında Galibiyetle Taçlandırmak İstiyor",
     "summary": "Thomas Reis yönetiminde çıktığı son yedi resmi maçtan zaferle ayrılan Trabzonspor, Konferans Ligi’ndeki üçüncü sınavında Alman ekibi Freiburg ile karşı karşıya geliyor. İlk sekiz hedefi doğrultusunda kritik bir öneme sahip olan bu mücadele, Karadeniz",
@@ -3815,5 +3806,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794973251.2425447
+  },
+  {
+    "slug": "bodrum-golf-kulubu-tgf-turkiye-sampiyonluguna-ulasti",
+    "title": "Bodrum Golf Kulübü TGF Türkiye Şampiyonluğuna Ulaştı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1794975952.4340725
+  },
+  {
+    "slug": "vanda-artan-isinma-giderlerine-karsi-kombi-bakimi-onerileri",
+    "title": "Van'da Artan Isınma Giderlerine Karşı Kombi Bakımı Önerileri",
+    "summary": "Soğuk havaların erken başlamasıyla birlikte Van'daki kombi servislerinde yoğunluk gözlenirken, uzmanlar bütçe dostu ısınma için bakım ve yalıtım uyarısında bulundu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794975975.1742058
   }
 ]
