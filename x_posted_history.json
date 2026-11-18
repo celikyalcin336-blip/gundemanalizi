@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "sakaryadaki-sekiz-aracli-zincirleme-trafik-kazasinda-dort-polis-yaralandi",
-    "title": "Sakarya'daki Sekiz Araçlı Zincirleme Trafik Kazasında Dört Polis Yaralandı",
-    "summary": "Kocaeli'den Antalya'daki görev yerlerine gitmekte olan emniyet mensuplarını taşıyan konvoyun da karıştığı zincirleme trafik kazası Sakarya sınırlarında yaşandı. D-650 kara yolunda sekiz taşıtın birbirine çarptığı olayda hafif yaralanan dört polis mem",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793870256.166829
-  },
-  {
     "slug": "fenerbahcenin-avrupa-sahnesindeki-liverpool-zaferi-camia-icin-kritik-bir-donemec",
     "title": "Fenerbahçe’nin Avrupa Sahnesindeki Liverpool Zaferi Camia İçin Kritik Bir Dönemeç Oldu",
     "summary": "UEFA Şampiyonlar Ligi 4. hafta mücadelesinde İngiliz devi Liverpool'u konuk eden Fenerbahçe, sahadan 3-2'lik galibiyetle ayrılarak turnuvadaki ilk puanlarını hanesine yazdırdı. Karşılaşma sonrası yapılan değerlendirmeler, sarı-lacivertli oyuncuların ",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794986869.8760867
+  },
+  {
+    "slug": "istanbul-icin-lodos-firtinasi-ve-kuvvetli-ruzgar-alarmi-verildi",
+    "title": "İstanbul İçin Lodos Fırtınası Ve Kuvvetli Rüzgar Alarmı Verildi",
+    "summary": "İstanbul Valiliği ve AKOM, kent genelinde etkisini artırması beklenen lodos fırtınasına karşı vatandaşları tedbirli olmaya çağırdı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794989602.1939104
   }
 ]
