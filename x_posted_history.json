@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "abd-is-gucu-piyasasinda-beklenmedik-dusus-ilk-issizlik-maasi-basvurulari-geriled",
-    "title": "ABD İş Gücü Piyasasında Beklenmedik Düşüş: İlk İşsizlik Maaşı Başvuruları Geriledi",
-    "summary": "ABD'de işsizlik maaşı için ilk kez başvuranların sayısı 31 Ekim haftasında 189 bine gerileyerek piyasa beklentilerinin altında kaldı. Devam eden başvurulardaki sınırlı artış ise iş gücü piyasasının esnekliğini korumaya çalıştığını gösteriyor.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793908350.6563325
-  },
-  {
     "slug": "nisantasinda-devrilen-agac-faciasini-saniye-farkiyla-bes-kisi-atlatmayi-basardi",
     "title": "Nişantaşı’nda Devrilen Ağaç Faciasını Saniye Farkıyla Beş Kişi Atlatmayı Başardı",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795025011.2351897
+  },
+  {
+    "slug": "aston-martin-dijital-tasarimi-dakar-rallisi-icin-gercege-donusturuyor",
+    "title": "Aston Martin Dijital Tasarımı Dakar Rallisi İçin Gerçeğe Dönüştürüyor",
+    "summary": "Lüks otomobil üreticisi Aston Martin, video oyunu için tasarlanan kurgusal arazi aracını gerçeğe uyarlayarak çöl yarışına katılma kararı aldı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795027744.4215157
   }
 ]
