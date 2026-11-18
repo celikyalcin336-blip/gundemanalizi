@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "avrupali-siyasetcilerden-cin-menseli-akilli-otomobillere-guvenlik-tedbiri-cagris",
-    "title": "Avrupalı Siyasetçilerden Çin Menşeli Akıllı Otomobillere Güvenlik Tedbiri Çağrısı",
-    "summary": "Avrupa Parlamentosu Üyesi Francois Kalfon ve sekiz milletvekili, Çinli üreticilerin geliştirdiği bağlantılı araçların taşıdığı potansiyel casusluk tehlikelerine dikkat çekerek Avrupa Komisyonu ve Fransa Başbakanlığına resmi başvuruda bulundu. Girişim",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793905630.0956717
-  },
-  {
     "slug": "abd-is-gucu-piyasasinda-beklenmedik-dusus-ilk-issizlik-maasi-basvurulari-geriled",
     "title": "ABD İş Gücü Piyasasında Beklenmedik Düşüş: İlk İşsizlik Maaşı Başvuruları Geriledi",
     "summary": "ABD'de işsizlik maaşı için ilk kez başvuranların sayısı 31 Ekim haftasında 189 bine gerileyerek piyasa beklentilerinin altında kaldı. Devam eden başvurulardaki sınırlı artış ise iş gücü piyasasının esnekliğini korumaya çalıştığını gösteriyor.",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795022288.3650627
+  },
+  {
+    "slug": "nvidia-cin-piyasasinda-h200-sevkiyatini-tamamen-durdurdu",
+    "title": "Nvidia Çin Piyasasında H200 Sevkiyatını Tamamen Durdurdu",
+    "summary": "Nvidia, Çin'e yönelik lisanslı Hopper mimarili veri merkezi ürünleri ile H200 yapay zeka çiplerinin sevkiyatına son verdiğini duyurdu.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795025011.2351897
   }
 ]
