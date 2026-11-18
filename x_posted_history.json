@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "general-motorsun-cin-pazari-icin-gelistirdigi-sarj-edilebilir-buick-electra-gs-o",
-    "title": "General Motors’un Çin Pazarı İçin Geliştirdiği Şarj Edilebilir Buick Electra GS Ortaya Çıktı",
-    "summary": "General Motors, Çinli ortak SAIC iş birliğiyle geliştirdiği yeni şarj edilebilir sedan modeli Electra GS’yi tanıttı. Coupe formundaki tasarımı ve iki farklı PHEV motor seçeneğiyle dikkat çeken araç, yerel pazardaki rekabeti hedefliyor.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793867535.308393
-  },
-  {
     "slug": "sakaryadaki-sekiz-aracli-zincirleme-trafik-kazasinda-dort-polis-yaralandi",
     "title": "Sakarya'daki Sekiz Araçlı Zincirleme Trafik Kazasında Dört Polis Yaralandı",
     "summary": "Kocaeli'den Antalya'daki görev yerlerine gitmekte olan emniyet mensuplarını taşıyan konvoyun da karıştığı zincirleme trafik kazası Sakarya sınırlarında yaşandı. D-650 kara yolunda sekiz taşıtın birbirine çarptığı olayda hafif yaralanan dört polis mem",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794984146.1853988
+  },
+  {
+    "slug": "dere-yataklarinda-altin-arama-furyasi-ticari-sektore-donustu",
+    "title": "Dere yataklarında altın arama furyası ticari sektöre dönüştü",
+    "summary": "Sosyal medya paylaşımlarıyla yayılan doğada altın arama faaliyetleri, yeni bir ticari alan yaratarak bireysel eğitim faaliyetlerine dönüştü.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794986869.8760867
   }
 ]
