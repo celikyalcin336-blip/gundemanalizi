@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "egitim-bakanlari-iklim-kriziyle-mucadele-icin-kuresel-zirvede-bulusuyor",
-    "title": "Eğitim Bakanları İklim Kriziyle Mücadele İçin Küresel Zirvede Buluşuyor",
-    "summary": "Milli Eğitim Bakanlığı, COP31 süreci kapsamında eğitim sistemlerinin iklim değişikliğine uyumunu ve gençlerin sürece katılımını artırmak için uluslararası düzeyde kapsamlı etkinlikler hazırlıyor. 14 Kasım'da düzenlenecek özel günde, farklı ülkelerin ",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793924678.3282263
-  },
-  {
     "slug": "kis-mevsiminde-solunum-yolu-enfeksiyonlari-ve-risk-grubundakiler-icin-uyarilar",
     "title": "Kış Mevsiminde Solunum Yolu Enfeksiyonları ve Risk Grubundakiler İçin Uyarılar",
     "summary": "Havaların soğuması ve kapalı alanlarda geçirilen sürenin artmasıyla birlikte grip ve zatürre vakalarında yükseliş kaydediliyor. Uzmanlar, özellikle kronik rahatsızlığı bulunanlar, yaşlılar ve çocukların bu dönemde enfeksiyonlara karşı daha dikkatli o",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795041364.773488
+  },
+  {
+    "slug": "anthropic-halka-arzinda-beklenti-ustu-fiyatlama-ve-kuresel-piyasalar",
+    "title": "Anthropic Halka Arzında Beklenti Üstü Fiyatlama ve Küresel Piyasalar",
+    "summary": "Teknoloji şirketi Anthropic PBC, halka arz sürecinde hisse başına fiyatı öngörülen aralığın üzerine çıkararak 83 dolar olarak belirledi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795044087.720856
   }
 ]
