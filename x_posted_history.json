@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "alman-otomotiv-devi-cindeki-uretim-tesisinde-personel-azaltimina-gidiyor",
-    "title": "Alman Otomotiv Devi Çin'deki Üretim Tesisinde Personel Azaltımına Gidiyor",
-    "summary": "Bavyeralı otomobil üreticisi BMW, Çin pazarındaki satış dalgalanmaları nedeniyle Shenyang ortak girişimindeki kadrosunu küçültme kararı aldı. Kasım ayının ilk günlerinde yürürlüğe giren planlama doğrultusunda yaklaşık bin sekiz yüz kişiyle yollar ayr",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793853927.7396326
-  },
-  {
     "slug": "siber-guvenlik-baskanligindan-iphone-ve-whatsapp-uzerinden-yapilan-dolandiricili",
     "title": "Siber Güvenlik Başkanlığından iPhone ve WhatsApp Üzerinden Yapılan Dolandırıcılıklara Karşı Uyarı",
     "summary": "Cumhurbaşkanlığı Siber Güvenlik Başkanlığı, güncellenmeyen iOS işletim sistemlerinin güvenlik açıklarını hedef alan siber saldırılar konusunda uyarıda bulundu. Dolandırıcıların ele geçirdikleri WhatsApp hesapları üzerinden kullanıcıların yakınlarında",
@@ -3815,5 +3806,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794970510.0677204
+  },
+  {
+    "slug": "abd-senatosundan-f-35-ve-fuze-sistemleri-odakli-trilyonluk-butce-teklifi",
+    "title": "ABD Senatosundan F-35 ve Füze Sistemleri Odaklı Trilyonluk Bütçe Teklifi",
+    "summary": "ABD Senatosu Cumhuriyetçileri, mühimmat, füze savunması ve F-35 programlarını merkeze alan devasa bir finansman tasarısını kamuoyuna açıkladı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794973251.2425447
   }
 ]
