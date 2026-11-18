@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-18 04:24:22",
+  "last_check": "2026-11-18 05:09:45",
   "result": "posted",
-  "last_post": "2026-11-18 04:24:22",
-  "next_planned": "2026-11-18 05:09:22",
+  "last_post": "2026-11-18 05:09:45",
+  "next_planned": "2026-11-18 05:54:45",
   "runner": "github-actions",
-  "log_tail": "[2026-11-18 01:24:00] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Galatasaray'ın Kolombiyalı Savunmac... (Birebir slug eşleşmesi: galatasarayin-kolombiyali-savunmacisi-carlos-cuesta-icin-brezilyada-operasyon-ka)\n🎯 [X Paylaşım Adayı] Kategori: Dünya | Virallik/Duygu Skoru: 225 | Başlık: Şanghay Üniversitesindeki Gen Tedbirsizliği Skandalı Sonrası Görevden Almalar\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794965040.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/sanghay-universitesindeki-gen-tedbirsizligi-skandali-sonrasi-gorevden-almalar\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Şanghay Üniversitesindeki Gen Tedbirsizliği Skandalı Sonrası Görevden Almalar\n"
+  "log_tail": "[2026-11-18 02:09:22] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Galatasaray'ın Kolombiyalı Savunmac... (Birebir slug eşleşmesi: galatasarayin-kolombiyali-savunmacisi-carlos-cuesta-icin-brezilyada-operasyon-ka)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Kilis'te Karbonmonoksit Zehirlenmes... (Birebir slug eşleşmesi: kiliste-karbonmonoksit-zehirlenmesi-faciasi-yasandi)\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 185 | Başlık: Nvidia Hisselerinde Yaşanan Düşüş Sonrası SEC Soruşturma Başlattı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1794967763.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🚀 [Google Indexing API] Bildirim başarıyla iletildi: https://xn--gndemanalizi-dlb.com.tr/haber/nvidia-hisselerinde-yasanan-dusus-sonrasi-sec-sorusturma-baslatti\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Nvidia Hisselerinde Yaşanan Düşüş Sonrası SEC Soruşturma Başlattı\n"
 }

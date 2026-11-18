@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "trumptan-secim-yenilgisi-ve-iran-operasyonu-aciklamasi",
-    "title": "Trump'tan Seçim Yenilgisi ve İran Operasyonu Açıklaması",
-    "summary": "ABD Başkanı Donald Trump, ara seçimlerde alınan mağlubiyetin İran operasyonundan kaynaklandığını kabul etti ancak askeri hamleden pişmanlık duymadığını vurguladı. Tahran yönetiminin nükleer silahlara erişmesini engellemek amacıyla atılan adımların ar",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793848486.7408557
-  },
-  {
     "slug": "elon-musk-yorungedeki-veri-merkezi-projelerini-yeniden-masaya-yatiriyor",
     "title": "Elon Musk Yörüngedeki Veri Merkezi Projelerini Yeniden Masaya Yatırıyor",
     "summary": "ABD'deki son seçim sonuçlarının ardından yapay zeka altyapısına yönelik endişeler artarken Elon Musk, uzayda veri merkezi kurma fikrinin yeniden oldukça cazip hale geldiğini belirtti. Sektör analistleri, Teksas gibi kritik eyaletlerdeki olası enerji ",
@@ -3815,5 +3806,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794965062.485308
+  },
+  {
+    "slug": "nvidia-hisselerinde-yasanan-dusus-sonrasi-sec-sorusturma-baslatti",
+    "title": "Nvidia Hisselerinde Yaşanan Düşüş Sonrası SEC Soruşturma Başlattı",
+    "summary": "ABD Menkul Kıymetler ve Borsa Komisyonu, CEO ayrılığı ve casusluk iddialarının ardından teknoloji devi hakkında inceleme başlattı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794967785.0338464
   }
 ]
