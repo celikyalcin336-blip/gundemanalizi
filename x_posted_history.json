@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "sanliurfada-aile-ici-siddet-para-istegi-olumle-sonuclandi",
-    "title": "Şanlıurfa’da Aile İçi Şiddet: Para İsteği Ölümle Sonuçlandı",
-    "summary": "Şanlıurfa’nın Haliliye ilçesinde gerçekleşen olayda, 21 yaşındaki Hüseyin D., kendisine para vermeyi reddeden annesini ve iki kız kardeşini silahla vurdu. Anne Huriye Çiçekli ile kızı Zeynep Demircan olay yerinde hayatını kaybederken, 11 yaşındaki di",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793864814.0532677
-  },
-  {
     "slug": "general-motorsun-cin-pazari-icin-gelistirdigi-sarj-edilebilir-buick-electra-gs-o",
     "title": "General Motors’un Çin Pazarı İçin Geliştirdiği Şarj Edilebilir Buick Electra GS Ortaya Çıktı",
     "summary": "General Motors, Çinli ortak SAIC iş birliğiyle geliştirdiği yeni şarj edilebilir sedan modeli Electra GS’yi tanıttı. Coupe formundaki tasarımı ve iki farklı PHEV motor seçeneğiyle dikkat çeken araç, yerel pazardaki rekabeti hedefliyor.",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794981422.409208
+  },
+  {
+    "slug": "amerika-birlesik-devletleri-acil-durum-yayin-sistemi-testi-gerceklestirildi",
+    "title": "Amerika Birleşik Devletleri Acil Durum Yayın Sistemi Testi Gerçekleştirildi",
+    "summary": "ABD genelinde gerçekleştirilen ulusal yayın kesintisi testi, radyo ve televizyon kanallarını kapsadı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794984146.1853988
   }
 ]
