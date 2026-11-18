@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "openai-yazilim-gelistirme-yeteneklerini-guclendirmek-icin-pierre-sirketini-bunye",
-    "title": "OpenAI Yazılım Geliştirme Yeteneklerini Güçlendirmek İçin Pierre Şirketini Bünyesine Katıyor",
-    "summary": "Yapay zeka devi OpenAI, kod depolama ve inceleme araçlarıyla tanınan Pierre Computer Company’yi satın alma kararı aldı. Bu hamleyle birlikte, şirketin yapay zeka temelli kodlama asistanı Codex’in teknik kapasitesinin genişletilmesi ve geliştirici iş ",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793921957.2993014
-  },
-  {
     "slug": "egitim-bakanlari-iklim-kriziyle-mucadele-icin-kuresel-zirvede-bulusuyor",
     "title": "Eğitim Bakanları İklim Kriziyle Mücadele İçin Küresel Zirvede Buluşuyor",
     "summary": "Milli Eğitim Bakanlığı, COP31 süreci kapsamında eğitim sistemlerinin iklim değişikliğine uyumunu ve gençlerin sürece katılımını artırmak için uluslararası düzeyde kapsamlı etkinlikler hazırlıyor. 14 Kasım'da düzenlenecek özel günde, farklı ülkelerin ",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795038641.6749578
+  },
+  {
+    "slug": "modern-surucu-teknolojilerinde-kritik-donanim-tercihleri-ve-cozunurluk-kriterler",
+    "title": "Modern Sürücü Teknolojilerinde Kritik Donanım Tercihleri ve Çözünürlük Kriterleri",
+    "summary": "Araç içi kayıt cihazları basit ön cam donanımı olmaktan çıkarak çift yönlü takip ve park güvenliği sağlayan gelişmiş sistemlere dönüştü.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795041364.773488
   }
 ]
