@@ -127,6 +127,13 @@ def notify_google_indexing(url: str, action: str = "URL_UPDATED", ping_websub: b
         except Exception:
             pass
 
+    # Google Indexing API resmi olarak yalnızca JobPosting / BroadcastEvent sayfaları içindir.
+    # Haber sayfaları için kullanımı spam riski taşıdığından varsayılan olarak KAPALI.
+    # (Site haritası, haber site haritası ve WebSub pingi çalışmaya devam eder.)
+    # Geri açmak için ortam değişkeni: GOOGLE_INDEXING_API_ENABLED=1
+    if os.getenv("GOOGLE_INDEXING_API_ENABLED", "0").strip() != "1":
+        return False
+
     access_token = get_access_token()
     if not access_token:
         return False

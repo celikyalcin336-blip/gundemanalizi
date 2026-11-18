@@ -138,7 +138,8 @@ def system_health_watchdog_worker():
                         import google_indexer
                         today_str = datetime.now(tz_tr).strftime("%Y-%m-%d")
                         last_bf_day = database.get_setting("indexing_backfill_day", "")
-                        if last_bf_day != today_str:
+                        # Günlük 135'lik arşiv gönderimi Indexing API kapalıyken tamamen atlanır
+                        if os.getenv("GOOGLE_INDEXING_API_ENABLED", "0").strip() == "1" and last_bf_day != today_str:
                             database.set_setting("indexing_backfill_day", today_str)
                             cur_off = int(database.get_setting("indexing_backfill_offset", "135") or "135")
                             all_idx = _indexable_articles()
