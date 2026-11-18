@@ -84,15 +84,6 @@
     "ts": 1793751995.5675063
   },
   {
-    "slug": "elon-musk-yorungedeki-veri-merkezi-projelerini-yeniden-masaya-yatiriyor",
-    "title": "Elon Musk Yörüngedeki Veri Merkezi Projelerini Yeniden Masaya Yatırıyor",
-    "summary": "ABD'deki son seçim sonuçlarının ardından yapay zeka altyapısına yönelik endişeler artarken Elon Musk, uzayda veri merkezi kurma fikrinin yeniden oldukça cazip hale geldiğini belirtti. Sektör analistleri, Teksas gibi kritik eyaletlerdeki olası enerji ",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793851207.1048853
-  },
-  {
     "slug": "alman-otomotiv-devi-cindeki-uretim-tesisinde-personel-azaltimina-gidiyor",
     "title": "Alman Otomotiv Devi Çin'deki Üretim Tesisinde Personel Azaltımına Gidiyor",
     "summary": "Bavyeralı otomobil üreticisi BMW, Çin pazarındaki satış dalgalanmaları nedeniyle Shenyang ortak girişimindeki kadrosunu küçültme kararı aldı. Kasım ayının ilk günlerinde yürürlüğe giren planlama doğrultusunda yaklaşık bin sekiz yüz kişiyle yollar ayr",
@@ -3815,5 +3806,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1794967785.0338464
+  },
+  {
+    "slug": "duzce-d-100-karayolunda-meydana-gelen-agir-trafik-kazasinda-surucu-yasamini-yiti",
+    "title": "Düzce D-100 Karayolunda Meydana Gelen Ağır Trafik Kazasında Sürücü Yaşamını Yitirdi",
+    "summary": "Düzce sınırları içindeki D-100 karayolunda seyreden bir otomobilin TIR'a arkadan çarpması sonucu ağır bir trafik kazası yaşandı. Olay yerine sevk edilen sağlık ekipleri, sürücünün hayatını kaybettiğini tespit etti.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1794970510.0677204
   }
 ]
