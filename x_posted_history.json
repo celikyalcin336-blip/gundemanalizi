@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "samsunda-tuketici-haklari-denetimi-idari-yaptirim-sureci-hiz-kazandi",
-    "title": "Samsun’da Tüketici Hakları Denetimi: İdari Yaptırım Süreci Hız Kazandı",
-    "summary": "Samsun’da bir işletmenin tüketici mağduriyetine yol açan uygulamaları, vatandaşın CİMER üzerinden yaptığı şikâyetle resmi incelemeye dönüştü. Ticaret İl Müdürlüğü tarafından gerçekleştirilen denetimlerin ardından mevzuata aykırı faaliyet gösteren işl",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793916516.1150398
-  },
-  {
     "slug": "fransada-egitim-politikalarina-karsi-duzenlenen-eylemlere-polis-mudahalesi",
     "title": "Fransa'da Eğitim Politikalarına Karşı Düzenlenen Eylemlere Polis Müdahalesi",
     "summary": "Fransa genelinde sendikaların grev çağrısıyla hareketlenen öğrenciler, eğitim reformlarını ve yetersiz bütçe taahhütlerini protesto etmek amacıyla lise ve üniversite binalarında kuşatma eylemleri başlattı. Başkent Paris başta olmak üzere pek çok merk",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795033192.1415534
+  },
+  {
+    "slug": "polonya-ordusu-ve-guvenlik-gucleri-kaliningrad-sinirindaki-rus-provokasyonunu-on",
+    "title": "Polonya Ordusu ve Güvenlik Güçleri Kaliningrad Sınırındaki Rus Provokasyonunu Önledi",
+    "summary": "Polonya güvenlik birimleri, Rus istihbaratının Kaliningrad sınırında düzenlemeyi planladığı sahte bayrak sabotaj operasyonunu önleyici müdahaleyle engelledi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795035916.5180047
   }
 ]
