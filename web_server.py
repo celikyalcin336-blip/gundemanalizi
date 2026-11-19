@@ -207,6 +207,11 @@ async def lifespan(app: FastAPI):
         clear_turbo_cache()
         gc.collect()
         try:
+            import special_dossiers
+            special_dossiers.seed_special_dossiers()
+        except Exception as _sde:
+            print(f'Özel dosya başlangıç uyarısı: {_sde}')
+        try:
             import analysis_engine
             analysis_engine.seed_curated_analyses()
             analysis_engine.ensure_daily_synthesis_reports()
@@ -2727,11 +2732,25 @@ async def kunye_page(request: Request):
 @app.get("/yazar/yalcin-celik", response_class=HTMLResponse)
 async def author_yalcin_page(request: Request):
     import content_quality
-    pool = database.get_sitemap_articles(limit=45)
-    articles = [a for a in pool if not content_quality.is_thin(a.get("content") or "") and not main.is_commodity_news(a.get("title", ""))][:15]
-    if not articles:
-        articles = database.get_articles(limit=15)
-    return templates.TemplateResponse(request=request, name="author.html", context={"articles": articles})
+    pool = database.get_sitemap_articles(limit=120)
+    signed = [
+        a for a in pool
+        if (a.get("category") or "") != "Analiz"
+        and (a.get("source") or "") in ("Gündem Analizi", "Gündem Analizi Özel", "Özel")
+        and not content_quality.is_thin(a.get("content") or "", threshold=150)
+    ]
+    curated = [
+        a for a in pool
+        if a not in signed
+        and not content_quality.is_thin(a.get("content") or "")
+        and not main.is_commodity_news(a.get("title", ""))
+    ][:12]
+    articles = (signed + curated)[:18] or database.get_articles(limit=15)
+    return templates.TemplateResponse(
+        request=request,
+        name="author.html",
+        context={"articles": articles, "signed_articles": signed},
+    )
 
 @app.get("/yayin-ilkeleri", response_class=HTMLResponse)
 async def editorial_policy_page(request: Request):
