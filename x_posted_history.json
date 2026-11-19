@@ -105,15 +105,6 @@
     "ts": 1794006312.9794788
   },
   {
-    "slug": "fedden-enflasyonla-mucadelede-yeni-sikilasma-sinyali-ve-faiz-artisi-ihtimali",
-    "title": "Fed’den Enflasyonla Mücadelede Yeni Sıkılaşma Sinyali ve Faiz Artışı İhtimali",
-    "summary": "San Francisco Fed Başkanı Mary Daly, ABD'de direnç gösteren enflasyon verileri karşısında faiz oranlarını yukarı çekmenin bir seçenek olarak masada kaldığını vurguladı. Yetkili, ekonomik istikrarı sağlamak adına para politikasında ilave adımların atı",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794009061.2773042
-  },
-  {
     "slug": "iran-korfezinde-patlama-sesleri-kesm-adasi-yakinlarina-iki-cisim-dustu",
     "title": "İran Körfezi'nde Patlama Sesleri: Keşm Adası Yakınlarına İki Cisim Düştü",
     "summary": "İran'ın güneyindeki Keşm Adası ve Bender Hamir kenti yakınlarında şiddetli patlama sesleri duyulurken, bölge sakinleri savaş uçağı gürültüsü duyduklarını ve adaya füze benzeri iki cismin isabet ettiğini aktardı. Yaşanan hareketliliğin ardından Tahran",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795125821.7375839
+  },
+  {
+    "slug": "abdden-bolgedeki-vatandaslarina-yonelik-yuksek-teyakkuz-cagrisi",
+    "title": "ABD'den bölgedeki vatandaşlarına yönelik yüksek teyakkuz çağrısı",
+    "summary": "ABD'nin Kuveyt Büyükelçiliği, İran ve Husilerin Körfez'deki hedeflere yönelik saldırılarının tırmanabileceği uyarısında bulundu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795128545.1349492
   }
 ]
