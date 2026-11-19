@@ -2395,12 +2395,17 @@ async def article_detail(request: Request, slug: str):
     # AdSense kalite: eski şablon/dolgu kalıntılarını gösterimde temizle, kısa haberleri Google dizininden çıkar
     import content_quality
     import html as _html_mod
-    article["title"] = content_quality.clean_title_text(article.get("title") or "")
+    try:
+        article["title"] = __import__("fact_guard").to_turkish_sentence_case(
+            content_quality.clean_title_text(article.get("title") or ""),
+            f"{article.get('summary') or ''} {raw_content[:1500]}",
+        )
+    except Exception:
+        article["title"] = content_quality.clean_title_text(article.get("title") or "")
     article["summary"] = content_quality.clean_summary_text(article.get("summary") or "", article["title"])
     raw_content = content_quality.clean_article_html(raw_content)
-    # Yeni çok kaynaklı formatta (kaynak tablosu, veri tablosu, resmi kaynak) kısa ama dolu haberler ince sayılmaz:
-    # şişirme yerine dürüst uzunluk kullanıldığı için eşik 150 kelime; eski tek kaynaklı haberlerde 220 korunur.
-    _thin_threshold = 150 if 'class="ga-multi"' in (raw_content or "") else 220
+    # Kısa bültenlerde (<200 kelime) şablon çerçevesi haberin önüne geçmesin diye eşik 200 kelime (eski haberlerde 220)
+    _thin_threshold = 200 if 'class="ga-multi"' in (raw_content or "") else 220
     _created_day = str(article.get("created_at") or "")[:10]
     _is_scaled_batch = False
     if (
@@ -3167,7 +3172,7 @@ def _indexable_articles() -> list:
             if cat_norm != "Analiz":
                 if "2026-10-27" <= c_day <= "2026-11-02" and slug_val not in google_slugs and 'class="ga-multi"' not in raw_c:
                     continue
-                t_thresh = 150 if 'class="ga-multi"' in raw_c else 220
+                t_thresh = 200 if 'class="ga-multi"' in raw_c else 220
                 if content_quality.is_thin(raw_c, threshold=t_thresh):
                     continue
             rows.append(d)

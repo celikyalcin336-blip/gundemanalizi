@@ -179,11 +179,13 @@ def _row_to_dict(row) -> Dict:
         d["image_path"] = f"{base_img}?v=3"
     try:
         import content_quality
+        import fact_guard
+        raw_c = d.get("content") or ""
         if d.get("title"):
-            d["title"] = content_quality.clean_title_text(str(d["title"]))
+            cleaned_t = content_quality.clean_title_text(str(d["title"]))
+            d["title"] = fact_guard.to_turkish_sentence_case(cleaned_t, f"{d.get('summary') or ''} {raw_c[:1500]}")
         if d.get("summary"):
             d["summary"] = content_quality.clean_summary_text(str(d["summary"]), d.get("title") or "")
-        raw_c = d.get("content") or ""
         if raw_c:
             wc = content_quality.visible_word_count(raw_c)
             d["reading_time_min"] = max(2, min(6, round(wc / 150)))

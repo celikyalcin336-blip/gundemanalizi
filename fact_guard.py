@@ -159,20 +159,46 @@ def restore_acronyms(title: str, source_text: str) -> str:
     return re.sub(r"(?<![\wçğıöşüÇĞİÖŞÜ])[A-Za-zÇĞİÖŞÜçğıöşü]{2,6}(?=['’\s:,.!?]|$)", fix, title)
 
 
-def to_turkish_sentence_case(title: str, source_text: str) -> str:
+_KNOWN_PROPER = {
+    "Türkiye", "Türk", "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep",
+    "Şanlıurfa", "Kocaeli", "Mersin", "Diyarbakır", "Hatay", "Manisa", "Kayseri", "Samsun", "Balıkesir",
+    "Kahramanmaraş", "Van", "Aydın", "Denizli", "Sakarya", "Tekirdağ", "Muğla", "Eskişehir", "Mardin",
+    "Trabzon", "Malatya", "Erzurum", "Ordu", "Afyonkarahisar", "Sivas", "Zonguldak", "Çanakkale", "Osmaniye",
+    "Giresun", "Rize", "Edirne", "Bolu", "Düzce", "Yalova", "KKTC", "Kıbrıs",
+    "Avrupa", "Asya", "Afrika", "Amerika", "Almanya", "Fransa", "İngiltere", "İtalya", "İspanya", "Hollanda",
+    "Belçika", "Avusturya", "İsviçre", "Yunanistan", "Bulgaristan", "Rusya", "Ukrayna", "Çin", "Japonya",
+    "Hindistan", "İran", "Irak", "Suriye", "İsrail", "Filistin", "Gazze", "Lübnan", "Ürdün", "Mısır", "Katar",
+    "Azerbaycan", "Gürcistan", "Ermenistan", "Polonya", "Krakow", "Okinawa", "Washington", "Moskova", "Brüksel",
+    "Londra", "Paris", "Berlin", "Tahran", "Pekin", "Tokyo",
+    "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık",
+    "Galatasaray", "Fenerbahçe", "Beşiktaş", "Trabzonspor", "Başakşehir", "Süper", "Lig", " Şampiyonlar",
+    "Euroleague", "Premier", "UEFA", "FIFA",
+    "Erdoğan", "Recep", "Tayyip", "Şimşek", "Mehmet", "Fidan", "Hakan", "Yılmaz", "Cevdet", "Tekin", "Yusuf",
+    "Kurum", "Murat", "Memişoğlu", "Kemal", "Trump", "Putin", "Zelenski", "Biden", "Netanyahu",
+    "Merkez", "Bankası", "Yargıtay", "Danıştay", "Anayasa", "Mahkemesi", "Meclis", "Resmî", "Resmi", "Gazete",
+    "Bakanlığı", "Bakanı", "Cumhurbaşkanı", "Cumhurbaşkanlığı", "Üniversitesi", "Belediyesi",
+    "Google", "Apple", "Microsoft", "Meta", "Amazon", "Tesla", "Nvidia", "Samsung", "Xiaomi", "Redmi",
+    "Huawei", "Intel", "Qualcomm", "OpenAI", "Anthropic", "Claude", "Gemini", "Volkswagen", "Mercedes",
+    "Toyota", "Hyundai", "Renault", "Peugeot", "Fiat", "Skoda", "Volvo", "Nissan", "Chery", "Lexus", "Porsche",
+    "Ferrari", "General", "Motors", "Corvette", "UniCredit", "Commerzbank", "Siemens", "Stellantis", "Nokia",
+    "Euro", "Dolar", "Lira", "Lirası", "Bitcoin", "Brent",
+}
+
+
+def to_turkish_sentence_case(title: str, source_text: str = "") -> str:
     """
     'Volkswagen Performans Odaklı Yeni T-Roc R Modelini Tanıttı'
       -> 'Volkswagen performans odaklı yeni T-Roc R modelini tanıttı'
-    Kural: Başlıktaki kelime kaynakta cümle ortasında BÜYÜK harfle geçiyorsa (özel isim) korunur;
-    tamamı büyük kısaltmalar (AB, ABD, TCMB, T-Roc) korunur; iki nokta sonrası ilk kelime korunur.
+    Kural: Başlıktaki kelime kaynakta cümle ortasında BÜYÜK harfle geçiyorsa veya bilinen özel isimse
+    korunur; kesme işareti alan kelimeler (Ankara'da) özel isimdir korunur; kısaltmalar korunur.
     """
     if title:
         title = restore_acronyms(title, source_text or "")
     if not title or title_case_ratio(title) < 0.6:
         return title
-    src = source_text or ""
+    src = re.sub(r"<[^>]+>", " ", source_text or "")
     # Kaynakta cümle ortasında büyük harfle geçen kelimeler (özel isim adayları)
-    proper: Set[str] = set()
+    proper: Set[str] = set(_KNOWN_PROPER)
     for m in re.finditer(r"(?<=[a-zçğıöşü0-9,;'’\"”)]\s)([A-ZÇĞİÖŞÜ][\wçğıöşüÇĞİÖŞÜ\-]*)", src):
         proper.add(m.group(1).split("'")[0].split("’")[0])
     tokens = re.split(r"(\s+)", title.strip())
@@ -184,10 +210,13 @@ def to_turkish_sentence_case(title: str, source_text: str) -> str:
             out.append(tok)
             continue
         core = re.sub(r"^[\"“‘(]+", "", tok)
+        has_apostrophe = ("'" in core or "’" in core)
         stem = re.split(r"['’]", core)[0]
         keep = False
         if not first_word_done or after_colon:
             keep = True
+        elif has_apostrophe and stem and stem[0].isupper():
+            keep = True  # Kesme işareti alan büyük harfli kelimeler Türkçe'de özel isimdir (Osmaniye'de, AB'den)
         elif not stem or not stem[0].isupper():
             keep = True
         elif len(stem) > 1 and (stem.isupper() or sum(1 for c in stem if c.isupper()) >= 2):

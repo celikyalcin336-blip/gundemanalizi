@@ -638,8 +638,69 @@ def _e(s) -> str:
     return _html.escape(_strip_ticks(str(s or "")), quote=True)
 
 
+def _dedup_sections(data: Dict, src_words: int = 250, mode: str = "news") -> Dict:
+    """
+    Aynı cümlenin/bilginin BOLUM_1, BOLUM_2, BOLUM_3, ETKI_METNI ve SONRA alanlarında
+    farklı kelimelerle tekrarlanmasını engeller; kısa tekil kaynaklı haberlerde zorlama kutuları kapatır.
+    """
+    seen_sets: List[set] = []
+
+    def _sent_toks(s: str) -> set:
+        return _tokens(s)
+
+    def _is_redundant_para(p: str, thresh: float = 0.48) -> bool:
+        t = _sent_toks(p)
+        if len(t) < 4:
+            return len((p or "").split()) < 8
+        for prev in seen_sets:
+            if not prev:
+                continue
+            ov = len(t & prev) / max(1, min(len(t), len(prev)))
+            if ov >= thresh:
+                return True
+        seen_sets.append(t)
+        return False
+
+    # BOLUM_1 referans havuzunu oluşturur
+    b1 = []
+    for p in _as_list(data.get("ne_oldu")):
+        if not _is_redundant_para(p, thresh=0.65):
+            b1.append(p)
+    data["ne_oldu"] = b1
+
+    # BOLUM_2 ve BOLUM_3: BOLUM_1 ile yüksek örtüşen veya tek cümlelik dolgu paragrafları elenir
+    for key in ("neden_onemli", "arka_plan"):
+        kept = []
+        for p in _as_list(data.get(key)):
+            if len(p.split()) < 14:
+                continue
+            if not _is_redundant_para(p, thresh=0.45):
+                kept.append(p)
+        data[key] = kept
+
+    # Kısa kaynaklı (<180 kelime) haberlerde arka_plan ve etki kutusu zorlama tekrar üretir -> kapat
+    if mode != "analysis" and src_words < 180:
+        data["arka_plan"] = []
+        data["turkiye_etkisi"] = ""
+
+    # ETKI_METNI ve SONRA: önceki bölümlerle örtüşüyorsa veya yeni somut bilgi taşımıyorsa basma
+    for key in ("turkiye_etkisi", "sonra"):
+        val = " ".join(_as_list(data.get(key))).strip()
+        if not val or val.upper() in {"YOK", "YOK."} or len(val.split()) < 14:
+            data[key] = ""
+            continue
+        if _is_redundant_para(val, thresh=0.42):
+            data[key] = ""
+        else:
+            data[key] = val
+
+    return data
+
+
 def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     """Yapılandırılmış veriyi konuya özgü ara başlıklarla temiz .ga-multi HTML gövdesine çevirir."""
+    src_words = len(" ".join(s.get("body") or "" for s in (sources or [])).split())
+    data = _dedup_sections(dict(data), src_words=src_words, mode=mode)
     parts = ['<div class="ga-multi">']
 
     bullets = _as_list(data.get("maddeler"))[:3]
