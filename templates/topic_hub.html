@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} | Gündem Analizi</title>
+    <meta name="description" content="{{ page_desc }}">
+    <link rel="canonical" href="https://xn--gndemanalizi-dlb.com.tr{{ page_path }}">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        var _savedConsent = null;
+        try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+        gtag('consent', 'default', {
+            'ad_storage': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
+            'ad_user_data': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
+            'ad_personalization': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
+            'analytics_storage': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
+            'wait_for_update': 500
+        });
+    </script>
+    <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/style.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
+    </style>
+
+    {% if hub and hub.faqs %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {% for q, a in hub.faqs %}
+        {
+          "@type": "Question",
+          "name": {{ q | tojson }},
+          "acceptedAnswer": { "@type": "Answer", "text": {{ a | tojson }} }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }
+    </script>
+    {% endif %}
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-red-600 selection:text-white">
+
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <img src="/assets/logo-128.png" width="40" height="40" alt="Gündem Analizi" class="w-10 h-10 rounded-full border-2 border-red-600 shadow-xs" onerror="this.onerror=null;this.src='/assets/logo.png';">
+                <div>
+                    <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 block leading-none">GÜNDEM <span class="text-red-600">ANALİZİ</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Özel Dosyalar &amp; Rehberler</span>
+                </div>
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="/hesaplama" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs border border-slate-200 transition hidden sm:inline-flex">🧮 Hesaplama</a>
+                <a href="/" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-xs text-white transition shadow-sm">← Ana Sayfa</a>
+            </div>
+        </div>
+        <div class="w-full bg-red-600 border-t border-red-700 shadow-xs" style="background-color: #dc2626 !important; border-color: #b91c1c !important;">
+            <div class="max-w-6xl mx-auto px-2 sm:px-4">
+                <nav aria-label="Ana Kategoriler" class="flex items-center justify-start md:justify-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-2 text-xs sm:text-[13px] font-extrabold whitespace-nowrap">
+                    <a href="/son-dakika" class="px-3 py-1 rounded-full bg-red-800 hover:bg-red-900 text-white transition flex items-center gap-1.5 shrink-0 shadow-xs" style="background-color: #991b1b !important; color: #ffffff !important;">
+                        <span class="w-2 h-2 rounded-full bg-white animate-pulse" style="background-color: #ffffff !important;"></span>
+                        <span style="color: #ffffff !important;">Son Dakika</span>
+                    </a>
+                    <a href="/analiz" class="px-3 py-1 rounded-full bg-white text-red-600 hover:bg-red-50 font-black transition flex items-center gap-1 shrink-0 shadow-xs" style="background-color: #ffffff !important; color: #dc2626 !important;">
+                        <span style="color: #dc2626 !important;">📊 Analiz</span>
+                    </a>
+                    <a href="/?kategori=Gündem" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Gündem</a>
+                    <a href="/?kategori=Ekonomi" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Ekonomi</a>
+                    <a href="/?kategori=Eğitim" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Eğitim</a>
+                    <a href="/?kategori=Otomobil" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Otomobil</a>
+                    <a href="/?kategori=Teknoloji" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Teknoloji</a>
+                    <a href="/?kategori=Sağlık" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Sağlık</a>
+                    <a href="/?kategori=Spor" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Spor</a>
+                    <a href="/?kategori=Dünya" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Dünya</a>
+                    <a href="/piyasalar" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🪙 Piyasalar</a>
+                    <a href="/hesaplama" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🧮 Hesaplama</a>
+                    <a href="/super-lig-puan-durumu" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🏆 Puan Durumu</a>
+                    <a href="/son-depremler" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🌍 Deprem</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full space-y-8">
+        <div class="border-b border-slate-200 pb-6">
+            <nav class="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3" aria-label="Breadcrumb">
+                <a href="/" class="hover:text-red-600 transition">Ana Sayfa</a><span>/</span>
+                {% if hub %}
+                <a href="/dosya" class="hover:text-red-600 transition">Özel Dosyalar</a><span>/</span>
+                <span class="text-red-600 font-bold">{{ hub.badge }}</span>
+                {% else %}
+                <span class="text-red-600 font-bold">Özel Dosyalar &amp; Rehberler</span>
+                {% endif %}
+            </nav>
+            <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{{ page_title }}</h1>
+            <p class="text-slate-600 text-sm sm:text-base mt-2 leading-relaxed">{{ hub.lead if hub else page_desc }}</p>
+        </div>
+
+        {% if not hub %}
+        <!-- TÜM DOSYALAR LİSTESİ -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {% for h in all_hubs %}
+            <a href="/dosya/{{ h.slug }}" class="group p-6 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-sm hover:shadow-md transition flex gap-4">
+                <span class="text-4xl shrink-0">{{ h.icon }}</span>
+                <div>
+                    <span class="text-[11px] font-black uppercase tracking-wider text-red-600">{{ h.badge }}</span>
+                    <h2 class="text-lg font-black text-slate-900 group-hover:text-red-600 transition mt-0.5">{{ h.title }}</h2>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">{{ h.meta_desc }}</p>
+                    <span class="inline-block mt-3 text-xs font-bold text-red-600">Dosyayı İncele →</span>
+                </div>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <!-- TEKİL DOSYA -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Temel Göstergeler Tablosu -->
+                <div class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h2 class="text-base sm:text-lg font-black text-slate-900">📌 Yürürlükteki Temel Veriler</h2>
+                        {% if hub.official_url %}
+                        <a href="{{ hub.official_url }}" target="_blank" rel="noopener" class="text-xs font-bold text-red-600 hover:underline">Resmi kaynak: {{ hub.official_name }} ↗</a>
+                        {% endif %}
+                    </div>
+                    <div class="divide-y divide-slate-200 text-xs sm:text-sm">
+                        {% for k, v in hub.facts %}
+                        <div class="py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            <span class="text-slate-600 font-medium">{{ k }}</span>
+                            <strong class="text-slate-900 font-extrabold">{{ v }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if hub.calc_href %}
+                    <div class="mt-5 pt-4 border-t border-slate-200">
+                        <a href="{{ hub.calc_href }}" class="inline-flex items-center justify-center w-full sm:w-auto px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm transition shadow-sm">
+                            🧮 {{ hub.calc_label }} →
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Açıklayıcı Bölümler -->
+                {% for sec in hub.sections %}
+                <article class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3 text-sm sm:text-base text-slate-800 leading-relaxed">
+                    <h2 class="text-lg sm:text-xl font-black text-slate-900">{{ sec.h }}</h2>
+                    {% for p in sec.p %}
+                    <p>{{ p }}</p>
+                    {% endfor %}
+                </article>
+                {% endfor %}
+
+                <!-- Sık Sorulan Sorular -->
+                {% if hub.faqs %}
+                <section class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-lg sm:text-xl font-black text-slate-900">❓ Sık Sorulan Sorular</h2>
+                    <div class="space-y-3">
+                        {% for q, a in hub.faqs %}
+                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            <h3 class="text-sm font-extrabold text-slate-900">{{ q }}</h3>
+                            <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">{{ a }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+                <!-- Bu Dosyadaki Haber Kronolojisi -->
+                <section class="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg sm:text-xl font-black text-slate-900">🗂️ Bu Konudaki Son Haberler ve Kronoloji</h2>
+                        <span class="text-xs font-bold text-slate-500">{{ related_articles|length }} haber</span>
+                    </div>
+                    {% if related_articles %}
+                    <div class="divide-y divide-slate-200">
+                        {% for a in related_articles %}
+                        <a href="/haber/{{ a.slug }}" class="py-3 flex items-start justify-between gap-4 group">
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-bold text-slate-500">{{ (a.created_at or '')[:16] }}</span>
+                                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-red-600 transition mt-0.5">{{ a.title }}</h3>
+                                {% if a.summary %}
+                                <p class="text-xs text-slate-600 mt-1 line-clamp-2">{{ a.summary }}</p>
+                                {% endif %}
+                            </div>
+                            <span class="text-xs font-extrabold text-red-600 shrink-0 mt-1">Oku →</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-xs text-slate-500">Bu başlıkta yeni gelişmeler yayımlandıkça burada tarih sırasıyla listelenir.</p>
+                    {% endif %}
+                </section>
+            </div>
+
+            <!-- Yan Sütun: Diğer Dosyalar & Canlı Araçlar -->
+            <aside class="lg:col-span-4 space-y-5">
+                <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-wide">📁 Diğer Özel Dosyalar</h3>
+                    <div class="space-y-2">
+                        {% for h in all_hubs if h.slug != hub.slug %}
+                        <a href="/dosya/{{ h.slug }}" class="block p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-300 transition">
+                            <span class="text-xs font-black text-slate-900 block">{{ h.icon }} {{ h.badge }}</span>
+                            <span class="text-[11px] text-slate-600 line-clamp-2 mt-0.5 block">{{ h.title }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2.5 text-xs font-bold">
+                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-wide mb-2">🧰 Canlı Veri ve Araçlar</h3>
+                    <a href="/piyasalar" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>🪙 Canlı Altın &amp; Döviz Kurları</span><span>→</span></a>
+                    <a href="/hesaplama/maas" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>💼 Brüt–Net Maaş Hesaplama</span><span>→</span></a>
+                    <a href="/hesaplama/emekli-zammi" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>📊 Emekli &amp; Memur Zammı</span><span>→</span></a>
+                    <a href="/hesaplama/kidem-tazminati" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>📑 Kıdem Tazminatı Hesaplama</span><span>→</span></a>
+                    <a href="/super-lig-puan-durumu" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>🏆 Süper Lig Puan Durumu</span><span>→</span></a>
+                    <a href="/son-depremler" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200"><span>🌍 Son Depremler (AFAD)</span><span>→</span></a>
+                </div>
+            </aside>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-6 text-center text-xs text-slate-600 mt-10">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span class="font-bold text-slate-800">GÜNDEM ANALİZİ © 2026 • Doğru Haber • Tarafsız Analiz</span>
+            <div class="flex flex-wrap items-center justify-center gap-3 font-semibold">
+                <a href="/hakkimizda" class="hover:text-red-600">Hakkımızda</a><span>•</span>
+                <a href="/kunye" class="hover:text-red-600">Künye</a><span>•</span>
+                <a href="/yayin-ilkeleri" class="hover:text-red-600">Yayın İlkeleri</a><span>•</span>
+                <a href="/gizlilik-politikasi" class="hover:text-red-600">Gizlilik</a><span>•</span>
+                <a href="/iletisim" class="hover:text-red-600">İletişim</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

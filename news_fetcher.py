@@ -396,6 +396,12 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
     seen_slug_map = {}
     seen_batch_items = []
     import difflib
+    try:
+        import living_article
+        _recent_for_living = database.get_articles(limit=70)
+    except Exception:
+        living_article = None
+        _recent_for_living = []
 
     for feed_info in config.RSS_FEEDS:
         feed_name = feed_info["name"]
@@ -428,10 +434,19 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                     continue
 
                 news_hash = get_news_hash(title, link)
+                feed_cat = feed_info.get("category", "Gündem")
 
                 # 1. Veritabanı ve Geçmiş Kontrolü (5 Katmanlı Akıllı Dedup: Hash, Link, Başlık, Benzerlik)
+                living_target = None
                 if database.is_already_posted(news_hash, title=title, link=link):
-                    continue
+                    # Birebir aynı hash veya aynı link değilse, son 48 saatteki bir haberin YENİ GELİŞMESİ olabilir (yaşayan haber)
+                    if living_article and not database.is_already_posted(news_hash, title="", link=link):
+                        try:
+                            living_target = living_article.find_living_match(title, summary, feed_cat, _recent_for_living)
+                        except Exception:
+                            living_target = None
+                    if not living_target:
+                        continue
 
                 # 2. Aynı Tarama Döngüsünde Başka Bir Kaynak Aynı Haberi Verdi mi? (Çapraz RSS Koruması + Çok Kaynaklı Kardeş Haber Bağlama)
                 from database import slugify
@@ -486,6 +501,7 @@ def fetch_latest_news(limit_per_feed: int = 12) -> List[Dict]:
                     "published": published,
                     "score": score,
                     "siblings": [],
+                    "living_target": living_target,
                 }
                 seen_slug_map[norm_slug] = new_item
                 seen_batch_items.append(new_item)

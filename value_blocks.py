@@ -224,17 +224,17 @@ def quake_block(title_low: str, quakes: Optional[List[Dict]]) -> str:
 # 5) Hesaplayıcı
 # ---------------------------------------------------------------------------
 _CALCS = [
-    (re.compile(r"kıdem tazminat"), "/hesaplama/kidem-tazminati", "Kıdem tazminatı hesaplama",
+    (re.compile(r"kıdem tazminat"), "/hesaplama/kidem-tazminati", "/dosya/kidem-tazminati", "Kıdem tazminatı hesaplama",
      "Çalışma sürenize ve brüt maaşınıza göre kıdem tazminatınızı hesaplayın."),
-    (re.compile(r"emekli (?:zam|maaş|aylı)|memur zam|memur maaş|ssk|bağ-kur|bağkur"), "/hesaplama/emekli-zammi", "Emekli ve memur zammı hesaplama",
+    (re.compile(r"emekli (?:zam|maaş|aylı)|memur zam|memur maaş|ssk|bağ-kur|bağkur"), "/hesaplama/emekli-zammi", "/dosya/emekli-ve-memur-zammi", "Emekli ve memur zammı hesaplama",
      "Mevcut maaşınıza ve zam oranına göre yeni maaşınızı hesaplayın."),
-    (re.compile(r"asgari ücret|net maaş|brüt maaş|maaş hesap|bordro"), "/hesaplama/maas", "Maaş hesaplama (brütten nete)",
+    (re.compile(r"asgari ücret|net maaş|brüt maaş|maaş hesap|bordro"), "/hesaplama/maas", "/dosya/asgari-ucret", "Maaş hesaplama (brütten nete)",
      "Brüt maaşınızdan net ele geçen tutarı, kesintileriyle birlikte hesaplayın."),
 ]
 
 
 def calculator_block(text_low: str) -> str:
-    for rx, href, label, desc in _CALCS:
+    for rx, href, hub_href, label, desc in _CALCS:
         if rx.search(text_low):
             inner = (
                 '<a href="' + _e(href) + '" class="flex items-center justify-between gap-3 p-3 rounded-xl bg-white border border-slate-200 hover:border-red-400 transition">'
@@ -242,7 +242,7 @@ def calculator_block(text_low: str) -> str:
                 f'<span class="text-xs text-slate-600">{_e(desc)}</span></span>'
                 '<span class="shrink-0 px-3 py-1.5 rounded-lg bg-red-600 text-white text-[11px] font-bold">Hesapla →</span></a>'
             )
-            return _box("🧮 Kendi hesabınızı yapın", inner)
+            return _box("🧮 Kendi hesabınızı yapın", inner, hub_href, "Kapsamlı rehber ve kronoloji →")
     return ""
 
 
@@ -281,7 +281,9 @@ def official_block(text_low: str) -> str:
         f'<a href="{_e(u)}" target="_blank" rel="noopener" class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-800 hover:border-red-400 hover:text-red-600">{_e(n)} ↗</a>'
         for n, u in found
     )
-    return _box("🏛️ Resmi kaynak", f'<div class="flex flex-wrap gap-2">{links}</div>',
+    hub_link = "/dosya/sinav-takvimi" if re.search(r"\b(ösym|kpss|yks|lgs|ales|dgs)\b", text_low) else ""
+    hub_txt = "Sınav dosyası ve kronoloji →" if hub_link else ""
+    return _box("🏛️ Resmi kaynak", f'<div class="flex flex-wrap gap-2">{links}</div>', hub_link, hub_txt,
                 note="Haberde adı geçen kurumun resmi internet sitesi. Kesin bilgi ve duyurular için birincil kaynağı kontrol edin.")
 
 

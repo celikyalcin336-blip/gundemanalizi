@@ -63,7 +63,8 @@ def bot_background_worker():
     while True:
         try:
             import main as bot_main
-            bot_main.run_bot(max_items=1)
+            if bot_main.run_bot(max_items=1):
+                clear_turbo_cache()
             import analysis_engine
             analysis_engine.ensure_daily_synthesis_reports()
             gc.collect()
@@ -2642,6 +2643,45 @@ async def calc_kidem(request: Request):
 async def calc_emekli(request: Request):
     return _render_calc(request, "emekli")
 
+@app.api_route("/dosya", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def topic_hubs_index(request: Request):
+    import topic_hubs
+    hubs = list(topic_hubs.get_hubs().values())
+    return templates.TemplateResponse(
+        request=request,
+        name="topic_hub.html",
+        context={
+            "hub": None,
+            "all_hubs": hubs,
+            "related_articles": [],
+            "page_title": "Özel Dosyalar ve Hesaplama Rehberleri",
+            "page_desc": "Asgari ücret, emekli ve memur maaş zammı, kıdem tazminatı ile ÖSYM/MEB sınav süreçlerine dair yürürlükteki resmi veriler, hesaplama araçları ve güncel haber kronolojisi.",
+            "page_path": "/dosya",
+        },
+    )
+
+@app.api_route("/dosya/{hub_slug}", methods=["GET", "HEAD"], response_class=HTMLResponse)
+async def topic_hub_detail(request: Request, hub_slug: str):
+    import topic_hubs
+    hubs_map = topic_hubs.get_hubs()
+    hub = hubs_map.get((hub_slug or "").strip().lower())
+    if not hub:
+        raise StarletteHTTPException(status_code=404)
+    pool = await asyncio.to_thread(_indexable_articles)
+    matched = topic_hubs.match_articles_for_hub(hub, pool, limit=18)
+    return templates.TemplateResponse(
+        request=request,
+        name="topic_hub.html",
+        context={
+            "hub": hub,
+            "all_hubs": list(hubs_map.values()),
+            "related_articles": matched,
+            "page_title": hub["title"],
+            "page_desc": hub["meta_desc"],
+            "page_path": f"/dosya/{hub['slug']}",
+        },
+    )
+
 @app.get("/about", response_class=HTMLResponse)
 @app.get("/hakkimizda", response_class=HTMLResponse)
 @app.get("/vizyonumuz", response_class=HTMLResponse)
@@ -3049,9 +3089,14 @@ def _indexable_articles() -> list:
         if _INDEX_CACHE["rows"] and _INDEX_CACHE.get("sig") == cur_sig and time.time() - _INDEX_CACHE["ts"] < _SITEMAP_TTL:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
-            meta = [dict(r) for r in conn.execute(
-                "SELECT id, slug, title, category, image_path, created_at FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1500 ORDER BY id DESC"
-            ).fetchall()]
+            try:
+                meta = [dict(r) for r in conn.execute(
+                    "SELECT id, slug, title, category, image_path, created_at, updated_at FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                ).fetchall()]
+            except Exception:
+                meta = [dict(r) for r in conn.execute(
+                    "SELECT id, slug, title, category, image_path, created_at FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                ).fetchall()]
         rows = []
         for m in meta:
             slug_val = (m.get("slug") or "").strip()
@@ -3064,6 +3109,7 @@ def _indexable_articles() -> list:
                 "category": database.normalize_category_name(m.get("category") or "Gündem") or "Gündem",
                 "image_path": m.get("image_path") or "",
                 "created_at": str(m.get("created_at") or ""),
+                "updated_at": m.get("updated_at"),
             })
             rows.append(d)
         _INDEX_CACHE["rows"] = rows
@@ -3083,6 +3129,11 @@ _STATIC_SITEMAP_PAGES = [
     ("/hesaplama/maas", "monthly", "0.8", "Brüt–Net Maaş Hesaplama"),
     ("/hesaplama/kidem-tazminati", "monthly", "0.8", "Kıdem Tazminatı Hesaplama"),
     ("/hesaplama/emekli-zammi", "monthly", "0.8", "Emekli Zammı Hesaplama"),
+    ("/dosya", "daily", "0.9", "Özel Dosyalar ve Hesaplama Rehberleri"),
+    ("/dosya/asgari-ucret", "daily", "0.9", "Asgari Ücret Rehberi ve Belirleme Süreci"),
+    ("/dosya/emekli-ve-memur-zammi", "daily", "0.9", "Emekli ve Memur Maaş Zammı Rehberi"),
+    ("/dosya/kidem-tazminati", "weekly", "0.85", "Kıdem Tazminatı Rehberi ve Tavan Tutarı"),
+    ("/dosya/sinav-takvimi", "daily", "0.85", "ÖSYM ve MEB Sınav Dosyası"),
     ("/hakkimizda", "monthly", "0.5", "Hakkımızda"),
     ("/kunye", "monthly", "0.5", "Künye (Medya Künyesi)"),
     ("/yayin-ilkeleri", "monthly", "0.5", "Yayın İlkeleri"),
@@ -3128,7 +3179,7 @@ async def sitemap(request: Request):
     for cat in _SITEMAP_CATEGORIES:
         xml.append(f'  <url><loc>{base_url}/?kategori={urllib.parse.quote(cat)}</loc><lastmod>{latest_art_lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>')
     for a in articles:
-        lastmod = _format_w3c_lastmod(a.get("created_at") or "", today_iso)
+        lastmod = _format_w3c_lastmod(a.get("updated_at") or a.get("created_at") or "", today_iso)
         img_name = (a.get("image_path") or "").replace("\\", "/").split("/")[-1].split("?")[0]
         img_tag = ""
         if img_name and not img_name.lower().endswith((".mp4", ".webm", ".mov")):

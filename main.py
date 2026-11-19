@@ -34,10 +34,41 @@ def process_single_news(item: dict, pool: list = None) -> bool:
     link = item["link"]
     image_url = item.get("image_url")
     news_hash = item["hash"]
+    living_target = item.get("living_target")
 
     # 🛡️ ÇELİK MÜKERRER KALKANI: Önce daha önce yayınlanıp yayınlanmadığını kontrol et
-    if database.is_already_posted(news_hash, title=title, link=link):
+    if living_target:
+        # Birebir aynı hash/link gelirse yine engelle
+        if database.is_already_posted(news_hash, title="", link=link):
+            return False
+    elif database.is_already_posted(news_hash, title=title, link=link):
         print(f"⚠️ [Mükerrer Paylaşım Engellendi] '{title[:50]}' daha önce yayınlanmış. Atlanıyor.")
+        return False
+
+    # 🔴 YAŞAYAN HABER: Son 48 saatteki haberin yeni gelişmesi ise yeni sayfa açmak yerine mevcut haberi büyüt
+    if living_target and living_target.get("id") and living_target.get("slug"):
+        try:
+            import living_article
+            det_lv = news_fetcher.fetch_article_details(link) or {}
+            body_lv = det_lv.get("body", "")
+            summ_lv = body_lv if len(body_lv) > len(item.get("summary", "")) else item.get("summary", "")
+            upd = living_article.generate_update_block(living_target, title, summ_lv, source, link)
+            database.claim_news_for_processing(news_hash, title=title, source=source, link=link)
+            if not upd:
+                print(f"⏩ [Yaşayan Haber] '{title[:45]}' mevcut habere yeni somut bilgi katmadı; atlandı.")
+                return False
+            if database.append_article_update(int(living_target["id"]), upd["html"]):
+                database.mark_as_posted(news_hash=news_hash, title=title, source=source, link=link)
+                site_article_url = f"{config.SITE_URL}/haber/{living_target['slug']}"
+                print(f"🔴 [Yaşayan Haber Güncellendi] {site_article_url} <- {upd['headline']}")
+                try:
+                    import google_indexer
+                    google_indexer.notify_google_indexing(site_article_url)
+                except Exception:
+                    pass
+                return True
+        except Exception as _lv_e:
+            print(f"⚠️ [Yaşayan Haber] hata: {_lv_e}")
         return False
 
     print("\n" + "="*60)
@@ -124,7 +155,11 @@ def process_single_news(item: dict, pool: list = None) -> bool:
     article_data["summary"] = clean_s
     article_data["content"] = clean_c
     final_title = clean_t
-    telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
+    ms_bullets = [b.strip() for b in (article_data.get("bullets") or []) if len((b or "").strip()) >= 25]
+    if len(ms_bullets) >= 3:
+        telegram_caption = f"{final_title}\n\n" + "\n".join(f"— {b}" for b in ms_bullets[:4])
+    else:
+        telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
     print(f"   [Kategori: {category} | {content_quality.visible_word_count(clean_c)} Kelime Özgün Makale Hazır]")
 
     # 2.5. DOĞAL YAYIN TEMPOSU: gündüz sık, gece seyrek (günlük toplam ~40 haber korunur)
@@ -301,7 +336,7 @@ def _run_bot_internal(max_items: int = 1, force: bool = False):
         print("ℹ️  Yeni paylaşılacak haber bulunamadı. Tüm haberler güncel.")
         return 0
 
-    fresh_news = [item for item in news_items if not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
+    fresh_news = [item for item in news_items if item.get("living_target") or not database.is_already_posted(item["hash"], title=item["title"], link=item["link"])]
 
     # Her sitede birebir aynı olan, özgün değer katılamayan "sıradan" haberleri atla
     # (yayın aralığı değişmez: bot sıradaki gerçek habere geçer)

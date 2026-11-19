@@ -806,5 +806,6 @@ def build_article(primary: Dict, primary_body: str, pool: List[Dict], category: 
         "category": category,
         "source_count": len(sources),
         "sources": [s["name"] for s in sources],
+        "bullets": _as_list(data.get("maddeler"))[:4],
         "sibling_items": [s["_raw_item"] for s in sources[1:] if s.get("_raw_item")],
     }

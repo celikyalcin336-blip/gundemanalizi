@@ -191,27 +191,28 @@ def _row_to_dict(row) -> Dict:
             d["reading_time_min"] = 2 + (int(d.get("id") or 0) % 3)
     except Exception:
         d["reading_time_min"] = 3
-    # created_at zaman damgasını daima Türkiye Yerel Saatine (TSİ, UTC+3) dönüştür
-    if d.get("created_at") is not None:
-        val = d["created_at"]
-        if isinstance(val, datetime):
-            if val.tzinfo is None:
-                val = val.replace(tzinfo=timezone.utc).astimezone(TR_TZ)
-            else:
-                val = val.astimezone(TR_TZ)
-            d["created_at"] = val.strftime("%Y-%m-%d %H:%M:%S")
-        elif isinstance(val, str) and val.strip():
-            try:
-                clean_str = val.split(".")[0].replace("T", " ")
-                dt = datetime.strptime(clean_str[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).astimezone(TR_TZ)
-                d["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
-            except Exception:
-                d["created_at"] = str(val)
+    # created_at ve updated_at zaman damgalarını daima Türkiye Yerel Saatine (TSİ, UTC+3) dönüştür
+    for _ts_key in ("created_at", "updated_at"):
+        if d.get(_ts_key) is not None:
+            val = d[_ts_key]
+            if isinstance(val, datetime):
+                if val.tzinfo is None:
+                    val = val.replace(tzinfo=timezone.utc).astimezone(TR_TZ)
+                else:
+                    val = val.astimezone(TR_TZ)
+                d[_ts_key] = val.strftime("%Y-%m-%d %H:%M:%S")
+            elif isinstance(val, str) and val.strip():
+                try:
+                    clean_str = val.split(".")[0].replace("T", " ")
+                    dt = datetime.strptime(clean_str[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc).astimezone(TR_TZ)
+                    d[_ts_key] = dt.strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    d[_ts_key] = str(val)
     return d
 
 
 def slugify(text: str) -> str:
-    """Türkçe başlığı SEO dostu URL slug'ına dönüştürür."""
+    """Türkçe başlığı SEO dostu URL slug'ına dönüştürür (kelime sınırından keser)."""
     tr_map = {
         'ç': 'c', 'Ç': 'c', 'ğ': 'g', 'Ğ': 'g', 'ı': 'i', 'I': 'i',
         'İ': 'i', 'ö': 'o', 'Ö': 'o', 'ş': 's', 'Ş': 's', 'ü': 'u', 'Ü': 'u'
@@ -221,7 +222,11 @@ def slugify(text: str) -> str:
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
     text = re.sub(r'[^\w\s-]', '', text).strip().lower()
     slug = re.sub(r'[-\s]+', '-', text)
-    return slug[:80]
+    if len(slug) > 80:
+        cut = slug[:80]
+        last_dash = cut.rfind('-')
+        slug = cut[:last_dash] if last_dash >= 40 else cut
+    return slug.strip('-')
 
 
 def init_db():
@@ -253,9 +258,14 @@ def init_db():
                 image_path TEXT,
                 source TEXT,
                 views INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
             )
         """)
+        try:
+            conn.execute("ALTER TABLE articles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP" if USE_PG else "ALTER TABLE articles ADD COLUMN updated_at TIMESTAMP")
+        except Exception:
+            pass
         # 3. Site ziyaret sayacı tablosu
         conn.execute("""
             CREATE TABLE IF NOT EXISTS site_metrics (
@@ -1309,8 +1319,28 @@ def update_article(article_id: int, title: str, summary: str, content: str, cate
     """Belirtilen ID'li makalenin başlık, özet, içerik ve kategorisini günceller."""
     with get_connection() as conn:
         cur = conn.execute(
-            "UPDATE articles SET title = ?, summary = ?, content = ?, category = ? WHERE id = ?",
+            "UPDATE articles SET title = ?, summary = ?, content = ?, category = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
             (title, summary, content, category, article_id)
+        )
+        return (cur.rowcount or 0) > 0
+
+
+def append_article_update(article_id: int, update_html: str, new_summary: str = "") -> bool:
+    """Yaşayan haber: mevcut haberin içeriğinin başına güncelleme kutusunu ekler ve updated_at zamanını yeniler."""
+    with get_connection() as conn:
+        row = conn.execute("SELECT content, summary FROM articles WHERE id = ?", (article_id,)).fetchone()
+        if not row:
+            return False
+        cur_c = row["content"] or ""
+        if cur_c.lstrip().startswith('<div class="ga-multi">'):
+            idx = cur_c.find('<div class="ga-multi">') + len('<div class="ga-multi">')
+            merged = cur_c[:idx] + "\n" + update_html + "\n" + cur_c[idx:]
+        else:
+            merged = update_html + "\n" + cur_c
+        summ = new_summary.strip() if new_summary and len(new_summary.strip()) >= 30 else (row["summary"] or "")
+        cur = conn.execute(
+            "UPDATE articles SET content = ?, summary = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            (merged, summ, article_id),
         )
         return (cur.rowcount or 0) > 0
 

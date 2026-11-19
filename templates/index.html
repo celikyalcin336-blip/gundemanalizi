@@ -297,6 +297,12 @@
                 <a href="/?kategori=Sağlık" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Sağlık' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Sağlık</a>
                 <a href="/?kategori=Spor" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Spor' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Spor</a>
                 <a href="/?kategori=Dünya" style="color: #ffffff !important; {{ 'background-color: rgba(0,0,0,0.28) !important;' if active_category == 'Dünya' else '' }}" class="shrink-0 px-3 py-1 rounded-lg hover:bg-black/20 transition">Dünya</a>
+                <span class="shrink-0 text-white/40 select-none">|</span>
+                <a href="/dosya" style="color: #ffffff !important; background-color: rgba(0,0,0,0.2) !important;" class="shrink-0 px-2.5 py-1 rounded-lg hover:bg-black/30 transition font-extrabold">📁 Rehberler</a>
+                <a href="/hesaplama" style="color: #ffffff !important;" class="shrink-0 px-2.5 py-1 rounded-lg hover:bg-black/20 transition">🧮 Hesaplama</a>
+                <a href="/piyasalar" style="color: #ffffff !important;" class="shrink-0 px-2.5 py-1 rounded-lg hover:bg-black/20 transition">🪙 Piyasalar</a>
+                <a href="/super-lig-puan-durumu" style="color: #ffffff !important;" class="shrink-0 px-2.5 py-1 rounded-lg hover:bg-black/20 transition">🏆 Puan Durumu</a>
+                <a href="/son-depremler" style="color: #ffffff !important;" class="shrink-0 px-2.5 py-1 rounded-lg hover:bg-black/20 transition">🌍 Deprem</a>
             </nav>
         </div>
     </header>
@@ -563,6 +569,53 @@
             </div>
         </section>
         {% endif %}
+
+        <!-- 5.5 📁 ÖZEL DOSYALAR, REHBERLER & HESAPLAMA ARAÇLARI (ÖZGÜN HİZMET İÇERİKLERİ) -->
+        <section class="pt-6 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3.5 h-3.5 bg-red-600 rounded-sm"></span>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight uppercase flex items-center gap-2">
+                        REHBER DOSYALAR &amp; HESAPLAMA ARAÇLARI <span class="text-xs font-bold text-slate-500 tracking-normal hidden sm:inline">| Resmi Veriler ve Canlı Araçlar</span>
+                    </h2>
+                </div>
+                <a href="/dosya" class="text-xs font-extrabold text-red-600 hover:underline transition">Tüm Dosyalar →</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="/dosya/asgari-ucret" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-[11px] font-black text-red-600 uppercase">💼 Çalışma Hayatı</span>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">Asgari Ücret Rehberi ve Net–Brüt Hesaplama</h3>
+                        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Yürürlükteki tutarlar, bordro kesintileri, komisyon takvimi ve haber kronolojisi.</p>
+                    </div>
+                    <span class="text-xs font-bold text-red-600 mt-3">Rehberi ve aracı aç →</span>
+                </a>
+                <a href="/dosya/emekli-ve-memur-zammi" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-[11px] font-black text-red-600 uppercase">📊 Sosyal Güvenlik</span>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">Emekli ve Memur Maaş Zammı Rehberi</h3>
+                        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">SSK, Bağ-Kur ve memur zamlarının yasal formülü, ödeme günleri ve hesaplayıcı.</p>
+                    </div>
+                    <span class="text-xs font-bold text-red-600 mt-3">Maaşını hesapla →</span>
+                </a>
+                <a href="/dosya/kidem-tazminati" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-[11px] font-black text-red-600 uppercase">📑 İş Hukuku</span>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">Kıdem Tazminatı Tavanı ve Hesaplama</h3>
+                        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">Güncel tavan tutarı, hak kazanma şartları, damga vergisi ve hesaplama aracı.</p>
+                    </div>
+                    <span class="text-xs font-bold text-red-600 mt-3">Tazminat hesapla →</span>
+                </a>
+                <a href="/dosya/sinav-takvimi" class="p-4 rounded-2xl bg-white border border-slate-200 hover:border-red-400 shadow-xs hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <span class="text-[11px] font-black text-red-600 uppercase">🎓 Eğitim &amp; Sınav</span>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">ÖSYM ve MEB Sınav Dosyası</h3>
+                        <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">YKS, KPSS, LGS başvuru-sonuç kılavuzları ve resmi duyuru kronolojisi.</p>
+                    </div>
+                    <span class="text-xs font-bold text-red-600 mt-3">Dosyayı incele →</span>
+                </a>
+            </div>
+        </section>
 
         <!-- 6. 🔴 GÜNDEM & SICAK GELİŞMELER (1 BÜYÜK DEV HABER + 4 KÜÇÜK YAN KART) -->
         {% set gundem_items = gundem_articles if (gundem_articles and gundem_articles|length >= 3) else articles[0:5] %}

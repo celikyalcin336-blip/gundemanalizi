@@ -66,8 +66,9 @@
           "image": [
             {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.replace('\\', '/').split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
           ],
+          {% set _mod_ts = (article.updated_at or article.created_at or '') %}
           "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
-          "dateModified": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
+          "dateModified": "{{ _mod_ts[:10] }}T{{ _mod_ts[11:19] if _mod_ts|length >= 19 else '00:00:00' }}+03:00",
           "author": {% if is_desk %}{
             "@type": "Organization",
             "name": "Gündem Analizi Haber Masası",
@@ -496,6 +497,11 @@
                     <a href="/?kategori=Sağlık" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Sağlık</a>
                     <a href="/?kategori=Spor" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Spor</a>
                     <a href="/?kategori=Dünya" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">Dünya</a>
+                    <a href="/dosya" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">📁 Rehberler</a>
+                    <a href="/hesaplama" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🧮 Hesaplama</a>
+                    <a href="/piyasalar" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🪙 Piyasalar</a>
+                    <a href="/super-lig-puan-durumu" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🏆 Puan Durumu</a>
+                    <a href="/son-depremler" class="px-3 py-1 rounded-full hover:bg-red-700 text-white transition shrink-0" style="color: #ffffff !important;">🌍 Deprem</a>
                 </nav>
             </div>
         </div>
@@ -562,6 +568,9 @@
                 <span class="text-slate-600 font-medium flex items-center gap-1">
                     <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-500"></i> {{ (article.created_at or '')[:16] }}
                 </span>
+                {% if article.updated_at and article.updated_at[:16] != (article.created_at or '')[:16] %}
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 font-bold text-[11px]">🔴 Güncellendi: {{ article.updated_at[:16] }}</span>
+                {% endif %}
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 {% set _desk_map = {'Analiz': 'Gündem Analizi Masası', 'Ekonomi': 'Ekonomi Masası', 'Spor': 'Spor Servisi', 'Teknoloji': 'Teknoloji Editörlüğü', 'Otomobil': 'Otomobil Editörlüğü', 'Sağlık': 'Sağlık Editörlüğü', 'Eğitim': 'Eğitim Servisi', 'Dünya': 'Dış Haberler Servisi'} %}
                 {% if is_desk %}
