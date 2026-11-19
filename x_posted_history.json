@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "canakkalede-karayolunda-kontrolden-cikan-otomobil-tir-ile-carpisip-alev-aldi",
-    "title": "Çanakkale'de Karayolunda Kontrolden Çıkan Otomobil TIR İle Çarpışıp Alev Aldı",
-    "summary": "Çanakkale’nin Çan ilçesinde meydana gelen trafik kazasında, bir başka kaza sonrası olay yerinden kaçtığı iddia edilen otomobil, karşı yönden gelen TIR ile çarpıştı. Şiddetli çarpışmanın etkisiyle alev alan otomobilde bulunan iki kişi hayatını kaybede",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793995449.413937
-  },
-  {
     "slug": "kasimpasa-gaziantepte-erken-gollerle-kazandi-kotu-gidis-suruyor",
     "title": "Kasımpaşa Gaziantep'te Erken Gollerle Kazandı Kötü Gidiş Sürüyor",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795112191.4158487
+  },
+  {
+    "slug": "bayraktar-kizilelma-insansiz-savas-ucagi-turk-silahli-kuvvetleri-envanterine",
+    "title": "Bayraktar Kızılelma insansız savaş uçağı Türk Silahlı Kuvvetleri envanterine girdi",
+    "summary": "Bayraktar Kızılelma insansız savaş uçağı, kabul testlerini tamamlamasının ardından Türk Silahlı Kuvvetleri envanterine alındı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795114916.4305534
   }
 ]
