@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "openai-veri-merkezi-projelerinde-kamu-tepkisi-sonrasi-seffaflik-donemi-baslatiyo",
-    "title": "OpenAI Veri Merkezi Projelerinde Kamu Tepkisi Sonrası Şeffaflık Dönemi Başlatıyor",
-    "summary": "Yapay zeka altyapılarına yönelik artan toplumsal direnç karşısında geri adım atan OpenAI, yeni inşa edilecek veri merkezleri için su ve elektrik kullanımına dair katı şeffaflık kuralları getirdi. Şirket, yerel topluluklarla doğrudan iletişim kuracağı",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793973681.8710694
-  },
-  {
     "slug": "afyonkarahisar-katliaminda-kan-donduran-itiraf-planli-cinayetlerin-detaylari-ort",
     "title": "Afyonkarahisar Katliamında Kan Donduran İtiraf: Planlı Cinayetlerin Detayları Ortaya Çıktı",
     "summary": "Afyonkarahisar’da borç anlaşmazlığı nedeniyle sekiz kişiyi pompalı tüfekle öldüren Arif Sefa Özdemir, jandarmadaki ifadesinde cinayetleri nasıl planladığını ve kurbanlarını nasıl tuzağa düşürdüğünü tüm çıplaklığıyla anlattı. Gasp ve cinayet suçlamala",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795090396.437436
+  },
+  {
+    "slug": "uzmanlardan-okul-tatilinde-dengeli-yasam-ve-dinlenme-uyarisi",
+    "title": "Uzmanlardan Okul Tatilinde Dengeli Yaşam ve Dinlenme Uyarısı",
+    "summary": "Uzmanlar okul tatillerinde yoğun ders programları ile değişen uyku rutinlerinin çocukların psikolojik sağlığını ve ikinci döneme uyumunu olumsuz etkileyebileceğini belirtiyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795093119.305844
   }
 ]
