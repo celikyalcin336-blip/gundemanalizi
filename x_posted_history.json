@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "meteorolojiden-sert-uyari-turkiye-hafta-sonu-soguk-hava-ve-firtinayla-sarsilacak",
-    "title": "Meteorolojiden Sert Uyarı: Türkiye Hafta Sonu Soğuk Hava ve Fırtınayla Sarsılacak",
-    "summary": "Hafta sonu Türkiye genelinde etkisini gösterecek soğuk hava dalgası, beraberinde yoğun kar yağışı ve fırtınayı getiriyor. Kuzey ve doğu bölgelerinde sıcaklıklar hızla düşerken, iç kesimlerde gece ayazı ve don riski artıyor.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793946457.0652425
-  },
-  {
     "slug": "kuresel-piyasalarda-dolarin-seyri-icin-stratejistlerin-celiskili-beklentileri",
     "title": "Küresel Piyasalarda Doların Seyri İçin Stratejistlerin Çelişkili Beklentileri",
     "summary": "ABD ara seçimlerinin ardından kısa süreli bir geri çekilme yaşayan dolar endeksi, Amerikan ekonomisinin dirençli yapısıyla yeniden yönünü belirlemeye çalışıyor. Bank of America, Standard Chartered ve Chatham Financial analistleri, Fed'in faiz artırım",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795063152.7877645
+  },
+  {
+    "slug": "yapay-zeka-yanilgisi-baltimore-okulunda-polis-baskinina-yol-acti",
+    "title": "Yapay Zeka Yanılgısı Baltimore Okulunda Polis Baskınına Yol Açtı",
+    "summary": "ABD'nin Maryland eyaletinde yer alan Kenwood Lisesi önünde cips paketini silah sanan yapay zeka sisteminin tetiklediği polis baskını nedeniyle mahkemeye başvuruldu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795065877.101324
   }
 ]
