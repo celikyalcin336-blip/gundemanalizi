@@ -2939,23 +2939,27 @@ async def robots(request: Request):
 
 @app.get("/site-haritasi", response_class=HTMLResponse)
 async def html_sitemap(request: Request):
-    """Ziyaretçiler ve Googlebot için tüm haber arşivini (Sıfır Yetim Sayfa) kategorilere göre sunan HTML Site Haritası."""
+    """Ziyaretçiler için sade, hızlı yüklenen (~35 KB) HTML Site Haritası: tüm bölümler, rehberler ve her kategoriden son 15 haber.
+    Tam arşiv arama motoru botları için /sitemap.xml içinde eksiksiz yer alır."""
     articles = await asyncio.to_thread(_indexable_articles)
     if not articles:
-        articles = database.get_articles(limit=200)
+        articles = database.get_articles(limit=120)
     cat_order = ["Gündem", "Ekonomi", "Teknoloji", "Spor", "Otomobil", "Sağlık", "Eğitim", "Dünya"]
     grouped_map = {c: [] for c in cat_order}
+    cat_totals = {c: 0 for c in cat_order}
     for a in articles:
         c = database.normalize_category_name(a.get("category") or "Gündem") or "Gündem"
         if c not in grouped_map:
             c = "Gündem"
-        grouped_map[c].append(a)
-    grouped_articles = [(c, grouped_map[c]) for c in cat_order if grouped_map.get(c)]
+        cat_totals[c] += 1
+        if len(grouped_map[c]) < 15:
+            grouped_map[c].append(a)
+    grouped_articles = [(c, grouped_map[c], cat_totals[c]) for c in cat_order if grouped_map.get(c)]
     return templates.TemplateResponse(
         request=request,
         name="sitemap.html",
         context={
-            "articles": articles,
+            "articles": articles[:80],
             "grouped_articles": grouped_articles,
             "total_articles_count": len(articles),
         }

@@ -34,6 +34,27 @@ _CRIME_ACCIDENT_SKIP = re.compile(
     re.I,
 )
 
+# Derin Analiz Dosyası olmayan rutin bülten / protokol / sınav yeri duyuruları (normal haber olarak kalır)
+_ROUTINE_NOT_ANALYSIS_RE = re.compile(
+    r"(rozet\s+takt|kabul\s+etti|ziyaret\s+etti|bir\s+araya\s+geldi|ile\s+görüştü|heyetini\s+ağırladı|"
+    r"tebrik\s+etti|başsağlığı\s+diledi|sınav\s+yeri\s+belge|giriş\s+belge\w*\s+.*erişime\s+açt|"
+    r"kitapçık\w*\s+.*erişime\s+aç|cisim\s+isabet\s+etmesi|havai\s+fişek)",
+    re.I,
+)
+
+
+def _fix_ascii_turkish_title(t: str) -> str:
+    """Eski başlıklardaki ASCII Türkçe yazım kusurlarını ('Erisimini Guvenceye ... Izmirde Baslatildi') düzeltir."""
+    if not t:
+        return t
+    repls = [
+        ("Erisimini", "Erişimini"), ("Guvenceye", "Güvenceye"), ("Girisimi", "Girişimi"),
+        ("Izmirde", "İzmir'de"), ("Izmir", "İzmir"), ("Baslatildi", "Başlatıldı"),
+    ]
+    for old, new in repls:
+        t = t.replace(old, new)
+    return t
+
 
 def _strip_tags(html_text: str) -> str:
     if not html_text:
@@ -548,7 +569,7 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     import database
 
     seed_curated_analyses()
-    synth_pool = database.get_articles(limit=18, category="Analiz")
+    synth_pool = database.get_articles(limit=30, category="Analiz")
     if not synth_pool or not any((x.get("category") or "").strip() == "Analiz" for x in synth_pool):
         if not globals().get("_BG_ANALIZ_RUNNING"):
             globals()["_BG_ANALIZ_RUNNING"] = True
@@ -564,13 +585,22 @@ def get_agenda_radar_data(widgets: Dict, force_refresh: bool = False) -> Dict:
     dossiers = []
     seen_titles = set()
     for s in (synth_pool or []):
-        # Çift güvenlik: Sadece gerçek kategorisi 'Analiz' olanları kabul et
+        # Çift güvenlik: Sadece gerçek kategorisi 'Analiz' olan ve rutin bülten/protokol OLMAYAN dosyaları vitrine çıkar
         if (s.get("category") or "").strip() != "Analiz":
             continue
-        t_norm = (s.get("title") or "").strip().lower()
+        fixed_title = _fix_ascii_turkish_title(s.get("title") or "")
+        try:
+            import fact_guard
+            fixed_title = fact_guard.to_turkish_sentence_case(fixed_title, f"{fixed_title}. {s.get('summary') or ''}")
+        except Exception:
+            pass
+        if _ROUTINE_NOT_ANALYSIS_RE.search(fixed_title):
+            continue
+        t_norm = fixed_title.strip().lower()
         if t_norm in seen_titles:
             continue
         seen_titles.add(t_norm)
+        s = {**s, "title": fixed_title}
         c_str = str(s.get("created_at") or "")[:16]
         try:
             _hr = int(c_str[11:13]) if len(c_str) >= 13 and c_str[11:13].isdigit() else 12
@@ -688,9 +718,12 @@ def _ensure_daily_synthesis_reports_locked(force: bool = False) -> Optional[str]
         t = (item.get("title") or "").strip()
         sm = (item.get("summary") or "").strip()
         cat = (item.get("category") or "Gündem").strip()
-        if not t or _CRIME_ACCIDENT_SKIP.search(t) or _is_comm(t):
+        if not t or _CRIME_ACCIDENT_SKIP.search(t) or _ROUTINE_NOT_ANALYSIS_RE.search(t) or _is_comm(t):
             continue
         sib_cnt = len(item.get("siblings") or [])
+        # Gerçek analiz dosyası için çok kaynaklı gündem maddesi şartı (en az 2 farklı kaynak aynı olayı işlemiş olmalı)
+        if sib_cnt < 1:
+            continue
         cat_weight = {
             "Ekonomi": 42,
             "Gündem": 36,

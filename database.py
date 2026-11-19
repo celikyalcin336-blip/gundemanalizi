@@ -395,6 +395,29 @@ def init_db():
     except Exception:
         pass
 
+    # Tek seferlik veri hijyeni (veri silinmez): yanlışlıkla 'Analiz' etiketi almış rutin protokol/bülten haberlerini
+    # gerçek kategorilerine (Gündem / Eğitim / Dünya) taşır ve ASCII başlık yazımını düzeltir.
+    try:
+        if get_setting("analiz_hygiene_v1", "") != "1":
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE articles SET title = ? WHERE slug = ?",
+                    ("Müttefiklerin uzay erişimini güvenceye alan STARLIFT girişimi İzmir'de başlatıldı",
+                     "muttefiklerin-uzay-erisimini-guvenceye-alan-starlift-girisimi-izmirde-baslatildi"),
+                )
+                conn.execute(
+                    "UPDATE articles SET category = 'Eğitim' WHERE category = 'Analiz' AND (LOWER(title) LIKE '%ösym%' OR LOWER(title) LIKE '%sınav yeri%' OR LOWER(title) LIKE '%ales%')",
+                )
+                conn.execute(
+                    "UPDATE articles SET category = 'Dünya' WHERE category = 'Analiz' AND (LOWER(title) LIKE '%papa %' OR LOWER(title) LIKE '%havai fişek%' OR LOWER(title) LIKE '%görüştü%')",
+                )
+                conn.execute(
+                    "UPDATE articles SET category = 'Gündem' WHERE category = 'Analiz' AND LOWER(title) LIKE '%rozet takt%'",
+                )
+            set_setting("analiz_hygiene_v1", "1")
+    except Exception as _he:
+        print(f"analiz_hygiene_v1 uyarısı: {_he}")
+
 
 def cleanup_corrupted_articles():
     # Hatalı kategori düzeltmesi: Estetik, cerrahi ve bıçak altına yatma haberleri kesinlikle Sağlık olmalıdır

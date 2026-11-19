@@ -153,9 +153,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
                 <div>
                     <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-                        <span class="text-red-600">📰</span> Tüm Haber Arşivi ({{ articles|length }} Haber)
+                        <span class="text-red-600">📰</span> Kategorilere Göre Son Haberler (Toplam {{ total_articles_count or (articles|length) }} Haber)
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">Kategorilere göre sınıflandırılmış tam yayın dizini. Hızlı geçiş için kategori seçebilirsiniz:</p>
+                    <p class="text-xs text-slate-500 mt-1">Her kategorinin en güncel 15 haberi aşağıda listelenir; tüm arşiv sayfalarına ilgili kategori vitrininden ve XML site haritasından ulaşabilirsiniz:</p>
                 </div>
                 <a href="/analiz" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-red-600 text-white text-xs font-extrabold transition shrink-0">
                     📊 Gündem Analizi Veri Radarı →
@@ -164,21 +164,21 @@
 
             {% if grouped_articles %}
             <div class="flex flex-wrap gap-2">
-                {% for cat_name, cat_items in grouped_articles %}
+                {% for cat_name, cat_items, cat_total in grouped_articles %}
                 <a href="#arsiv-{{ loop.index }}" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-600 hover:text-white text-slate-800 text-xs font-extrabold transition border border-slate-200">
-                    {{ cat_name }} ({{ cat_items|length }})
+                    {{ cat_name }} ({{ cat_total }})
                 </a>
                 {% endfor %}
             </div>
 
-            {% for cat_name, cat_items in grouped_articles %}
+            {% for cat_name, cat_items, cat_total in grouped_articles %}
             <section id="arsiv-{{ loop.index }}" class="pt-4 border-t border-slate-100">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-red-600"></span>
-                        {{ cat_name }} Haberleri ({{ cat_items|length }})
+                        {{ cat_name }} — Son {{ cat_items|length }} Haber (Toplam {{ cat_total }})
                     </h3>
-                    <a href="/?kategori={{ cat_name }}" class="text-xs font-bold text-red-600 hover:underline">{{ cat_name }} Vitrinine Git →</a>
+                    <a href="/?kategori={{ cat_name }}" class="text-xs font-bold text-red-600 hover:underline">Tüm {{ cat_name }} Haberleri →</a>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
                     {% for a in cat_items %}
