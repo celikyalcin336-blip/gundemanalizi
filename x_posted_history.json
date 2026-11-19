@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "new-york-fed-baskani-williams-mevcut-veriler-enflasyon-riskini-desteklemiyor",
-    "title": "New York Fed Başkanı Williams: Mevcut Veriler Enflasyon Riskini Desteklemiyor",
-    "summary": "New York Fed Başkanı John Williams, ABD ekonomisindeki güncel verilerin herhangi bir alarm durumuna işaret etmediğini belirterek merkez bankasının veri odaklı bekle-gör politikasını savundu. Ücret artışlarının hedeflerle uyumlu seyrettiğini vurgulaya",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793970960.7695699
-  },
-  {
     "slug": "openai-veri-merkezi-projelerinde-kamu-tepkisi-sonrasi-seffaflik-donemi-baslatiyo",
     "title": "OpenAI Veri Merkezi Projelerinde Kamu Tepkisi Sonrası Şeffaflık Dönemi Başlatıyor",
     "summary": "Yapay zeka altyapılarına yönelik artan toplumsal direnç karşısında geri adım atan OpenAI, yeni inşa edilecek veri merkezleri için su ve elektrik kullanımına dair katı şeffaflık kuralları getirdi. Şirket, yerel topluluklarla doğrudan iletişim kuracağı",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795087673.2142992
+  },
+  {
+    "slug": "yargitaydan-resit-olmadan-baba-yaninda-calisan-eytlilerin-emeklilik-hesabina-ili",
+    "title": "Yargıtaydan Reşit Olmadan Baba Yanında Çalışan EYT'lilerin Emeklilik Hesabına İlişkin Emsal Karar",
+    "summary": "Reşit olmadan önce babasına ait iş yerinde geçen prim günlerinin EYT kapsamında sayılması talebiyle açılan davada Yargıtay, eksik inceleme gerekçesiyle yerel mahkeme kararını bozdu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795090396.437436
   }
 ]
