@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "nvidia-rtx-5070-ti-modellerinde-fiyatlar-kisa-surede-iki-katina-cikti",
-    "title": "Nvidia RTX 5070 Ti Modellerinde Fiyatlar Kısa Sürede İki Katına Çıktı",
-    "summary": "Şubat ayında 750 dolar fiyat etiketiyle piyasaya sürülen RTX 5070 Ti ekran kartları, ABD pazarındaki arz ve talep dengesizliği nedeniyle 1500 dolar seviyelerine tırmandı. Donanım dünyasında şaşkınlık yaratan bu ani fiyat artışı, farklı üreticilerin m",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793979122.7114365
-  },
-  {
     "slug": "avrupa-birliginden-tiktokun-algoritmasina-ruh-sagligi-sorusturmasi",
     "title": "Avrupa Birliği’nden TikTok’un Algoritmasına Ruh Sağlığı Soruşturması",
     "summary": "Avrupa Komisyonu, TikTok’un kişiselleştirilmiş video akış sisteminin kullanıcıları zararlı içerik döngülerine sürüklediği gerekçesiyle yürüttüğü incelemenin ön bulgularını paylaştı. Yapılan değerlendirmelerde, özellikle genç kullanıcıların psikolojis",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795095842.4485605
+  },
+  {
+    "slug": "ilayda-yasar-wushu-bransinda-balkan-sampiyonluguna-ulasti",
+    "title": "İlayda Yaşar Wushu Branşında Balkan Şampiyonluğuna Ulaştı",
+    "summary": "Milli sporcu İlayda Yaşar, Bolu'da gerçekleştirilen uluslararası organizasyonda altın madalya kazandı. Genç sporcunun başarısı memleketi Ordu'da büyük bir gurur yaşattı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795098566.4084752
   }
 ]
