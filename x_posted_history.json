@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "aleksey-batrakov-icin-transfer-spekulasyonlari-ve-menajerinden-gelen-iddiali-bon",
-    "title": "Aleksey Batrakov İçin Transfer Spekülasyonları ve Menajerinden Gelen İddialı Bonservis Yanıtı",
-    "summary": "Galatasaray forması giyen genç orta saha oyuncusu Aleksey Batrakov'un Avrupa'daki dikkat çekici performansı, transfer piyasasındaki değerini hızla yükseltti. Oyuncunun menajeri tarafından dile getirilen yüksek bonservis beklentisi, sarı-kırmızılı kul",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793990008.438531
-  },
-  {
     "slug": "teknoloji-devlerini-bulusturacak-beyaz-saray-zirvesi-piyasa-calkantisi-nedeniyle",
     "title": "Teknoloji Devlerini Buluşturacak Beyaz Saray Zirvesi Piyasa Çalkantısı Nedeniyle Ertelendi",
     "summary": "ABD Başkanı Trump yönetimi, Nvidia ve Meta gibi teknoloji devlerinin üst düzey yöneticilerini ağırlamayı planladığı bilim ve teknoloji konseyi toplantısını aniden askıya aldı. Kararın, borsalarda teknoloji hisselerine yönelik sert satış dalgasının ar",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795106742.5971782
+  },
+  {
+    "slug": "uzmanlardan-cocuklarda-omega-3-eksikligi-ve-tuketim-uyarisi",
+    "title": "Uzmanlardan çocuklarda omega-3 eksikliği ve tüketim uyarısı",
+    "summary": "Uzmanlar, çocuklarda omega-3 yetersizliğine karşı haftada iki öğün balık tüketimini önerirken, eksikliğin çeşitli sağlık sorunlarıyla ilişkili olabileceğini belirtiyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795109466.923484
   }
 ]
