@@ -84,16 +84,24 @@ def process_single_news(item: dict, pool: list = None) -> bool:
     item_category = item.get("category")
     article_data = None
     # 2.a Yeni çok kaynaklı format (aynı olayı anlatan farklı kaynakları birleştirir)
+    ms_reason = ""
     try:
         import multisource
         ms_category = item_category if item_category in {"Gündem", "Ekonomi", "Eğitim", "Otomobil", "Teknoloji", "Sağlık", "Spor", "Dünya"} else ai_writer.classify_article(title, summary, item_category)
         article_data = multisource.build_article(item, summary, pool or [], category=ms_category, mode="news")
+        ms_reason = getattr(multisource, "LAST_REJECT_REASON", "") if not article_data else ""
     except Exception as _ms_e:
-        print(f"⚠️ [Çok Kaynaklı] Hata, eski akışa dönülüyor: {_ms_e}")
+        print(f"⚠️ [Çok Kaynaklı] Hata, yedek akışa dönülüyor: {_ms_e}")
         article_data = None
-    # 2.b Yedek: mevcut tek kaynaklı yazım akışı (bot hiçbir koşulda durmaz)
+        ms_reason = "ai_failed"
+    # Kaynak yetersizse haber şişirilmez: yedek akışa da gönderilmez, bir daha denenmemek üzere işaretlenir
+    if not article_data and ms_reason in ("thin_source", "too_short"):
+        database.claim_news_for_processing(news_hash, title=title, source=source, link=link)
+        print(f"⏩ [Kaynak Yeterliliği] '{title[:50]}' için yeterli kaynak bilgisi yok; yayınlanmadı, sıradaki habere geçiliyor.")
+        return False
+    # 2.b Yedek: yalnızca yapay zekâ servisi hata verdiğinde tek kaynaklı yazım akışı
     if not article_data:
-        article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category)
+        article_data = ai_writer.generate_full_article(title, summary, source, force_category=item_category, min_source_words=90)
     if not article_data:
         print(f"⛔ [KESİN EMİR - METİN KALİTE KALKANI] '{title[:50]}' için özgün makale üretilemedi; yayınlanmadı.")
         return False
@@ -103,7 +111,7 @@ def process_single_news(item: dict, pool: list = None) -> bool:
     clean_c = content_quality.clean_article_html(article_data.get("content") or "")
     category = database.normalize_category_name(article_data.get("category") or item_category or "Gündem") or "Gündem"
 
-    if len(clean_t) < 15 or content_quality.visible_word_count(clean_c) < 250:
+    if len(clean_t) < 15 or content_quality.visible_word_count(clean_c) < 170:
         print(f"⛔ [KESİN EMİR - YETERSİZ İÇERİK ENGELLENDİ] '{clean_t[:50]}' kelime/başlık barajını geçemedi; yayınlanmadı.")
         return False
 
@@ -119,15 +127,14 @@ def process_single_news(item: dict, pool: list = None) -> bool:
     telegram_caption = ai_writer.generate_telegram_post(final_title, summary, source)
     print(f"   [Kategori: {category} | {content_quality.visible_word_count(clean_c)} Kelime Özgün Makale Hazır]")
 
-    # 2.5. HASSAS 40 DAKİKA NİŞANGAHI:
-    # Haber 35.5. dakikada önceden hazırlanır; 39.5. dakikada yayına basılır!
-    TARGET_MINUTES = 39.5
+    # 2.5. DOĞAL YAYIN TEMPOSU: gündüz sık, gece seyrek (günlük toplam ~40 haber korunur)
+    TARGET_MINUTES = get_publish_interval_minutes()
     while True:
         mins_now = get_minutes_since_last_article()
         if mins_now >= TARGET_MINUTES:
             break
         wait_sec = min(10.0, max(1.0, (TARGET_MINUTES - mins_now) * 60.0))
-        print(f"⏱️ [40 Dk Kuralı] Haber ve gerçek görseli hazır! 39.5. dk hedefi için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
+        print(f"⏱️ [Yayın Temposu] Haber hazır; {round(TARGET_MINUTES, 1)} dk aralık için {round(wait_sec, 1)} sn bekleniyor (Geçen: {round(mins_now, 1)} dk)...")
         time.sleep(wait_sec)
 
     # 3. Web Sitesinde Yayınlama (Yazısız, saf ve kristal netliğinde görsel)
@@ -216,6 +223,21 @@ def is_commodity_news(title: str) -> bool:
         return True
     return bool(_COMMODITY_RE.search(t))
 
+def get_publish_interval_minutes() -> float:
+    """
+    Doğal yayın temposu (Türkiye saati):
+    - 07:00-23:59 arası ~32 dk (okurun en yoğun olduğu saatler)
+    - 00:00-06:59 arası ~60 dk (gece seyrek)
+    Saatlik sabit küçük sapma (±3 dk) eklenir; robot gibi dakikası dakikasına aynı aralık oluşmaz.
+    Günlük toplam ~40 haber (17 saat x ~1,9 + 7 saat x 1).
+    """
+    import random
+    now_tr = datetime.now(database.TR_TZ)
+    base = 60.0 if now_tr.hour < 7 else 32.0
+    jitter = random.Random(now_tr.strftime("%Y%m%d%H")).uniform(-3.0, 3.0)
+    return base + jitter
+
+
 def get_minutes_since_last_article() -> float:
     """
     Veritabanındaki en son yayınlanan OTONOM BOT haberinin üzerinden kaç dakika geçtiğini hesaplar.
@@ -250,8 +272,8 @@ def get_minutes_since_last_article() -> float:
 
 def run_bot(max_items: int = 1, force: bool = False):
     """
-    11.5. dakikada uyanıp haberi önceden hazırlar ve tam 15:00. dakikada sıfır gecikmeyle yayınlar.
-    Sabit Kategori Sırası: Gündem -> Ekonomi -> Dünya -> Spor -> Teknoloji -> Otomobil -> Sağlık -> Eğitim
+    Doğal tempoda (gündüz ~32 dk, gece ~60 dk) uyanıp en önemli haberi önceden hazırlar ve yayınlar.
+    Seçim: önem puanı (kaynak sayısı + okur ilgisi), kategori dengesi ikinci kriter.
     """
     global _BOT_PROCESS_LOCK
     if not _BOT_PROCESS_LOCK.acquire(blocking=False):
@@ -264,8 +286,8 @@ def run_bot(max_items: int = 1, force: bool = False):
 
 def _run_bot_internal(max_items: int = 1, force: bool = False):
     if not force:
-        # En fazla 15 dk kuralı: Hazırlığa 10.0. dakikada başlar, 13.5. dakikada yayına basar!
-        prep_start_minute = 35.5
+        # Hazırlık, yayın aralığından ~4 dk önce başlar (kaynak tarama + AI metin + görsel)
+        prep_start_minute = max(5.0, get_publish_interval_minutes() - 4.0)
         minutes_passed = get_minutes_since_last_article()
         if minutes_passed < prep_start_minute:
             remaining = round(prep_start_minute - minutes_passed, 1)
@@ -293,42 +315,49 @@ def _run_bot_internal(max_items: int = 1, force: bool = False):
 
     print(f"📡 Paylaşılmaya hazır {len(fresh_news)} adet taze ve benzersiz haber tespit edildi.")
 
-    # 🎯 8 KATEGORİ TAM EŞİTLİK VE ADİL ROTASYON (Otomobil, Sağlık, Eğitim Asla Atlanamaz!)
-    ALL_CATEGORIES = [
-        "Gündem", "Ekonomi", "Dünya", "Spor",
-        "Teknoloji", "Otomobil", "Sağlık", "Eğitim"
-    ]
+    # 🎯 ÖNEM PUANI İLE HABER SEÇİMİ (Genel Yayın Yönetmeni mantığı)
+    # 1. Aynı olayı kaç farklı kaynak yazdı (en güçlü gündem sinyali)
+    # 2. Okur ilgisi / cüzdan / sıcak gündem puanı (news_fetcher)
+    # 3. Kategori dengesi YALNIZCA ikinci kriter: son haberlerde hiç olmayan kategoriye destek,
+    #    art arda aynı kategoriye hafif ceza (sabit sıralı rotasyon kaldırıldı)
     recent_arts = database.get_articles(limit=24)
     recent_cats = [a.get("category", "") for a in recent_arts if a.get("category")]
     last_cat = recent_cats[0] if recent_cats else ""
+    last8 = recent_cats[:8]
 
-    # En uzun süredir haber paylaşılmamış kategoriyi EN BAŞA koy:
-    # Eğer bir kategori son 24 haberde hiç yoksa (Örn: Otomobil, Sağlık, Eğitim) puanı 9999 olur ve İLK SIRADA paylaşılır!
-    def get_cat_starvation_score(cat):
+    def importance(item) -> float:
+        cat = item.get("category", "Gündem")
+        coverage = 1 + len(item.get("siblings") or [])
+        imp = float(item.get("score", 0))
+        imp += 60.0 * min(coverage - 1, 4)          # her ek kaynak: +60 (en fazla +240)
         if cat not in recent_cats:
-            return 9999
-        return recent_cats.index(cat)
+            imp += 70.0                             # 24 haberdir hiç yoksa denge desteği
+        elif cat not in last8:
+            imp += 25.0
+        if cat == last_cat:
+            imp -= 35.0                             # art arda aynı kategori
+        if last8.count(cat) >= 3:
+            imp -= 30.0                             # son 8 haberin 3'ü aynı kategoriyse
+        return imp
 
-    priority_categories = sorted(ALL_CATEGORIES, key=get_cat_starvation_score, reverse=True)
-    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Kesin Adil Sıra: {priority_categories}")
-
-    selected_pool = []
-    for target_cat in priority_categories:
-        cat_items = [item for item in fresh_news if item.get("category") == target_cat]
-        cat_items.sort(key=lambda x: x.get("score", 0), reverse=True)
-        selected_pool.extend(cat_items)
+    for _it in fresh_news:
+        _it["importance"] = importance(_it)
+    selected_pool = sorted(fresh_news, key=lambda x: x.get("importance", 0), reverse=True)
+    print(f"📋 Son Yayınlanan: [{last_cat or 'Yok'}] | Önem sırası ilk 5: " + " | ".join(
+        f"[{i.get('category')}] {i.get('title', '')[:35]} ({round(i.get('importance', 0))}, {1 + len(i.get('siblings') or [])} kaynak)"
+        for i in selected_pool[:5]))
 
     processed_count = 0
     tried_count = 0
-    MAX_CANDIDATE_ATTEMPTS = 6
+    MAX_CANDIDATE_ATTEMPTS = 8
     for item in selected_pool:
         if processed_count >= max_items or tried_count >= MAX_CANDIDATE_ATTEMPTS:
             break
         tried_count += 1
         title_snippet = item.get('title', '')[:45]
         cat = item.get('category', 'Gündem')
-        score = item.get('score', 0)
-        print(f"🎯 [Otonom Bot] Sıradaki Kategoriden Seçilen Haber ({tried_count}/{MAX_CANDIDATE_ATTEMPTS}): [{cat}] {title_snippet}... (Puan: {score})")
+        score = round(item.get('importance', 0))
+        print(f"🎯 [Otonom Bot] Önem sırasına göre seçilen haber ({tried_count}/{MAX_CANDIDATE_ATTEMPTS}): [{cat}] {title_snippet}... (Önem: {score})")
         try:
             success = process_single_news(item, pool=news_items)
             if success:

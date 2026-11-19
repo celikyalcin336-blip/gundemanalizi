@@ -2394,66 +2394,9 @@ async def article_detail(request: Request, slug: str):
     raw_content = content_quality.clean_article_html(raw_content)
     is_thin_article = (category != "Analiz") and content_quality.is_thin(raw_content, threshold=220)
 
-    # Eski/yeni makalelerdeki tekdüze "Gündem Analizi Notu: Bu Sizin İçin Ne Anlama Geliyor?" şablon başlığını
-    # ve kalıp kapanış cümlelerini kategoriye ve haber ID'sine göre doğal gazetecilik başlıklarıyla çeşitlendir
-    _NATURAL_SUBHEADS = {
-        "Ekonomi": [
-            "Piyasa Dengeleri ve Ekonomik Görünüm",
-            "Sektörel Yansımalar ve Bütçe Etkisi",
-            "Finansal Perspektif ve Önümüzdeki Dönem",
-            "Reel Sektör ve Tüketici Açısından Tablo",
-        ],
-        "Teknoloji": [
-            "Teknolojik Dönüşüm ve Kullanıcı Deneyimi",
-            "Sektörel Rekabet ve Yeni Standartlar",
-            "Dijital Ekosistemde Beklenen Yansımalar",
-            "Donanım ve Yazılım Dünyasında Yeni Safha",
-        ],
-        "Otomobil": [
-            "Otomotiv Pazarında Rekabet ve Beklentiler",
-            "Sürücü Deneyimi ve Sektörel Yansımalar",
-            "Piyasa Koşulları ve Model Stratejisi",
-            "Mobilite Dünyasında Öne Çıkan Detaylar",
-        ],
-        "Spor": [
-            "Saha İçi Dengeler ve Teknik Değerlendirme",
-            "Sezon Yürüyüşünde Kritik Viraj",
-            "Takım Performansı ve Rekabet Tablosu",
-            "Spor Kamuoyunda Yansımalar ve Beklentiler",
-        ],
-        "Sağlık": [
-            "Klinik Değerlendirme ve Koruyucu Önlemler",
-            "Toplum Sağlığı Açısından Öne Çıkan Noktalar",
-            "Uzman Yaklaşımı ve Günlük Yaşam Etkisi",
-            "Tıbbi Süreçler ve Dikkat Edilmesi Gerekenler",
-        ],
-        "Eğitim": [
-            "Akademik Takvim ve Öğrenciler İçin Rehber",
-            "Eğitim Süreçlerinde Yeni Dönem",
-            "Adaylar ve Veliler Açısından Önemli Noktalar",
-            "Kurumsal Uygulama ve Takvim Detayları",
-        ],
-        "Dünya": [
-            "Uluslararası Dengeler ve Diplomatik Tablo",
-            "Bölgesel Güvenlik ve Jeopolitik Yansımalar",
-            "Küresel Siyasette Olası Senaryolar",
-            "Diplomatik Trafik ve Sahadaki Gerçekler",
-        ],
-        "Gündem": [
-            "Kamuoyu Yansımaları ve Sürecin Çerçevesi",
-            "Sahadaki Durum ve İdari Süreç",
-            "Toplumsal Etkiler ve Beklenen Adımlar",
-            "Resmi Süreç ve Öne Çıkan Ayrıntılar",
-        ],
-    }
-    _cat_heads = _NATURAL_SUBHEADS.get(category, _NATURAL_SUBHEADS["Gündem"])
-    _chosen_head = _cat_heads[(article_id or 0) % len(_cat_heads)]
-    raw_content = re.sub(
-        r'<h3([^>]*)>\s*Gündem Analizi Notu[^<]*</h3>',
-        lambda _m: f'<h3{_m.group(1)}>{_chosen_head}</h3>',
-        raw_content,
-        flags=re.I,
-    )
+    # Eski makalelerdeki tekdüze "Gündem Analizi Notu: ..." şablon ara başlığı kaldırılır (başlık çevirme yapılmaz;
+    # altındaki paragraf metnin doğal devamı olarak kalır)
+    raw_content = re.sub(r'<h3[^>]*>\s*Gündem Analizi Notu[^<]*</h3>', '', raw_content, flags=re.I)
     # Tekdüze yapay zeka kapanış kalıplarını ("en doğru yaklaşım olacaktır" vb.) doğal cümlelerle yumuşat
     raw_content = re.sub(
         r'\ben doğru yaklaşım olacaktır\.',

@@ -50,6 +50,7 @@
 
 
     <!-- Google News, Discover & Breadcrumb Schema (JSON-LD) -->
+    {% set is_desk = (article.category == 'Analiz') or (article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel', 'Özel']) %}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -67,11 +68,15 @@
           ],
           "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
           "dateModified": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
-          "author": {
+          "author": {% if is_desk %}{
+            "@type": "Organization",
+            "name": "Gündem Analizi Haber Masası",
+            "url": "https://xn--gndemanalizi-dlb.com.tr/yayin-ilkeleri"
+          }{% else %}{
             "@type": "Person",
             "name": "Yalçın Çelik",
             "url": "https://xn--gndemanalizi-dlb.com.tr/yazar/yalcin-celik"
-          },
+          }{% endif %},
           "publisher": {
             "@type": "Organization",
             "name": "Gündem Analizi",
@@ -559,9 +564,15 @@
                 </span>
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 {% set _desk_map = {'Analiz': 'Gündem Analizi Masası', 'Ekonomi': 'Ekonomi Masası', 'Spor': 'Spor Servisi', 'Teknoloji': 'Teknoloji Editörlüğü', 'Otomobil': 'Otomobil Editörlüğü', 'Sağlık': 'Sağlık Editörlüğü', 'Eğitim': 'Eğitim Servisi', 'Dünya': 'Dış Haberler Servisi'} %}
-                <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Genel Yayın Yönetmeni ve Sorumlu Yazı İşleri Müdürü">
-                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Editör: Yalçın Çelik
+                {% if is_desk %}
+                <a href="/yayin-ilkeleri" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Gündem Analizi Haber Masası • Yayın İlkeleri">
+                    <i data-lucide="newspaper" class="w-3.5 h-3.5 text-red-600"></i> Gündem Analizi Haber Masası
                 </a>
+                {% else %}
+                <a href="/yazar/yalcin-celik" class="inline-flex items-center gap-1 text-slate-700 hover:text-red-600 font-bold text-xs transition" title="Genel Yayın Yönetmeni ve Sorumlu Yazı İşleri Müdürü">
+                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-red-600"></i> Yalçın Çelik
+                </a>
+                {% endif %}
                 {% if is_multi_source and source_count and source_count > 1 %}
                 <span class="text-slate-400 hidden sm:inline">•</span>
                 <span class="inline-flex items-center gap-1 text-slate-700 font-bold text-xs">
@@ -670,7 +681,7 @@
                         <span class="font-semibold text-slate-700">Sorumlu Yazı İşleri Müdürü: <a href="/yazar/yalcin-celik" class="text-red-600 hover:underline">Yalçın Çelik</a> (<a href="/kunye" class="text-slate-600 underline">Künye</a>)</span>
                     </div>
                     <p class="text-slate-600 text-[11px] leading-relaxed">
-                        {% if is_multi_source %}Bu içerik, yukarıda bağlantısı verilen kaynaklar karşılaştırılarak Gündem Analizi editörlüğünde <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde hazırlanmıştır.{% elif article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel'] %}Bu haber, <strong>{{ article.source }}</strong> ve açık basın kaynaklarındaki veriler doğrultusunda Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde derlenerek yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi <strong>{{ article.category or 'Gündem' }} Servisi</strong> tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% endif %}
+                        {% if is_desk %}Bu haber, belirtilen kaynaklardan yapay zekâ desteğiyle derlenmiş ve <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde yayına hazırlanmıştır.{% else %}Bu içerik Gündem Analizi tarafından <a href="/yayin-ilkeleri" class="underline font-semibold">Yayın İlkelerimiz</a> çerçevesinde hazırlanmıştır.{% endif %}
                         Düzeltme ve cevap hakkı başvuruları için <a href="/iletisim" class="underline font-bold">İletişim Formumuzu</a> kullanabilirsiniz.
                     </p>
                 </div>

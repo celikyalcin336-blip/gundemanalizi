@@ -184,7 +184,7 @@ _FORBIDDEN_TEMPLATE_HEADINGS = {
 }
 
 
-def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hint: bool = False) -> str:
+def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hint: bool = False, feedback: str = "") -> str:
     blocks = []
     for i, s in enumerate(sources, 1):
         blocks.append(f"[{i}] KAYNAK: {s['name']}\nBaşlık: {s['title']}\nMetin: {s['body']}")
@@ -193,7 +193,10 @@ def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hi
         "Resmi açıklamaları, sahadaki somut durumu, hukuki/idari çerçeveyi ve kamuoyunu ilgilendiren yönlerini berrak bir gazetecilik diliyle aktar.",
     )
     if mode == "analysis":
-        length_rule = "Toplam metin 520-720 kelime aralığında, sıkı ve bilgi dolu olsun. Bu bir GÜNLÜK ÖZEL ANALİZ dosyasıdır: neden-sonuç ilişkisini, etkileri ve olası senaryoları tekrara düşmeden incele."
+        length_rule = (
+            "Bu bir GÜNLÜK ÖZEL ANALİZ dosyasıdır: neden-sonuç ilişkisini, etkileri ve olası senaryoları tekrara düşmeden incele. "
+            "Uzunluğu kaynaklardaki bilgi belirler (genellikle 450-700 kelime); kaynakta olmayan bilgiyle metni uzatma."
+        )
         scen_section = """
 [SENARYO_BASLIK]
 Önümüzdeki sürece dair konuya özgü 4-8 kelimelik özgün ara başlık (kesinlikle "Olası Senaryolar" yazma)
@@ -204,16 +207,20 @@ def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hi
 - 3. olası gelişme veya süreç ihtimali (2 tam cümle)
 """
     else:
-        length_rule = "Toplam metin 380-540 kelime aralığında, sıkı, akıcı ve doyurucu olsun."
+        length_rule = (
+            "UZUNLUK KURALI (ÇOK KRİTİK): Metnin uzunluğunu kaynaklardaki GERÇEK BİLGİ miktarı belirler. "
+            "Kaynak kısaysa kısa ve net yaz (yaklaşık 180-300 kelime); kaynaklar zenginse 300-550 kelimeye çıkabilirsin. "
+            "Metni uzatmak için genel geçer, her habere uyacak cümleler YAZMA "
+            "(örnek yasak cümleler: '... dikkatle izleniyor', '... bir kez daha gösterdi', '... önem taşıyor', "
+            "'... dengeleri yeniden şekillendirebilir', '... küresel çapta takip edilecek'). "
+            "Bir bölüm için kaynakta yeterli somut bilgi yoksa o bölüme yalnızca YOK yaz; bölümü boş laf ile doldurma."
+        )
         scen_section = ""
 
-    if extra_length_hint:
-        length_rule += " DİKKAT: Bir önceki deneme çok kısa kaldı; tekrara düşmeden her paragrafı 3-5 tam cümleyle detaylandır."
-
     multi_rule = (
-        f"Aşağıda AYNI olayı anlatan {len(sources)} farklı kaynağın haberleri var. Bunları BİRLEŞTİR ve SENTEZLE; hiçbir kaynağı tek başına kopyalama."
+        f"Aşağıda AYNI olayı anlatan {len(sources)} farklı kaynağın haberleri var. Bunları BİRLEŞTİR ve SENTEZLE; hiçbir kaynağı tek başına kopyalama. Kaynakların birbirini tamamlayan farklı ayrıntılarını tek akışta topla."
         if len(sources) > 1
-        else "Aşağıda bu olayı anlatan kaynak haber var. Sadece kısa ajans tekrarı yapma; uydurma rakam/olay eklemeden konunun kurumsal, hukuki veya sektörel bağlamını analitik gazetecilik diliyle açıkla."
+        else "Aşağıda bu olayı anlatan kaynak haber var. Kaynaktaki bilgiyi kendi cümlelerinle, okurun hızlıca anlayacağı net bir haber akışıyla anlat. Kaynakta olmayan bilgi EKLEME."
     )
 
     if len(sources) > 1:
@@ -221,24 +228,26 @@ def _build_prompt(sources: List[Dict], category: str, mode: str, extra_length_hi
     else:
         src_instruction = f"Ters tırnak kullanmadan düz metinle: {sources[0]['name']} | Kaynağın aktardığı ana gelişme ve öne çıkan somut bilgi (1 cümle)"
 
+    feedback_block = f"\nÖNCEKİ DENEMEDEKİ HATA (MUTLAKA DÜZELT): {feedback}\n" if feedback else ""
+
     return f"""Sen Türkçe ulusal haber ve analiz sitesi Gündem Analizi'nin kıdemli baş editörüsün.
 {multi_rule}
 Kategori: {category}. Kategori odağı: {focus}
-
+{feedback_block}
 KESİN KURALLAR:
-1. DOĞRULUK: SADECE kaynaklarda geçen somut bilgi, isim, tarih ve rakamları kullan. Kaynakta olmayan rakam, kişi, alıntı veya iddia KESİNLİKLE UYDURMA. Kaynak kısa ise hayali detay uydurmadan olayın doğrulanabilir genel hukuki, kurumsal veya sektörel çerçevesini anlat.
-2. SIFIR VERİ TEKRARI (ÇOK KRİTİK): Özette (MADDELER), paragraflarda ve veri tablosunda (RAKAMLAR) aynı rakamları, aynı sıfat tamlamalarını veya aynı cümleleri evirip çevirip tekrarlama!
-   - Temel rakamları ve olayın 5N1K akışını BOLUM_1 içinde ver.
-   - BOLUM_2 içinde BOLUM_1'deki rakamları tekrar saymak yerine kararın/olayın neden kritik olduğunu ve etkisini analiz et.
-   - BOLUM_3 içinde önceki cümleleri tekrarlamadan konunun geçmişini veya yapısal çerçevesini anlat.
-   - SONRA bölümünde önceki paragraflarda yazılmış komisyon/süreç cümlelerini kopyalamadan yalnızca takvimdeki sıradaki somut adımı yaz.
-3. SABİT ŞABLON BAŞLIK YASAĞI (ÇOK KRİTİK): ARA_BASLIK_1, ARA_BASLIK_2, ARA_BASLIK_3, SENARYO_BASLIK ve SONRA_BASLIK alanlarında KESİNLİKLE "Ne Oldu?", "Neden Önemli?", "Arka Plan", "Olası Senaryolar", "Bundan Sonra Ne İzlenmeli?" gibi sabit şablon başlıklar KULLANMA! Her ara başlık doğrudan o haberdeki kurum, şehir, kişi, yasa veya projeye özel 4-8 kelimelik gerçek gazetecilik başlığı olsun.
+1. DOĞRULUK (EN ÖNEMLİ KURAL): SADECE kaynaklarda geçen somut bilgi, isim, tarih ve rakamları kullan. Kaynakta yazmayan HİÇBİR rakam, yüzde, tarih, süre, kişi, alıntı veya iddia yazma. Kendi hesapladığın rakamları (toplam, fark, kaç ay geçtiği vb.) da yazma. Yazdığın her sayı kaynak metinde birebir geçmelidir; otomatik kontrol edilir ve kaynakta olmayan sayı içeren metin reddedilir.
+2. SIFIR TEKRAR: Özette (MADDELER), paragraflarda ve veri tablosunda (RAKAMLAR) aynı rakamları ve aynı cümleleri evirip çevirip tekrarlama.
+   - Temel bilgileri ve olayın 5N1K akışını BOLUM_1 içinde ver.
+   - BOLUM_2 içinde BOLUM_1'i tekrar etmeden, kaynakta geçen etkileri, tarafların gerekçelerini veya farklı ayrıntıları aktar.
+   - BOLUM_3 içinde kaynakta geçen geçmiş/arka plan bilgisini aktar.
+3. SABİT ŞABLON BAŞLIK YASAĞI: ARA_BASLIK_1, ARA_BASLIK_2, ARA_BASLIK_3, SENARYO_BASLIK ve SONRA_BASLIK alanlarında "Ne Oldu?", "Neden Önemli?", "Arka Plan", "Olası Senaryolar", "Bundan Sonra Ne İzlenmeli?" gibi sabit kalıp başlıklar KULLANMA. Her ara başlık o haberdeki kurum, şehir, kişi, yasa veya projeye özel 4-8 kelimelik gerçek gazetecilik başlığı olsun.
 4. {length_rule}
-5. DİL VE TÜRKÇE İMLA: Kusursuz, duru Türkçe. Başlık dahil TÜM alanlarda Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) eksiksiz kullan; kesinlikle İngilizce/ASCII harflerle yazma. Tık tuzağı, ünlem, üç nokta, ters tırnak işareti, kod bloğu, hashtag ve yapay zeka ibaresi YOK. "Sonuç olarak", "Özetle", "merakla bekleniyor", "yakından takip ediliyor", "büyük önem taşımaktadır" klişelerini KULLANMA.
-6. ÇIKTI FORMATI: JSON veya kod bloğu KULLANMA. Yanıtı SADECE aşağıdaki köşeli parantezli etiketlerle düz metin olarak ver:
+5. BAŞLIK ÜSLUBU: Türk basını usulü CÜMLE DÜZENİNDE yaz: yalnızca ilk kelime ve özel isimler (kişi, kurum, şehir, marka) büyük harfle başlar. İngilizce gibi Her Kelimenin Baş Harfini Büyük YAZMA. Kaynakta geçmiyorsa "tarihi, dev, şok, rekor, kritik, sarstı, bomba, flaş, efsane" gibi abartı kelimeleri KULLANMA. Başlık olayı olduğu gibi, abartmadan anlatsın.
+6. DİL VE TÜRKÇE İMLA: Kusursuz, duru Türkçe. Tüm alanlarda Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) eksiksiz kullan. Tık tuzağı, ünlem, üç nokta, ters tırnak işareti, kod bloğu, hashtag ve yapay zeka ibaresi YOK. "Sonuç olarak", "Özetle", "merakla bekleniyor", "yakından takip ediliyor", "büyük önem taşımaktadır" klişelerini KULLANMA.
+7. ÇIKTI FORMATI: JSON veya kod bloğu KULLANMA. Yanıtı SADECE aşağıdaki köşeli parantezli etiketlerle düz metin olarak ver:
 
 [BASLIK]
-7-13 kelimelik, kaynak başlıklarla birebir aynı olmayan, Türkçe harfleri eksiksiz özgün haber başlığı
+7-13 kelimelik, kaynak başlıklarla birebir aynı olmayan, cümle düzeninde, Türkçe harfleri eksiksiz özgün haber başlığı
 
 [OZET]
 Haberin özünü anlatan 2 cümlelik net özet.
@@ -246,45 +255,45 @@ Haberin özünü anlatan 2 cümlelik net özet.
 [MADDELER]
 - 1. özet maddesi (kısa, net, somut tek cümle)
 - 2. özet maddesi (farklı bir somut boyutu anlatan tek cümle)
-- 3. özet maddesi (sürecin etkisini veya takvimini özetleyen tek cümle)
+- 3. özet maddesi (kaynakta varsa sürecin takvimi veya etkisi; yoksa farklı bir somut ayrıntı)
 
 [ARA_BASLIK_1]
 Olayın somut gelişmesini anlatan konuya özel 4-8 kelimelik özgün ara başlık
 
 [BOLUM_1]
-Olayın kim, nerede, ne zaman ve nasıl gerçekleştiğini somut verilerle anlatan 3-4 cümlelik birinci paragraf.
+Olayın kim, nerede, ne zaman ve nasıl gerçekleştiğini kaynaktaki somut verilerle anlatan 2-4 cümlelik birinci paragraf.
 
-Yetkililerin/tarafların açıklamalarını veya müdahale/uygulama detaylarını aktaran 3-4 cümlelik ikinci paragraf.
+Kaynakta varsa yetkililerin/tarafların açıklamalarını veya uygulama detaylarını aktaran 2-4 cümlelik ikinci paragraf (yoksa bu paragrafı yazma).
 
 [ARA_BASLIK_2]
-Gelişmenin önemini ve etkisini yansıtan konuya özel 4-8 kelimelik özgün ara başlık
+Gelişmenin etkisini veya farklı boyutunu yansıtan konuya özel 4-8 kelimelik özgün ara başlık
 
 [BOLUM_2]
-BOLUM_1'deki cümleleri ve rakamları tekrar etmeden, bu gelişmenin sektörel, ekonomik, hukuki veya toplumsal açıdan neden kritik olduğunu inceleyen 3-5 cümlelik paragraf.
+BOLUM_1'i tekrar etmeden, kaynakta geçen etkileri, gerekçeleri veya ek ayrıntıları anlatan 2-4 cümlelik paragraf. Kaynakta böyle bir bilgi yoksa yalnızca YOK yaz.
 
 [ARA_BASLIK_3]
 Konunun geçmişini veya kurumsal çerçevesini yansıtan konuya özel 4-8 kelimelik özgün ara başlık
 
 [BOLUM_3]
-Önceki bölümleri tekrarlamadan, konunun doğrulanabilir arka planını veya önceki benzer adımları anlatan 3-4 cümlelik paragraf.
+Kaynakta geçen arka plan veya önceki benzer adımları anlatan 2-3 cümlelik paragraf. Kaynakta arka plan bilgisi yoksa yalnızca YOK yaz.
 
 [ETKI_BASLIK]
-Konuya doğal uyan kısa kutu başlığı (Yurt dışı haberi Türkiye ile bağlantılıysa: Türkiye ve Bölgesel Dengelere Yansıması | Yurt içi haberi ise konuya özel: Vatandaş ve Sektör Açısından Önemi, Öğrenci ve Veliler İçin Kritik Detay vb.)
+Konuya doğal uyan kısa kutu başlığı (ör: Vatandaş ve Sektör Açısından Önemi, Öğrenci ve Veliler İçin Kritik Detay)
 
 [ETKI_METNI]
-Olayın vatandaş, ilgili sektör veya Türkiye açısından somut karşılığını anlatan 2-3 cümlelik net değerlendirme (eğer bağlantı tamamen zorlama olacaksa yalnızca YOK yaz).
+Kaynakta geçen bilgilere dayanarak olayın vatandaş veya ilgili sektör açısından somut karşılığını anlatan 1-2 cümle. Kaynakta buna dayanak yoksa veya bağlantı zorlama olacaksa yalnızca YOK yaz.
 {scen_section}
 [KAYNAKLAR]
 - {src_instruction}
 
 [RAKAMLAR]
-- Etiket | Somut sayısal veri (YALNIZCA haberde en az 3 FARKLI ve önemli sayısal veri varsa 3-5 satır yaz; 1-2 rakam varsa tekrara düşmemek için yalnızca YOK yaz)
+- Etiket | Kaynakta birebir geçen sayısal veri (YALNIZCA kaynakta en az 3 FARKLI ve önemli sayısal veri varsa 3-5 satır yaz; yoksa yalnızca YOK yaz)
 
 [SONRA_BASLIK]
 Takvimdeki sıradaki aşamayı anlatan konuya özel 4-8 kelimelik özgün ara başlık
 
 [SONRA]
-Önceki paragraflardaki cümleleri tekrarlamadan, bundan sonra izlenecek resmi süreci veya takvimi anlatan 3 cümlelik paragraf.
+Kaynakta açıkça geçen sıradaki resmi adımı veya takvimi anlatan 1-3 cümle. Kaynakta sıradaki adım/takvim bilgisi yoksa yalnızca YOK yaz.
 
 KAYNAKLAR:
 """ + "\n\n".join(blocks)
@@ -482,6 +491,53 @@ def _estimate_data_words(data: Dict) -> int:
     return len(" ".join(chunks).split())
 
 
+def _guard_check(data: Dict, sources: List[Dict]) -> Dict:
+    """Doğruluk kalkanı: kaynakta olmayan sayılar ve kaynakta olmayan abartı kelimeleri."""
+    import fact_guard
+    src_text = " ".join(f"{s.get('title', '')} {s.get('body', '')}" for s in sources)
+    allowed = fact_guard.source_number_set([src_text])
+    texts = [str(data.get("baslik") or ""), str(data.get("ozet") or "")]
+    for key in ("maddeler", "ne_oldu", "neden_onemli", "arka_plan", "senaryolar"):
+        texts.extend(str(x) for x in (data.get(key) or []))
+    for key in ("turkiye_etkisi", "sonra"):
+        texts.append(str(data.get(key) or ""))
+    for r in (data.get("rakamlar") or []):
+        if isinstance(r, dict):
+            texts.append(f"{r.get('etiket', '')} {r.get('deger', '')}")
+    bad_nums = []
+    for t in texts:
+        for n in fact_guard.unverified_numbers(t, allowed):
+            if n not in bad_nums:
+                bad_nums.append(n)
+    hype = fact_guard.hype_violations(str(data.get("baslik") or ""), src_text)
+    return {"bad_nums": bad_nums, "hype": hype, "allowed": allowed, "src_text": src_text}
+
+
+def _salvage(data: Dict, chk: Dict, primary_title: str) -> Dict:
+    """Son çare: kaynakta olmayan sayı içeren cümleleri/satırları çıkarır; sorunlu başlığı kaynak başlıkla değiştirir."""
+    import fact_guard
+    allowed = chk["allowed"]
+    for key in ("ne_oldu", "neden_onemli", "arka_plan"):
+        cleaned = []
+        for p in (data.get(key) or []):
+            p2 = fact_guard.drop_unverified_sentences(str(p), allowed)
+            if len(p2.split()) >= 8:
+                cleaned.append(p2)
+        data[key] = cleaned
+    for key in ("maddeler", "senaryolar"):
+        data[key] = [b for b in (data.get(key) or []) if not fact_guard.unverified_numbers(str(b), allowed)]
+    for key in ("turkiye_etkisi", "sonra", "ozet"):
+        data[key] = fact_guard.drop_unverified_sentences(str(data.get(key) or ""), allowed)
+    data["rakamlar"] = [
+        r for r in (data.get("rakamlar") or [])
+        if isinstance(r, dict) and not fact_guard.unverified_numbers(f"{r.get('etiket', '')} {r.get('deger', '')}", allowed)
+    ]
+    title = str(data.get("baslik") or "")
+    if fact_guard.unverified_numbers(title, allowed) or fact_guard.hype_violations(title, chk["src_text"]):
+        data["baslik"] = primary_title
+    return data
+
+
 def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news") -> Optional[Dict]:
     if not sources or not getattr(config, "GEMINI_API_KEY", ""):
         return None
@@ -497,22 +553,25 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
         return None
 
     src_has_tr = bool(re.search(r"[çğıöşüÇĞİÖŞÜ]", " ".join(s.get("title", "") for s in sources)))
-    min_raw_words = 360 if mode == "analysis" else 235
+    # Uzunluğu kaynak belirler: haber modunda yalnızca boş/yarım yanıtları eleyen düşük bir taban
+    min_raw_words = 360 if mode == "analysis" else 110
+    primary_title = sources[0].get("title", "")
 
     now_ts = time.time()
     active_models = [m for m in MODELS if _MODEL_COOLDOWN_UNTIL.get(m, 0.0) <= now_ts]
     if not active_models:
         active_models = list(MODELS)
 
-    attempt_chain = []
-    for m_name in active_models:
-        attempt_chain.append((m_name, False))
-        attempt_chain.append((m_name, True))
+    feedback = ""
+    guard_failures = 0
+    last_data = None
+    last_chk = None
+    attempt_chain = [m for m in active_models for _ in (0, 1)]
 
-    for step_i, (m_name, extra_len) in enumerate(attempt_chain):
+    for step_i, m_name in enumerate(attempt_chain):
         if _MODEL_COOLDOWN_UNTIL.get(m_name, 0.0) > time.time():
             continue
-        prompt = _build_prompt(sources, category, mode, extra_length_hint=extra_len)
+        prompt = _build_prompt(sources, category, mode, feedback=feedback)
         try:
             res = client.models.generate_content(model=m_name, contents=prompt)
             raw = (res.text or "").strip() if res else ""
@@ -524,9 +583,27 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
             if src_has_tr and len(cand_title) > 20 and not re.search(r"[çğıöşüÇĞİÖŞÜ]", cand_title):
                 print(f"⚠️ [Çok Kaynaklı] {m_name} başlıkta Türkçe karakter kullanmadı, yeniden deneniyor: {cand_title[:60]}")
                 continue
+
+            chk = _guard_check(data, sources)
+            if chk["bad_nums"] or chk["hype"]:
+                guard_failures += 1
+                last_data, last_chk = data, chk
+                msg = []
+                if chk["bad_nums"]:
+                    msg.append("Kaynakta geçmeyen sayılar yazdın: " + ", ".join(chk["bad_nums"][:8]) + ". Bu sayıları ve onlara dayanan cümleleri tamamen çıkar.")
+                if chk["hype"]:
+                    msg.append("Başlıkta kaynakta geçmeyen abartı kelimesi kullandın: " + ", ".join(chk["hype"]) + ". Başlığı abartısız yaz.")
+                feedback = " ".join(msg)
+                print(f"🛡️ [Doğruluk Kalkanı] {m_name}: {feedback[:200]}")
+                if guard_failures < 2:
+                    continue
+                # İkinci ihlalde: sorunlu cümleleri çıkararak kurtar
+                data = _salvage(data, chk, primary_title)
+                print("🛡️ [Doğruluk Kalkanı] Kaynakta olmayan sayı içeren cümleler çıkarıldı.")
+
             est_w = _estimate_data_words(data)
             if est_w < min_raw_words:
-                print(f"⚠️ [Çok Kaynaklı] {m_name} kısa yanıt verdi ({est_w} kelime < {min_raw_words}), tekrar deneniyor.")
+                print(f"⚠️ [Çok Kaynaklı] {m_name} yanıtı yetersiz ({est_w} kelime < {min_raw_words}); yeniden deneniyor.")
                 continue
             data["_model"] = m_name
             return data
@@ -539,6 +616,13 @@ def generate(sources: List[Dict], category: str = "Gündem", mode: str = "news")
             if step_i < len(attempt_chain) - 1 and ("503" in err_s or "UNAVAILABLE" in err_s):
                 time.sleep(3.0)
             continue
+
+    # Tüm denemeler doğruluk kalkanına takıldıysa son yanıtı temizleyerek kurtarmayı dene
+    if last_data is not None and last_chk is not None:
+        data = _salvage(last_data, last_chk, primary_title)
+        if _estimate_data_words(data) >= min_raw_words and data.get("ne_oldu"):
+            data["_model"] = "salvaged"
+            return data
     return None
 
 
@@ -559,7 +643,11 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     parts = ['<div class="ga-multi">']
 
     bullets = _as_list(data.get("maddeler"))[:3]
-    if bullets:
+    _body_words = len(" ".join(
+        _as_list(data.get("ne_oldu")) + _as_list(data.get("neden_onemli")) + _as_list(data.get("arka_plan")) + _as_list(data.get("sonra"))
+    ).split())
+    # Özet kutusu yalnızca okunacak kadar uzun haberlerde anlamlı; kısa haberde metni tekrar eder
+    if bullets and len(bullets) >= 2 and _body_words >= 220:
         parts.append(
             '<div class="ga-box ga-tldr"><h4 class="ga-box-title">⚡ 30 Saniyede Özet</h4><ul>'
             + "".join(f"<li>{_e(b)}</li>" for b in bullets)
@@ -664,30 +752,49 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     return "\n".join(parts)
 
 
+LAST_REJECT_REASON = ""
+
+
 def build_article(primary: Dict, primary_body: str, pool: List[Dict], category: str, mode: str = "news") -> Optional[Dict]:
     """
     Uçtan uca: kaynakları topla -> Gemini 3.5 ile yaz -> HTML'e çevir.
     Dönüş: {"title","summary","content","category","source_count","sources","sibling_items"} veya None
+    None dönerse LAST_REJECT_REASON: "thin_source" (kaynak yetersiz, haber atlanmalı) | "ai_failed" | "too_short"
     """
+    global LAST_REJECT_REASON
+    LAST_REJECT_REASON = ""
     import content_quality
+    import fact_guard
     sources = gather_sources(primary, primary_body, pool)
+    for s in sources:
+        s["body"] = fact_guard.strip_source_junk(s.get("body") or "")
     total_input_words = len((" ".join(f"{s['title']} {s['body']}" for s in sources)).split())
-    if total_input_words < 18:
-        print(f"⏩ [Çok Kaynaklı] Kaynak metin çok kısa ({total_input_words} kelime), atlanıyor.")
+    body_words = len((" ".join(s.get("body") or "" for s in sources)).split())
+    # Kaynak yeterliliği: tek cümlelik kaynaktan haber şişirilmez. Ya ikinci bir kaynak olmalı ya da metin yeterli olmalı.
+    min_body = 70 if mode == "analysis" else 90
+    if total_input_words < 18 or (body_words < min_body and len(sources) < 2):
+        LAST_REJECT_REASON = "thin_source"
+        print(f"⏩ [Çok Kaynaklı] Kaynak metin yetersiz ({body_words} kelime, {len(sources)} kaynak); şişirme yapılmaz, haber atlandı.")
         return None
     data = generate(sources, category=category, mode=mode)
     if not data:
+        LAST_REJECT_REASON = "ai_failed"
         return None
     title = content_quality.clean_title_text(_strip_ticks(str(data.get("baslik") or "")))
     if not (15 <= len(title) <= 140):
         title = content_quality.clean_title_text(primary.get("title", ""))
+    try:
+        title = fact_guard.to_turkish_sentence_case(title, " ".join(f"{s['title']}. {s['body']}" for s in sources))
+    except Exception:
+        pass
     summary = content_quality.clean_title_text(_strip_ticks(str(data.get("ozet") or "")))
     body = render_html(data, sources, mode=mode)
     content = content_quality.clean_article_html(body)
     words = content_quality.visible_word_count(content)
-    min_words = 380 if mode == "analysis" else 250
+    min_words = 380 if mode == "analysis" else 170
     if words < min_words:
-        print(f"⚠️ [Çok Kaynaklı] Metin kısa kaldı ({words} kelime < {min_words}), eski akışa dönülüyor.")
+        LAST_REJECT_REASON = "too_short"
+        print(f"⚠️ [Çok Kaynaklı] Metin kısa kaldı ({words} kelime < {min_words}); haber atlandı.")
         return None
     if len(summary) < 40:
         summary = content_quality._norm(content).split(". ")[0][:300]

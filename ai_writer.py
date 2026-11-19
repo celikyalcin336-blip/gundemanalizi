@@ -322,9 +322,10 @@ def classify_article(title: str, summary: str = "", force_category: str = None) 
 
     return "Gündem"
 
-def generate_full_article(title: str, summary: str, source: str, force_category: str = None) -> dict:
+def generate_full_article(title: str, summary: str, source: str, force_category: str = None, min_source_words: int = 18) -> dict:
     """
-    Web sitesi için 3-4 paragraflık zenginleştirilmiş, akıcı ve özgün haber makalesi üretir.
+    Web sitesi için özgün haber metni üretir (yedek / tek kaynaklı akış).
+    Uzunluğu kaynaktaki bilgi belirler; kaynakta olmayan sayı içeren cümleler doğruluk kalkanıyla çıkarılır.
     """
     import news_fetcher
     import content_quality
@@ -361,30 +362,34 @@ def generate_full_article(title: str, summary: str, source: str, force_category:
         return None
 
     source_text = (summary or "").strip()
-    if len(f"{title} {source_text}".split()) < 18:
-        print(f"⏩ [Makale] Kaynak metin çok kısa ({len(source_text.split())} kelime); özgün ve doyurucu haber yazılamaz, atlandı.")
+    try:
+        import fact_guard
+        source_text = fact_guard.strip_source_junk(source_text)
+    except Exception:
+        pass
+    if len(f"{title} {source_text}".split()) < 18 or len(source_text.split()) < min_source_words:
+        print(f"⏩ [Makale] Kaynak metin yetersiz ({len(source_text.split())} kelime); şişirme yapılmaz, haber atlandı.")
         return None
 
     _style_idx = sum(ord(ch) for ch in title) % 3
     if _style_idx == 0:
-        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 3 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-7 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Olayın 5N1K özeti, 4-5 cümle)
-- 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Olayın somut ayrıntıları, rakamlar ve resmi açıklamalar)
-- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Konunun tarihsel/sektörel arka planı ve önceki gelişmeler)
-- 3. Ara Başlık (<h3>) + altında 1 veya 2 <p> paragrafı (Uygulama takvimi, resmi süreçteki sıradaki adımlar ve somut detaylar)"""
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; uzunluğu kaynaktaki bilgi belirlesin (kısa kaynakta 180-300, zengin kaynakta 300-550 kelime):
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Olayın 5N1K özeti, 2-4 cümle)
+- 1. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Olayın somut ayrıntıları, rakamlar ve resmi açıklamalar)
+- 2. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (YALNIZCA kaynakta arka plan/önceki gelişme bilgisi varsa; yoksa bu bölümü hiç yazma)
+- 3. Ara Başlık (<h3>) + altında 1 <p> paragrafı (YALNIZCA kaynakta uygulama takvimi veya sıradaki adım varsa; yoksa yazma)"""
     elif _style_idx == 1:
-        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 2 ÖZGÜN ARA BAŞLIK (<h3>) ve 6 DOLU PARAGRAF (<p>) ile EN AZ 450-650 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 4-5 cümle)
-- Girişin hemen altında ara başlıksız 1 <p> paragrafı daha (İlk tepkiler ve sahadaki/kurumdaki mevcut durum)
-- 1. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Detaylı veriler, teknik/hukuki boyut ve sürecin geçmişi)
-- 2. Ara Başlık (<h3>) + altında 2 ayrı <p> paragrafı (Uygulama detayları, ilgili kurumların takvimi ve somut veriler)"""
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; uzunluğu kaynaktaki bilgi belirlesin (kısa kaynakta 180-300, zengin kaynakta 300-550 kelime):
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Haberin ana gelişmesini aktaran güçlü giriş paragrafı, 2-4 cümle)
+- Girişin hemen altında ara başlıksız 1 <p> paragrafı daha (kaynakta varsa ilk tepkiler ve mevcut durum)
+- 1. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Kaynaktaki detaylı veriler ve teknik/hukuki boyut)
+- 2. Ara Başlık (<h3>) + altında 1 <p> paragrafı (YALNIZCA kaynakta uygulama detayı veya takvim varsa; yoksa yazma)"""
     else:
-        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; toplamda 4 ÖZGÜN ARA BAŞLIK (<h3>) ve 6-8 DOLU PARAGRAF (<p>) ile EN AZ 480-700 KELİME üret:
-- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (Kapsamlı 5N1K giriş paragrafı, 4-5 cümle)
-- 1. Ara Başlık (<h3>) + altında 2 <p> paragrafı (Gelişmenin tüm somut detayları ve tarafların açıklamaları)
-- 2. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sürecin arka planı ve önceki kararlar)
-- 3. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Sektörel veya toplumsal veriler)
-- 4. Ara Başlık (<h3>) + altında 1 <p> paragrafı (Takvimdeki somut tarih, resmi prosedür veya açıklanan son detay)"""
+        _structure_guide = """Sadece <p> ve <h3> HTML etiketlerini kullan; uzunluğu kaynaktaki bilgi belirlesin (kısa kaynakta 180-300, zengin kaynakta 300-550 kelime):
+- Giriş: <p class="lead font-medium text-lg text-slate-900 mb-6"> (5N1K giriş paragrafı, 2-4 cümle)
+- 1. Ara Başlık (<h3>) + altında 1-2 <p> paragrafı (Gelişmenin somut detayları ve tarafların açıklamaları)
+- 2. Ara Başlık (<h3>) + altında 1 <p> paragrafı (YALNIZCA kaynakta arka plan bilgisi varsa)
+- 3. Ara Başlık (<h3>) + altında 1 <p> paragrafı (YALNIZCA kaynakta takvim, prosedür veya son detay varsa)"""
 
     prompt = f"""
 Sen 'Gündem Analizi' adlı Türkçe haber sitesinin kıdemli editörüsün. Aşağıdaki kaynak haberden yola çıkarak
@@ -399,10 +404,11 @@ Kaynak Metin:
 
 KESİN KURALLAR:
 1. ÖZGÜNLÜK: Kaynak metinden cümle KOPYALAMA. Tüm bilgiyi kendi cümlelerinle, farklı bir kurgu ve akışla yeniden anlat.
-2. DOĞRULUK: Kaynakta OLMAYAN rakam, isim, tarih, alıntı veya iddia UYDURMA. Arka plan ve bağlam bölümünde yalnızca
-   genel kabul görmüş, doğrulanabilir bilgiler ver; emin olmadığın hiçbir bilgiyi yazma.
-3. UZUNLUK VE ANALİTİK DERİNLİK (GÜNDEM ANALİZİ FARKI): Metin en az 480, ideal olarak 550-700 kelime olmalı. Sadece ajans bülteni gibi "ne olduğunu" aktarmakla yetinme;
-   olayın neden-sonuç ilişkisini, önceki dönem veya benzer kararlarla karşılaştırmasını, rakamsal/sektörel boyutunu ve vatandaşın/piyasanın üzerindeki somut etkisini analitik gazetecilik perspektifiyle derinlemesine incele.
+2. DOĞRULUK (EN ÖNEMLİ KURAL): Kaynakta OLMAYAN rakam, yüzde, tarih, süre, isim, alıntı veya iddia YAZMA. Kendi hesapladığın
+   rakamları da yazma. Yazdığın her sayı kaynakta birebir geçmelidir; otomatik kontrol edilir.
+3. UZUNLUK: Metnin uzunluğunu kaynaktaki GERÇEK BİLGİ belirler. Kaynak kısaysa kısa ve net yaz. Metni uzatmak için genel geçer,
+   her habere uyacak cümleler ("... dikkatle izleniyor", "... bir kez daha gösterdi", "... önem taşıyor") YAZMA.
+   Kaynakta arka plan veya takvim bilgisi yoksa o bölümü hiç yazma.
 4. DİL: Sade, akıcı, dil bilgisi kurallarına uygun Türkçe. Klişe, abartı, tık tuzağı, hashtag, emoji ve okura soru sorma YOK.
 5. DOĞAL AJANS KAPANIŞI (ÇOK KRİTİK): Haberin son paragrafını ve son cümlesini ASLA kompozisyon/makale özeti gibi bitirme!
    Son paragrafta "Sonuç olarak", "Özetle", "pekiştirmektedir", "gözler önüne sermektedir", "net bir şekilde ortaya koymaktadır",
@@ -414,7 +420,7 @@ KESİN KURALLAR:
 
 ÇIKTI BİÇİMİ (aynen bu üç bölüm):
 [BAŞLIK]
-Kaynak başlıkla kelimesi kelimesine aynı OLMAYAN, olayın gerçekliğini ve anlamını %100 koruyan, tık tuzağı içermeyen, 6-12 kelimelik tamamen özgün ve güçlü Türkçe haber başlığı.
+Kaynak başlıkla kelimesi kelimesine aynı OLMAYAN, olayın gerçekliğini ve anlamını %100 koruyan, tık tuzağı içermeyen, 6-12 kelimelik özgün Türkçe haber başlığı. Türk basını usulü cümle düzeninde yaz (yalnızca ilk kelime ve özel isimler büyük harfle başlar); kaynakta geçmiyorsa "tarihi, dev, şok, rekor, kritik" gibi abartı kelimeleri kullanma.
 
 [ÖZET]
 Haberin özünü somut bilgilerle anlatan 2-3 cümlelik özgün özet.
@@ -465,8 +471,28 @@ Tüm ara başlıkları ("Neler Oldu?", "Arka Plan", "Değerlendirme" gibi kalıp
             gen_summary = content_quality.clean_title_text(gen_summary)
             gen_content = content_quality.clean_article_html(content_part.strip())
 
+            # Doğruluk kalkanı: kaynakta olmayan sayı içeren cümleleri çıkar, abartılı/uydurma başlığı kaynak başlıkla değiştir
+            try:
+                import fact_guard
+                _allowed = fact_guard.source_number_set([f"{title} {source_text}"])
+                _bad_before = fact_guard.unverified_numbers(content_quality._norm(gen_content), _allowed)
+                if _bad_before:
+                    print(f"🛡️ [Doğruluk Kalkanı] Kaynakta olmayan sayılar çıkarılıyor: {', '.join(_bad_before[:8])}")
+
+                    def _fix_para(m):
+                        inner = re.sub(r"<[^>]+>", "", m.group(2))
+                        fixed = fact_guard.drop_unverified_sentences(inner, _allowed)
+                        return f"{m.group(1)}{fixed}</p>" if len(fixed.split()) >= 6 else ""
+                    gen_content = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_para, gen_content, flags=re.S)
+                    gen_summary = fact_guard.drop_unverified_sentences(gen_summary, _allowed)
+                if fact_guard.unverified_numbers(gen_title, _allowed) or fact_guard.hype_violations(gen_title, f"{title} {source_text}"):
+                    gen_title = title
+                gen_title = fact_guard.to_turkish_sentence_case(gen_title, f"{title}. {source_text}")
+            except Exception as _fg_e:
+                print(f"⚠️ [Doğruluk Kalkanı] atlandı: {_fg_e}")
+
             words = content_quality.visible_word_count(gen_content)
-            if words < 260:
+            if words < 170:
                 print(f"⚠️ [Makale] {m_name} metni kısa kaldı ({words} kelime), tekrar deneniyor.")
                 continue
             if len(gen_summary) < 40:

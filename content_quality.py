@@ -352,6 +352,11 @@ def clean_article_html(content: str) -> str:
         inner = re.sub(r"^(?:[A-ZÇĞİÖŞÜ0-9'’\-]+\s+){4,}[A-ZÇĞİÖŞÜ0-9'’\-]+\s*", "", inner.strip())
         inner = fix_brand_splits(inner)
         inner = soften_sensitive_terms(inner)
+        try:
+            import fact_guard
+            inner = fact_guard.strip_source_junk(inner)
+        except Exception:
+            pass
         return f"{m.group(1)}{inner}</p>"
     c = re.sub(r"(<p[^>]*>)(.*?)</p>", _fix_p, c, flags=re.S)
 
@@ -513,6 +518,11 @@ def clean_summary_text(summary: str, fallback_title: str = "") -> str:
     s = clean_title_text(summary or "")
     s = re.sub(r"<[^>]+>", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
+    try:
+        import fact_guard
+        s = fact_guard.strip_source_junk(s)
+    except Exception:
+        pass
     if len(s) > 220:
         cut = s[:215]
         last_dot = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
