@@ -98,15 +98,6 @@
     "ts": 1793998150.4273956
   },
   {
-    "slug": "amerikan-ekonomisinde-tuketici-borclanmasi-tahminleri-asarak-zirveye-tirmandi",
-    "title": "Amerikan Ekonomisinde Tüketici Borçlanması Tahminleri Aşarak Zirveye Tırmandı",
-    "summary": "ABD Merkez Bankası verilerine göre, Eylül ayında tüketici kredileri 27,8 milyar dolarlık artışla toplam 5,22 trilyon dolara yükseldi. Piyasa beklentilerini ikiye katlayan bu borçlanma dalgası, hem kartlı ödemelerde hem de taşıt ve öğrenim kredilerind",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794000890.8546362
-  },
-  {
     "slug": "resmi-gazete-yayimlandi-on-bir-universiteye-yeni-rektor-gorevlendirildi",
     "title": "Resmi Gazete Yayımlandı: On Bir Üniversiteye Yeni Rektör Görevlendirildi",
     "summary": "Cumhurbaşkanlığı tarafından yapılan yeni atama kararlarıyla birlikte Türkiye genelindeki on bir farklı üniversitenin rektörlük koltuğuna yeni isimler getirildi. İlgili karar, Yükseköğretim Kanunu ve Cumhurbaşkanlığı Kararnameleri'ndeki yetki hükümler",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795117641.7408285
+  },
+  {
+    "slug": "avrupa-birliginden-urdun-ekonomisine-yuz-milyonlarca-avroluk-destek-hamlesi",
+    "title": "Avrupa Birliği'nden Ürdün ekonomisine yüz milyonlarca avroluk destek hamlesi",
+    "summary": "Avrupa Komisyonu Başkanı Ursula von der Leyen, Ürdün'de gerçekleştirilen yatırım konferansında ülkenin ekonomik kalkınması ve reform gündemi için altı yüz yetmiş milyon avroyu aşan finansman sağlanacağını açıkladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795120365.8699222
   }
 ]
