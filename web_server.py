@@ -2397,12 +2397,21 @@ async def article_detail(request: Request, slug: str):
     # şişirme yerine dürüst uzunluk kullanıldığı için eşik 150 kelime; eski tek kaynaklı haberlerde 220 korunur.
     _thin_threshold = 150 if 'class="ga-multi"' in (raw_content or "") else 220
     _created_day = str(article.get("created_at") or "")[:10]
-    _is_scaled_batch = (
+    _is_scaled_batch = False
+    if (
         category != "Analiz"
         and "2026-10-27" <= _created_day <= "2026-11-02"
-        and int(article.get("views") or 0) < 3
         and 'class="ga-multi"' not in (raw_content or "")
-    )
+    ):
+        try:
+            with database.get_connection() as _vc:
+                _gh = _vc.execute(
+                    "SELECT 1 FROM visitor_logs WHERE page = ? AND referrer = 'Google' AND device IN ('Mobil', 'Masaüstü', 'Tablet') LIMIT 1",
+                    (f"/haber/{slug}",),
+                ).fetchone()
+                _is_scaled_batch = not bool(_gh)
+        except Exception:
+            _is_scaled_batch = True
     is_thin_article = _is_scaled_batch or ((category != "Analiz") and content_quality.is_thin(raw_content, threshold=_thin_threshold))
 
     # Eski makalelerdeki tekdüze "Gündem Analizi Notu: ..." şablon ara başlığı kaldırılır (başlık çevirme yapılmaz;
@@ -3101,12 +3110,22 @@ def _indexable_articles() -> list:
             return _INDEX_CACHE["rows"]
         with database.get_connection() as conn:
             try:
+                google_slugs = {
+                    str(r["page"])[7:].split("?")[0]
+                    for r in conn.execute(
+                        "SELECT DISTINCT page FROM visitor_logs WHERE page LIKE '/haber/%' AND referrer = 'Google' AND device IN ('Mobil', 'Masaüstü', 'Tablet')"
+                    ).fetchall()
+                    if r["page"]
+                }
+            except Exception:
+                google_slugs = set()
+            try:
                 meta = [dict(r) for r in conn.execute(
-                    "SELECT id, slug, title, category, image_path, views, created_at, updated_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                    "SELECT id, slug, title, category, image_path, created_at, updated_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
                 ).fetchall()]
             except Exception:
                 meta = [dict(r) for r in conn.execute(
-                    "SELECT id, slug, title, category, image_path, views, created_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                    "SELECT id, slug, title, category, image_path, created_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
                 ).fetchall()]
         rows = []
         for m in meta:
@@ -3127,7 +3146,7 @@ def _indexable_articles() -> list:
             # Sitemap ile sayfa robots etiketi birebir uyumlu olmalı: noindex olan hiçbir haber sitemap'e girmez
             c_day = (d.get("created_at") or "")[:10]
             if cat_norm != "Analiz":
-                if "2026-10-27" <= c_day <= "2026-11-02" and int(m.get("views") or 0) < 3 and 'class="ga-multi"' not in raw_c:
+                if "2026-10-27" <= c_day <= "2026-11-02" and slug_val not in google_slugs and 'class="ga-multi"' not in raw_c:
                     continue
                 t_thresh = 150 if 'class="ga-multi"' in raw_c else 220
                 if content_quality.is_thin(raw_c, threshold=t_thresh):
