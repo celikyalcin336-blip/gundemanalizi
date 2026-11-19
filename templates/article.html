@@ -22,6 +22,16 @@
       function gtag(){dataLayer.push(arguments);}
       var _savedConsent = null;
       try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+      if (_savedConsent !== 'accepted') {
+        gtag('consent', 'default', {
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied',
+          'ad_personalization': 'denied',
+          'analytics_storage': 'denied',
+          'region': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH'],
+          'wait_for_update': 500
+        });
+      }
       var _cState = (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted';
       gtag('consent', 'default', {
         'ad_storage': _cState,

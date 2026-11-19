@@ -183,7 +183,7 @@ def _row_to_dict(row) -> Dict:
         raw_c = d.get("content") or ""
         if d.get("title"):
             cleaned_t = content_quality.clean_title_text(str(d["title"]))
-            d["title"] = fact_guard.to_turkish_sentence_case(cleaned_t, f"{d.get('summary') or ''} {raw_c[:1500]}")
+            d["title"] = fact_guard.to_turkish_sentence_case(cleaned_t, f"{d.get('summary') or ''} {raw_c[:3500]}")
         if d.get("summary"):
             d["summary"] = content_quality.clean_summary_text(str(d["summary"]), d.get("title") or "")
         if raw_c:
@@ -419,6 +419,43 @@ def init_db():
             set_setting("analiz_hygiene_v1", "1")
     except Exception as _he:
         print(f"analiz_hygiene_v1 uyarısı: {_he}")
+
+    # Tek seferlik sızıntı/başlık onarımı (veri ve slug silinmez): Habertürk sonsuz kaydırmasından Donald Tusk
+    # haberine sızan Van Gogh alt bölümünü temizler ve abartılı başlığı nötrleştirir.
+    try:
+        if get_setting("adsense_final_audit_v1", "") != "1":
+            with get_connection() as conn:
+                tusk_row = conn.execute(
+                    "SELECT id, content FROM articles WHERE slug = ?",
+                    ("polonya-basbakani-donald-tusk-putin-aciklamasi-yapti",),
+                ).fetchone()
+                if tusk_row:
+                    tc = str(tusk_row["content"] or "")
+                    tc = re.sub(
+                        r"<h3[^>]*>[^<]*Van\s+Gogh[^<]*</h3>\s*<p[^>]*>.*?</p>",
+                        "",
+                        tc,
+                        flags=re.I | re.S,
+                    )
+                    tc = re.sub(r"\s+ve\s+Van\s+Gogh\s+tablosunun\s+satışı", "", tc, flags=re.I)
+                    conn.execute(
+                        "UPDATE articles SET title = ?, content = ? WHERE id = ?",
+                        (
+                            "Polonya Başbakanı Donald Tusk'tan Trump ve Putin açıklaması",
+                            tc,
+                            tusk_row["id"],
+                        ),
+                    )
+                conn.execute(
+                    "UPDATE articles SET title = ? WHERE slug = ?",
+                    (
+                        "Küresel döviz piyasalarında FED tutanaklarının etkisiyle yükseliş",
+                        "kuresel-doviz-piyasalarinda-fed-tutanaklarinin-etkisiyle-yasanan-tarihi-sicrama",
+                    ),
+                )
+            set_setting("adsense_final_audit_v1", "1")
+    except Exception as _fae:
+        print(f"adsense_final_audit_v1 uyarısı: {_fae}")
 
 
 def cleanup_corrupted_articles():

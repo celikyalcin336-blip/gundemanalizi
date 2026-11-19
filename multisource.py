@@ -661,18 +661,31 @@ def _dedup_sections(data: Dict, src_words: int = 250, mode: str = "news") -> Dic
         seen_sets.append(t)
         return False
 
-    # BOLUM_1 referans havuzunu oluşturur
+    # BOLUM_1 referans havuzunu ve konu çapasını oluşturur
     b1 = []
     for p in _as_list(data.get("ne_oldu")):
         if not _is_redundant_para(p, thresh=0.65):
             b1.append(p)
     data["ne_oldu"] = b1
 
-    # BOLUM_2 ve BOLUM_3: BOLUM_1 ile yüksek örtüşen veya tek cümlelik dolgu paragrafları elenir
+    _coh_ignore = {
+        "düzenl", "açıkla", "belirt", "ifade", "kaydet", "aktard", "bildir", "söyled", "değerl",
+        "gerçek", "buluna", "olarak", "üzerin", "içinde", "birlik", "yapıld", "edildi", "olduğu",
+        "milyon", "milyar", "yüzde", "türkiy",
+    }
+    anchor_toks = {
+        t for t in _sent_toks(f"{data.get('baslik') or ''} {data.get('ozet') or ''} {' '.join(b1)}")
+        if t not in _coh_ignore
+    }
+
+    # BOLUM_2 ve BOLUM_3: BOLUM_1 ile yüksek örtüşen, tek cümlelik dolgu veya konu dışı sızan paragraflar elenir
     for key in ("neden_onemli", "arka_plan"):
         kept = []
         for p in _as_list(data.get(key)):
             if len(p.split()) < 14:
+                continue
+            p_toks = {t for t in _sent_toks(p) if t not in _coh_ignore}
+            if anchor_toks and len(p_toks) >= 5 and len(p_toks & anchor_toks) == 0:
                 continue
             if not _is_redundant_para(p, thresh=0.45):
                 kept.append(p)
@@ -715,19 +728,28 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
             + "</ul></div>"
         )
 
+    import fact_guard as _fg_sub
+    _src_prose = " ".join(f"{s.get('title') or ''}. {s.get('body') or ''}" for s in (sources or []))
+
+    def _norm_h(h_txt: str) -> str:
+        try:
+            return _fg_sub.to_turkish_sentence_case(_strip_ticks(h_txt or ""), _src_prose)
+        except Exception:
+            return _strip_ticks(h_txt or "")
+
     def section(title: str, paras: List[str]):
         if paras:
-            parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(title)}</h3>')
+            parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(_norm_h(title))}</h3>')
             for p in paras:
                 parts.append(f'<p class="text-slate-800 leading-relaxed mb-4">{_e(p)}</p>')
 
-    section(data.get("h1") or "Gelişmenin Ayrıntıları ve İlk Açıklamalar", _as_list(data.get("ne_oldu")))
-    section(data.get("h2") or "Kararın Sektörel ve Toplumsal Yansımaları", _as_list(data.get("neden_onemli")))
-    section(data.get("h3") or "Sürecin Geçmişi ve Kurumsal Çerçeve", _as_list(data.get("arka_plan")))
+    section(data.get("h1") or "Gelişmenin ayrıntıları ve ilk açıklamalar", _as_list(data.get("ne_oldu")))
+    section(data.get("h2") or "Kararın sektörel ve toplumsal yansımaları", _as_list(data.get("neden_onemli")))
+    section(data.get("h3") or "Sürecin geçmişi ve kurumsal çerçeve", _as_list(data.get("arka_plan")))
 
     tr = " ".join(_as_list(data.get("turkiye_etkisi")))
     if tr and tr.upper() not in {"YOK", "YOK."}:
-        etki_h = _strip_ticks(data.get("etki_baslik") or "Sahaya ve Vatandaşa Yansıması")
+        etki_h = _norm_h(data.get("etki_baslik") or "Sahaya ve vatandaşa yansıması")
         icon = "🇹🇷 " if ("türkiye" in etki_h.lower() and not etki_h.startswith("🇹🇷")) else ("📌 " if not re.match(r"^[\W_]", etki_h) else "")
         parts.append(
             f'<div class="ga-box ga-tr"><h4 class="ga-box-title">{icon}{_e(etki_h)}</h4><p>{_e(tr)}</p></div>'
@@ -736,7 +758,7 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     if mode == "analysis":
         scen = _as_list(data.get("senaryolar"))[:4]
         if scen:
-            scen_h = data.get("senaryo_baslik") or "Önümüzdeki Süreçte Öne Çıkan İhtimaller"
+            scen_h = _norm_h(data.get("senaryo_baslik") or "Önümüzdeki süreçte öne çıkan ihtimaller")
             parts.append(
                 f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(scen_h)}</h3><ol class="ga-list">'
                 + "".join(f"<li>{_e(s)}</li>" for s in scen)
@@ -751,12 +773,12 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     ][:6]
     if len(nums) >= 3:
         parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Öne Çıkan Veriler</h3><div class="ga-table-wrap"><table class="ga-table"><tbody>'
+            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Öne çıkan veriler</h3><div class="ga-table-wrap"><table class="ga-table"><tbody>'
             + "".join(f"<tr><td>{_e(r['etiket'])}</td><td><strong>{_e(r['deger'])}</strong></td></tr>" for r in nums)
             + "</tbody></table></div>"
         )
 
-    section(data.get("sonra_baslik") or "Takvimdeki Sıradaki Adımlar", _as_list(data.get("sonra")))
+    section(data.get("sonra_baslik") or "Takvimdeki sıradaki adımlar", _as_list(data.get("sonra")))
 
     # Kaynak karşılaştırması / şeffaf kaynak bağlantısı (yazının sonunda, ters tırnaksız tertemiz kutu)
     link_by_name = {}
@@ -844,8 +866,11 @@ def build_article(primary: Dict, primary_body: str, pool: List[Dict], category: 
     title = content_quality.clean_title_text(_strip_ticks(str(data.get("baslik") or "")))
     if not (15 <= len(title) <= 140):
         title = content_quality.clean_title_text(primary.get("title", ""))
+    src_blob = " ".join(f"{s['title']}. {s['body']}" for s in sources)
+    for hw in fact_guard.hype_violations(title, src_blob):
+        title = re.sub(rf"(?i)\b{re.escape(hw)}\s+", "", title).strip()
     try:
-        title = fact_guard.to_turkish_sentence_case(title, " ".join(f"{s['title']}. {s['body']}" for s in sources))
+        title = fact_guard.to_turkish_sentence_case(title, src_blob)
     except Exception:
         pass
     summary = content_quality.clean_title_text(_strip_ticks(str(data.get("ozet") or "")))

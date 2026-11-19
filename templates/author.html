@@ -19,7 +19,6 @@
         })();
     </script>
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yalçın Çelik — Genel Yayın Yönetmeni | Gündem Analizi</title>
     <meta name="description" content="Gündem Analizi İmtiyaz Sahibi ve Genel Yayın Yönetmeni Yalçın Çelik'in biyografisi, yayın ilkeleri ve denetiminde yayımlanan güncel haber analizleri.">
@@ -156,12 +155,15 @@
         {% endif %}
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-md">
-            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 mb-4">Yalçın Çelik Editoryal Sorumluluğunda Yayımlanan Son Haberler</h2>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">📋 Genel Yayın Yönetmeni Denetimindeki Haber Masası Akışı</h2>
+                <span class="text-xs font-semibold text-slate-500">Gündem Analizi Haber Masası</span>
+            </div>
             <div class="divide-y divide-slate-200">
                 {% for a in articles %}
                 <a href="/haber/{{ a.slug }}" class="py-3.5 flex items-center justify-between gap-4 group block">
                     <div>
-                        <span class="text-[11px] font-extrabold text-red-600 uppercase">{{ a.category }}</span>
+                        <span class="text-[11px] font-extrabold text-slate-500 uppercase">{{ a.category }} • Haber Masası</span>
                         <h3 class="text-sm sm:text-base font-bold text-slate-800 group-hover:text-red-600 transition">{{ a.title }}</h3>
                     </div>
                     <span class="text-xs text-slate-500 shrink-0">{{ (a.created_at or '')[:16] }}</span>

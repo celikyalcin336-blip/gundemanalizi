@@ -238,6 +238,11 @@ def fetch_article_details(link: str, max_paragraphs: int = 10) -> dict:
 
         soup = BeautifulSoup(resp.content, "html.parser")
 
+        # Haberin kendi başlığını (konu bütünlüğü kontrolü için) al
+        og_t = soup.find("meta", property="og:title") or soup.find("meta", attrs={"name": "twitter:title"})
+        h1_el = soup.find("h1")
+        page_headline = (og_t.get("content", "").strip() if og_t and og_t.get("content") else (h1_el.get_text(" ", strip=True) if h1_el else ""))
+
         # 1. Haberin Resmi Editoryal Görseli (OG Image / Twitter Image)
         candidate_images = []
         og = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "twitter:image"})
@@ -248,17 +253,36 @@ def fetch_article_details(link: str, max_paragraphs: int = 10) -> dict:
             if og_url.startswith("http"):
                 candidate_images.append(og_url)
 
-        # 2. Sayfa içi çöpleri (menü, script, stil, arama kutusu, yazar kutusu, sidebar) DOM'dan tamamen temizle
-        for tag in soup(["script", "style", "nav", "header", "footer", "aside", "form", "button"]):
+        # 2. Sayfa içi çöpleri, sonsuz kaydırma (sıradaki haber) ve ilgili haber kartlarını DOM'dan tamamen temizle
+        for tag in soup(["script", "style", "nav", "header", "footer", "aside", "form", "button", "noscript", "iframe"]):
             tag.decompose()
-
-        # Makale gövdesini içeren ana kapsayıcıyı bul
-        article_elem = (
-            soup.find("article") or
-            soup.find("div", class_=re.compile(r"entry-content|post-content|article-content|content-body|news-detail", re.I)) or
-            soup.find("main") or
-            soup
+        _JUNK_ATTR_RE = re.compile(
+            r"related|ilgili|siradaki|next[-_]?news|next[-_]?article|infinite|recommended|benzer|"
+            r"most[-_]?read|cok[-_]?okunan|other[-_]?news|widget|carousel|slider|haber[-_]?kart|"
+            r"manset|galeri[-_]?kart|sidebar|comment|yorum|author[-_]?box|newsletter|share[-_]?bar",
+            re.I,
         )
+        for el in list(soup.find_all(["div", "section", "ul"])):
+            try:
+                cls_id = " ".join(el.get("class") or []) + " " + (el.get("id") or "")
+                if cls_id.strip() and _JUNK_ATTR_RE.search(cls_id):
+                    el.decompose()
+            except Exception:
+                continue
+
+        # Makale gövdesini içeren EN DAR ana kapsayıcıyı bul (Habertürk vb. sitelerde <main> içinde sıradaki haber de
+        # yer alabildiği için önce itemprop="articleBody" ve haber metin kutuları, sonra ilk <article> seçilir)
+        article_elem = (
+            soup.find(attrs={"itemprop": "articleBody"})
+            or soup.find("div", class_=re.compile(r"article[-_]?body|news[-_]?body|entry[-_]?content|post[-_]?content|article[-_]?content|content[-_]?body|news[-_]?detail|habermetni|detay[-_]?metin|haber[-_]?detay[-_]?icerik", re.I))
+            or soup.find("article")
+            or soup.find("main")
+            or soup
+        )
+        # Eğer kapsayıcı içinde birden fazla <article> varsa yalnızca ilkini al (sonsuz kaydırma sızıntısını kes)
+        sub_articles = article_elem.find_all("article") if article_elem and getattr(article_elem, "name", "") != "article" else []
+        if sub_articles:
+            article_elem = sub_articles[0]
 
         clean_paras = []
         bad_body_phrases = [
@@ -277,8 +301,25 @@ def fetch_article_details(link: str, max_paragraphs: int = 10) -> dict:
             "scorsese", "donanım haber", "donanimhaber", "tam boyutta gör", "click()", "preventdefault",
             "n11.com", "migros.com", "idefix.com", "trendyol.com", "hepsiburada.com",
             "son haberler", "yapay zeka otomobil", "kategoriler nasıl yapılır", "donanım yazılım android",
-            "ai ile özetle", "yorum yap", "yorumlar", "giriş yap", "üye ol"
+            "ai ile özetle", "yorum yap", "yorumlar", "giriş yap", "üye ol",
+            "ilginizi çekebilir", "bunları da okuyun", "sıradaki haber", "diğer haberler"
         ]
+        _COH_STOP = {
+            "düzen", "açıkl", "belir", "ifade", "kayde", "aktar", "bildi", "söyle", "değer", "gerçe",
+            "bulun", "olara", "üzeri", "sonra", "içind", "kendi", "birli", "yapıl", "yaptı", "edild",
+            "ettiğ", "olduğ", "gelen", "karşı", "arası", "taraf", "konus", "kapsa", "ilişk", "öneml",
+            "büyük", "yüzde", "milyo", "milya", "dolar", "liras", "türki", "dünya", "haber", "başka",
+            "genel", "resmi", "devam", "ancak", "dahil", "neden", "sonuc", "süreç",
+        }
+
+        def _coh_stems(s: str) -> set:
+            return {
+                w.replace("İ", "i").replace("I", "ı").lower()[:5]
+                for w in re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]{4,}", s or "")
+                if w.replace("İ", "i").replace("I", "ı").lower()[:5] not in _COH_STOP
+            }
+
+        anchor_stems = _coh_stems(page_headline)
 
         for p in article_elem.find_all("p"):
             txt = p.get_text()
@@ -287,7 +328,16 @@ def fetch_article_details(link: str, max_paragraphs: int = 10) -> dict:
             # 40 karakterden uzun, çöp içermeyen ve daha önce listeye eklenmemiş özgün paragraflar
             if len(c) > 40 and not any(b in c.lower() for b in bad_body_phrases):
                 if not any(c.lower() in existing.lower() or existing.lower() in c.lower() for existing in clean_paras):
+                    p_stems = _coh_stems(c)
+                    if len(clean_paras) < 2:
+                        anchor_stems |= p_stems
+                    elif len(p_stems) >= 5 and anchor_stems and len(p_stems & anchor_stems) == 0:
+                        # Önceki paragrafla da hiçbir ortak kök yoksa bu sonsuz kaydırmadan sızan başka bir haberdir -> kes
+                        prev_stems = _coh_stems(clean_paras[-1])
+                        if len(p_stems & prev_stems) == 0:
+                            break
                     clean_paras.append(c)
+                    anchor_stems |= (p_stems & anchor_stems)
                     if len(clean_paras) >= max_paragraphs:
                         break
 

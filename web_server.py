@@ -2398,7 +2398,7 @@ async def article_detail(request: Request, slug: str):
     try:
         article["title"] = __import__("fact_guard").to_turkish_sentence_case(
             content_quality.clean_title_text(article.get("title") or ""),
-            f"{article.get('summary') or ''} {raw_content[:1500]}",
+            f"{article.get('summary') or ''} {raw_content[:3500]}",
         )
     except Exception:
         article["title"] = content_quality.clean_title_text(article.get("title") or "")
@@ -2407,11 +2407,13 @@ async def article_detail(request: Request, slug: str):
     # Kısa bültenlerde (<200 kelime) şablon çerçevesi haberin önüne geçmesin diye eşik 200 kelime (eski haberlerde 220)
     _thin_threshold = 200 if 'class="ga-multi"' in (raw_content or "") else 220
     _created_day = str(article.get("created_at") or "")[:10]
+    _art_src_raw = (article.get("source") or "").strip()
     _is_scaled_batch = False
     if (
         category != "Analiz"
-        and "2026-10-27" <= _created_day <= "2026-11-02"
+        and _created_day <= "2026-11-18"
         and 'class="ga-multi"' not in (raw_content or "")
+        and _art_src_raw not in ("Gündem Analizi", "Gündem Analizi Özel", "Özel")
     ):
         try:
             with database.get_connection() as _vc:
@@ -2750,7 +2752,7 @@ async def author_yalcin_page(request: Request):
         and not content_quality.is_thin(a.get("content") or "")
         and not main.is_commodity_news(a.get("title", ""))
     ][:12]
-    articles = (signed + curated)[:18] or database.get_articles(limit=15)
+    articles = curated[:8] or database.get_articles(limit=8)
     return templates.TemplateResponse(
         request=request,
         name="author.html",
@@ -3145,11 +3147,11 @@ def _indexable_articles() -> list:
                 google_slugs = set()
             try:
                 meta = [dict(r) for r in conn.execute(
-                    "SELECT id, slug, title, category, image_path, created_at, updated_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                    "SELECT id, slug, title, summary, source, category, image_path, created_at, updated_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
                 ).fetchall()]
             except Exception:
                 meta = [dict(r) for r in conn.execute(
-                    "SELECT id, slug, title, category, image_path, created_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
+                    "SELECT id, slug, title, summary, source, category, image_path, created_at, content FROM articles WHERE COALESCE(category, '') = 'Analiz' OR LENGTH(COALESCE(content, '')) >= 1200 ORDER BY id DESC"
                 ).fetchall()]
         rows = []
         for m in meta:
@@ -3157,20 +3159,33 @@ def _indexable_articles() -> list:
             if not slug_val:
                 continue
             raw_c = m.get("content") or ""
+            src_val = (m.get("source") or "").strip()
             cat_norm = database.normalize_category_name(m.get("category") or "Gündem") or "Gündem"
             d = database._row_to_dict({
                 "id": m["id"],
                 "slug": slug_val,
                 "title": content_quality.clean_title_text(m.get("title") or ""),
+                "summary": m.get("summary") or "",
+                "source": src_val,
                 "category": cat_norm,
                 "image_path": m.get("image_path") or "",
                 "created_at": str(m.get("created_at") or ""),
                 "updated_at": m.get("updated_at"),
+                "content": raw_c,
             })
+            # Render 512MB RAM koruması: başlık imlası düzeltildikten sonra gövdeyi önbellekte tutma
+            has_video = ("<video" in raw_c.lower() or ".mp4" in raw_c.lower())
+            d.pop("content", None)
+            d["_has_video"] = has_video
             # Sitemap ile sayfa robots etiketi birebir uyumlu olmalı: noindex olan hiçbir haber sitemap'e girmez
             c_day = (d.get("created_at") or "")[:10]
             if cat_norm != "Analiz":
-                if "2026-10-27" <= c_day <= "2026-11-02" and slug_val not in google_slugs and 'class="ga-multi"' not in raw_c:
+                if (
+                    c_day <= "2026-11-18"
+                    and slug_val not in google_slugs
+                    and 'class="ga-multi"' not in raw_c
+                    and src_val not in ("Gündem Analizi", "Gündem Analizi Özel", "Özel")
+                ):
                     continue
                 t_thresh = 200 if 'class="ga-multi"' in raw_c else 220
                 if content_quality.is_thin(raw_c, threshold=t_thresh):
@@ -3293,17 +3308,9 @@ async def news_sitemap(request: Request):
     """Google Haberler (Google News & Top Stories) özel XML site haritası."""
     from xml.sax.saxutils import escape
     import content_quality
-    # Google Haberler kuralı: yalnızca son 48 saatte yayımlanan haberler
+    # Google Haberler kuralı: yalnızca son 48 saatte yayımlanan dizinlenebilir haberler (başlık imlası _indexable_articles içinde düzeltilmiştir)
     cutoff = (datetime.now(timezone(timedelta(hours=3))) - timedelta(hours=48)).strftime("%Y-%m-%d %H:%M:%S")
-    articles = [a for a in (await asyncio.to_thread(_indexable_articles))[:300] if (a.get("created_at") or "") >= cutoff]
-    by_id = {}
-    if articles:
-        ids = [a["id"] for a in articles]
-        with database.get_connection() as conn:
-            for r in conn.execute(f"SELECT id, title FROM articles WHERE id IN ({','.join('?' * len(ids))})", tuple(ids)).fetchall():
-                by_id[dict(r)["id"]] = dict(r)["title"]
-    for a in articles:
-        a["title"] = content_quality.clean_title_text(by_id.get(a["id"], "") or a.get("title") or "")
+    articles = [dict(a) for a in (await asyncio.to_thread(_indexable_articles))[:300] if (a.get("created_at") or "") >= cutoff]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     if _is_human_browser_request(request):
         rows = [
@@ -3341,15 +3348,11 @@ async def news_sitemap(request: Request):
 
 @app.get("/video-sitemap.xml")
 async def video_sitemap(request: Request):
-    """Google Video Search için özel XML Video Site Haritası (Sadece gerçek videosu olan makaleler)."""
+    """Google Video Search için özel XML Video Site Haritası (Sadece dizine açık ve gerçek videosu olan makaleler)."""
     from xml.sax.saxutils import escape
-    articles = database.get_articles(limit=100)
+    idx_articles = await asyncio.to_thread(_indexable_articles)
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
-    vid_articles = []
-    for a in articles:
-        content_lower = (a.get("content") or "").lower()
-        if "<video" in content_lower or ".mp4" in content_lower or "iframe" in content_lower:
-            vid_articles.append(a)
+    vid_articles = [a for a in idx_articles[:200] if a.get("_has_video")]
     if _is_human_browser_request(request):
         rows = [
             {"label": a.get("title", ""), "loc": f"{base_url}/haber/{a['slug']}", "date": (a.get("created_at") or "")[:16], "prio": "0.8"}
@@ -3393,8 +3396,7 @@ async def video_sitemap(request: Request):
 async def rss_feed(request: Request):
     from xml.sax.saxutils import escape
     from email.utils import format_datetime
-    import content_quality
-    articles = [a for a in database.get_sitemap_articles(limit=50) if not content_quality.is_thin(a.get("content") or "")][:30]
+    articles = (await asyncio.to_thread(_indexable_articles))[:30]
     base_url = "https://xn--gndemanalizi-dlb.com.tr"
     if _is_human_browser_request(request):
         rows = [

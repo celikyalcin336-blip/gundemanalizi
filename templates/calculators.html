@@ -15,6 +15,16 @@
         function gtag(){dataLayer.push(arguments);}
         var _savedConsent = null;
         try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+        if (_savedConsent !== 'accepted') {
+            gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'region': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH'],
+                'wait_for_update': 500
+            });
+        }
         gtag('consent', 'default', {
             'ad_storage': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
             'ad_user_data': (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted',
@@ -24,7 +34,9 @@
         });
     </script>
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
+    {% if tool != 'hub' %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
+    {% endif %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -219,6 +231,9 @@
                 {% endfor %}
             </ul>
             <p class="text-[12px] text-slate-500">{{ params.year }} asgari ücret: brüt {{ '{:,.2f}'.format(params.asgari_brut).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL, net {{ '{:,.2f}'.format(params.asgari_net).replace(',', 'X').replace('.', ',').replace('X', '.') }} TL.</p>
+            <h3 class="text-base font-black text-slate-900 pt-2">Bordro Okuma ve Vergi Dilimi Geçişlerinde Dikkat Edilecek Noktalar</h3>
+            <p>Özel sektörde iş sözleşmesi <strong>“aylık brüt ücret”</strong> üzerinden imzalandığında işverenin ödediği brüt rakam yıl boyunca sabit kalır; ancak çalışanın kümülatif gelir vergisi matrahı %15'lik ilk dilimi aşıp %20 ve %27 dilimlerine geçtiğinde yılın ikinci yarısında ele geçen net tutar kademeli olarak azalır. Buna karşılık iş sözleşmesi <strong>“aylık sabit net ücret”</strong> üzerinden yapılmışsa vergi dilimi farkını işveren üstlenir ve brüt tutar sonbahar aylarında yukarı yönlü güncellenir.</p>
+            <p>Prime esas kazanç üst sınırını (SGK tavanını) aşan yüksek brüt maaşlarda, tavanın üzerindeki kısım üzerinden %14 SGK ve %1 işsizlik primi kesilmez; doğrudan gelir vergisi ve damga vergisi matrahına dahil edilir. İkramiye, prim ve fazla mesai ödemeleri de ödendiği ayın kümülatif matrahına eklenerek vergilendirilir. Konuyla ilgili resmi gelişmeleri <a href="/dosya/asgari-ucret" class="text-red-600 font-bold underline">Asgari Ücret Rehberi</a> sayfamızdan takip edebilirsiniz.</p>
         </section>
 
         {% elif tool == 'kidem' %}
@@ -290,6 +305,9 @@
                 <li>1,5 yıl – 3 yıl: 6 hafta</li>
                 <li>3 yıldan fazla: 8 hafta</li>
             </ul>
+            <h3 class="text-base font-black text-slate-900 pt-2">Giydirilmiş Brüt Ücret ve SGK İstifa Kodları</h3>
+            <p>Kıdem tazminatı hesabında yalnızca çıplak brüt maaş değil; süreklilik arz eden nakdi ve ayni ödemelerin aylık ortalaması (yemek kartı, servis veya yol yardımı, düzenli ikramiye, yakacak ve konut yardımı) <strong>giydirilmiş brüt ücrete</strong> eklenir. Buna karşılık tek seferlik primler, fazla mesai ücretleri ve yıllık izin ücreti giydirilmiş brüt hesaba katılmaz.</p>
+            <p>SGK'dan 15 yıl sigortalılık ve 3.600 prim günü (8 Eylül 1999 öncesi girişliler) veya 7.000 prim günü / 25 yıl şartlarını tamamlayarak “kıdem tazminatı alabilir” yazısı alan çalışanlar, kendi istekleriyle ayrılsalar dahi tazminat hakkını korur. Güncel tavan kararları ve Yargıtay emsal içtihatları için <a href="/dosya/kidem-tazminati" class="text-red-600 font-bold underline">Kıdem Tazminatı Rehberi</a> sayfamızı inceleyebilirsiniz.</p>
         </section>
 
         {% elif tool == 'emekli' %}
@@ -335,6 +353,9 @@
             <p><strong>SSK ve Bağ-Kur emeklileri:</strong> Aylıklar her yıl Ocak ve Temmuz aylarında, bir önceki 6 aylık dönemin TÜİK tarafından açıklanan enflasyon (TÜFE) oranında artırılır. Örneğin Ocak zammı, Temmuz–Aralık dönemi enflasyonuna göre belirlenir.</p>
             <p><strong>Memur emeklileri:</strong> Toplu sözleşmeyle belirlenen zam oranı uygulanır; 6 aylık enflasyon bu oranı aşarsa aradaki fark <em>enflasyon farkı</em> olarak ayrıca eklenir.</p>
             <p><strong>En düşük emekli aylığı:</strong> Kanunla belirlenen taban tutarın altında aylık alanlara, aradaki fark devlet tarafından tamamlanır. Bu nedenle düşük aylıklarda zam oranı hesaplaması ile ele geçen tutar farklı olabilir. Kesin tutar için e-Devlet'teki SGK aylık bilgilerinizi kontrol edin.</p>
+            <h3 class="text-base font-black text-slate-900 pt-2">Kök Maaş, %4 Ek Ödeme ve Hazine Tamamlaması Nasıl İşler?</h3>
+            <p>5510 sayılı Kanun'un Ek 19. maddesi uyarınca Ocak ve Temmuz zam oranları, banka hesabına yatan tamamlanmış tutara değil emeklinin e-Devlet ekranındaki <strong>gerçek kök aylığına</strong> ve bunun üzerine eklenen <strong>%4 (veya %5) vergi iadesi karşılığı ek ödemeye</strong> uygulanır. Zamlı kök aylık ile ek ödemenin toplamı, Türkiye Büyük Millet Meclisi tarafından belirlenen <em>en düşük emekli aylığı</em> sınırının altında kalırsa Hazine desteği devreye girerek ödemeyi taban aylığa tamamlar; sınırın üzerine çıkarsa hesaplanan yeni tutar kuruşu kuruşuna ödenir.</p>
+            <p>4C (Emekli Sandığı / memur emeklisi) kapsamındaki hak sahiplerinde ise altı aylık enflasyon farkı, önceki dönem toplu sözleşme zammını aşan TÜFE oranı üzerinden kümülatif çarpımla bulunur ve yeni dönem toplu sözleşme artışıyla birleştirilir. Güncel TÜİK enflasyon verileri ve kuruşu kuruşuna maaş tabloları için <a href="/dosya/emekli-ve-memur-zammi" class="text-red-600 font-bold underline">Emekli ve Memur Maaş Zammı Dosyası</a> sayfamıza göz atabilirsiniz.</p>
         </section>
         {% endif %}
 

@@ -37,6 +37,16 @@
       function gtag(){dataLayer.push(arguments);}
       var _savedConsent = null;
       try { _savedConsent = localStorage.getItem('ga_cookie_consent'); } catch(e) {}
+      if (_savedConsent !== 'accepted') {
+        gtag('consent', 'default', {
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied',
+          'ad_personalization': 'denied',
+          'analytics_storage': 'denied',
+          'region': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH'],
+          'wait_for_update': 500
+        });
+      }
       var _cState = (_savedConsent === 'rejected' || _savedConsent === 'essential') ? 'denied' : 'granted';
       gtag('consent', 'default', {
         'ad_storage': _cState,
@@ -63,7 +73,19 @@
     </script>
     {% endif %}
 
-    <meta name="description" content="Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, otomobil, teknoloji, spor ve güncel haberlerin tarafsız analizi.">
+    {% set _cat_descs = {
+        'Gündem': 'Türkiye gündemindeki son gelişmeler, resmi kurum açıklamaları, kamu düzenlemeleri, yargı kararları ve güncel haber analizleri.',
+        'Ekonomi': 'Enflasyon, Merkez Bankası faiz kararları, döviz ve altın piyasaları, maaş, emekli ve çalışma hayatına dair güncel ekonomi haberleri.',
+        'Eğitim': 'ÖSYM ve MEB sınav takvimi, YKS, LGS, KPSS duyuruları, öğretmen atamaları ve yükseköğretim gündemindeki güncel eğitim haberleri.',
+        'Teknoloji': 'Yapay zekâ, siber güvenlik, mobil cihazlar, yazılım dünyası ve dijital dönüşüm alanındaki son teknoloji haberleri ve incelemeler.',
+        'Otomobil': 'Türkiye otomobil pazarı, elektrikli ve hibrit araç modelleri, ÖTV düzenlemeleri, yakıt maliyetleri ve otomotiv sektörü gelişmeleri.',
+        'Sağlık': 'Tıp dünyasındaki bilimsel araştırmalar, Sağlık Bakanlığı duyuruları, koruyucu hekimlik uyarıları ve halk sağlığı haberleri.',
+        'Spor': 'Trendyol Süper Lig, Avrupa kupaları, milli takım karşılaşmaları, basketbol ve voleybol branşlarından güncel spor haberleri.',
+        'Dünya': 'Uluslararası diplomasi, küresel güvenlik, Avrupa, Orta Doğu ve ABD merkezli dış politika gelişmelerinin tarafsız analizi.',
+        'Son Dakika': 'Türkiye ve dünyadan anlık son dakika gelişmeleri, resmi açıklamalar ve doğrulanmış sıcak haber akışı.'
+    } %}
+    {% set _page_meta_desc = _cat_descs.get(active_category, 'Türkiye ve dünyadan son dakika gelişmeleri, ekonomi, siyaset, otomobil, teknoloji, spor ve güncel haberlerin tarafsız analizi.') %}
+    <meta name="description" content="{{ _page_meta_desc }}">
     {% if search_query or not articles or articles|length < 3 %}
     <meta name="robots" content="noindex, follow">
     {% else %}
@@ -74,13 +96,13 @@
     <!-- Open Graph & Twitter Cards -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Gündem Analizi">
-    <meta property="og:title" content="Gündem Analizi | Doğru Haber • Tarafsız Analiz">
-    <meta property="og:description" content="Türkiye ve dünyadan tarafsız, bağımsız ve son dakika haber analizleri.">
+    <meta property="og:title" content="{{ (active_category ~ ' Haberleri | Gündem Analizi') if active_category else 'Gündem Analizi | Doğru Haber • Tarafsız Analiz' }}">
+    <meta property="og:description" content="{{ _page_meta_desc }}">
     <meta property="og:url" content="{{ canonical_url or 'https://xn--gndemanalizi-dlb.com.tr/' }}">
     <meta property="og:image" content="https://xn--gndemanalizi-dlb.com.tr/assets/logo.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gündem Analizi | Doğru Haber • Tarafsız Analiz">
-    <meta name="twitter:description" content="Türkiye ve dünyadan tarafsız, bağımsız ve son dakika haber analizleri.">
+    <meta name="twitter:title" content="{{ (active_category ~ ' Haberleri | Gündem Analizi') if active_category else 'Gündem Analizi | Doğru Haber • Tarafsız Analiz' }}">
+    <meta name="twitter:description" content="{{ _page_meta_desc }}">
     <meta name="twitter:image" content="https://xn--gndemanalizi-dlb.com.tr/assets/logo.png">
     <!-- Google News, Knowledge Graph & Site Arama Şeması (JSON-LD) -->
     <script type="application/ld+json">
@@ -1173,11 +1195,11 @@
                     <div>
                         <div class="flex items-center gap-2.5 mb-2">
                             <span class="w-3 h-3 rounded-full bg-red-600 animate-ping"></span>
-                            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase">
+                            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                 {% if search_query %}
                                     "{{ search_query }}" Arama Sonuçları
                                 {% else %}
-                                    {{ active_category }} HABERLERİ
+                                    {{ active_category }} Haberleri
                                 {% endif %}
                             </h1>
                         </div>

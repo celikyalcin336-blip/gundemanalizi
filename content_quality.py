@@ -359,11 +359,16 @@ def clean_article_html(content: str) -> str:
     }
     def _fix_heading(m):
         tag, attrs, inner = m.group(1), m.group(2), m.group(3)
-        inner = clean_title_text(inner)
-        low_h = inner.strip(" ?:.-").lower()
+        raw_inner = clean_title_text(_html.unescape(re.sub(r"<[^>]+>", "", inner)))
+        low_h = raw_inner.strip(" ?:.-").lower()
         if low_h in _GENERIC_H3_MAP:
-            inner = _GENERIC_H3_MAP[low_h]
-        return f"<{tag}{attrs}>{inner}</{tag}>"
+            raw_inner = _GENERIC_H3_MAP[low_h]
+        try:
+            import fact_guard as _fg_h
+            raw_inner = _fg_h.to_turkish_sentence_case(raw_inner, c)
+        except Exception:
+            pass
+        return f"<{tag}{attrs}>{_html.escape(raw_inner)}</{tag}>"
     c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _fix_heading, c, flags=re.S | re.I)
 
     # 4) Paragraflar arası tekrar eden cümleler ve özet kutusuyla birebir örtüşen cümleler
