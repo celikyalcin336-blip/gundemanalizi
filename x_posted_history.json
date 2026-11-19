@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "yapay-zeka-asistani-claude-banka-hesaplariyla-entegre-olarak-butce-takibi-yapaca",
-    "title": "Yapay zeka asistanı Claude banka hesaplarıyla entegre olarak bütçe takibi yapacak",
-    "summary": "Yapay zeka geliştiricisi Anthropic, Claude asistanına banka hesaplarını bağlama özelliği getirerek harcamaların otomatik olarak kategorize edilmesini sağladı. Yeni araç; fatura takvimi oluşturma, mükerrer ödemeleri tespit etme ve faiz oranlarını anal",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793960067.7394972
-  },
-  {
     "slug": "fransada-hayat-pahaliligi-ve-maas-artisi-talebiyle-genis-capli-grev-dalgasi",
     "title": "Fransa’da Hayat Pahalılığı ve Maaş Artışı Talebiyle Geniş Çaplı Grev Dalgası",
     "summary": "Fransa genelinde sendikaların çağrısıyla düzenlenen hayat pahalılığı ve maaş artışı protestolarında yüz binlerce çalışan sokaklara indi. Eğitimden ulaşıma pek çok sektörün katıldığı grevler nedeniyle ülke genelinde ulaşım aksarken, güvenlik güçleri g",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795076769.2677727
+  },
+  {
+    "slug": "tarihi-shelby-cobra-prototipi-rekor-tahminle-muzayedede",
+    "title": "Tarihi Shelby Cobra Prototipi Rekor Tahminle Müzayedede",
+    "summary": "Efsanevi pilot Ken Miles'ın emeğiyle şekillenen 1964 model nadir Shelby Cobra prototipi, ABD'deki Florida müzayedesinde milyonlarca dolarlık beklentiyle satışa çıkarılıyor.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795079493.4652693
   }
 ]
