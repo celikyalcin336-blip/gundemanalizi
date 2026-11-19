@@ -2392,7 +2392,10 @@ async def article_detail(request: Request, slug: str):
     article["title"] = content_quality.clean_title_text(article.get("title") or "")
     article["summary"] = content_quality.clean_summary_text(article.get("summary") or "", article["title"])
     raw_content = content_quality.clean_article_html(raw_content)
-    is_thin_article = (category != "Analiz") and content_quality.is_thin(raw_content, threshold=220)
+    # Yeni çok kaynaklı formatta (kaynak tablosu, veri tablosu, resmi kaynak) kısa ama dolu haberler ince sayılmaz:
+    # şişirme yerine dürüst uzunluk kullanıldığı için eşik 150 kelime; eski tek kaynaklı haberlerde 220 korunur.
+    _thin_threshold = 150 if 'class="ga-multi"' in (raw_content or "") else 220
+    is_thin_article = (category != "Analiz") and content_quality.is_thin(raw_content, threshold=_thin_threshold)
 
     # Eski makalelerdeki tekdüze "Gündem Analizi Notu: ..." şablon ara başlığı kaldırılır (başlık çevirme yapılmaz;
     # altındaki paragraf metnin doğal devamı olarak kalır)
@@ -2411,61 +2414,23 @@ async def article_detail(request: Request, slug: str):
         flags=re.I,
     )
 
-    # Ekonomi haberlerinde sayfanın açıldığı andaki canlı piyasa verilerini göster (bizim verimiz → özgün katma değer)
-    if False and (article.get("category") or "") == "Ekonomi":
-        try:
-            _rates = {r.get("key"): r for r in (get_market_rates().get("rates") or [])}
-            _cells = ""
-            for _k, _lbl in (("dolar", "Dolar"), ("euro", "Euro"), ("altin", "Gram Altın")):
-                _r = _rates.get(_k)
-                if _r and _r.get("price"):
-                    _up = _r.get("direction") == "up"
-                    _cells += (
-                        f'<div class="p-3 rounded-xl bg-white border border-slate-200">'
-                        f'<span class="block text-[10px] font-extrabold text-slate-500 uppercase">{_html_mod.escape(_lbl)}</span>'
-                        f'<strong class="block text-base font-black text-slate-900 font-mono">{_html_mod.escape(str(_r.get("price")))} {_html_mod.escape(str(_r.get("unit") or ""))}</strong>'
-                        f'<span class="text-[11px] font-bold {"text-emerald-700" if _up else "text-red-700"}">{"▲" if _up else "▼"} %{_html_mod.escape(str(abs(float(_r.get("change") or 0))))}</span>'
-                        f'</div>'
-                    )
-            if _cells:
-                raw_content += (
-                    '<div class="not-prose my-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">'
-                    '<div class="flex items-center justify-between mb-3">'
-                    '<span class="text-xs font-black text-slate-900 uppercase tracking-wide">📊 Şu Anki Piyasa Verileri</span>'
-                    '<a href="/piyasalar" class="text-[11px] font-bold text-red-600 hover:underline">Çevirici ve tüm kurlar →</a>'
-                    '</div>'
-                    f'<div class="grid grid-cols-3 gap-2">{_cells}</div>'
-                    '<p class="text-[10px] text-slate-500 mt-2">Veriler sayfanın açıldığı andaki serbest piyasa değerleridir; yatırım tavsiyesi değildir.</p>'
-                    '</div>'
-                )
-        except Exception as _e:
-            print(f"Ekonomi piyasa kutusu atlandı: {_e}")
-
-    # Spor haberlerinde sayfanın açıldığı andaki canlı Süper Lig İlk 5 Puan Durumu kutusunu göster (şans oyunları/emtia hariç)
-    if False and (article.get("category") or "") == "Spor" and not is_thin_article and not main.is_commodity_news(article.get("title", "")):
-        try:
-            import live_services
-            _sl = await asyncio.to_thread(live_services.get_live_superlig)
-            _top5 = (_sl.get("standings") or [])[:5]
-            if _top5:
-                _rows_html = "".join(
-                    f'<div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs">'
-                    f'<span class="font-extrabold text-slate-900 truncate">{int(t.get("rank") or 0)}. {_html_mod.escape(str(t.get("team") or ""))}</span>'
-                    f'<span class="font-mono font-black text-red-600 shrink-0 ml-2">{int(t.get("p") or 0)} P</span>'
-                    f'</div>'
-                    for t in _top5
-                )
-                raw_content += (
-                    '<div class="not-prose my-8 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">'
-                    '<div class="flex items-center justify-between mb-3">'
-                    f'<span class="text-xs font-black text-slate-900 uppercase tracking-wide">🏆 Süper Lig Canlı Puan Durumu ({int(_sl.get("week") or 11)}. Hafta)</span>'
-                    '<a href="/super-lig-puan-durumu" class="text-[11px] font-bold text-red-600 hover:underline">18 takım tam tablo &amp; fikstür →</a>'
-                    '</div>'
-                    f'<div class="grid grid-cols-1 sm:grid-cols-5 gap-2">{_rows_html}</div>'
-                    '</div>'
-                )
-        except Exception as _e:
-            print(f"Spor puan durumu kutusu atlandı: {_e}")
+    # HABER DEĞER KATMANI: habere konusuna göre bize ait veri blokları (kronoloji, kur, puan durumu, deprem,
+    # hesaplayıcı, resmi kaynak). Yalnızca önbellek kullanılır; sayfa açılışı ağ isteği beklemez.
+    try:
+        import value_blocks
+        import live_services as _ls_vb
+        _vb_market = get_market_rates() if _MARKET_CACHE.get("ts", 0) > 0 else None
+        _vb_sl = _ls_vb._SUPERLIG_CACHE.get("data")
+        _vb_quakes = (_DEPREM_CACHE.get("data") or [])
+        if not _vb_quakes and re.search(r"deprem|sarsıntı|afad|kandilli", (article.get("title") or "").lower()):
+            threading.Thread(target=get_live_earthquakes, args=(100,), daemon=True).start()
+        if not _vb_sl and (article.get("category") or "") == "Spor":
+            threading.Thread(target=_ls_vb.get_live_superlig, daemon=True).start()
+        _vb_html = value_blocks.build(article, raw_content, _indexable_articles(), market=_vb_market, superlig=_vb_sl, quakes=_vb_quakes)
+        if _vb_html:
+            raw_content = raw_content + "\n" + _vb_html
+    except Exception as _vb_e:
+        print(f"Değer katmanı atlandı: {_vb_e}")
 
     # 3. alt başlığın hemen üstüne tek satırlık şık "İlginizi Çekebilir" iç bağlantısı (SEO & Sayfa Görüntüleme Artırıcı)
     # İçerik çeşitlendirme (her haberde aynı 5'li <h3> şablonu yerine ID'ye göre 3 farklı editoryal mizanpaj)
