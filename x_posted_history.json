@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "galatasarayda-gelecegin-kadro-planlamasi-kiralik-oyuncular-icin-haftalik-takip-s",
-    "title": "Galatasaray'da Geleceğin Kadro Planlaması: Kiralık Oyuncular İçin Haftalık Takip Sistemi",
-    "summary": "Süper Lig'de liderlik koltuğunda yer alan ve Avrupa kulvarında başarılı bir grafik çizen Galatasaray, gelecek sezonun kadro yapılanması için kiralık gönderdiği futbolcuları mercek altına aldı. Sarı-kırmızılı yönetim ve teknik heyet, yabancı oyuncu ko",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793957347.780547
-  },
-  {
     "slug": "yapay-zeka-asistani-claude-banka-hesaplariyla-entegre-olarak-butce-takibi-yapaca",
     "title": "Yapay zeka asistanı Claude banka hesaplarıyla entegre olarak bütçe takibi yapacak",
     "summary": "Yapay zeka geliştiricisi Anthropic, Claude asistanına banka hesaplarını bağlama özelliği getirerek harcamaların otomatik olarak kategorize edilmesini sağladı. Yeni araç; fatura takvimi oluşturma, mükerrer ödemeleri tespit etme ve faiz oranlarını anal",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795074046.5719273
+  },
+  {
+    "slug": "apple-parca-satis-programini-genisleterek-katlanabilir-ekran-bilesenlerini-ekled",
+    "title": "Apple Parça Satış Programını Genişleterek Katlanabilir Ekran Bileşenlerini Ekledi",
+    "summary": "Teknoloji devi Apple, kendi kendine onarım programının kapsamını genişleterek yeni cihaz bileşenlerini kullanıcıların erişimine açtı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795076769.2677727
   }
 ]
