@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "washingtondan-gelen-yardim-karari-tel-aviv-siyasetinde-sok-etkisi-yaratti",
-    "title": "Washington'dan Gelen Yardım Kararı Tel Aviv Siyasetinde Şok Etkisi Yarattı",
-    "summary": "ABD yönetiminin İsrail'e yönelik dört milyar dolarlık finansal desteği askıya alma kararı, Tel Aviv'de büyük bir siyasi sarsıntıya yol açtı. Cumhurbaşkanı Isaac Herzog, kararın kendisi için tamamen beklenmedik olduğunu vurgularken, muhalefet kanadıyl",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793930119.070149
-  },
-  {
     "slug": "pekin-yonetimi-yapay-zeka-cipi-ithalatini-henuz-onaylamadi",
     "title": "Pekin Yönetimi Yapay Zeka Çipi İthalatını Henüz Onaylamadı",
     "summary": "Amerikalı yarı iletken devi Nvidia'nın ürettiği yüz binlerce gelişmiş yapay zeka işlemcisi, Hong Kong üzerinden Çin ana karasına taşınmak üzere lojistik merkezlerde bekletiliyor. Yerel firmaların yoğun işlemci talebine rağmen Pekin makamlarının büyük",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795046812.043183
+  },
+  {
+    "slug": "mevsimsel-depresyon-belirtileri-ve-gun-isigi-azalmasinin-etkileri",
+    "title": "Mevsimsel Depresyon Belirtileri Ve Gün Işığı Azalmasının Etkileri",
+    "summary": "Uzmanlar sonbahar ve kış aylarında gün ışığının azalmasıyla ortaya çıkan mevsimsel depresyon belirtilerine karşı uyarıda bulunuyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795049535.1250083
   }
 ]
