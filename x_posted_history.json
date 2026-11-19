@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "hyperxin-cocuklara-ozel-gelistirdigi-kablosuz-oyuncu-kulakligi-piyasaya-suruluyo",
-    "title": "HyperX'in Çocuklara Özel Geliştirdiği Kablosuz Oyuncu Kulaklığı Piyasaya Sürülüyor",
-    "summary": "Oyun ekipmanları pazarında çocuk kullanıcı grubunu hedefleyen HyperX, Cloud Mini Wireless modeliyle ergonomi ve işitsel güvenlik odaklı bir yaklaşım sergiliyor. Sınırlı ses çıkışı ve uzun süreli kullanım kolaylığı sunan cihaz, genç oyuncuların dijita",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793951907.0944746
-  },
-  {
     "slug": "turk-akademisyenler-yerli-kanser-tedavisi-icin-yeni-molekuller-gelistirdi",
     "title": "Türk Akademisyenler Yerli Kanser Tedavisi İçin Yeni Moleküller Geliştirdi",
     "summary": "Zonguldak ve İstanbul’daki üniversitelerden bilim insanlarının ortak çalışmasıyla kanser hücrelerini hedef alan yeni bir molekül serisi sentezlendi. Türk Patent ve Marka Kurumu tarafından tescillenen buluş, Avrupa ölçeğinde de fikri mülkiyet koruması",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795068599.9521341
+  },
+  {
+    "slug": "kuresel-doviz-piyasalarinda-fed-tutanaklarinin-etkisiyle-yasanan-tarihi-sicrama",
+    "title": "Küresel Döviz Piyasalarında Fed Tutanaklarının Etkisiyle Yaşanan Tarihi Sıçrama",
+    "summary": "Amerikan Merkez Bankası ekim toplantı tutanaklarında sıkı para politikası vurgusu yapılmasının ardından döviz piyasalarında sert hareketler görüldü.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795071323.0258982
   }
 ]
