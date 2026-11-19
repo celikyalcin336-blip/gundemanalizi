@@ -105,15 +105,6 @@
     "ts": 1794006312.9794788
   },
   {
-    "slug": "iran-korfezinde-patlama-sesleri-kesm-adasi-yakinlarina-iki-cisim-dustu",
-    "title": "İran Körfezi'nde Patlama Sesleri: Keşm Adası Yakınlarına İki Cisim Düştü",
-    "summary": "İran'ın güneyindeki Keşm Adası ve Bender Hamir kenti yakınlarında şiddetli patlama sesleri duyulurken, bölge sakinleri savaş uçağı gürültüsü duyduklarını ve adaya füze benzeri iki cismin isabet ettiğini aktardı. Yaşanan hareketliliğin ardından Tahran",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794011781.316131
-  },
-  {
     "slug": "nenad-bjelica-samsunspor-tercihini-elestirenlere-sahadan-yanit-verdi",
     "title": "Nenad Bjelica Samsunspor Tercihini Eleştirenlere Sahadan Yanıt Verdi",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795128545.1349492
+  },
+  {
+    "slug": "shenzhen-kentinde-insansi-robotlar-ayni-anda-dans-ederek-rekor-kirdi",
+    "title": "Shenzhen kentinde insansı robotlar aynı anda dans ederek rekor kırdı",
+    "summary": "Çin'in teknoloji başkenti Shenzhen'de düzenlenen etkinlikte 151 insansı robot aynı anda dans ederek Guinness dünya rekoru kırdı. Gösteride farklı modeller yer alırken robotların adımları milisaniye düzeyinde eşleşti.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795131269.2992463
   }
 ]
