@@ -457,6 +457,44 @@ def init_db():
     except Exception as _fae:
         print(f"adsense_final_audit_v1 uyarısı: {_fae}")
 
+    # Tek seferlik anlam/kategori onarımı (veri ve slug silinmez):
+    # - Konya haberindeki "onurlandırılan ceza" -> "onanan ceza"
+    # - Epstein haberindeki "adli vaka iddiası" -> "cinayet iddiası"
+    # - 28 Ekim adli olay haberindeki yanlış "Sağlık" -> "Gündem" kategorisi
+    try:
+        if get_setting("adsense_brand_safety_v1", "") != "1":
+            with get_connection() as conn:
+                konya = conn.execute(
+                    "SELECT id, summary, content FROM articles WHERE slug = ?",
+                    ("konya-merkezli-tarikat-davasinda-onurlandirilan-cezanin-ardindan-sanigin-olumu-o",),
+                ).fetchone()
+                if konya:
+                    ks = re.sub(r"(?i)onurlandırılan", "onanan", str(konya["summary"] or ""))
+                    kc = re.sub(r"(?i)onurlandırılan", "onanan", str(konya["content"] or ""))
+                    conn.execute(
+                        "UPDATE articles SET title = ?, summary = ?, content = ? WHERE id = ?",
+                        (
+                            "Konya merkezli tarikat davasında onanan cezanın ardından sanığın ölümü ortaya çıktı",
+                            ks,
+                            kc,
+                            konya["id"],
+                        ),
+                    )
+                conn.execute(
+                    "UPDATE articles SET title = ? WHERE slug = ?",
+                    (
+                        "Adli tıp uzmanından Jeffrey Epstein davasında çarpıcı cinayet iddiası",
+                        "adli-tip-uzmanindan-jeffrey-epstein-davasinda-carpici-adli-vaka-iddiasi",
+                    ),
+                )
+                conn.execute(
+                    "UPDATE articles SET category = 'Gündem' WHERE slug = ?",
+                    ("11-aylik-bebegi-vardi-bir-kadina-kiydilar",),
+                )
+            set_setting("adsense_brand_safety_v1", "1")
+    except Exception as _bse:
+        print(f"adsense_brand_safety_v1 uyarısı: {_bse}")
+
 
 def cleanup_corrupted_articles():
     # Hatalı kategori düzeltmesi: Estetik, cerrahi ve bıçak altına yatma haberleri kesinlikle Sağlık olmalıdır

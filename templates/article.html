@@ -42,9 +42,9 @@
       });
     </script>
 
-    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca dizine açık zengin içeriklerde aktifleşir) -->
+    <!-- Google AdSense Doğrulama & Otomatik Reklam Kodu (Yalnızca dizine açık ve marka güvenliğine uygun içeriklerde aktifleşir) -->
     <meta name="google-adsense-account" content="ca-pub-3827167989675699">
-    {% if not noindex %}
+    {% if not noindex and not ads_restricted %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3827167989675699" crossorigin="anonymous"></script>
     {% endif %}
 

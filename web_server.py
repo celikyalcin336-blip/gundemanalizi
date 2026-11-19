@@ -2425,6 +2425,18 @@ async def article_detail(request: Request, slug: str):
         except Exception:
             _is_scaled_batch = True
     is_thin_article = _is_scaled_batch or ((category != "Analiz") and content_quality.is_thin(raw_content, threshold=_thin_threshold))
+    # Google AdSense Yayıncı Kısıtlamaları (Marka Güvenliği): intihar, cinsel/çocuk istismarı, tecavüz veya ağır aile içi
+    # ölüm içeren adli haberler yayında ve dizinde kalır; ancak bu sayfalarda reklam kodu (adsbygoogle.js) yüklenmez.
+    _brand_safety_blob = f"{slug} {article.get('title') or ''} {article.get('summary') or ''} {_html_mod.unescape(re.sub(r'<[^>]+>', ' ', raw_content or ''))}"
+    is_ads_restricted = bool(
+        re.search(
+            r"\b(intihar\w*|cinsel\s+istismar\w*|çocuk\s+istismar\w*|tecavüz\w*|fuhuş\w*|pornograf\w*|kafa\s+kesti\w*|kanlı\s+bir\s+trajedi\w*|bir-kadina-kiydilar|kumsali-da-kaybettik)\b",
+            _brand_safety_blob,
+            re.I,
+        )
+    )
+    if is_thin_article or is_ads_restricted:
+        ad_mid = ""
 
     # Eski makalelerdeki tekdüze "Gündem Analizi Notu: ..." şablon ara başlığı kaldırılır (başlık çevirme yapılmaz;
     # altındaki paragraf metnin doğal devamı olarak kalır)
@@ -2523,11 +2535,12 @@ async def article_detail(request: Request, slug: str):
             "prev_article": prev_article,
             "breaking_news": breaking_news,
             "reading_time_min": reading_time_min,
-            "ad_settings": get_site_ad_settings(),
+            "ad_settings": ({**ad_settings, "ads_enabled": False} if (is_thin_article or is_ads_restricted) else ad_settings),
             "market_rates": get_market_rates()["rates"],
             "weather_data": get_live_weather(),
             "canonical_url": canonical_url,
-            "noindex": is_thin_article
+            "noindex": is_thin_article,
+            "ads_restricted": is_ads_restricted,
         }
     )
     if cache_key and resp.body:
