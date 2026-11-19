@@ -98,15 +98,6 @@
     "ts": 1793998150.4273956
   },
   {
-    "slug": "resmi-gazete-yayimlandi-on-bir-universiteye-yeni-rektor-gorevlendirildi",
-    "title": "Resmi Gazete Yayımlandı: On Bir Üniversiteye Yeni Rektör Görevlendirildi",
-    "summary": "Cumhurbaşkanlığı tarafından yapılan yeni atama kararlarıyla birlikte Türkiye genelindeki on bir farklı üniversitenin rektörlük koltuğuna yeni isimler getirildi. İlgili karar, Yükseköğretim Kanunu ve Cumhurbaşkanlığı Kararnameleri'ndeki yetki hükümler",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794003611.5725694
-  },
-  {
     "slug": "kasimpasada-yeni-donem-galibiyetle-basladi-gaziantep-fk-dususte",
     "title": "Kasımpaşa’da Yeni Dönem Galibiyetle Başladı: Gaziantep FK Düşüşte",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795120365.8699222
+  },
+  {
+    "slug": "irandan-abdnin-olasi-kara-harekatina-yonelik-savunma-hazirligi-aciklamasi",
+    "title": "İran'dan ABD'nin olası kara harekâtına yönelik savunma hazırlığı açıklaması",
+    "summary": "İran Devrim Muhafızları Ordusu Sözcüsü Hüseyin Muhibbi, ülkesinin ABD'nin olası kara saldırısına karşı hazırlıklarının hava ve deniz savunmasına göre çok daha ileri düzeyde olduğunu açıkladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795123098.0372987
   }
 ]
