@@ -105,15 +105,6 @@
     "ts": 1794006312.9794788
   },
   {
-    "slug": "sudan-collerinde-ortaya-cikan-devasa-katedral-tarihi-degistiriyor",
-    "title": "Sudan Çöllerinde Ortaya Çıkan Devasa Katedral Tarihi Değiştiriyor",
-    "summary": "Arkeologlar, Sudan’ın tarihi Eski Dongola bölgesinde kumlar altında saklı devasa boyutlarda bir katedral keşfetti. Yapılan ilk ölçümler, antik yapının Beyaz Saray'dan bile daha geniş bir alana yayıldığını ortaya koyuyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794006333.8830624
-  },
-  {
     "slug": "fedden-enflasyonla-mucadelede-yeni-sikilasma-sinyali-ve-faiz-artisi-ihtimali",
     "title": "Fed’den Enflasyonla Mücadelede Yeni Sıkılaşma Sinyali ve Faiz Artışı İhtimali",
     "summary": "San Francisco Fed Başkanı Mary Daly, ABD'de direnç gösteren enflasyon verileri karşısında faiz oranlarını yukarı çekmenin bir seçenek olarak masada kaldığını vurguladı. Yetkili, ekonomik istikrarı sağlamak adına para politikasında ilave adımların atı",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795123098.0372987
+  },
+  {
+    "slug": "toyotanin-yeni-pikap-modeli-corolla-deck-tanitildi",
+    "title": "Toyota'nın yeni pikap modeli Corolla Deck tanıtıldı",
+    "summary": "Toyota, Corolla Cross modelini temel alan yeni yekpare gövdeli pikap modeli Corolla Deck'i tanıttı. Brezilya'daki Sorocaba 2 fabrikasında üretilecek olan araç, Güney Amerika pazarındaki rekabetçi segmente giriş yapıyor.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795125821.7375839
   }
 ]
