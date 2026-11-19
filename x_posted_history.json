@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "pekin-yonetimi-yapay-zeka-cipi-ithalatini-henuz-onaylamadi",
-    "title": "Pekin Yönetimi Yapay Zeka Çipi İthalatını Henüz Onaylamadı",
-    "summary": "Amerikalı yarı iletken devi Nvidia'nın ürettiği yüz binlerce gelişmiş yapay zeka işlemcisi, Hong Kong üzerinden Çin ana karasına taşınmak üzere lojistik merkezlerde bekletiliyor. Yerel firmaların yoğun işlemci talebine rağmen Pekin makamlarının büyük",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793932851.6515172
-  },
-  {
     "slug": "abdden-irana-yonelik-petrol-ticareti-kisitlamalarinda-turkiye-ve-hindistana-yeni",
     "title": "ABD’den İran’a Yönelik Petrol Ticareti Kısıtlamalarında Türkiye ve Hindistan’a Yeni Yaptırımlar",
     "summary": "Washington yönetimi, İran’ın petrol gelirlerini kesmeyi amaçlayan \"Ekonomik Parya Operasyonu\" kapsamında Türkiye ve Hindistan merkezli bazı kişi ve kurumları yaptırım listesine dahil etti. Söz konusu kararlar, İran’ın küresel finans sistemine erişimi",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795049535.1250083
+  },
+  {
+    "slug": "suudi-arabistan-baskenti-riyad-hedef-alinan-saldirilarla-sarsildi",
+    "title": "Suudi Arabistan Başkenti Riyad Hedef Alınan Saldırılarla Sarsıldı",
+    "summary": "Yemen merkezli Husilerin füzelerle düzenlediği saldırılar Suudi Arabistan'ın başkenti Riyad'da şiddetli patlamalara yol açtı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795052258.2122781
   }
 ]
