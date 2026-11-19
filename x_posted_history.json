@@ -91,15 +91,6 @@
     "ts": 1793911051.7025006
   },
   {
-    "slug": "otomotiv-sektorunde-yaprak-dokumu-egea-sonrasi-fiatta-sasirtan-tablo",
-    "title": "Otomotiv Sektöründe Yaprak Dökümü: Egea Sonrası Fiat'ta Şaşırtan Tablo",
-    "summary": "Otomotiv Distribütörleri ve Mobilite Derneği'nin Ekim 2026 verilerine göre, uzun süredir binek pazarının zirvesinde yer alan Fiat, Bursa fabrikasındaki model geçişleri nedeniyle satışlarda tarihi bir düşüş yaşadı. Marka, binek segmentindeki bu daralm",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1793943735.914257
-  },
-  {
     "slug": "meteorolojiden-sert-uyari-turkiye-hafta-sonu-soguk-hava-ve-firtinayla-sarsilacak",
     "title": "Meteorolojiden Sert Uyarı: Türkiye Hafta Sonu Soğuk Hava ve Fırtınayla Sarsılacak",
     "summary": "Hafta sonu Türkiye genelinde etkisini gösterecek soğuk hava dalgası, beraberinde yoğun kar yağışı ve fırtınayı getiriyor. Kuzey ve doğu bölgelerinde sıcaklıklar hızla düşerken, iç kesimlerde gece ayazı ve don riski artıyor.",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795060429.9446378
+  },
+  {
+    "slug": "besiktas-fuzul-basantrenoru-dusan-alimpijevic-real-madrid-macini-degerlendirdi",
+    "title": "Beşiktaş Fuzul Başantrenörü Dusan Alimpijevic Real Madrid Maçını Değerlendirdi",
+    "summary": "Beşiktaş Fuzul, Euro League'in on ikinci haftasında Real Madrid'i seksen üç ila yetmiş dokuz mağlup etti.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795063152.7877645
   }
 ]
