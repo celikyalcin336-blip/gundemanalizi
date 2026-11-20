@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "kuresel-otomotiv-devlerinin-yeni-finans-rotasi-abd-pazari-oldu",
-    "title": "Küresel Otomotiv Devlerinin Yeni Finans Rotası ABD Pazarı Oldu",
-    "summary": "Çin ve Avrupa pazarlarındaki talep daralması, küresel otomotiv üreticilerini Kuzey Amerika'ya yöneltti. Toyota, Volkswagen, Hyundai, Honda ve Nissan gibi büyük markalar, özellikle SUV ve pick-up segmentindeki güçlü kârlılık potansiyeli nedeniyle bölg",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794096128.067772
-  },
-  {
     "slug": "emekli-maaslarina-yonelik-zam-senaryolari-ve-uzman-degerlendirmeleri-gundemde",
     "title": "Emekli Maaşlarına Yönelik Zam Senaryoları ve Uzman Değerlendirmeleri Gündemde",
     "summary": "Ekonomi yönetiminin açıklamaları sonrasında emekli maaşlarına uygulanacak olası refah payı artışları ve taban aylık beklentileri piyasaların odağına yerleşti. Sosyal güvenlik alanındaki hesaplamalarıyla bilinen uzman isimler, yeni dönemde gündeme gel",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795213022.54161
+  },
+  {
+    "slug": "hyundai-yenilenen-tasarimi-ve-hibrit-ozellikleriyle-yeni-elantra-modelini",
+    "title": "Hyundai, yenilenen tasarımı ve hibrit özellikleriyle yeni Elantra modelini tanıttı",
+    "summary": "Hyundai, Los Angeles Otomobil Fuarı'nda tanıttığı yeni kompakt sedan modeli Elantra'yı büyüyen boyutları ve gelişmiş teknolojik özellikleriyle yeniledi.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795215746.4313972
   }
 ]
