@@ -112,15 +112,6 @@
     "ts": 1794014482.7024946
   },
   {
-    "slug": "fenerbahce-otobusune-duzenlenen-silahli-saldirida-iddianame-sureci-tamamlandi",
-    "title": "Fenerbahçe Otobüsüne Düzenlenen Silahlı Saldırıda İddianame Süreci Tamamlandı",
-    "summary": "Trabzon Cumhuriyet Başsavcılığı, 2015 yılında Fenerbahçe kafilesini taşıyan otobüse yönelik gerçekleştirilen saldırıya ilişkin yürütülen soruşturmayı sonuçlandırdı. Elde edilen teknik bulgular ve kriminal incelemeler doğrultusunda, 5 şüpheli hakkında",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794030832.324417
-  },
-  {
     "slug": "turk-futbolunda-ataturkun-anisina-kapsamli-saygi-durusu-karari",
     "title": "Türk Futbolunda Atatürk'ün Anısına Kapsamlı Saygı Duruşu Kararı",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795147612.8396633
+  },
+  {
+    "slug": "emtia-uzmani-zafer-ergezen-altindaki-gerilemeyi-ve-yil-sonu-tahminlerini",
+    "title": "Emtia uzmanı Zafer Ergezen altındaki gerilemeyi ve yıl sonu tahminlerini değerlendirdi",
+    "summary": "Emtia piyasaları uzmanı Zafer Ergezen, Fed tutanakları ve küresel gelişmelerin altın ile gümüş fiyatlarında satışları tetiklediğini belirtti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795150336.5142627
   }
 ]
