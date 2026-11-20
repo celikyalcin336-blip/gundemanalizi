@@ -119,15 +119,6 @@
     "ts": 1794033533.8880742
   },
   {
-    "slug": "chery-kalite-kontrol-sorunu-nedeniyle-cinde-binlerce-araci-servise-cagiriyor",
-    "title": "Chery Kalite Kontrol Sorunu Nedeniyle Çin'de Binlerce Aracı Servise Çağırıyor",
-    "summary": "Çinli otomotiv üreticisi Chery, üretim kaynaklı teknik bir aksaklık sebebiyle yüz binlerce aracı kapsayan geniş çaplı bir operasyon başlatıyor. Yapılan resmi açıklamaya göre, belirli üretim tarihlerine sahip Omoda ve Tiggo 5x serisi araçların kritik ",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794047153.1591446
-  },
-  {
     "slug": "iranin-nukleer-faaliyetlerine-istihbarat-saglayanlara-20-milyon-dolarlik-odul-te",
     "title": "İran’ın Nükleer Faaliyetlerine İstihbarat Sağlayanlara 20 Milyon Dolarlık Ödül Teklifi",
     "summary": "ABD Merkez Komutanlığı ve Dışişleri Bakanlığı, Tahran yönetiminin nükleer programına dair gizli verileri sızdıracak isimlere 20 milyon dolara ulaşan nakdi ödül verileceğini duyurdu. Program, kritik tesislerin deşifre edilmesini ve bölgedeki stratejik",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795163954.0761907
+  },
+  {
+    "slug": "ingiltere-ve-avrupa-birligi-iliskileri-bruksel-zirvesiyle-masada",
+    "title": "İngiltere ve Avrupa Birliği ilişkileri Brüksel zirvesiyle masada",
+    "summary": "İngiltere ve Avrupa Birliği, Brüksel'de düzenlenen zirvede ilişkileri yeniden şekillendirmek için bir araya geliyor.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795166676.5579095
   }
 ]
