@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "kartaldaki-kuyumcuda-planli-hirsizlik-200-sahte-yuzuk-caldi",
-    "title": "Kartal'daki Kuyumcuda Planlı Hırsızlık: 200 Sahte Yüzük Çaldı",
-    "summary": "İstanbul Kartal’da bir kuyumcu dükkânına gece yarısı giren şüpheli, vitrindeki yüzüklerin plastik demo olduğunu fark etmeden çalarak kaçtı. Kepenk sisteminin şifresini kopyaladığı belirlenen zanlı, olaydan bir gün sonra Sabiha Gökçen Havalimanı'nda y",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794093407.3220978
-  },
-  {
     "slug": "kuresel-otomotiv-devlerinin-yeni-finans-rotasi-abd-pazari-oldu",
     "title": "Küresel Otomotiv Devlerinin Yeni Finans Rotası ABD Pazarı Oldu",
     "summary": "Çin ve Avrupa pazarlarındaki talep daralması, küresel otomotiv üreticilerini Kuzey Amerika'ya yöneltti. Toyota, Volkswagen, Hyundai, Honda ve Nissan gibi büyük markalar, özellikle SUV ve pick-up segmentindeki güçlü kârlılık potansiyeli nedeniyle bölg",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795210299.4920566
+  },
+  {
+    "slug": "istanbulda-duvarlari-siirle-dolduran-tahliye-edilen-kiraci-konustu",
+    "title": "İstanbul'da duvarları şiirle dolduran tahliye edilen kiracı konuştu",
+    "summary": "İstanbul Büyükçekmece'de kira ödemediği gerekçesiyle tahliye edilen ve evin duvarlarını şiirlerle dolduran Abdullah Gönen ilk kez konuştu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795213022.54161
   }
 ]
