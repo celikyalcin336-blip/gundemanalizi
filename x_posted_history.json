@@ -112,15 +112,6 @@
     "ts": 1794014482.7024946
   },
   {
-    "slug": "kuresel-ekonomide-2040-projeksiyonu-turkiyenin-yeni-kuresel-siralamasi",
-    "title": "Küresel Ekonomide 2040 Projeksiyonu: Türkiye'nin Yeni Küresel Sıralaması",
-    "summary": "Uluslararası araştırma kuruluşlarının hazırladığı uzun vadeli projeksiyonlara göre, 2040 yılında küresel ekonominin hacmi 227 trilyon dolara yükselecek. ABD liderliğini korurken Çin ve Hindistan dengeleri değiştirecek, Türkiye ise iki trilyon doları ",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794022661.9109185
-  },
-  {
     "slug": "besiktas-euroleague-sahasinda-zalgirisin-dis-sutlarina-engel-olamadi",
     "title": "Beşiktaş EuroLeague Sahasında Zalgiris’in Dış Şutlarına Engel Olamadı",
     "summary": "Beşiktaş, EuroLeague’in 10. haftasında evinde ağırladığı Litvanya temsilcisi Zalgiris’e 83-67 mağlup oldu. Siyah-beyazlılar, özellikle ilk yarıda rakibinin hücum ritmini durdurmakta zorlanarak ligdeki 6. yenilgisini aldı.",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795139438.5652237
+  },
+  {
+    "slug": "inveonai-yapay-zeka-destekli-sesli-alisveris-cozumunu-kullanima-sundu",
+    "title": "Inveon.ai yapay zeka destekli sesli alışveriş çözümünü kullanıma sundu",
+    "summary": "Inveon bünyesinden doğan inveon.ai, kullanıcıların markaların web siteleri ve mobil uygulamaları üzerinden sesli komutlarla alışveriş yapmasını sağlayan ASA Voice Shopping çözümünü hayata geçirdi.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795142164.0891817
   }
 ]
