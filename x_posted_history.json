@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "emekli-maaslarina-yonelik-zam-senaryolari-ve-uzman-degerlendirmeleri-gundemde",
-    "title": "Emekli Maaşlarına Yönelik Zam Senaryoları ve Uzman Değerlendirmeleri Gündemde",
-    "summary": "Ekonomi yönetiminin açıklamaları sonrasında emekli maaşlarına uygulanacak olası refah payı artışları ve taban aylık beklentileri piyasaların odağına yerleşti. Sosyal güvenlik alanındaki hesaplamalarıyla bilinen uzman isimler, yeni dönemde gündeme gel",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794098848.514501
-  },
-  {
     "slug": "turkiyede-organ-nakli-bekleyenlerin-yasam-mucadelesi-suruyor",
     "title": "Türkiye'de Organ Nakli Bekleyenlerin Yaşam Mücadelesi Sürüyor",
     "summary": "Türkiye genelinde otuz binden fazla insan organ nakli sırasında yaşam mücadelesi verirken, uzmanlar kadavradan bağış oranlarının artırılması gerektiğine dikkat çekiyor. Yasal süreçlerin ve tıbbi prosedürlerin tüm yönleriyle şeffaf yürütüldüğü vurgula",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795215746.4313972
+  },
+  {
+    "slug": "andromeda-galaksisinde-iki-yildizin-birlesmesi-ilk-kez-dogrudan-gozlemlendi",
+    "title": "Andromeda Galaksisi'nde iki yıldızın birleşmesi ilk kez doğrudan gözlemlendi",
+    "summary": "Astronomlar, Dünya'dan 2,5 milyon ışık yılı uzaklıktaki Andromeda Galaksisi'nde dev bir yıldızın yörüngesindeki küçük eşini yutmasını ilk kez doğrudan takip etti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795218485.2457957
   }
 ]
