@@ -119,15 +119,6 @@
     "ts": 1794033533.8880742
   },
   {
-    "slug": "uzmanlardan-uyari-basit-grip-sanilan-vakalar-ciddi-riskler-barindiriyor",
-    "title": "Uzmanlardan Uyarı: Basit Grip Sanılan Vakalar Ciddi Riskler Barındırıyor",
-    "summary": "Son dönemde artış gösteren viral enfeksiyonların yalnızca hafif bir soğukalgınlığı olarak görülmemesi gerektiğini belirten uzmanlar, özellikle kronik rahatsızlığı bulunan vatandaşların temkinli olması gerektiğini vurguluyor. Alerjik bünyeler ve risk ",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794038993.732953
-  },
-  {
     "slug": "galatasarayda-victor-osimhenin-sakatligi-ve-ameliyat-karari-duyuruldu",
     "title": "Galatasaray'da Victor Osimhen'in Sakatlığı ve Ameliyat Kararı Duyuruldu",
     "summary": "Galatasaray'ın Nijeryalı golcüsü Victor Osimhen, Stuttgart ile oynanan Şampiyonlar Ligi mücadelesinde sol dizinden sakatlık geçirdi. Yapılan tıbbi tetkikler sonucunda serbest fragman tespit edilen futbolcunun operasyon geçireceği açıklandı.",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795155783.4294925
+  },
+  {
+    "slug": "kuresel-piyasalarda-yapay-zeka-endiseleriyle-derinlesen-satis-dalgasi",
+    "title": "Küresel piyasalarda yapay zeka endişeleriyle derinleşen satış dalgası",
+    "summary": "Küresel borsalarda yapay zeka rallisinin sürdürülememesiyle satışlar genele yayılırken, ABD ve Asya piyasalarında sert düşüşler yaşandı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795158507.3605766
   }
 ]
