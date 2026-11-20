@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "trump-kabinesinde-radikal-degisim-stephen-miller-ozel-kalem-koltuguna-oturuyor",
-    "title": "Trump Kabinesinde Radikal Değişim: Stephen Miller Özel Kalem Koltuğuna Oturuyor",
-    "summary": "Donald Trump, sadık danışmanı Stephen Miller’ı yeni Özel Kalem olarak atadığını duyururken, mevcut Özel Kalem Susie Wiles’ın siyasi operasyonlar birimine kaydırılacağını belirtti. Kongre ara seçimlerinin ardından gelen bu yönetim değişikliği, Beyaz S",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794087966.1750774
-  },
-  {
     "slug": "malatyanin-degerli-bakliyat-urununde-resmi-tescil-donemi-basladi",
     "title": "Malatya'nın Değerli Bakliyat Ürününde Resmi Tescil Dönemi Başladı",
     "summary": "Malatya coğrafyasının özgün tarımsal ürünleri arasında bulunan Doğanşehir Dermason Kuru Fasulyesi, resmi makamlarca coğrafi işaretle güvence altına alındı. Bu hukuki adımın, yerel üreticilerin pazardaki rekabet gücünü artırması ve bölge ticaretine ma",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795204851.7037594
+  },
+  {
+    "slug": "java4shell-acigi-ve-islemci-mimarisi-uzerindeki-teknik-etkileri",
+    "title": "Java4Shell açığı ve işlemci mimarisi üzerindeki teknik etkileri",
+    "summary": "Calif adlı araştırmacının yapay zekâ destekli analizleriyle Java ekosisteminde kritik bir açık tespit edildi.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795207575.4339802
   }
 ]
