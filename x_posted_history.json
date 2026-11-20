@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "malatyada-komsular-arasi-silahli-kavga-itfaiye-eri-hayatini-kaybetti",
-    "title": "Malatya'da Komşular Arası Silahlı Kavga: İtfaiye Eri Hayatını Kaybetti",
-    "summary": "Malatya'nın Yazıhan ilçesinde aynı binayı paylaşan bir itfaiye eri ile köy koruyucusu komşusu arasında çıkan tartışma kanlı bitti. Silahlı saldırıya uğrayan iki çocuk babası maktul olay yerinde yaşamını yitirirken, şüpheli güvenlik güçlerince gözaltı",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794074354.324282
-  },
-  {
     "slug": "nvidia-ceosunu-hedef-alan-cin-istihbarati-ve-cip-savaslarinin-perde-arkasi",
     "title": "NVIDIA CEO'sunu Hedef Alan Çin İstihbaratı ve Çip Savaşlarının Perde Arkası",
     "summary": "New York Times'ın aktardığı son istihbarat raporlarına göre, Çin'in en üst düzey güvenlik kurumu, NVIDIA CEO'su Jensen Huang hakkında bilgi toplamak ve ülkeye gelişmiş çip satışına onay koparmak amacıyla Singapurlu bir teknoloji yöneticisini devreye ",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795191203.7186759
+  },
+  {
+    "slug": "tuik-2026-yili-cocuklarda-bilisim-teknolojileri-kullanim-arastirmasi",
+    "title": "TÜİK 2026 yılı çocuklarda Bilişim Teknolojileri kullanım araştırması sonuçlarını açıkladı",
+    "summary": "TÜİK, 2026 yılına ilişkin \"Çocuklarda Bilişim Teknolojileri Kullanım Araştırması\" sonuçlarını kamuoyuyla paylaştı.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795193928.797004
   }
 ]
