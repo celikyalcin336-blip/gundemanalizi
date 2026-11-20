@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "nvidia-ceosunu-hedef-alan-cin-istihbarati-ve-cip-savaslarinin-perde-arkasi",
-    "title": "NVIDIA CEO'sunu Hedef Alan Çin İstihbaratı ve Çip Savaşlarının Perde Arkası",
-    "summary": "New York Times'ın aktardığı son istihbarat raporlarına göre, Çin'in en üst düzey güvenlik kurumu, NVIDIA CEO'su Jensen Huang hakkında bilgi toplamak ve ülkeye gelişmiş çip satışına onay koparmak amacıyla Singapurlu bir teknoloji yöneticisini devreye ",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794077074.3389957
-  },
-  {
     "slug": "zararsiz-sanilan-yeni-nesil-plastik-katkisi-bebek-sagligini-tehdit-ediyor",
     "title": "Zararsız Sanılan Yeni Nesil Plastik Katkısı Bebek Sağlığını Tehdit Ediyor",
     "summary": "Endüstride geleneksel plastikleştiricilerin yerine geçen DINCH maddesinin güvenli olmadığı yönünde bilimsel bulgular elde edildi. ABD federal sağlık verilerini inceleyen uzmanlar, bu kimyasalın bebeklerin düşük doğum ağırlığıyla dünyaya gelmesine yol",
@@ -3829,5 +3820,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795193928.797004
+  },
+  {
+    "slug": "samsung-mobil-bolumunde-yedi-yillik-donem-sona-erdi",
+    "title": "Samsung mobil bölümünde yedi yıllık dönem sona erdi",
+    "summary": "Samsung mobil bölümünü yedi yıldır yöneten TM Roh, görevini mühendislik geçmişi bulunan Won-Joon Choi'ye devretti.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795196653.314816
   }
 ]
