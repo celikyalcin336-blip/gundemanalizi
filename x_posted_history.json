@@ -119,15 +119,6 @@
     "ts": 1794033533.8880742
   },
   {
-    "slug": "fiorentinadan-lucas-torreira-hamlesi-sari-kirmizili-yildiz-icin-yeni-gelisme",
-    "title": "Fiorentina'dan Lucas Torreira Hamlesi: Sarı-Kırmızılı Yıldız İçin Yeni Gelişme",
-    "summary": "Galatasaray'ın orta saha kurgusundaki kilit ismi Lucas Torreira için İtalyan basınından dikkat çeken bir iddia geldi. Çizme temsilcisi Fiorentina'nın, Uruguaylı futbolcuyu kış transfer döneminde kadrosuna katmak adına resmi temaslara hazırlanıldığı b",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794055311.527838
-  },
-  {
     "slug": "balikesir-edremit-yolu-uzerindeki-trafik-kazasinda-anne-ve-kizi-yasamini-yitirdi",
     "title": "Balıkesir Edremit Yolu Üzerindeki Trafik Kazasında Anne ve Kızı Yaşamını Yitirdi",
     "summary": "Balıkesir’in Edremit ilçesinde seyir halindeki bir kamyonun, dönüş manevrası yapan otomobile çarpması sonucu meydana gelen kazada, 34 yaşındaki sürücü Nilüfer A. ve 10 yaşındaki kızı Eliz A. hayatını kaybetti. Kazayla ilgili soruşturma başlatılarak k",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795172122.1906893
+  },
+  {
+    "slug": "gazzede-kis-sartlari-ve-sel-sulari-saglik-krizini-derinlestiriyor",
+    "title": "Gazze'de kış şartları ve sel suları sağlık krizini derinleştiriyor",
+    "summary": "Gazze'de şiddetli yağışlar ve sel suları çadırları sular altında bırakırken, hastalar ile çocuklar enfeksiyon ve hipotermi riskiyle karşı karşıya kalıyor.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795174844.899257
   }
 ]
