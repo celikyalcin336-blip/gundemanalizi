@@ -112,15 +112,6 @@
     "ts": 1794014482.7024946
   },
   {
-    "slug": "besiktas-euroleague-sahasinda-zalgirisin-dis-sutlarina-engel-olamadi",
-    "title": "Beşiktaş EuroLeague Sahasında Zalgiris’in Dış Şutlarına Engel Olamadı",
-    "summary": "Beşiktaş, EuroLeague’in 10. haftasında evinde ağırladığı Litvanya temsilcisi Zalgiris’e 83-67 mağlup oldu. Siyah-beyazlılar, özellikle ilk yarıda rakibinin hücum ritmini durdurmakta zorlanarak ligdeki 6. yenilgisini aldı.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794025382.9014502
-  },
-  {
     "slug": "trt-world-forum-2026da-uluslararasi-hukukun-gazze-sinavi-masaya-yatirildi",
     "title": "TRT World Forum 2026'da Uluslararası Hukukun Gazze Sınavı Masaya Yatırıldı",
     "summary": "İstanbul Kongre Merkezi'nde onuncusu düzenlenen TRT World Forum'da, Gazze'deki insani kriz ve uluslararası hukukun işlevselliği üst düzey isimlerin katıldığı bir panelle ele alındı. Oturumda, Güney Afrika'nın Uluslararası Adalet Divanı'ndaki dava sür",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795142164.0891817
+  },
+  {
+    "slug": "abd-baskani-trump-havacilik-krizinin-ardindan-siber-guvenlik-direktorunu",
+    "title": "ABD başkanı Trump havacılık krizinin ardından siber güvenlik direktörünü görevden aldı",
+    "summary": "Amerika birleşik devletleri'nde uçak seferlerinin iptal olmasına yol açan havacılık krizinin ardından ulusal siber direktörü sean cairncross görevden uzaklaştırıldı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795144888.2640018
   }
 ]
