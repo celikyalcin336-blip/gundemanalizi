@@ -112,15 +112,6 @@
     "ts": 1794014482.7024946
   },
   {
-    "slug": "merkez-bankasi-baskanindan-fon-siyasasinda-siki-takip-ve-likidite-adimlari",
-    "title": "Merkez Bankası Başkanından Fon Siyasasında Sıkı Takip ve Likidite Adımları",
-    "summary": "TCMB Başkanı Fatih Karahan, fon piyasalarındaki son hareketliliğin bankacılık sistemiyle olan bağını mercek altına aldıklarını açıkladı. Karahan, Türk lirası varlıklara duyulan güvenin sürdüğünü vurgularken, likidite yönetimini rahatlatmak adına devr",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794017222.4387815
-  },
-  {
     "slug": "yapay-zeka-destekli-davranis-analizi-kedilerin-bebeklerle-ortak-dunyasini-araliy",
     "title": "Yapay Zeka Destekli Davranış Analizi Kedilerin Bebeklerle Ortak Dünyasını Aralıyor",
     "summary": "Kyoto Üniversitesi araştırmacıları, kedi davranışlarını sınıflandırmak için geliştirdikleri dijital modelleme yöntemleriyle kedilerin tepki süreçlerinin bebeklerin gelişim evreleriyle benzerlik gösterdiğini kanıtladı. Üç yüzü aşkın kedi sahibinden al",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795133993.1941688
+  },
+  {
+    "slug": "federal-acil-durum-yonetim-ajansi-merkezindeki-tahtakurusu-istilasi-binayi",
+    "title": "Federal acil Durum Yönetim Ajansı merkezindeki tahtakurusu istilası binayı kapattı",
+    "summary": "ABD Federal Acil Durum Yönetim Ajansı'nın Washington'daki merkezinde ortaya çıkan tahtakurusu istilası nedeniyle bin çalışan uzaktan çalışma düzenine geçti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795136715.880595
   }
 ]
