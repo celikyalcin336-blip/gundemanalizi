@@ -119,15 +119,6 @@
     "ts": 1794033533.8880742
   },
   {
-    "slug": "balikesir-edremit-yolu-uzerindeki-trafik-kazasinda-anne-ve-kizi-yasamini-yitirdi",
-    "title": "Balıkesir Edremit Yolu Üzerindeki Trafik Kazasında Anne ve Kızı Yaşamını Yitirdi",
-    "summary": "Balıkesir’in Edremit ilçesinde seyir halindeki bir kamyonun, dönüş manevrası yapan otomobile çarpması sonucu meydana gelen kazada, 34 yaşındaki sürücü Nilüfer A. ve 10 yaşındaki kızı Eliz A. hayatını kaybetti. Kazayla ilgili soruşturma başlatılarak k",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794058030.430468
-  },
-  {
     "slug": "gazzedeki-derme-catma-cadirlari-saganak-yagis-su-altinda-birakti",
     "title": "Gazze'deki Derme Çatma Çadırları Sağanak Yağış Su Altında Bıraktı",
     "status": "skipped",
@@ -3822,5 +3813,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795174844.899257
+  },
+  {
+    "slug": "mebibireysel-ogrenme-platformu-yenilenen-arayuzu-ve-yapay-zeka-ozellikleriyle",
+    "title": "Mebibireysel öğrenme Platformu yenilenen arayüzü ve yapay zeka özellikleriyle güncellendi",
+    "summary": "Milli Eğitim Bakanlığı tarafından kullanıcı geri bildirimleri doğrultusunda yenilenen MEBİ Bireysel Öğrenme Platformu, yeni arayüz ve özelliklerle donatıldı.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795177567.3226342
   }
 ]
