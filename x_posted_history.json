@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "washington-ve-pekin-arasindaki-ticaret-diplomasisinde-busan-mutabakati-krizi",
-    "title": "Washington ve Pekin Arasındaki Ticaret Diplomasisinde Busan Mutabakatı Krizi",
-    "summary": "ABD Hazine Bakanı Scott Bessent ile Ticaret Temsilcisi Jamieson Greer, Çin Başbakan Yardımcısı Hı Lifıng ile bir araya gelerek ekonomik temaslarda bulundu. Washington yönetimi, Pekin'in Busan Mutabakatı çerçevesindeki yükümlülüklerini gecikmeksizin y",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794060751.2545002
-  },
-  {
     "slug": "apple-music-classical-uygulamasinin-arayuzu-ve-simgesi-yeniden-tasarlandi",
     "title": "Apple Music Classical Uygulamasının Arayüzü ve Simgesi Yeniden Tasarlandı",
     "summary": "Apple, klasik müzik platformu Apple Music Classical'ın uygulama simgesini ve genel arayüz tasarımını güncelledi. Şirket, kullanıcıların eleştirilerine kulak vererek siyah-beyaz tonların ağır bastığı daha sade ve renksiz bir görsel dili hayata geçirdi",
@@ -3822,5 +3813,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795177567.3226342
+  },
+  {
+    "slug": "pendikspor-teknik-direktoru-murat-sahin-den-sergen-yalcin-a-destek-aciklamasi",
+    "title": "Pendikspor teknik Direktörü Murat şahin den Sergen Yalçın a destek açıklaması",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795180268.9521747
+  },
+  {
+    "slug": "dmd-hastasi-bes-yasindaki-kayra-icin-yardim-kampanyasi-baslatildi",
+    "title": "DMD hastası beş yaşındaki Kayra için yardım kampanyası başlatıldı",
+    "summary": "Samsun'da yaşayan beş yaşındaki Kayra Yaşar'a bir yıl önce kas yıkımına yol açan DMD hastalığı teşhisi konuldu.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795180292.8918662
   }
 ]
