@@ -133,15 +133,6 @@
     "ts": 1794060732.9980462
   },
   {
-    "slug": "unlu-rapci-macklemoreun-filistin-yardim-turnesi-abddeki-buyuk-arenalara-takildi",
-    "title": "Ünlü Rapçi Macklemore’un Filistin Yardım Turnesi ABD’deki Büyük Arenalara Takıldı",
-    "summary": "Grammy ödüllü rap sanatçısı Macklemore, gelirini Filistin’e bağışlamayı hedeflediği yardım turnesinin ABD ayağının, ülkenin en büyük dokuz konser salonu tarafından reddedildiğini açıkladı. Sanatçı, arenaların Filistin ismi zikredildiği an geri adım a",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794109731.5942526
-  },
-  {
     "slug": "stanimir-stoilovdan-basaksehir-maglubiyeti-sonrasi-savunma-uyarisi-ve-genc-oyunc",
     "title": "Stanimir Stoilov'dan Başakşehir Mağlubiyeti Sonrası Savunma Uyarısı ve Genç Oyuncu Mesajı",
     "status": "skipped",
@@ -3829,5 +3820,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795226656.9826758
+  },
+  {
+    "slug": "ford-tourneo-courier-serisine-blackline-donanimi-eklendi",
+    "title": "Ford Tourneo Courier serisine Blackline donanımı eklendi",
+    "status": "skipped",
+    "reason": "Çöp/Magazin filtresine takıldı: 'hafif ticari araç'",
+    "ts": 1795229358.5955153
+  },
+  {
+    "slug": "lufthansa-frankfurt-ve-munih-havalimanlarinda-bin-calisani-isten-cikaracak",
+    "title": "Lufthansa Frankfurt ve Münih havalimanlarında bin çalışanı işten çıkaracak",
+    "summary": "Alman hava yolu şirketi Lufthansa, yeniden yapılanma sürecinin yavaş ilerlemesi ve enerji şoku nedeniyle Frankfurt ve Münih havalimanlarında bin tam zamanlı çalışanı işten çıkaracağını açıkladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795229380.9209967
   }
 ]
