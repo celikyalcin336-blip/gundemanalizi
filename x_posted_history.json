@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "kuresel-olcekte-artis-gosteren-kizamik-vakalarinda-asilanma-oranlari-kritik-esik",
-    "title": "Küresel Ölçekte Artış Gösteren Kızamık Vakalarında Aşılanma Oranları Kritik Eşik Olarak Görülüyor",
-    "summary": "Son dönemde dünya genelinde yükselişe geçen kızamık vakaları, toplum sağlığını koruma noktasında aşılanmanın hayati önemini bir kez daha gündeme taşıdı.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794120613.8147185
-  },
-  {
     "slug": "irandan-fuze-kapasitesi-mesaji-nukleer-doktrin-gozden-gecirilebilir",
     "title": "İran'dan Füze Kapasitesi Mesajı: Nükleer Doktrin Gözden Geçirilebilir",
     "summary": "İranlı bir yetkili, ülkenin füze menzilini artırma çalışmalarının kesintisiz devam ettiğini ve düşman hedeflerinin erişilebilir olduğunu bildirdi.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795237554.0248294
+  },
+  {
+    "slug": "meteorolojiden-yirmi-dort-kent-icin-sari-kodlu-saganak-uyarisi",
+    "title": "Meteoroloji'den yirmi dört kent için sarı kodlu sağanak uyarısı",
+    "summary": "Meteoroloji Genel Müdürlüğü, ülke genelinde parçalı ve çok bulutlu hava beklendiğini duyurarak yirmi dört kent için sarı alarm verdi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795240277.5091882
   }
 ]
