@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "misirin-kahire-asvan-hattinda-iki-tren-carpisti-onlarca-yarali-tedavi-altinda",
-    "title": "Mısır'ın Kahire-Asvan Hattında İki Tren Çarpıştı: Onlarca Yaralı Tedavi Altında",
-    "summary": "Mısır’da başkent Kahire’yi ülkenin güneyindeki Asvan şehrine bağlayan demir yolu hattında seyir halindeki iki yolcu treni şiddetli bir kazaya karıştı.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794166910.8042874
-  },
-  {
     "slug": "batarya-teknolojisinde-devrim-vaadi-2000-kilometre-menzilin-teorik-sinirlari",
     "title": "Batarya Teknolojisinde Devrim Vaadi: 2000 Kilometre Menzilin Teorik Sınırları",
     "summary": "Dünyanın en büyük batarya üreticisi CATL, lityum-hava teknolojisiyle elektrikli araçlarda 2000 kilometre menzile ulaşmanın teorik altyapısını duyurdu.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795281139.6417851
+  },
+  {
+    "slug": "dunyanin-firtina-dongulerini-venus-ve-jupiterin-cekim-gucu-belirliyor",
+    "title": "Dünya'nın fırtına döngülerini Venüs ve Jüpiter'in çekim gücü belirliyor",
+    "summary": "Çin Petrol Arama ve Geliştirme Araştırma Enstitüsü'nden jeologların yürüttüğü araştırma, Dünya'daki şiddetli fırtınaların milyonlarca yıla yayılan jeolojik ritimlere sahip olduğunu ortaya koydu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795283863.3955994
   }
 ]
