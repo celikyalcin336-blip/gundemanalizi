@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "mercedes-benz-otonom-surus-stratejisinde-radikal-degisiklige-giderek-yeni-yol-ha",
-    "title": "Mercedes-Benz Otonom Sürüş Stratejisinde Radikal Değişikliğe Giderek Yeni Yol Haritasını Belirledi",
-    "summary": "Lüks segmentin öncü ismi Mercedes-Benz, Seviye 3 otonom sürüş teknolojisi yerine günlük kullanıma odaklanan gelişmiş sürüş destek sistemlerine ağırlık verme kararı aldı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794128777.6800485
-  },
-  {
     "slug": "hatayda-tehlikeli-motosiklet-gosterisine-agir-ceza-ve-adli-surec",
     "title": "Hatay'da Tehlikeli Motosiklet Gösterisine Ağır Ceza ve Adli Süreç",
     "summary": "Hatay'ın İskenderun ilçesinde plakasız motosikletiyle akrobatik hareketler yapan ve havai fişek patlatan sürücüye 271 bin liralık idari para cezası kesildi.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795245723.4873145
+  },
+  {
+    "slug": "turk-arastirmaci-yapay-zeka-destegiyle-riemann-hipotezini-cozdugunu-one-surdu",
+    "title": "Türk araştırmacı yapay zeka desteğiyle Riemann hipotezini çözdüğünü öne sürdü",
+    "summary": "Anthropic bünyesinde görev yapan Türk kökenli araştırmacı Levent Alpöge, sohbet robotu Claude'u kullanarak Riemann Hipotezi'ni kanıtladığını iddia etti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795248445.5900009
   }
 ]
