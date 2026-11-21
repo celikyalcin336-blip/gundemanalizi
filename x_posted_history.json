@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "dizi-sektorunde-maliyet-krizi-fatih-aksoydan-vergi-indirimi-ve-mevzuat-cagrisi",
-    "title": "Dizi Sektöründe Maliyet Krizi: Fatih Aksoy'dan Vergi İndirimi ve Mevzuat Çağrısı",
-    "summary": "Yapımcı Fatih Aksoy, yükselen üretim giderleri ve gerileyen reklam gelirleri nedeniyle Türk dizi sektörünün derin bir finansal krizle karşı karşıya olduğunu açıkladı.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794172361.7469718
-  },
-  {
     "slug": "yapay-zeka-destekli-suc-iddiasi-openai-sirketini-hukuki-kiskaca-aldi",
     "title": "Yapay Zeka Destekli Suç İddiası OpenAI Şirketini Hukuki Kıskaca Aldı",
     "summary": "ABD'de eşini zehirleme girişimiyle suçlanan bir kadın, planlama sürecinde ChatGPT'yi bir danışman gibi kullandığı iddiasıyla gündeme geldi.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795286588.9070797
+  },
+  {
+    "slug": "fenerbahce-kocaeli-deplasmaninda-son-dakikada-puani-kurtardi",
+    "title": "Fenerbahçe Kocaeli deplasmanında son dakikada puanı kurtardı",
+    "summary": "Süper Lig'in 12. haftasında Kocaelispor'a konuk olan Fenerbahçe sahadan 2-2 beraberlikle ayrıldı. Sarı-lacivertliler bu sonuçla zirve yarışında yara aldı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795289312.9972816
   }
 ]
