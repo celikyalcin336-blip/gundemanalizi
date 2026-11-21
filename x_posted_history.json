@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "chpde-yeni-donem-uye-odakli-siyaset-ve-yerel-teskilatlanma-hamlesi",
-    "title": "CHP’de Yeni Dönem: Üye Odaklı Siyaset ve Yerel Teşkilatlanma Hamlesi",
-    "summary": "Cumhuriyet Halk Partisi Genel Başkanı Özgür Özel, partinin iç işleyişinde başlattığı demokratikleşme sürecini mahalle ve ilçe meclisleri üzerinden tabana yaymayı hedeflediklerini açıkladı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794177812.182702
-  },
-  {
     "slug": "gazzede-yagislarin-ardindan-gelen-gocuk-felaketi-bes-kisi-hayatini-kaybetti",
     "title": "Gazze’de Yağışların Ardından Gelen Göçük Felaketi: Beş Kişi Hayatını Kaybetti",
     "summary": "Gazze Şeridi’ndeki Deyr el-Belah kentinde şiddetli yağışların tetiklediği toprak kayması sonucu, sığınmacıların barındığı çadırlar enkaz altında kaldı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795292037.2270825
+  },
+  {
+    "slug": "basradaki-termik-santral-yangininda-can-kaybi-yasandi",
+    "title": "Basra'daki Termik santral yangınında can kaybı yaşandı",
+    "summary": "Irak'ın Basra kentinde bulunan Harise Termik Elektrik Santrali'nde henüz belirlenemeyen bir nedenle yangın çıktı. Çıkan yangın sonucunda ilk belirlemelere göre 4 kişi hayatını kaybederken 35 kişi yaralandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795294762.8505697
   }
 ]
