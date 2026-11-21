@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "nvidianin-ozel-bellek-standardi-rakip-yari-iletken-devleri-ortak-uretime-yoneliy",
-    "title": "NVIDIA'nın Özel Bellek Standardı: Rakip Yarı İletken Devleri Ortak Üretime Yöneliyor",
-    "summary": "Yapay zeka çipleri pazarının lideri NVIDIA, yüksek performanslı özel HBM (NVHBM) bellek çözümü için Samsung ve TSMC'yi 3nm temel kalıp üretiminde bir araya getirdi.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794126056.8420136
-  },
-  {
     "slug": "mercedes-benz-otonom-surus-stratejisinde-radikal-degisiklige-giderek-yeni-yol-ha",
     "title": "Mercedes-Benz Otonom Sürüş Stratejisinde Radikal Değişikliğe Giderek Yeni Yol Haritasını Belirledi",
     "summary": "Lüks segmentin öncü ismi Mercedes-Benz, Seviye 3 otonom sürüş teknolojisi yerine günlük kullanıma odaklanan gelişmiş sürüş destek sistemlerine ağırlık verme kararı aldı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795243000.5872324
+  },
+  {
+    "slug": "cocuklarda-ilk-dis-muayenesi-ve-agiz-sagligi-uyarilari-yapildi",
+    "title": "Çocuklarda ilk diş muayenesi ve ağız Sağlığı uyarıları yapıldı",
+    "summary": "Uzmanlar ağız ve diş sağlığının genel vücut sağlığıyla doğrudan ilişkili olduğunu belirterek çocuklarda ilk diş muayenesinin ilk yaş içinde yapılması gerektiğini vurguladı.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795245723.4873145
   }
 ]
