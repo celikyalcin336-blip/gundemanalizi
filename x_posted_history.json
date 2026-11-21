@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "gaziantep-ipek-yolundaki-feci-kazada-iki-kisi-yasamini-yitirdi",
-    "title": "Gaziantep İpek Yolu'ndaki Feci Kazada İki Kişi Yaşamını Yitirdi",
-    "summary": "Gaziantep'te seyir halindeyken lastiği patlayan hafif ticari aracın üst geçit ayağına çarpması sonucu meydana gelen kazada iki kişi hayatını kaybetti, iki kişi ise ağır yaralandı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794147832.7699609
-  },
-  {
     "slug": "gazzede-kis-sartlari-altinda-insani-krizin-boyutu-kritik-esige-ulasti",
     "title": "Gazze’de Kış Şartları Altında İnsani Krizin Boyutu Kritik Eşiğe Ulaştı",
     "summary": "Avrupa Birliği yetkilileri, Gazze’deki çadır kentleri vuran şiddetli yağışların insani felaketi derinleştirdiğini vurgulayarak acil yardım çağrısını yineledi.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795262072.078958
+  },
+  {
+    "slug": "anthropic-sirketinin-nasdaq-borsasindaki-halka-arzi-kurucularini-milyarder-yapti",
+    "title": "Anthropic şirketinin Nasdaq borsasındaki halka arzı kurucularını milyarder yaptı",
+    "summary": "Yapay zeka şirketi Anthropic, Nasdaq borsasında gerçekleştirdiği halka arzla ABD tarihinin en büyük halka arzına imza attı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795264795.6209612
   }
 ]
