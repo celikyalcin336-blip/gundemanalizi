@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "irandan-fuze-kapasitesi-mesaji-nukleer-doktrin-gozden-gecirilebilir",
-    "title": "İran'dan Füze Kapasitesi Mesajı: Nükleer Doktrin Gözden Geçirilebilir",
-    "summary": "İranlı bir yetkili, ülkenin füze menzilini artırma çalışmalarının kesintisiz devam ettiğini ve düşman hedeflerinin erişilebilir olduğunu bildirdi.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794123335.9506452
-  },
-  {
     "slug": "nvidianin-ozel-bellek-standardi-rakip-yari-iletken-devleri-ortak-uretime-yoneliy",
     "title": "NVIDIA'nın Özel Bellek Standardı: Rakip Yarı İletken Devleri Ortak Üretime Yöneliyor",
     "summary": "Yapay zeka çipleri pazarının lideri NVIDIA, yüksek performanslı özel HBM (NVHBM) bellek çözümü için Samsung ve TSMC'yi 3nm temel kalıp üretiminde bir araya getirdi.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795240277.5091882
+  },
+  {
+    "slug": "dusuk-maas-alan-emekliler-icin-yeni-zam-formulu-masada",
+    "title": "Düşük maaş alan emekliler için yeni zam formülü masada",
+    "summary": "Maaşı belirli bir seviyenin altında kalan milyonlarca emekli için enflasyon farkına ek olarak ilave iyileştirme formülleri değerlendiriliyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795243000.5872324
   }
 ]
