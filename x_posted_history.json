@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "batarya-teknolojisinde-devrim-vaadi-2000-kilometre-menzilin-teorik-sinirlari",
-    "title": "Batarya Teknolojisinde Devrim Vaadi: 2000 Kilometre Menzilin Teorik Sınırları",
-    "summary": "Dünyanın en büyük batarya üreticisi CATL, lityum-hava teknolojisiyle elektrikli araçlarda 2000 kilometre menzile ulaşmanın teorik altyapısını duyurdu.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794169636.4794948
-  },
-  {
     "slug": "dizi-sektorunde-maliyet-krizi-fatih-aksoydan-vergi-indirimi-ve-mevzuat-cagrisi",
     "title": "Dizi Sektöründe Maliyet Krizi: Fatih Aksoy'dan Vergi İndirimi ve Mevzuat Çağrısı",
     "summary": "Yapımcı Fatih Aksoy, yükselen üretim giderleri ve gerileyen reklam gelirleri nedeniyle Türk dizi sektörünün derin bir finansal krizle karşı karşıya olduğunu açıkladı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795283863.3955994
+  },
+  {
+    "slug": "istanbul-cumhuriyet-bassavciligi-fon-sorusturmasinda-yabanci-yatirimci-oyununu",
+    "title": "İstanbul Cumhuriyet Başsavcılığı fon soruşturmasında yabancı yatırımcı oyununu deşifre etti",
+    "summary": "İstanbul Cumhuriyet Başsavcılığı tarafından yürütülen fon soruşturmasında, yabancı yatırımcı görünümüyle yurt dışına çıkarılan milyarlarca liralık işlem ağı MASAK raporuyla ortaya çıkarıldı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795286588.9070797
   }
 ]
