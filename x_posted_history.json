@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "bydnin-yeni-luks-sedan-modeli-yangwang-altior-kuresel-sahneye-cikti",
-    "title": "BYD'nin Yeni Lüks Sedan Modeli Yangwang Altior Küresel Sahneye Çıktı",
-    "summary": "Çinli üretici BYD, ultra lüks segmentteki yeni amiral gemisi Yangwang Altior modelini tanıttı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794156005.0651827
-  },
-  {
     "slug": "chatgpt-kullanicilarinin-beklenmedik-hesap-kapatilma-sureci-ve-destek-mekanizmal",
     "title": "ChatGPT Kullanıcılarının Beklenmedik Hesap Kapatılma Süreci ve Destek Mekanizmalarındaki Aksaklıklar",
     "summary": "OpenAI’ın ChatGPT platformunda son dönemde yaşanan ani hesap kısıtlamaları, uzun süreli aboneleri ve profesyonel kullanıcıları mağdur ediyor.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795270240.7607024
+  },
+  {
+    "slug": "eglence-merkezinde-go-kart-kazasi-geciren-gencin-sacli-derisi-mikrocerrahiyle",
+    "title": "Eğlence merkezinde go-kart kazası geçiren gencin saçlı derisi mikrocerrahiyle dikildi",
+    "summary": "Mardin'de go-kart aracına saçını kaptırarak ağır yaralanan Büşra Bayır, Dicle Üniversitesi Tıp Fakültesi Hastanesinde gerçekleştirilen uzun operasyonla sağlığına kavuştu.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795272964.1727445
   }
 ]
