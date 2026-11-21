@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "general-motors-kalkis-sureclerini-otomatiklestiren-yeni-sistem-icin-patent-aldi",
-    "title": "General Motors Kalkış Süreçlerini Otomatikleştiren Yeni Sistem İçin Patent Aldı",
-    "summary": "Otomotiv devi General Motors, drag yarışlarında pist ışıklarını algılayarak kalkış sürecini tamamen otomatik hale getiren yenilikçi bir teknoloji geliştirdi. Kamera ve gelişmiş yazılım altyapısına dayanan patentli sistem, sürücü müdahalesine gerek ka",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794112452.43796
-  },
-  {
     "slug": "cevresel-etki-degerlendirmesi-mevzuatinda-buyuk-enerji-ve-su-yatirimi-duzenlemes",
     "title": "Çevresel Etki Değerlendirmesi Mevzuatında Büyük Enerji ve Su Yatırımı Düzenlemesi",
     "summary": "Çevresel Etki Değerlendirmesi Yönetmeliği'nde yapılan kapsamlı değişikliklerle termik ve nükleer tesisler ile akarsular arası su transferi projeleri yeni hukuki ve teknik kriterlere bağlandı. Resmi düzenleme, enerji üretim tesisleri ve endüstriyel ya",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795229380.9209967
+  },
+  {
+    "slug": "honda-ve-acura-modelleri-icin-yeni-muhendislik-analizi-baslatildi",
+    "title": "Honda ve Acura modelleri için yeni mühendislik analizi başlatıldı",
+    "summary": "Ulusal Karayolu Trafik Güvenliği İdaresi, Auto Start/Stop sistemi arızaları nedeniyle bir milyondan fazla aracı kapsayan yeni bir mühendislik analizi başlattı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795232105.1981497
   }
 ]
