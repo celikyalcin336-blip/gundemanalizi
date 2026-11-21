@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "gazzede-yagislarin-ardindan-gelen-gocuk-felaketi-bes-kisi-hayatini-kaybetti",
-    "title": "Gazze’de Yağışların Ardından Gelen Göçük Felaketi: Beş Kişi Hayatını Kaybetti",
-    "summary": "Gazze Şeridi’ndeki Deyr el-Belah kentinde şiddetli yağışların tetiklediği toprak kayması sonucu, sığınmacıların barındığı çadırlar enkaz altında kaldı.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794180544.7428284
-  },
-  {
     "slug": "marsilya-zorlu-lens-deplasmanindan-son-dakika-goluyle-galibiyet-cikardi",
     "title": "Marsilya Zorlu Lens Deplasmanından Son Dakika Golüyle Galibiyet Çıkardı",
     "status": "skipped",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795294762.8505697
+  },
+  {
+    "slug": "iran-ve-bahreyn-arasindaki-askeri-ve-diplomatik-gelismelerin-detaylari",
+    "title": "İran ve Bahreyn arasındaki askeri ve diplomatik gelişmelerin detayları",
+    "summary": "İran Devrim Muhafızları Ordusu, Bahreyn'deki iki ABD üssünde bulunan Patriot radar sistemlerinin insansız hava araçları ve füzelerle hedef alındığını açıkladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795297486.3951566
   }
 ]
