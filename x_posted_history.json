@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "yapay-zeka-destekli-suc-iddiasi-openai-sirketini-hukuki-kiskaca-aldi",
-    "title": "Yapay Zeka Destekli Suç İddiası OpenAI Şirketini Hukuki Kıskaca Aldı",
-    "summary": "ABD'de eşini zehirleme girişimiyle suçlanan bir kadın, planlama sürecinde ChatGPT'yi bir danışman gibi kullandığı iddiasıyla gündeme geldi.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794175086.5769818
-  },
-  {
     "slug": "chpde-yeni-donem-uye-odakli-siyaset-ve-yerel-teskilatlanma-hamlesi",
     "title": "CHP’de Yeni Dönem: Üye Odaklı Siyaset ve Yerel Teşkilatlanma Hamlesi",
     "summary": "Cumhuriyet Halk Partisi Genel Başkanı Özgür Özel, partinin iç işleyişinde başlattığı demokratikleşme sürecini mahalle ve ilçe meclisleri üzerinden tabana yaymayı hedeflediklerini açıkladı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795289312.9972816
+  },
+  {
+    "slug": "kati-besin-yiyemeyen-genc-kiz-ince-bagirsak-nakliyle-sagligina-kavustu",
+    "title": "Katı besin yiyemeyen genç kız ince bağırsak nakliyle sağlığına kavuştu",
+    "summary": "Adana'da yaşayan ve bağırsak yetmezliği nedeniyle katı besin tüketemeyen genç hasta, İzmir'de geçirdiği başarılı ince bağırsak nakli operasyonuyla sağlığına yeniden kavuştu.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795292037.2270825
   }
 ]
