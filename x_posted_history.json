@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "hyundai-elektrikli-mobilite-vizyonunda-ioniq-3-icin-finansman-destegini-baslatti",
-    "title": "Hyundai, Elektrikli Mobilite Vizyonunda Ioniq 3 İçin Finansman Desteğini Başlattı",
-    "summary": "Hyundai Motor Türkiye, İzmit fabrikasında üretilen elektrikli modeli Ioniq 3 için faiz avantajı ve üç ay ertelemeli kredi seçeneklerini kapsayan yeni bir destek programını devreye aldı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794145109.7709167
-  },
-  {
     "slug": "gaziantep-ipek-yolundaki-feci-kazada-iki-kisi-yasamini-yitirdi",
     "title": "Gaziantep İpek Yolu'ndaki Feci Kazada İki Kişi Yaşamını Yitirdi",
     "summary": "Gaziantep'te seyir halindeyken lastiği patlayan hafif ticari aracın üst geçit ayağına çarpması sonucu meydana gelen kazada iki kişi hayatını kaybetti, iki kişi ise ağır yaralandı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795259349.091378
+  },
+  {
+    "slug": "sardunya-yapraklarindan-gelistirilen-biyosensor-pku-teshisini-kolaylastiracak",
+    "title": "Sardunya yapraklarından geliştirilen biyosensör PKU teşhisini kolaylaştıracak",
+    "summary": "Gazi Üniversitesi'nden akademisyenler, yenidoğanlarda görülen genetik PKU hastalığının teşhisi için sardunya yapraklarından biyosensör geliştirdi.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795262072.078958
   }
 ]
