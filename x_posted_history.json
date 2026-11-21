@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "kahramanmarastaki-ortaokul-saldirisinda-supheli-iki-cocugun-goruntuleri-sorustur",
-    "title": "Kahramanmaraş’taki Ortaokul Saldırısında Şüpheli İki Çocuğun Görüntüleri Soruşturma Dosyasına Girdi",
-    "summary": "Kahramanmaraş’ta on kişinin hayatını kaybettiği okul baskınına dair hazırlanan inceleme tutanakları, saldırıdan kısa süre önce yaşanan şüpheli etkileşimleri gün yüzüne çıkardı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794183267.16511
-  },
-  {
     "slug": "demokratlarin-kongre-hakimiyeti-15-trilyon-dolarlik-savunma-butcesini-cikmaza-su",
     "title": "Demokratların Kongre Hakimiyeti 1,5 Trilyon Dolarlık Savunma Bütçesini Çıkmaza Sürükledi",
     "summary": "ABD ara seçimlerinin ardından Kongre’de çoğunluğu ele geçiren Demokratlar, Trump yönetiminin %44 oranında artış öngören 1,5 trilyon dolarlık dev savunma bütçesine geçit vermeyeceklerini açıkladı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795297486.3951566
+  },
+  {
+    "slug": "caykur-rizespor-teknik-direktoru-recep-ucardan-amed-sportif-faaliyetler",
+    "title": "Çaykur Rizespor Teknik Direktörü Recep Uçar'dan Amed Sportif Faaliyetler galibiyeti değerlendirmesi",
+    "summary": "Trendyol Süper Lig'in 12. haftasında Çaykur Rizespor, deplasmanda karşılaştığı Amed Sportif Faaliyetler'i 2-0 mağlup etti.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795300210.4590201
   }
 ]
