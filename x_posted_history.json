@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "gazzede-kis-sartlari-altinda-insani-krizin-boyutu-kritik-esige-ulasti",
-    "title": "Gazze’de Kış Şartları Altında İnsani Krizin Boyutu Kritik Eşiğe Ulaştı",
-    "summary": "Avrupa Birliği yetkilileri, Gazze’deki çadır kentleri vuran şiddetli yağışların insani felaketi derinleştirdiğini vurgulayarak acil yardım çağrısını yineledi.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794150555.9363947
-  },
-  {
     "slug": "bakan-simsekten-bolgesel-ekonomi-vizyonu-rekabet-azalirken-is-birligi-vurgusu",
     "title": "Bakan Şimşek'ten Bölgesel Ekonomi Vizyonu: Rekabet Azalırken İş Birliği Vurgusu",
     "summary": "Hazine ve Maliye Bakanı Mehmet Şimşek, İstanbul'da düzenlenen TRT World Forumu'nda küresel ve bölgesel ekonomik görünüme ilişkin değerlendirmelerde bulundu.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795264795.6209612
+  },
+  {
+    "slug": "abd-merkez-bankasi-faiz-sinyalleri-ve-kuresel-baskilarla-degerli-metallerde",
+    "title": "ABD Merkez Bankası faiz sinyalleri ve küresel baskılarla değerli metallerde gerileme yaşandı",
+    "summary": "Küresel piyasalarda artan risk unsurları ve ABD Merkez Bankası faiz artırımı sinyalleri değerli metallerde sert değer kayıplarına yol açtı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795267518.2712839
   }
 ]
