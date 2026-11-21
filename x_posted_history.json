@@ -147,15 +147,6 @@
     "ts": 1794112433.6461213
   },
   {
-    "slug": "chatgpt-kullanicilarinin-beklenmedik-hesap-kapatilma-sureci-ve-destek-mekanizmal",
-    "title": "ChatGPT Kullanıcılarının Beklenmedik Hesap Kapatılma Süreci ve Destek Mekanizmalarındaki Aksaklıklar",
-    "summary": "OpenAI’ın ChatGPT platformunda son dönemde yaşanan ani hesap kısıtlamaları, uzun süreli aboneleri ve profesyonel kullanıcıları mağdur ediyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794158728.9869168
-  },
-  {
     "slug": "imalat-sanayisindeki-uzun-sureli-daralma-ekonomik-rekabet-gucu-icin-risk-tasiyor",
     "title": "İmalat Sanayisindeki Uzun Süreli Daralma Ekonomik Rekabet Gücü İçin Risk Taşıyor",
     "summary": "İktisatçı Mahfi Eğilmez, imalat sektöründe 31 aydır süregelen daralma eğilimine ve yatırımlardaki gerilemeye dikkat çekerek, bu tablonun Türkiye'nin orta ve uzun vadeli ekonomik istikrarını tehdit edebileceği",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795272964.1727445
+  },
+  {
+    "slug": "ispanya-merkezli-arastirmada-tiktok-cocuk-istismari-iddialari-ortaya-cikti",
+    "title": "İspanya merkezli araştırmada TikTok çocuk istismarı iddiaları ortaya çıktı",
+    "summary": "Maldita.es vakfı yöneticisi Clara Jiménez Cruz, TikTok algoritmasının kullanıcıları çocukların yaptığı canlı yayınlara yönlendirdiğini açıkladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795275690.3411372
   }
 ]
