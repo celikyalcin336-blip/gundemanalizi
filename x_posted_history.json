@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "inek-sutu-alerjisiyle-mucadele-eden-cocuk-icin-immunoterapi-umudu",
-    "title": "İnek Sütü Alerjisiyle Mücadele Eden Çocuk İçin İmmünoterapi Umudu",
-    "summary": "Doğuştan gelen inek sütü alerjisi nedeniyle yoğun bakım süreçleri yaşayan 7 yaşındaki Naz Sobacı, Ankara’da uygulanan başarılı bir tedavi yöntemiyle sağlığına kavuştu.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794243245.9740787
-  },
-  {
     "slug": "potanin-perileri-yeni-teknik-yapilanmayla-avrupa-sampiyonasi-yolculuguna-hazirla",
     "title": "Potanın Perileri Yeni Teknik Yapılanmayla Avrupa Şampiyonası Yolculuğuna Hazırlanıyor",
     "status": "skipped",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795357439.7347429
+  },
+  {
+    "slug": "gazze-seridinde-altyapi-cokusu-menenjit-vakalarini-hizla-artiriyor",
+    "title": "Gazze Şeridi'nde altyapı çöküşü menenjit vakalarını hızla artırıyor",
+    "summary": "Gazze Şeridi'nde İsrail saldırıları ve altyapı tahribatı nedeniyle menenjit vakalarında olağan dışı artış yaşanıyor. Bakanlık, uluslararası topluma acil tıbbi malzeme ve onarım ekipmanı çağrısında bulundu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795360163.0906205
   }
 ]
