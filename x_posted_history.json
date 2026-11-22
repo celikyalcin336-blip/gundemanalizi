@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "kis-kosullari-kapida-meteorolojiden-iki-ile-kritik-kar-uyarisi-geldi",
-    "title": "Kış Koşulları Kapıda: Meteorolojiden İki İle Kritik Kar Uyarısı Geldi",
-    "summary": "Meteoroloji Genel Müdürlüğü, 9 Kasım 2026 itibarıyla Türkiye genelinde beklenen yağışlı hava sistemine dair detaylı bir rapor yayımladı.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794199614.0644195
-  },
-  {
     "slug": "sisli-kustepede-elektrik-altyapisi-endise-yaratti-direk-yangini-ve-patlama",
     "title": "Şişli Kuştepe’de Elektrik Altyapısı Endişe Yarattı: Direk Yangını ve Patlama",
     "summary": "İstanbul’un Şişli ilçesinde yer alan bir elektrik direğinde meydana gelen patlama ve ardından çıkan yangın, mahalle sakinlerine korkulu anlar yaşattı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795313848.5705543
+  },
+  {
+    "slug": "meksikada-uyusturucu-baronu-operasyonu-sonrasi-catismalar-cikti",
+    "title": "Meksika'da uyuşturucu baronu operasyonu sonrası çatışmalar çıktı",
+    "summary": "ABD Federal Soruşturma Bürosunun en çok arananlar listesinde yer alan Meksikalı uyuşturucu baronu Fausto Isidro Meza Flores, ortak operasyonla yakalandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795316580.204441
   }
 ]
