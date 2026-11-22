@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "besiktas-savunma-hattinda-istikrar-arayisi-emmanuel-agbadounun-mesajlariyla-seki",
-    "title": "Beşiktaş Savunma Hattında İstikrar Arayışı Emmanuel Agbadou’nun Mesajlarıyla Şekilleniyor",
-    "summary": "Trendyol Süper Lig’in 11. haftasında Gençlerbirliği’ni sahasında mağlup eden Beşiktaş, milli araya galibiyetle girmenin moralini yaşıyor.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794194164.096477
-  },
-  {
     "slug": "kuresel-cip-devi-nvidiada-casusluk-iddialari-ve-bagimsiz-denetim-sureci",
     "title": "Küresel Çip Devi Nvidia’da Casusluk İddiaları ve Bağımsız Denetim Süreci",
     "summary": "Yapay zeka teknolojilerinin lideri Nvidia, CEO Jensen Huang’ın özel hayatı üzerinden yöneltilen ciddi bir istihbarat sızdırma iddiasıyla karşı karşıya kaldı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795308390.452377
+  },
+  {
+    "slug": "israilin-gazzedeki-asevi-aracina-duzenledigi-saldirida-uc-filistinli-yasamini",
+    "title": "İsrail'in Gazze'deki aşevi aracına düzenlediği saldırıda üç Filistinli yaşamını yitirdi",
+    "summary": "İsrail ordusuna ait savaş uçaklarının Gazze'nin Tel el-Heva Mahallesi'nde yemek taşıyan bir aracı hedef alması sonucu 3 Filistinli hayatını kaybetti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795311114.7113013
   }
 ]
