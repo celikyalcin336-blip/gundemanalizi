@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "italyan-uretici-iki-efsanevi-modelini-yeniden-sahneye-cikarmaya-hazirlaniyor",
-    "title": "İtalyan Üretici İki Efsanevi Modelini Yeniden Sahneye Çıkarmaya Hazırlanıyor",
-    "summary": "Lüks otomobil üreticisi, geçtiğimiz dönemde üretimini sonlandırdığı ikonik modelleri Levante ve Quattroporte'yi modern çizgilerle yeniden canlandırma kararı aldı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794237800.705654
-  },
-  {
     "slug": "gazzede-insani-krizin-bilancosu-can-kaybi-75-bin-sinirina-dayandi",
     "title": "Gazze’de İnsani Krizin Bilançosu: Can Kaybı 75 Bin Sınırına Dayandı",
     "summary": "Filistin Sağlık Bakanlığı, 7 Ekim 2023’ten bu yana devam eden saldırılarda hayatını kaybedenlerin toplam sayısının 74 bin 643’e ulaştığını açıkladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795351994.033559
+  },
+  {
+    "slug": "zelenskiy-rusyanin-son-bir-haftada-ukraynanin-20-bolgesini-fuzelerle-hedef",
+    "title": "Zelenskiy Rusya'nın son bir haftada Ukrayna'nın 20 bölgesini füzelerle hedef aldığını duyurdu",
+    "summary": "Ukrayna Devlet Başkanı Zelenskiy, Rus ordusunun son bir haftada ülkenin 20 farklı bölgesine saldırı düzenlediğini açıkladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795354716.9919848
   }
 ]
