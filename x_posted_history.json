@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "kuresel-cip-devi-nvidiada-casusluk-iddialari-ve-bagimsiz-denetim-sureci",
-    "title": "Küresel Çip Devi Nvidia’da Casusluk İddiaları ve Bağımsız Denetim Süreci",
-    "summary": "Yapay zeka teknolojilerinin lideri Nvidia, CEO Jensen Huang’ın özel hayatı üzerinden yöneltilen ciddi bir istihbarat sızdırma iddiasıyla karşı karşıya kaldı.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794196888.0017796
-  },
-  {
     "slug": "kis-kosullari-kapida-meteorolojiden-iki-ile-kritik-kar-uyarisi-geldi",
     "title": "Kış Koşulları Kapıda: Meteorolojiden İki İle Kritik Kar Uyarısı Geldi",
     "summary": "Meteoroloji Genel Müdürlüğü, 9 Kasım 2026 itibarıyla Türkiye genelinde beklenen yağışlı hava sistemine dair detaylı bir rapor yayımladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795311114.7113013
+  },
+  {
+    "slug": "fenerbahce-teknik-direktoru-emre-belozoglundan-kocaelispor-maci-sonrasi",
+    "title": "Fenerbahçe teknik direktörü Emre Belözoğlu'ndan Kocaelispor maçı sonrası değerlendirmeler",
+    "summary": "Trendyol Süper Lig'in 12. haftasında Kocaelispor ile 2-2 berabere kalan Fenerbahçe'de teknik direktör Emre Belözoğlu, maçın ardından açıklamalarda bulundu.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795313848.5705543
   }
 ]
