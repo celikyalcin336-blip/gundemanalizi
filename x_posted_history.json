@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "apple-ceosu-tim-cookun-istanbul-ziyareti-teknoloji-dunyasinda-yanki-uyandirdi",
-    "title": "Apple CEO’su Tim Cook’un İstanbul Ziyareti Teknoloji Dünyasında Yankı Uyandırdı",
-    "summary": "Apple Yönetim Kurulu Başkanı Tim Cook, pazar gününü İstanbul’da çeşitli mekanları ziyaret ederek geçirdi.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794188715.199416
-  },
-  {
     "slug": "egitim-diplomasisinde-tarihi-kopru-turk-ogrenciler-ataturkun-ilkokul-siralarinda",
     "title": "Eğitim Diplomasisinde Tarihi Köprü: Türk Öğrenciler Atatürk’ün İlkokul Sıralarında Buluştu",
     "summary": "Bilfen Okulları öğrencileri, Mustafa Kemal Atatürk’ün eğitim hayatına başladığı Selanik’teki tarihi okulda düzenlenen anlamlı etkinlikle kardeş okul protokolü imzaladı.",
@@ -3836,5 +3827,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795302943.3686304
+  },
+  {
+    "slug": "bursa-hizli-tren-hattinda-test-sureci-ve-hedef-sure-aciklandi",
+    "title": "Bursa hızlı tren hattında test süreci ve hedef süre açıklandı",
+    "summary": "Bursa'yı yüksek hızlı tren ağına bağlayacak olan Osmaneli-Bursa hattında altyapı ve üstyapı çalışmaları tamamlanarak test süreci başlatıldı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795305666.702809
   }
 ]
