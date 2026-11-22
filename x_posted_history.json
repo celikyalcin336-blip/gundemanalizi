@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "sisli-kustepede-elektrik-altyapisi-endise-yaratti-direk-yangini-ve-patlama",
-    "title": "Şişli Kuştepe’de Elektrik Altyapısı Endişe Yarattı: Direk Yangını ve Patlama",
-    "summary": "İstanbul’un Şişli ilçesinde yer alan bir elektrik direğinde meydana gelen patlama ve ardından çıkan yangın, mahalle sakinlerine korkulu anlar yaşattı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794202338.6148047
-  },
-  {
     "slug": "gta-vi-heyecani-siber-dunyada-karmasik-bir-guvenlik-riski-doguruyor",
     "title": "GTA VI Heyecanı Siber Dünyada Karmaşık Bir Güvenlik Riski Doğuruyor",
     "summary": "Oyun dünyasının merakla beklenen yeni yapımı GTA VI, piyasaya çıkmadan siber dolandırıcıların hedefi haline geldi.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795316580.204441
+  },
+  {
+    "slug": "hyundai-n-vision-74-projesinin-seri-uretim-plani-iptal-edildi",
+    "title": "Hyundai n vision 74 projesinin seri üretim planı iptal edildi",
+    "summary": "Hyundai Tasarım Merkezi başkanı Simon Loasby, retro esintili spor otomobil konsepti N Vision 74'ü üretime dönüştürme planlarının olmadığını açıkladı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795319303.0471876
   }
 ]
