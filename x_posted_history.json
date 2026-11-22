@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "bursa-cevreyolunda-ihmal-sehirlerarasi-otobuste-can-guvenligini-hice-sayan-manev",
-    "title": "Bursa Çevreyolunda İhmal: Şehirlerarası Otobüste Can Güvenliğini Hiçe Sayan Manevra",
-    "summary": "Bursa-Gebze seferini gerçekleştiren bir yolcu otobüsünün şoförü, güzergahı karıştırınca yoğun otobanda geri geri giderek onlarca kişinin hayatını tehlikeye attı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794229591.9766042
-  },
-  {
     "slug": "busader-10uncu-yilinda-sosyal-sorumluluk-ve-basari-vizyonunu-birlestiriyor",
     "title": "BUSADER 10’uncu Yılında Sosyal Sorumluluk ve Başarı Vizyonunu Birleştiriyor",
     "summary": "BUSADER Federasyonu, onuncu kuruluş yıl dönümünü sağlık ve eğitim alanında düzenlediği ödül töreni ile kutlamaya hazırlanıyor.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795343826.015271
+  },
+  {
+    "slug": "muratpasa-belediyesi-ikinci-taksit-vergi-odemeleri-icin-mesai-saatlerini-uzatti",
+    "title": "Muratpaşa Belediyesi ikinci taksit vergi ödemeleri için mesai saatlerini uzattı",
+    "summary": "Muratpaşa Belediyesi, vergi ödemeleri kapsamında semt ve merkez veznelerinin çalışma saatlerini akşam ve hafta sonunu kapsayacak şekilde esnetti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795346548.2612052
   }
 ]
