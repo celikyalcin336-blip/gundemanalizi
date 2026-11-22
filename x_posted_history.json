@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "girit-aciklarinda-goc-krizi-14-can-kaybi-bolgesel-guvenlik-tartismalarini-alevle",
-    "title": "Girit Açıklarında Göç Krizi: 14 Can Kaybı Bölgesel Güvenlik Tartışmalarını Alevlendirdi",
-    "summary": "Yunanistan'ın Girit adası güneyinde, düzensiz göçmenleri taşıyan bir teknenin alabora olması sonucu 14 kişi yaşamını yitirdi.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794273214.2666812
-  },
-  {
     "slug": "turkiyede-diyabet-vakasi-yuzde-20-seviyesine-cikti-sessiz-tehlike-buyuyor",
     "title": "Türkiye'de Diyabet Vakası Yüzde 20 Seviyesine Çıktı: Sessiz Tehlike Büyüyor",
     "summary": "Türkiye genelinde yetişkin nüfusta diyabet görülme sıklığı 15 yıl önceki oranlara kıyasla ciddi bir artış göstererek yüzde 20 bandına yerleşti.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795387418.7938797
+  },
+  {
+    "slug": "otomotiv-devi-stellantis-maliyet-kesintisi-nedeniyle-yarislardan-cekiliyor",
+    "title": "Otomotiv devi Stellantis maliyet kesintisi nedeniyle yarışlardan çekiliyor",
+    "summary": "Stellantis, yıllık işletme maliyeti yaklaşık 300 milyon euroyu bulan motor sporları departmanını kapatma hazırlığı yapıyor.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795390143.7592285
   }
 ]
