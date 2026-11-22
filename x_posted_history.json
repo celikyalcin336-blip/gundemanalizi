@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "egitim-diplomasisinde-tarihi-kopru-turk-ogrenciler-ataturkun-ilkokul-siralarinda",
-    "title": "Eğitim Diplomasisinde Tarihi Köprü: Türk Öğrenciler Atatürk’ün İlkokul Sıralarında Buluştu",
-    "summary": "Bilfen Okulları öğrencileri, Mustafa Kemal Atatürk’ün eğitim hayatına başladığı Selanik’teki tarihi okulda düzenlenen anlamlı etkinlikle kardeş okul protokolü imzaladı.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794191439.8440697
-  },
-  {
     "slug": "besiktas-savunma-hattinda-istikrar-arayisi-emmanuel-agbadounun-mesajlariyla-seki",
     "title": "Beşiktaş Savunma Hattında İstikrar Arayışı Emmanuel Agbadou’nun Mesajlarıyla Şekilleniyor",
     "summary": "Trendyol Süper Lig’in 11. haftasında Gençlerbirliği’ni sahasında mağlup eden Beşiktaş, milli araya galibiyetle girmenin moralini yaşıyor.",
@@ -3836,5 +3827,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795305666.702809
+  },
+  {
+    "slug": "trendyol-1-lig-mucadelesinde-kectas-ankara-keciorengucu-deplasmanda-kazandi",
+    "title": "Trendyol 1. Lig mücadelesinde Keçtaş Ankara Keçiörengücü deplasmanda kazandı",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795308367.9430077
+  },
+  {
+    "slug": "akilli-telefon-uygulamasiyla-kontrol-edilen-dumansiz-ates-cukuru-tanitildi",
+    "title": "Akıllı telefon uygulamasıyla kontrol edilen dumansız ateş çukuru tanıtıldı",
+    "summary": "Bio Lite Fire Pit+ adı verilen taşınabilir ateş çukuru, patentli hava akışı teknolojisi sayesinde duman miktarını azaltarak kamp ve bahçe etkinliklerinde kullanılıyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795308390.452377
   }
 ]
