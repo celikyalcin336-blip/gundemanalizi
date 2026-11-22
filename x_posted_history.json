@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "land-rover-ve-byd-arasinda-defender-tasarimi-uzerinden-hukuki-gerilim-tirmaniyor",
-    "title": "Land Rover ve BYD Arasında Defender Tasarımı Üzerinden Hukuki Gerilim Tırmanıyor",
-    "summary": "İngiliz lüks arazi aracı üreticisi JLR, BYD’nin yeni modeli Ti7’nin ikonik Defender tasarımını taklit ettiği iddiasıyla Hollanda merkezli bir hukuk mücadelesi başlattı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794267763.206698
-  },
-  {
     "slug": "turkiye-ve-irak-arasindaki-guvenlik-is-birliginde-yeni-donem-basliyor",
     "title": "Türkiye ve Irak Arasındaki Güvenlik İş Birliğinde Yeni Dönem Başlıyor",
     "summary": "Ankara ve Bağdat yönetimleri, Başika-Zilikan yerleşkesinin Irak’a devri ve PKK’nın bölgedeki faaliyetlerinin sonlandırılması için ortak güvenlik mekanizması kurma kararı aldı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795381960.46135
+  },
+  {
+    "slug": "dusen-hava-sicakliklari-elektrikli-battaniye-ihracatini-artirdi",
+    "title": "Düşen hava sıcaklıkları elektrikli battaniye ihracatını artırdı",
+    "summary": "Hava sıcaklıklarının düşmesiyle birlikte kışlık ürünlere yönelen talep, Türkiye'nin elektrikli battaniye ihracatına dış ticaret fazlası olarak yansıdı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795384694.4870608
   }
 ]
