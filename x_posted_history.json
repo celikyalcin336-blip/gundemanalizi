@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "mebden-iklim-degisikligiyle-mucadeleye-egitim-destekli-yeni-akademik-yaklasim",
-    "title": "MEB’den İklim Değişikliğiyle Mücadeleye Eğitim Destekli Yeni Akademik Yaklaşım",
-    "summary": "Milli Eğitim Bakanlığı, öğretmenlerin mesleki gelişimini desteklemek amacıyla yayımladığı \"Öğretmen İZ\" dergisinin COP31 özel sayısını yayımladı.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794221415.4079154
-  },
-  {
     "slug": "abdnin-israil-temsilcisi-huckabeeden-yardim-programinda-esnetme-sinyali",
     "title": "ABD’nin İsrail Temsilcisi Huckabee’den Yardım Programında Esnetme Sinyali",
     "summary": "ABD’nin İsrail Büyükelçisi Mike Huckabee, Trump’ın duyurduğu 4 milyar dolarlık yardım kesintisinin ani bir şekilde uygulanmayacağını belirtti.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795335650.3327105
+  },
+  {
+    "slug": "galatasaray-samsunsporu-yenerek-31-puanla-liderligini-surdurdu",
+    "title": "Galatasaray Samsunspor'u yenerek 31 puanla liderliğini sürdürdü",
+    "summary": "Galatasaray, Süper Lig'in 12. haftasında ev sahipliği yaptığı maçta Samsunspor'u 2-1 mağlup ederek haftayı 31 puanla lider kapattı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795338372.5324497
   }
 ]
