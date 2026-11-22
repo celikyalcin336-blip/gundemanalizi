@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "a-milli-takimin-uluslar-ligi-zorlu-viraji-sifresiz-yayinla-ekranlara-geliyor",
-    "title": "A Milli Takım'ın Uluslar Ligi Zorlu Virajı Şifresiz Yayınla Ekranlara Geliyor",
-    "summary": "UEFA Uluslar Ligi'nde mücadele eden A Milli Futbol Takımı, kasım ayı fikstüründe Belçika ve Fransa ile karşı karşıya gelecek.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794218689.1648269
-  },
-  {
     "slug": "mebden-iklim-degisikligiyle-mucadeleye-egitim-destekli-yeni-akademik-yaklasim",
     "title": "MEB’den İklim Değişikliğiyle Mücadeleye Eğitim Destekli Yeni Akademik Yaklaşım",
     "summary": "Milli Eğitim Bakanlığı, öğretmenlerin mesleki gelişimini desteklemek amacıyla yayımladığı \"Öğretmen İZ\" dergisinin COP31 özel sayısını yayımladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795332927.3882508
+  },
+  {
+    "slug": "fransadaki-protesto-eylemlerinde-katilim-sayisi-ve-guvenlik-onlemleri-aciklandi",
+    "title": "Fransa'daki protesto eylemlerinde katılım sayısı ve güvenlik önlemleri açıklandı",
+    "summary": "Fransa'da hayat pahalılığı ve eğitim koşullarına karşı düzenlenen protesto eylemleri ülke genelinde sürerken sokaklarda yoğun güvenlik önlemleri alındı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795335650.3327105
   }
 ]
