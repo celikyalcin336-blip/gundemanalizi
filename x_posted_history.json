@@ -154,15 +154,6 @@
     "ts": 1794183245.6079857
   },
   {
-    "slug": "kagithanede-cocuklarin-oyun-oynadigi-midibus-yangini-maddi-hasara-yol-acti",
-    "title": "Kağıthane'de Çocukların Oyun Oynadığı Midibüs Yangını Maddi Hasara Yol Açtı",
-    "summary": "İstanbul Kağıthane'de iki çocuğun girdiği boş bir midibüste çıkan yangın, park halindeki başka bir araca sıçrayarak toplamda ciddi maddi hasara sebep oldu.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794213235.3222702
-  },
-  {
     "slug": "ekim-ayinda-enflasyona-karsi-koruma-kalkani-mevduat-faizi-oldu",
     "title": "Ekim Ayında Enflasyona Karşı Koruma Kalkanı Mevduat Faizi Oldu",
     "summary": "Türkiye İstatistik Kurumu tarafından paylaşılan Ekim ayı verilerine göre, finansal yatırım araçları arasında mevduat faizi reel getiri sağlayan nadir seçeneklerden biri olarak öne çıktı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795327480.2041411
+  },
+  {
+    "slug": "1973-yilinda-bostanci-sahilinde-sandikta-ortaya-cikan-vahsi-cinayet",
+    "title": "1973 yılında Bostancı sahilinde sandıkta ortaya çıkan vahşi cinayet",
+    "summary": "İstanbul Bostancı sahilinde devriye gezen polislerin şüphe üzerine durdurduğu bir kişinin taşıdığı sandıktan parçalanmış insan cesedi çıktı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795330203.2254856
   }
 ]
