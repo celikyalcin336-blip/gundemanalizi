@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "yurt-disindan-teknoloji-alisverisinde-gizli-maliyetler-ve-sektorel-riskler",
-    "title": "Yurt Dışından Teknoloji Alışverişinde Gizli Maliyetler ve Sektörel Riskler",
-    "summary": "Yurt dışı kaynaklı teknolojik ürün tedariki, ilk bakışta fiyat avantajı sunuyor gibi görünse de uzun vadede garanti süreçleri ve donanım uyumsuzlukları gibi ciddi problemler yaratabiliyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794245970.041312
-  },
-  {
     "slug": "koc-holdingin-surdurulebilirlik-vizyonunda-2040-su-tasarrufu-hamlesi",
     "title": "Koç Holding’in Sürdürülebilirlik Vizyonunda 2040 Su Tasarrufu Hamlesi",
     "summary": "Koç Holding, COP31 zirvesinde duyurduğu yeni stratejisiyle operasyonel tatlı su kullanımını 2040 yılına kadar yüzde 85 oranında düşürmeyi hedefliyor.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795360163.0906205
+  },
+  {
+    "slug": "okan-buruk-samsunspor-maci-sonrasi-yasanan-kart-olayini-degerlendirdi",
+    "title": "Okan Buruk Samsunspor maçı sonrasi yaşanan kart olayını değerlendirdi",
+    "summary": "Galatasaray Teknik Direktörü Okan Buruk, Samsunspor maçının sonunda gördüğü kırmızı kartla ilgili kulüp televizyonuna açıklamalarda bulundu.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795362887.0449522
   }
 ]
