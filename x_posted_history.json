@@ -168,15 +168,6 @@
     "ts": 1794314084.3391252
   },
   {
-    "slug": "fenerbahcede-norwich-citynin-musaba-karari-transfer-stratejisini-yeniden-sekille",
-    "title": "Fenerbahçe’de Norwich City’nin Musaba Kararı Transfer Stratejisini Yeniden Şekillendiriyor",
-    "summary": "Fenerbahçe’nin sezon başında İngiliz ekibi Norwich City’ye kiraladığı Anthony Musaba’nın geleceği, kulübün yeni sezon planlaması kapsamında netleşmeye başladı.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794322283.4309201
-  },
-  {
     "slug": "moskova-mahkemesinden-kuresel-teknoloji-devlerine-agir-para-cezasi",
     "title": "Moskova Mahkemesinden Küresel Teknoloji Devlerine Ağır Para Cezası",
     "summary": "Moskova'daki Taganskiy Bölge Mahkemesi, yasaklı içeriklerin erişimden kaldırılmasına yönelik yasal zorunlulukları yerine getirmeyen Apple, Google, Telegram ve Wikimedia Vakfına para cezası kesti.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795436511.8507338
+  },
+  {
+    "slug": "ab-komisyonu-coca-cola-siseleme-sirketi-ccep-hakkinda-rekabet-sorusturmasi",
+    "title": "AB komisyonu coca-cola şişeleme şirketi CCEP hakkında rekabet soruşturması başlattı",
+    "summary": "Avrupa Birliği Komisyonu, İngiltere merkezli CCEP şirketinin gazlı alkolsüz içecekler ve sporcu içecekleri ticaretinde rekabet kurallarını ihlal edip etmediğini incelemek üzere resmi soruşturma başlattı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795439256.2691467
   }
 ]
