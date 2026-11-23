@@ -450,7 +450,7 @@ def _fast_clean_for_word_count(content: str) -> str:
     return c
 
 
-def is_thin(content: str, threshold: int = 240) -> bool:
+def is_thin(content: str, threshold: int = 200) -> bool:
     if not content:
         return True
     key = (len(content), content[:80], content[-80:])
