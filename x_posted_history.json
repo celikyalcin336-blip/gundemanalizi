@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "havacilik-devi-boeing-uretim-yavaslamasi-nedeniyle-is-gucunu-daraltiyor",
-    "title": "Havacılık Devi Boeing Üretim Yavaşlaması Nedeniyle İş Gücünü Daraltıyor",
-    "summary": "ABD merkezli havacılık devi Boeing, ticari uçak üretiminde yaşadığı aksaklıklar ve tedarik zinciri kısıtları nedeniyle iş gücünde yüzde 5’lik bir küçülmeye gidiyor.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794281390.167747
-  },
-  {
     "slug": "bebeklerde-fistik-alerjisi-teshisinde-beklenmedik-geri-donus-ve-uzman-analizi",
     "title": "Bebeklerde Fıstık Alerjisi Teşhisinde Beklenmedik Geri Dönüş ve Uzman Analizi",
     "summary": "Yaklaşık 800 bebeğin dahil edildiği güncel bir klinik araştırma, fıstık alerjisi tanısı alan çocukların önemli bir kısmında altı ay gibi kısa bir sürede semptomların kaybolduğunu gösteriyor.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795395592.2996836
+  },
+  {
+    "slug": "hamstring-kasi-yaralanmalarinda-agriya-ragmen-spora-devam-edilmemeli",
+    "title": "Hamstring kası yaralanmalarında ağrıya rağmen spora devam edilmemeli",
+    "summary": "Uzmanlar, ani hız ve kuvvet gerektiren sporlarda sık görülen hamstring kası yaralanmalarında ağrıya rağmen spora devam edilmemesi gerektiğini belirtiyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795398315.3747864
   }
 ]
