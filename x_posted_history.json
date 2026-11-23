@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "turkiyede-erken-dogum-gercegi-her-sekiz-bebekten-biri-premature-olarak-dunyaya-g",
-    "title": "Türkiye'de Erken Doğum Gerçeği: Her Sekiz Bebekten Biri Prematüre Olarak Dünyaya Geliyor",
-    "summary": "Sağlık Bakanlığı verilerine göre 2024 yılında 121 bini aşkın bebek prematüre doğarak kritik bir tıbbi sürece adım attı.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794308656.444177
-  },
-  {
     "slug": "kuresel-piyasalarda-enerji-dalgasi-brent-petrol-varil-fiyati-90-dolarin-altina-i",
     "title": "Küresel Piyasalarda Enerji Dalgası: Brent Petrol Varil Fiyatı 90 Doların Altına İndi",
     "summary": "Uluslararası piyasalarda enerji varlıkları, Orta Doğu hattındaki gerilimlerin hafifleyebileceğine dair beklentilerin güçlenmesiyle gerileme kaydetti.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795422858.4157712
+  },
+  {
+    "slug": "antalyadaki-iklim-zirvesinde-ortu-karari-taslaklari-uzlasma-saglanamadigi-icin",
+    "title": "Antalya'daki iklim zirvesinde örtü kararı taslakları uzlaşma sağlanamadığı için kabul edilmedi",
+    "summary": "Türkiye'nin ev sahipliğinde Antalya'da düzenlenen Birleşmiş Milletler İklim Değişikliği Çerçeve Sözleşmesi Taraflar Konferansı'nın kapanış genel kurulunda örtü kararı taslakları görüşüldü.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795425582.8436053
   }
 ]
