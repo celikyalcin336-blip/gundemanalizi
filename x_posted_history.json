@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "ford-kuresel-pickup-pazarinda-cinli-ureticilere-karsi-yeni-bir-hamle-baslatiyor",
-    "title": "Ford Küresel Pickup Pazarında Çinli Üreticilere Karşı Yeni Bir Hamle Başlatıyor",
-    "summary": "Ford CEO’su Jim Farley, markanın geleneksel üstünlüğünü korumak adına gelişmekte olan pazarlara özel, maliyet odaklı yeni bir orta boy pickup geliştirdiklerini duyurdu.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794303203.0766733
-  },
-  {
     "slug": "sonyden-otomobil-ic-mekanlarini-hedef-alan-kisisellestirilmis-reklam-patent-haml",
     "title": "Sony’den Otomobil İç Mekanlarını Hedef Alan Kişiselleştirilmiş Reklam Patent Hamlesi",
     "summary": "Teknoloji devi Sony, araç içi kameralar ve sensör verilerini kullanarak yolculara hedefe yönelik reklamlar sunmayı amaçlayan yeni bir patent sistemini tescilledi.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795417401.3405097
+  },
+  {
+    "slug": "abd-hazine-bakani-scott-bessentten-fed-politikalarina-faiz-uyarisi",
+    "title": "ABD hazine Bakanı Scott Bessent'ten FED politikalarına faiz uyarısı",
+    "summary": "ABD Hazine Bakanı Scott Bessent, Fed'in aşırı sıkılaşma politikasının ekonomiyi riske atabileceğini belirtti. Piyasalardaki son düşüşün ardından yatırımcıların aralık ayı faiz artışı beklentileri azaldı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795420125.973793
   }
 ]

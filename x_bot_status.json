@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-23 10:03:21",
+  "last_check": "2026-11-23 10:48:45",
   "result": "posted",
-  "last_post": "2026-11-23 10:03:21",
-  "next_planned": "2026-11-23 10:48:21",
+  "last_post": "2026-11-23 10:48:45",
+  "next_planned": "2026-11-23 11:33:45",
   "runner": "github-actions",
-  "log_tail": "[2026-11-23 07:02:42] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⚠️ Canlı API okunamadı (The read operation timed out), RSS deneniyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Gazze Şeridi'nde altyapı çöküşü men... (Birebir slug eşleşmesi: gazze-seridinde-altyapi-cokusu-menenjit-vakalarini-hizla-artiriyor)\n🎯 [X Paylaşım Adayı] Kategori: Analiz | Virallik/Duygu Skoru: 135 | Başlık: ABD'nin ilk başkanı George Washington'ın saçı açık artırmada satıldı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795417379.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: ABD'nin ilk başkanı George Washington'ın saçı açık artırmada satıldı\n"
+  "log_tail": "[2026-11-23 07:48:21] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 150 | Başlık: ABD hazine Bakanı Scott Bessent'ten FED politikalarına faiz uyarısı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795420103.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: ABD hazine Bakanı Scott Bessent'ten FED politikalarına faiz uyarısı\n"
 }
