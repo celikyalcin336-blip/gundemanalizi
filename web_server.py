@@ -64,9 +64,10 @@ def bot_background_worker():
         try:
             import main as bot_main
             if bot_main.run_bot(max_items=1):
-                clear_turbo_cache()
+                clear_turbo_cache(refresh_now=True)
             import analysis_engine
-            analysis_engine.ensure_daily_synthesis_reports()
+            if analysis_engine.ensure_daily_synthesis_reports():
+                clear_turbo_cache(refresh_now=True)
             gc.collect()
         except Exception as e:
             print(f"⚠️ [Otonom Bot İstisnası]: {e}")
@@ -917,13 +918,13 @@ def market_rates_background_worker():
 def keep_alive_background_worker():
     """
     Render Free Tier 15 dakika hareketsizlikte uykuya (cold-sleep) geçer.
-    Bu arka plan işçisi her 3 dakikada bir dış genel domain'e (/health) hafif bir istek atarak
-    sunucunun 7/24 uyanık ve sıfır gecikmeli (cold-start olmadan) kalmasını sağlar.
+    Bu arka plan işçisi her 3 dakikada bir doğrudan Render origin (/health) adresine hafif bir istek atarak
+    Cloudflare önbelleğine takılmadan sunucunun uyanık kalmasına yardımcı olur (ek olarak GitHub Actions dıştan ping atar).
     """
     time.sleep(30)
     while True:
         try:
-            requests.get("https://xn--gndemanalizi-dlb.com.tr/health", headers=config.get_internal_bot_headers(), timeout=10)
+            requests.get("https://gundemanalizi.onrender.com/health", headers=config.get_internal_bot_headers(), timeout=10)
         except Exception:
             pass
         time.sleep(180)
@@ -1163,10 +1164,18 @@ def set_turbo_page(key: str, html: str):
                 _TURBO_PAGE_CACHE.pop(k, None)
     _TURBO_PAGE_CACHE[key] = {"html": html, "ts": now}
 
-def clear_turbo_cache():
-    global _TURBO_PAGE_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
+def clear_turbo_cache(refresh_now: bool = False):
+    global _TURBO_PAGE_CACHE, _CATEGORY_WIDGETS_CACHE, _CATEGORY_WIDGETS_CACHE_TIME
     _TURBO_PAGE_CACHE.clear()
     _CATEGORY_WIDGETS_CACHE_TIME = 0
+    with _INDEX_LOCK:
+        _INDEX_CACHE["ts"] = 0
+    if refresh_now:
+        with _WIDGETS_REFRESH_LOCK:
+            _refresh_category_widgets_sync()
+        _TURBO_PAGE_CACHE.clear()
+    else:
+        _CATEGORY_WIDGETS_CACHE = {}
 
 _CATEGORY_WIDGETS_CACHE = {}
 _CATEGORY_WIDGETS_CACHE_TIME = 0
@@ -1455,7 +1464,7 @@ async def admin_panel(request: Request):
 
     stats["gemini_active"] = bool(config.GEMINI_API_KEY)
     stats["telegram_active"] = bool(config.TELEGRAM_BOT_TOKEN and config.TELEGRAM_CHAT_ID)
-    stats["check_interval"] = config.CHECK_INTERVAL_MINUTES
+    stats["check_interval"] = round(main.get_publish_interval_minutes())
     try:
         stats["total_articles"] = database.get_articles_total_count()
     except Exception:

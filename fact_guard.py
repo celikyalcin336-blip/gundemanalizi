@@ -256,6 +256,7 @@ _UNAMBIGUOUS_PROPER = {
     "Ferrari", "Lamborghini", "Maserati", "Bentley", "Bugatti", "Audi", "Ford", "Chevrolet", "Buick", "Electra",
     "Cadillac", "Jeep", "Dacia", "Tofaş", "Corvette", "UniCredit", "Commerzbank", "Siemens", "Stellantis",
     "Nokia", "Ericsson", "Boeing", "Airbus", "SpaceX", "Starlink", "Bitcoin", "Ethereum", "Brent", "Habertürk",
+    "Trugo", "Kızılelma", "Zelenskiy",
 }
 _UNAMBIGUOUS_PROPER = {w.strip() for w in _UNAMBIGUOUS_PROPER if w.strip() and w.strip()[0].isupper()}
 
@@ -301,6 +302,7 @@ _COMMON_NON_PROPER_LOWER = {
     "mahkeme", "mahkemeden", "polis", "jandarma", "asker", "askeri", "ekonomi", "ekonomik", "siyasi", "sosyal",
     "dijital", "teknoloji", "otomobil", "araç", "model", "modeli", "şirket", "şirketi", "banka", "bankası",
     "kredi", "faiz", "vergi", "ceza", "yasası", "kanunu", "yönetmelik", "tebliğ", "genelge",
+    "iklim", "zirvesi", "zirvesinde", "komisyonu", "oturumu",
 }
 
 # Çok kelimeli kurumsal / coğrafi özel ad kalıpları (ASCII yazım hataları dahil düzeltilir):
@@ -335,6 +337,9 @@ _COMPOUND_PROPER_SUBS = [
     (re.compile(r"\bmilli\s+eğitim\s+bakanı\b", re.I), "Milli Eğitim Bakanı"),
     (re.compile(r"\bmilli\s+savunma\s+bakanı\b", re.I), "Milli Savunma Bakanı"),
     (re.compile(r"\bhazine\s+ve\s+maliye\s+bakanı\b", re.I), "Hazine ve Maliye Bakanı"),
+    (re.compile(r"\bmaçı\s+sonrasi\b", re.I), "maçı sonrası"),
+    (re.compile(r"\bsatış\s+sonrasi\b", re.I), "satış sonrası"),
+    (re.compile(r"\bistanbul\s+fuar\s+merkezi", re.I), "İstanbul Fuar Merkezi"),
 ]
 
 

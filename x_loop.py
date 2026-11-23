@@ -134,8 +134,34 @@ def run_one_cycle() -> tuple:
     return ok, buf.getvalue()
 
 
+_LAST_ORIGIN_PING_TS = 0.0
+
+
+def _ping_render_origin():
+    """GitHub Actions üzerinden Render origin'e dışarıdan hafif /health isteği atar; sabaha karşı uykuya geçmeyi önler."""
+    global _LAST_ORIGIN_PING_TS
+    now = time.time()
+    if now - _LAST_ORIGIN_PING_TS < 480:
+        return
+    _LAST_ORIGIN_PING_TS = now
+    try:
+        import urllib.request
+        import config as _cfg
+        hdrs = {"User-Agent": "GundemAnalizi-KeepAlive/1.0"}
+        try:
+            hdrs.update(_cfg.get_internal_bot_headers())
+        except Exception:
+            pass
+        req = urllib.request.Request("https://gundemanalizi.onrender.com/health", headers=hdrs)
+        with urllib.request.urlopen(req, timeout=12) as _:
+            pass
+    except Exception:
+        pass
+
+
 def sleep_until(target_ts: float):
     while True:
+        _ping_render_origin()
         remaining = target_ts - time.time()
         if remaining <= 0:
             return
