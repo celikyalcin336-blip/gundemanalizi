@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "sonyden-otomobil-ic-mekanlarini-hedef-alan-kisisellestirilmis-reklam-patent-haml",
-    "title": "Sony’den Otomobil İç Mekanlarını Hedef Alan Kişiselleştirilmiş Reklam Patent Hamlesi",
-    "summary": "Teknoloji devi Sony, araç içi kameralar ve sensör verilerini kullanarak yolculara hedefe yönelik reklamlar sunmayı amaçlayan yeni bir patent sistemini tescilledi.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794305931.0229032
-  },
-  {
     "slug": "turkiyede-erken-dogum-gercegi-her-sekiz-bebekten-biri-premature-olarak-dunyaya-g",
     "title": "Türkiye'de Erken Doğum Gerçeği: Her Sekiz Bebekten Biri Prematüre Olarak Dünyaya Geliyor",
     "summary": "Sağlık Bakanlığı verilerine göre 2024 yılında 121 bini aşkın bebek prematüre doğarak kritik bir tıbbi sürece adım attı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795420125.973793
+  },
+  {
+    "slug": "new-york-times-iddiasina-gore-alice-huang-cin-istihbaratiyla-iletisim-kurdu",
+    "title": "New York Times iddiasına göre Alice Huang Çin istihbaratıyla iletişim kurdu",
+    "summary": "New York Times'ın haberinde, Singapur merkezli Megaspeed International şirketinin eski lideri Alice Huang'ın Çin Devlet Güvenlik Bakanlığı görevlisiyle iletişim kurduğu iddia edildi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795422858.4157712
   }
 ]
