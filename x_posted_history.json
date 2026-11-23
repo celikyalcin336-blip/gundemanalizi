@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "turkiyede-diyabet-vakasi-yuzde-20-seviyesine-cikti-sessiz-tehlike-buyuyor",
-    "title": "Türkiye'de Diyabet Vakası Yüzde 20 Seviyesine Çıktı: Sessiz Tehlike Büyüyor",
-    "summary": "Türkiye genelinde yetişkin nüfusta diyabet görülme sıklığı 15 yıl önceki oranlara kıyasla ciddi bir artış göstererek yüzde 20 bandına yerleşti.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794275940.750323
-  },
-  {
     "slug": "chp-genel-baskani-ozgur-ozelden-10-kasima-ozel-gorsel-anma-mesaji",
     "title": "CHP Genel Başkanı Özgür Özel’den 10 Kasım’a Özel Görsel Anma Mesajı",
     "summary": "CHP Genel Başkanı Özgür Özel, 10 Kasım Atatürk’ü Anma Günü vesilesiyle yayımladığı videoda Cumhuriyet’in kurucusunun mirasına ve fikirlerine olan bağlılığı vurguladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795390143.7592285
+  },
+  {
+    "slug": "marketten-alinan-bos-cekirdekler-icin-tuketiciye-ucret-iadesi-karari",
+    "title": "Marketten alınan boş çekirdekler için tüketiciye ücret iadesi kararı",
+    "summary": "Çekmeköy'deki bir zincir marketten satın alınan paketli çekirdeklerin içinin boş çıkması üzerine Tüketici Hakem Heyeti başvuruyu haklı buldu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795392867.6589732
   }
 ]
