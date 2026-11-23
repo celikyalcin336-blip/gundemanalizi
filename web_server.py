@@ -2766,7 +2766,8 @@ async def author_yalcin_page(request: Request):
         with database.get_connection() as conn:
             s_rows = conn.execute(
                 "SELECT id, slug, title, summary, category, image_path, source, created_at, content "
-                "FROM articles WHERE source IN ('Gündem Analizi', 'Gündem Analizi Özel', 'Özel') "
+                "FROM articles WHERE source = 'Gündem Analizi Özel' "
+                "AND COALESCE(image_path, '') NOT LIKE '%viral_%' "
                 "AND COALESCE(category, '') != 'Analiz' ORDER BY id DESC LIMIT 100"
             ).fetchall()
         for r in s_rows:

@@ -60,7 +60,7 @@
 
 
     <!-- Google News, Discover & Breadcrumb Schema (JSON-LD) -->
-    {% set is_desk = (article.category == 'Analiz') or (article.source and article.source not in ['Gündem Analizi', 'Gündem Analizi Özel', 'Özel']) %}
+    {% set is_desk = (article.category == 'Analiz') or ('viral_' in (article.image_path or '')) or (article.source != 'Gündem Analizi Özel') %}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
