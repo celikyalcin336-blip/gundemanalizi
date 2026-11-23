@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "nvidianin-tepe-yonetiminde-etik-sorgulama-cip-ihracatinda-diplomatik-trafik",
-    "title": "Nvidia’nın Tepe Yönetiminde Etik Sorgulama: Çip İhracatında Diplomatik Trafik",
-    "summary": "Nvidia üst düzey hukuk yetkilisinin, CEO Jensen Huang’ın özel ilişkisiyle gündeme gelen bir yönetici için ABD Ticaret Bakanlığı nezdinde girişimde bulunduğu ortaya çıktı.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794297749.6183589
-  },
-  {
     "slug": "g7-zirvesinde-batili-diplomatlardan-hibrit-savas-tehdidine-karsi-ortak-cephe-cag",
     "title": "G7 Zirvesinde Batılı Diplomatlardan Hibrit Savaş Tehdidine Karşı Ortak Cephe Çağrısı",
     "summary": "Fransa'daki G7 Dışişleri Bakanları toplantısında konuşan İtalyan diplomasi başkanı, Batı ülkelerini hedef alan siber saldırıların ve asılsız tehditlerin organize bir şekilde yanıtlanması gerektiğini vurguladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795411938.8437023
+  },
+  {
+    "slug": "apple-firmasinin-iki-bin-yirmi-yedi-yilindaki-yeni-urun-planlari",
+    "title": "Apple firmasının iki bin yirmi yedi yılındaki yeni ürün planları",
+    "summary": "Apple firmasının iki bin yirmi yedi yılı içerisinde tanıtması beklenen yeni cihaz modelleri teknoloji kulislerinde paylaşıldı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795414662.3027601
   }
 ]
