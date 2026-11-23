@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "chp-genel-baskani-ozgur-ozelden-10-kasima-ozel-gorsel-anma-mesaji",
-    "title": "CHP Genel Başkanı Özgür Özel’den 10 Kasım’a Özel Görsel Anma Mesajı",
-    "summary": "CHP Genel Başkanı Özgür Özel, 10 Kasım Atatürk’ü Anma Günü vesilesiyle yayımladığı videoda Cumhuriyet’in kurucusunun mirasına ve fikirlerine olan bağlılığı vurguladı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794278666.1138263
-  },
-  {
     "slug": "havacilik-devi-boeing-uretim-yavaslamasi-nedeniyle-is-gucunu-daraltiyor",
     "title": "Havacılık Devi Boeing Üretim Yavaşlaması Nedeniyle İş Gücünü Daraltıyor",
     "summary": "ABD merkezli havacılık devi Boeing, ticari uçak üretiminde yaşadığı aksaklıklar ve tedarik zinciri kısıtları nedeniyle iş gücünde yüzde 5’lik bir küçülmeye gidiyor.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795392867.6589732
+  },
+  {
+    "slug": "bakan-kurumdan-iklim-zirvesinde-muzakere-tikanikligi-ve-uzlasi-aciklamasi",
+    "title": "Bakan kurumdan İklim zirvesinde müzakere tıkanıklığı ve uzlaşı açıklaması",
+    "summary": "Türkiye'nin ev sahipliğinde süren BM İklim Değişikliği Çerçeve Sözleşmesi'nin 31. Taraflar Konferansı'nın 14. gününde bazı ülkelerin tutumu nedeniyle müzakerelerde ilerleme sağlanamadı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795395592.2996836
   }
 ]
