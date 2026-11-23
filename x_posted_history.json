@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "kuresel-piyasalarda-enerji-dalgasi-brent-petrol-varil-fiyati-90-dolarin-altina-i",
-    "title": "Küresel Piyasalarda Enerji Dalgası: Brent Petrol Varil Fiyatı 90 Doların Altına İndi",
-    "summary": "Uluslararası piyasalarda enerji varlıkları, Orta Doğu hattındaki gerilimlerin hafifleyebileceğine dair beklentilerin güçlenmesiyle gerileme kaydetti.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794311382.0597491
-  },
-  {
     "slug": "bakirkoyde-trafik-teroru-genc-yayalara-carpan-arac-bir-can-aldi",
     "title": "Bakırköy’de Trafik Terörü: Genç Yayalara Çarpan Araç Bir Can Aldı",
     "status": "skipped",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795425582.8436053
+  },
+  {
+    "slug": "yargitay-baska-sirket-isini-takip-eden-muhendisin-tazminat-talebini-reddetti",
+    "title": "Yargıtay başka şirket işini takip eden mühendisin tazminat talebini reddetti",
+    "summary": "Çalıştığı şirketten habersiz ikinci bir firmanın işlerini takip ettiği belirlenen kimya mühendisi işten çıkarılmasının ardından dava açtı. Yargıtay 9.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795428307.5034223
   }
 ]
