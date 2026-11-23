@@ -168,15 +168,6 @@
     "ts": 1794314084.3391252
   },
   {
-    "slug": "moskova-mahkemesinden-kuresel-teknoloji-devlerine-agir-para-cezasi",
-    "title": "Moskova Mahkemesinden Küresel Teknoloji Devlerine Ağır Para Cezası",
-    "summary": "Moskova'daki Taganskiy Bölge Mahkemesi, yasaklı içeriklerin erişimden kaldırılmasına yönelik yasal zorunlulukları yerine getirmeyen Apple, Google, Telegram ve Wikimedia Vakfına para cezası kesti.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794325009.4251463
-  },
-  {
     "slug": "biyolojik-saati-geriye-almak-mumkun-mu-beslenme-modelleri-ve-uzun-omur-iliskisi",
     "title": "Biyolojik Saati Geriye Almak Mümkün mü? Beslenme Modelleri ve Uzun Ömür İlişkisi",
     "summary": "Alman Nörodejeneratif Hastalıklar Merkezi tarafından 6 binden fazla katılımcıyla gerçekleştirilen kapsamlı araştırma, beslenme alışkanlıklarının biyolojik yaşlanma süreci üzerinde doğrudan belirleyici bir rol",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795439256.2691467
+  },
+  {
+    "slug": "the-last-of-us-part-ii-icin-hayran-yapimi-yeni-mod-cikti",
+    "title": "The Last of us Part II için hayran yapımı yeni mod çıktı",
+    "summary": "The Last of Us Part II Remastered için geliştirilen ücretsiz ve hayran yapımı çok oyunculu mod Twelve Weeks oyuncularla buluştu. Mod, orijinal serideki klan tabanlı takım savaşlarını PC platformuna taşıyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795441989.7477698
   }
 ]
