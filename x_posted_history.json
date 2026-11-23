@@ -161,15 +161,6 @@
     "ts": 1794245947.4955263
   },
   {
-    "slug": "prof-dr-osman-muftuoglu-kaliteli-ve-saglikli-yasam-icin-yirmi-tavsiye-paylasti",
-    "title": "Prof. Dr. Osman Müftüoğlu Kaliteli ve Sağlıklı Yaşam İçin Yirmi Tavsiye Paylaştı",
-    "summary": "Uzman isim Prof. Dr. Osman Müftüoğlu, uzun ve sağlıklı bir ömür sürmek isteyenler için günlük rutinlere kolayca entegre edilebilecek yirmi maddelik bir rehber yayımladı.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794292289.338434
-  },
-  {
     "slug": "turkiye-10-kasimda-durdu-atasina-minnetle-saygi-durusunda-bulustu",
     "title": "Türkiye 10 Kasım’da Durdu: Ata’sına Minnetle Saygı Duruşunda Buluştu",
     "summary": "Türkiye Cumhuriyeti’nin kurucusu Gazi Mustafa Kemal Atatürk, vefatının 88. yıl dönümünde tüm yurtta düzenlenen törenlerle anıldı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795406492.9948294
+  },
+  {
+    "slug": "netanyahudan-trumpa-irana-yonelik-yeni-saldiri-talimati-baskisi",
+    "title": "Netanyahu'dan Trump'a İran'a yönelik yeni saldırı talimatı baskısı",
+    "summary": "İsrail geçici Başbakanı Binyamin Netanyahu, ABD Başkanı Donald Trump'ı en kısa sürede İran'a askeri saldırı emri vermesi için ikna etmeye çalışıyor.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795409215.6370602
   }
 ]
