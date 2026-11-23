@@ -340,6 +340,7 @@ _COMPOUND_PROPER_SUBS = [
     (re.compile(r"\bmaçı\s+sonrasi\b", re.I), "maçı sonrası"),
     (re.compile(r"\bsatış\s+sonrasi\b", re.I), "satış sonrası"),
     (re.compile(r"\bistanbul\s+fuar\s+merkezi", re.I), "İstanbul Fuar Merkezi"),
+    (re.compile(r"\basgari\s+ücret\s+tespit\s+komisyonu\b", re.I), "Asgari Ücret Tespit Komisyonu"),
 ]
 
 
