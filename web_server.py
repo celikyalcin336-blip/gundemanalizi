@@ -2761,19 +2761,29 @@ async def kunye_page(request: Request):
 @app.get("/yazar/yalcin-celik", response_class=HTMLResponse)
 async def author_yalcin_page(request: Request):
     import content_quality
-    pool = database.get_sitemap_articles(limit=120)
-    signed = [
-        a for a in pool
-        if (a.get("category") or "") != "Analiz"
-        and (a.get("source") or "") in ("Gündem Analizi", "Gündem Analizi Özel", "Özel")
-        and not content_quality.is_thin(a.get("content") or "", threshold=150)
-    ]
+    signed = []
+    try:
+        with database.get_connection() as conn:
+            s_rows = conn.execute(
+                "SELECT id, slug, title, summary, category, image_path, source, created_at, content "
+                "FROM articles WHERE source IN ('Gündem Analizi', 'Gündem Analizi Özel', 'Özel') "
+                "AND COALESCE(category, '') != 'Analiz' ORDER BY id DESC LIMIT 100"
+            ).fetchall()
+        for r in s_rows:
+            d = database._row_to_dict(dict(r))
+            if not content_quality.is_thin(d.get("content") or "", threshold=150):
+                d.pop("content", None)
+                signed.append(d)
+    except Exception:
+        signed = []
+    signed_ids = {s.get("id") for s in signed if s.get("id")}
+    pool = database.get_sitemap_articles(limit=40)
     curated = [
         a for a in pool
-        if a not in signed
+        if a.get("id") not in signed_ids
         and not content_quality.is_thin(a.get("content") or "")
         and not main.is_commodity_news(a.get("title", ""))
-    ][:12]
+    ][:8]
     articles = curated[:8] or database.get_articles(limit=8)
     return templates.TemplateResponse(
         request=request,
