@@ -168,15 +168,6 @@
     "ts": 1794314084.3391252
   },
   {
-    "slug": "abd-enflasyon-verileri-ve-fed-mesajlariyla-kripto-piyasasinda-sert-dusus",
-    "title": "ABD Enflasyon Verileri ve Fed Mesajlarıyla Kripto Piyasasında Sert Düşüş",
-    "summary": "ABD'den gelen son enflasyon verileri ile merkez bankası yetkililerinin para politikasına dair açıklamaları, küresel finans sisteminde risk iştahını azalttı.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794333181.6262472
-  },
-  {
     "slug": "napolide-de-bruyne-donemi-calkantili-bir-ayrilikla-sona-eriyor",
     "title": "Napoli’de De Bruyne Dönemi Çalkantılı Bir Ayrılıkla Sona Eriyor",
     "status": "skipped",
@@ -3843,5 +3834,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795447437.5788467
+  },
+  {
+    "slug": "a-milli-basketbol-takimi-italya-ve-izlanda-maclarina-hazirlaniyor",
+    "title": "A milli Basketbol takımı İtalya ve İzlanda maçlarına hazırlanıyor",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795450138.6898792
+  },
+  {
+    "slug": "aston-villa-teknik-direktoru-unai-emery-galatasaray-maci-oncesi-konustu",
+    "title": "Aston Villa teknik direktörü Unai Emery Galatasaray maçı öncesi konuştu",
+    "summary": "Aston Villa teknik direktörü Unai Emery, UEFA Şampiyonlar Ligi'nin 5. haftasında Galatasaray ile deplasmanda yapacakları maç öncesinde değerlendirmelerde bulundu.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795450175.7420902
   }
 ]
