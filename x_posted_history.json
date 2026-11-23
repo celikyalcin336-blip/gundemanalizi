@@ -168,15 +168,6 @@
     "ts": 1794314084.3391252
   },
   {
-    "slug": "biyolojik-saati-geriye-almak-mumkun-mu-beslenme-modelleri-ve-uzun-omur-iliskisi",
-    "title": "Biyolojik Saati Geriye Almak Mümkün mü? Beslenme Modelleri ve Uzun Ömür İlişkisi",
-    "summary": "Alman Nörodejeneratif Hastalıklar Merkezi tarafından 6 binden fazla katılımcıyla gerçekleştirilen kapsamlı araştırma, beslenme alışkanlıklarının biyolojik yaşlanma süreci üzerinde doğrudan belirleyici bir rol",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794327733.746939
-  },
-  {
     "slug": "samsunda-gorev-basindaki-cerrahi-asistanina-bicakli-saldiri-ve-supheli-tutukland",
     "title": "Samsun'da Görev Başındaki Cerrahi Asistanına Bıçaklı Saldırı ve Şüpheli Tutuklandı",
     "summary": "Samsun'un Atakum ilçesinde, yasaklı madde suçundan adli denetimi bulunan bir kişi, hastanede görev yapan genel cerrahi asistanını apartman koridorunda bıçakla yaraladı.",
@@ -3843,5 +3834,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795441989.7477698
+  },
+  {
+    "slug": "hindistan-ic-fiyatlari-dengelemek-icin-pirinc-ihracatina-vergi-getirebilir",
+    "title": "Hindistan iç fiyatları dengelemek için pirinç ihracatına vergi getirebilir",
+    "summary": "Hindistan hükümeti, iç piyasadaki fiyat artışlarını sınırlamak amacıyla basmati dışındaki pirinçlerin ihracatına yüzde 30 vergi getirme önerisini değerlendiriyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795444713.7235463
   }
 ]
