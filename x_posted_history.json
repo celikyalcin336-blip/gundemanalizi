@@ -175,15 +175,6 @@
     "ts": 1794335884.08164
   },
   {
-    "slug": "ingiltere-16-yas-alti-sosyal-medya-yasagini-oyun-ve-muzik-platformlarina-yayiyor",
-    "title": "İngiltere 16 Yaş Altı Sosyal Medya Yasağını Oyun ve Müzik Platformlarına Yayıyor",
-    "summary": "İngiltere hükümeti, 16 yaş altındaki gençlere yönelik planlanan sosyal medya yasağının kapsamını genişleterek öneri algoritmaları kullanan tüm platformları dahil etmeyi hedefliyor.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794361339.7878602
-  },
-  {
     "slug": "turkiye-iklim-okulu-cop31-kapsaminda-kuresel-egitim-oturumlarina-ev-sahipligi-ya",
     "title": "Türkiye İklim Okulu COP31 Kapsamında Küresel Eğitim Oturumlarına Ev Sahipliği Yaptı",
     "summary": "Antalya'da düzenlenen COP31 zirvesi bünyesinde faaliyet gösteren Türkiye İklim Okulu, uluslararası katılımlı oturumlarla ikinci gününü tamamladı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795538579.5204363
+  },
+  {
+    "slug": "hazine-ve-maliye-bakanligi-2027-yili-yeniden-degerleme-oranini-ilan-etti",
+    "title": "Hazine ve Maliye Bakanlığı 2027 yılı yeniden değerleme oranını ilan etti",
+    "summary": "Resmi Gazete'de yayımlanan Vergi Usul Kanunu Genel Tebliği ile 2027 yılında uygulanacak yeniden değerleme oranı yüzde 27,83 olarak açıklandı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795541302.8720274
   }
 ]
