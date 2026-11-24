@@ -175,15 +175,6 @@
     "ts": 1794335884.08164
   },
   {
-    "slug": "turkiye-iklim-okulu-cop31-kapsaminda-kuresel-egitim-oturumlarina-ev-sahipligi-ya",
-    "title": "Türkiye İklim Okulu COP31 Kapsamında Küresel Eğitim Oturumlarına Ev Sahipliği Yaptı",
-    "summary": "Antalya'da düzenlenen COP31 zirvesi bünyesinde faaliyet gösteren Türkiye İklim Okulu, uluslararası katılımlı oturumlarla ikinci gününü tamamladı.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794364065.9245813
-  },
-  {
     "slug": "kalbin-kansere-karsi-gizemli-direnci-tibbi-tedavilerde-devrim-yaratabilir",
     "title": "Kalbin Kansere Karşı Gizemli Direnci Tıbbi Tedavilerde Devrim Yaratabilir",
     "summary": "Tıp dünyası, insan vücudunda tümör gelişimine karşı en yüksek direnci gösteren kalp dokusunun bu benzersiz özelliğinin ardındaki mekanizmayı çözmeye hazırlanıyor.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795541302.8720274
+  },
+  {
+    "slug": "abd-ticaret-bakanligi-cine-nvidia-cipi-aktaran-megaspeedi-kara-listeye-aldi",
+    "title": "ABD ticaret Bakanlığı Çin'e Nvidia çipi aktaran Megaspeed'i kara listeye aldı",
+    "summary": "ABD Ticaret Bakanlığı, Nvidia'nın gelişmiş çiplerini Çin'e yönlendirdiği şüphesiyle Singapur merkezli Megaspeed şirketini ve Tayland ile Malezya'daki iştiraklerini ticaret kara listesine dahil etti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795544027.0265553
   }
 ]
