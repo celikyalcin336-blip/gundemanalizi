@@ -175,15 +175,6 @@
     "ts": 1794335884.08164
   },
   {
-    "slug": "tip-milletvekili-ahmet-sikin-esi-yonca-verdioglu-sik-casusluk-iddiasiyla-gozalti",
-    "title": "TİP Milletvekili Ahmet Şık'ın Eşi Yonca Verdioğlu Şık Casusluk İddiasıyla Gözaltına Alındı",
-    "summary": "Türkiye İşçi Partisi İstanbul Milletvekili Ahmet Şık'ın eşi Yonca Verdioğlu Şık, yürütülen bir adli soruşturma çerçevesinde gözaltına alındı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794358615.2841876
-  },
-  {
     "slug": "ingiltere-16-yas-alti-sosyal-medya-yasagini-oyun-ve-muzik-platformlarina-yayiyor",
     "title": "İngiltere 16 Yaş Altı Sosyal Medya Yasağını Oyun ve Müzik Platformlarına Yayıyor",
     "summary": "İngiltere hükümeti, 16 yaş altındaki gençlere yönelik planlanan sosyal medya yasağının kapsamını genişleterek öneri algoritmaları kullanan tüm platformları dahil etmeyi hedefliyor.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795535856.066332
+  },
+  {
+    "slug": "emekli-ogretmen-bilecikte-yetistirdigi-aronya-meyvesini-kanser-hastalarina",
+    "title": "Emekli öğretmen Bilecik'te yetiştirdiği aronya meyvesini kanser hastalarına ücretsiz dağıtıyor",
+    "summary": "Kocaeli Gebze'den Bilecik'in Osmaneli ilçesine yerleşen emekli edebiyat öğretmeni Sıtkı Akçayır, hobi olarak aronya meyvesi üretimine başladı.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795538579.5204363
   }
 ]
