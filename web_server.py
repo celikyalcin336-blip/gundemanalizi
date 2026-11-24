@@ -3471,11 +3471,11 @@ async def rss_feed(request: Request):
       <pubDate>{pub_date}</pubDate>
       <description>{escape(a.get("summary") or a["title"])}</description>
       <category>{escape(a.get("category") or "Gündem")}</category>
-      <enclosure url="{img_url}" type="image/jpeg"/>
+      <media:content url="{escape(img_url)}" medium="image" type="image/jpeg"/>
     </item>""")
     rss = f"""<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
     <link>{base_url}/</link>
