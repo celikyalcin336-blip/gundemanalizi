@@ -133,6 +133,65 @@ SPECIAL_DOSSIERS: List[Dict] = [
 <h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Komisyon Takvimi Nasıl İşleyecek?</h3>
 <p class="text-slate-800 leading-relaxed mb-4">İşçi, işveren ve hükümeti temsilen beşer üyeden oluşan Asgari Ücret Tespit Komisyonu, Aralık ayının ilk yarısında Çalışma ve Sosyal Güvenlik Bakanlığı ev sahipliğinde ilk toplantısını gerçekleştirecek. Komisyon masasında 3 Aralık'ta açıklanacak Kasım ayı TÜİK enflasyon verisi, Orta Vadeli Program (OVP) enflasyon hedefleri, geçim endeksleri ve kayıtlı istihdam maliyetleri birlikte değerlendirilecek; oy çokluğuyla alınacak nihai karar Aralık ayının son haftasında Resmî Gazete'de yayımlanarak 1 Ocak 2027 itibarıyla yürürlüğe girecek.</p>""",
     },
+    {
+        "key": "special_dossier_2026_11_25_ydo_2027_vergi_harc",
+        "title": "2027 vergi, harç ve ceza tablosu: Yüzde 27,83 yeniden değerleme oranıyla pasaport, ehliyet ve IMEI tutarları",
+        "summary": "Resmî Gazete'de yayımlanan 599 Sıra No.lu Vergi Usul Kanunu Genel Tebliği ile yüzde 27,83 olarak ilan edilen yeniden değerleme oranı sonrasında 1 Ocak 2027'de güncellenecek pasaport, ehliyet, IMEI kayıt, yurt dışı çıkış harcı, MTV ve trafik cezası tablosu netleşti.",
+        "category": "Ekonomi",
+        "source": "Gündem Analizi Özel",
+        "image_filename": "post_ozel_20261125_ydo.jpg",
+        "image_candidates": [
+            "https://trthaberstatic.cdn.wp.trt.com.tr/resimler/1726000/turk-lirasi-kolaj-trt-haber-1726520.jpg",
+        ],
+        "tg_bullets": [
+            "599 Sıra No.lu VUK Genel Tebliği ile 2027 yeniden değerleme oranı %27,83 olarak Resmî Gazete'de yayımlandı.",
+            "10 yıllık pasaport harcı 13.410,40 TL'den 17.142,51 TL'ye, B sınıfı ehliyet harcı 8.634,41 TL'ye, IMEI kaydı 69.358 TL'ye çıkıyor.",
+            "31 Aralık 2026 mesai bitimine kadar mevcut tarifeden yararlanılabilecek kalemler ve Cumhurbaşkanı yetkisi detayları.",
+        ],
+        "content": """<p class="lead font-medium text-lg text-slate-900 mb-6">Hazine ve Maliye Bakanlığı Gelir İdaresi Başkanlığı tarafından hazırlanan 599 Sıra No.lu Vergi Usul Kanunu Genel Tebliği Resmî Gazete'de yayımlanarak yürürlüğe girdi. Türkiye İstatistik Kurumu'nun (TÜİK) Ekim 2026 itibarıyla açıkladığı 12 aylık ortalama Yurt İçi Üretici Fiyat Endeksi (Yİ-ÜFE) verisine dayanan <strong>yüzde 27,83</strong> oranındaki yeniden değerleme oranı (YDO), 1 Ocak 2027 itibarıyla pasaport ve ehliyet harçlarından IMEI kayıt ücretine, yurt dışı çıkış harcından Motorlu Taşıtlar Vergisi'ne (MTV) ve trafik cezalarına kadar onlarca kamu tarifesinde yasal artış tabanını belirledi.</p>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">2027 Pasaport Harçları: Süreye Göre Karşılaştırmalı Tablo</h2>
+<p class="text-slate-800 leading-relaxed mb-4">492 sayılı Harçlar Kanunu uyarınca pasaport harçları her yıl yeniden değerleme oranında otomatik olarak güncelleniyor. Cumhurbaşkanı'nın kanunla tanınan indirim veya artırım yetkisini kullanmaması halinde 1 Ocak 2027'den itibaren 6 aylık pasaport harcı 3.587,55 TL'ye, 10 yıllık pasaport harcı ise 17.142,51 TL'ye yükselecek. Bu tutarlara her başvuru için ayrıca Hazine ve Maliye Bakanlığı tarafından ilan edilen pasaport defter (değerli kâğıt) bedeli ekleniyor.</p>
+
+<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">
+<thead><tr class="bg-slate-100 text-slate-900 font-bold">
+<th class="p-2.5 border border-slate-200">Pasaport Süresi</th>
+<th class="p-2.5 border border-slate-200">2026 Yürürlükteki Harç</th>
+<th class="p-2.5 border border-slate-200">2027 YDO (%27,83) Sonrası</th>
+<th class="p-2.5 border border-slate-200">Artış Farkı</th>
+</tr></thead>
+<tbody>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">6 Aylık Pasaport</td><td class="p-2.5 border border-slate-200">2.806,50 TL</td><td class="p-2.5 border border-slate-200 font-bold">3.587,55 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+781,05 TL</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">1 Yıllık Pasaport</td><td class="p-2.5 border border-slate-200">4.103,00 TL</td><td class="p-2.5 border border-slate-200 font-bold">5.244,86 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+1.141,86 TL</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2 Yıllık Pasaport</td><td class="p-2.5 border border-slate-200">6.698,50 TL</td><td class="p-2.5 border border-slate-200 font-bold">8.562,69 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+1.864,19 TL</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">3 Yıllık Pasaport</td><td class="p-2.5 border border-slate-200">9.516,00 TL</td><td class="p-2.5 border border-slate-200 font-bold">12.164,30 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+2.648,30 TL</td></tr>
+<tr class="bg-red-50/60"><td class="p-2.5 border border-slate-200 font-bold text-slate-900">3 Yıldan Fazla (10 Yıllık)</td><td class="p-2.5 border border-slate-200 font-bold">13.410,40 TL</td><td class="p-2.5 border border-slate-200 font-extrabold text-red-600">17.142,51 TL</td><td class="p-2.5 border border-slate-200 font-bold text-slate-700">+3.732,11 TL</td></tr>
+</tbody></table></div>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">Ehliyet Harçları, IMEI Kayıt Ücreti ve Yurt Dışı Çıkış Harcı</h2>
+<p class="text-slate-800 leading-relaxed mb-4">Yüzde 27,83'lük yeniden değerleme oranı en belirgin tutar farkını yolcu beraberinde yurt dışından getirilen cep telefonlarının IMEI kayıt harcında yaratıyor. 2026 yılında 54.258 TL olarak uygulanan IMEI kayıt ücreti, yeni yılda 15.100 TL artışla <strong>69.358 TL</strong> seviyesine çıkıyor. Sürücü belgesi alacak adaylar için B sınıfı ehliyet harcı 6.754,60 TL'den 8.634,41 TL'ye, yurt dışı çıkış harcı ise 1.250 TL'den 1.597,88 TL'ye (tam lira uygulamasıyla yaklaşık 1.598 TL) yükseliyor.</p>
+
+<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">
+<thead><tr class="bg-slate-100 text-slate-900 font-bold">
+<th class="p-2.5 border border-slate-200">Harç / Kamu Tarifesi</th>
+<th class="p-2.5 border border-slate-200">2026 Yürürlükteki Tutar</th>
+<th class="p-2.5 border border-slate-200">2027 YDO (%27,83) Sonrası</th>
+<th class="p-2.5 border border-slate-200">Artış Farkı</th>
+</tr></thead>
+<tbody>
+<tr class="border-b border-slate-200 bg-red-50/60"><td class="p-2.5 border border-slate-200 font-bold text-slate-900">IMEI Kayıt Ücreti (Yurt Dışı Telefon)</td><td class="p-2.5 border border-slate-200 font-bold">54.258,00 TL</td><td class="p-2.5 border border-slate-200 font-extrabold text-red-600">69.358,00 TL</td><td class="p-2.5 border border-slate-200 font-bold text-slate-700">+15.100,00 TL</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">B Sınıfı Ehliyet Harcı</td><td class="p-2.5 border border-slate-200">6.754,60 TL</td><td class="p-2.5 border border-slate-200 font-bold">8.634,41 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+1.879,81 TL</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">A Sınıfı Ehliyet Harcı</td><td class="p-2.5 border border-slate-200">2.240,00 TL</td><td class="p-2.5 border border-slate-200 font-bold">2.863,39 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+623,39 TL</td></tr>
+<tr><td class="p-2.5 border border-slate-200 font-semibold">Yurt Dışı Çıkış Harcı</td><td class="p-2.5 border border-slate-200">1.250,00 TL</td><td class="p-2.5 border border-slate-200 font-bold">1.597,88 TL</td><td class="p-2.5 border border-slate-200 text-slate-600">+347,88 TL</td></tr>
+</tbody></table></div>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">MTV, Trafik Cezaları ve Gelir Vergisi Dilimlerinde Yasal Çerçeve</h2>
+<p class="text-slate-800 leading-relaxed mb-4">197 sayılı Motorlu Taşıtlar Vergisi Kanunu ve 2918 sayılı Karayolları Trafik Kanunu gereği MTV tutarları ile idari trafik para cezaları da her yılın 1 Ocak tarihinde yeniden değerleme oranı kadar artıyor. Gelir vergisi tarife dilimleri ile yemek ve ulaşım istisnalarının da yüzde 27,83 oranında yükseltilmesi, 2027 yılında ücretli çalışanların üst vergi dilimine daha geç girmesini sağlayacak. Çalışanların güncel brüt–net maaş kesintileri ile yeni yıl bordro takvimini <a href="/dosya/asgari-ucret" class="text-red-600 font-semibold hover:underline">Asgari Ücret Rehberi</a> ve <a href="/hesaplama/maas" class="text-red-600 font-semibold hover:underline">Brüt–Net Maaş Hesaplama</a> sayfalarından inceleyebilirsiniz.</p>
+<p class="text-slate-800 leading-relaxed mb-4">Hukuki takvim açısından kritik nokta, <strong>Cumhurbaşkanı'nın oran belirleme yetkisidir</strong>: Vergi Usul Kanunu ve ilgili harç/MTV kanunları uyarınca Cumhurbaşkanı, MTV ve bazı harç kalemlerinde yeniden değerleme oranını yüzde 50'ye kadar indirme veya artırma yetkisine sahiptir. Bu yetkinin kullanılıp kullanılmayacağı Aralık ayının son haftasında Resmî Gazete'de yayımlanacak nihai tebliğlerle kesinleşecek.</p>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">31 Aralık 2026 Mesai Bitimine Kadar Dikkat Edilecek İşlemler</h2>
+<p class="text-slate-800 leading-relaxed mb-4">Pasaport yenileyecek, yeni ehliyet harcı yatıracak veya yurt dışından getirdiği telefonun IMEI kaydını tamamlayacak vatandaşlar için <strong>31 Aralık 2026</strong> tarihi belirleyici sınır niteliği taşıyor. Harç ödemesinin 2026 yılı içinde Gelir İdaresi Başkanlığı (Dijital Vergi Dairesi) veya anlaşmalı bankalar üzerinden yatırılması ve ilgili başvurunun yıl kapanmadan sisteme işlenmesi halinde 2026 tarifesi geçerli oluyor. 1 Ocak 2027 saat 00.00 itibarıyla tamamlanmamış başvurularda yeni tarife farkı tahsil ediliyor. Aynı döneme denk gelen emekli ve memur maaş zammı takvimini de <a href="/dosya/emekli-ve-memur-zammi" class="text-red-600 font-semibold hover:underline">Emekli ve Memur Zammı Dosyası</a> üzerinden takip edebilirsiniz.</p>""",
+    },
 ]
 
 

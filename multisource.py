@@ -739,7 +739,7 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
 
     def section(title: str, paras: List[str]):
         if paras:
-            parts.append(f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(_norm_h(title))}</h3>')
+            parts.append(f'<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(_norm_h(title))}</h2>')
             for p in paras:
                 parts.append(f'<p class="text-slate-800 leading-relaxed mb-4">{_e(p)}</p>')
 
@@ -760,7 +760,7 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
         if scen:
             scen_h = _norm_h(data.get("senaryo_baslik") or "Önümüzdeki süreçte öne çıkan ihtimaller")
             parts.append(
-                f'<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(scen_h)}</h3><ol class="ga-list">'
+                f'<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">{_e(scen_h)}</h2><ol class="ga-list">'
                 + "".join(f"<li>{_e(s)}</li>" for s in scen)
                 + "</ol>"
             )
@@ -773,7 +773,7 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
     ][:6]
     if len(nums) >= 3:
         parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Öne çıkan veriler</h3><div class="ga-table-wrap"><table class="ga-table"><tbody>'
+            '<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">Öne çıkan veriler</h2><div class="ga-table-wrap"><table class="ga-table"><tbody>'
             + "".join(f"<tr><td>{_e(r['etiket'])}</td><td><strong>{_e(r['deger'])}</strong></td></tr>" for r in nums)
             + "</tbody></table></div>"
         )
@@ -824,7 +824,7 @@ def render_html(data: Dict, sources: List[Dict], mode: str = "news") -> str:
 
     if len(rows) >= 2:
         parts.append(
-            '<h3 class="text-xl font-bold text-slate-900 mt-6 mb-3">Kaynakların Öne Çıkardığı Detaylar</h3><ul class="ga-sources">'
+            '<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">Kaynakların Öne Çıkardığı Detaylar</h2><ul class="ga-sources">'
             + "".join(rows)
             + "</ul>"
         )
