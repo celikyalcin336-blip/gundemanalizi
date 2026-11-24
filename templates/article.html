@@ -73,8 +73,17 @@
           },
           "headline": {{ article.title | tojson }},
           "description": {{ article.summary | tojson }},
+          "inLanguage": "tr-TR",
+          "articleSection": {{ article.category | tojson }},
+          "isAccessibleForFree": true,
+          {% if word_count %}"wordCount": {{ word_count }},{% endif %}
           "image": [
-            {% if article.image_path %}"https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.replace('\\', '/').split('/')[-1] }}"{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
+            {% if article.image_path %}{
+              "@type": "ImageObject",
+              "url": "https://xn--gndemanalizi-dlb.com.tr/images/{{ article.image_path.replace('\\', '/').split('/')[-1] }}",
+              "width": 1280,
+              "height": 720
+            }{% else %}"https://xn--gndemanalizi-dlb.com.tr/assets/logo.png"{% endif %}
           ],
           {% set _mod_ts = (article.updated_at or article.created_at or '') %}
           "datePublished": "{{ (article.created_at or '')[:10] }}T{{ (article.created_at or '')[11:19] if (article.created_at or '')|length >= 19 else '00:00:00' }}+03:00",
@@ -110,7 +119,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": {{ article.category | tojson }},
-              "item": "https://xn--gndemanalizi-dlb.com.tr{% if article.category == 'Analiz' %}/analiz{% else %}/?kategori={{ article.category }}{% endif %}"
+              "item": "https://xn--gndemanalizi-dlb.com.tr{% if article.category == 'Analiz' %}/analiz{% else %}/?kategori={{ category_url_encoded or (article.category | urlencode) }}{% endif %}"
             },
             {
               "@type": "ListItem",
@@ -147,7 +156,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"></noscript>
 
-    <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <!-- Ultra Hızlı Statik CSS (3.5MB Tailwind CDN Yerine 14KB Gzip) -->
     <link rel="stylesheet" href="/assets/style.min.css">
     <style>

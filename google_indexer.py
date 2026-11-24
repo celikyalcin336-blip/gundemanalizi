@@ -114,18 +114,15 @@ def notify_google_indexing(url: str, action: str = "URL_UPDATED", ping_websub: b
     """
     if ping_websub:
         try:
-            for feed_url in (
-                "https://xn--gndemanalizi-dlb.com.tr/rss.xml",
-                "https://xn--gndemanalizi-dlb.com.tr/news-sitemap.xml",
-                "https://xn--gndemanalizi-dlb.com.tr/sitemap.xml",
-            ):
-                requests.post(
-                    "https://pubsubhubbub.appspot.com/",
-                    data={"hub.mode": "publish", "hub.url": feed_url},
-                    timeout=6,
-                )
-        except Exception:
-            pass
+            r_hub = requests.post(
+                "https://pubsubhubbub.appspot.com/",
+                data={"hub.mode": "publish", "hub.url": "https://xn--gndemanalizi-dlb.com.tr/rss.xml"},
+                timeout=6,
+            )
+            if r_hub.status_code not in (200, 202, 204):
+                print(f"⚠️ [WebSub] Hub yanıtı ({r_hub.status_code}): {r_hub.text[:120]}")
+        except Exception as _we:
+            print(f"⚠️ [WebSub] Ping hatası: {_we}")
 
     # Google Indexing API resmi olarak yalnızca JobPosting / BroadcastEvent sayfaları içindir.
     # Haber sayfaları için kullanımı spam riski taşıdığından varsayılan olarak KAPALI.

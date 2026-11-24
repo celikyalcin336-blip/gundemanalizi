@@ -359,6 +359,8 @@ def clean_article_html(content: str) -> str:
     }
     def _fix_heading(m):
         tag, attrs, inner = m.group(1), m.group(2), m.group(3)
+        # Semantik H1 -> H2 başlık hiyerarşisi: makale gövdesi ara başlıklarını h2 olarak standardize et
+        out_tag = "h2" if tag.lower() == "h3" else tag.lower()
         raw_inner = clean_title_text(_html.unescape(re.sub(r"<[^>]+>", "", inner)))
         low_h = raw_inner.strip(" ?:.-").lower()
         if low_h in _GENERIC_H3_MAP:
@@ -368,7 +370,7 @@ def clean_article_html(content: str) -> str:
             raw_inner = _fg_h.to_turkish_sentence_case(raw_inner, c)
         except Exception:
             pass
-        return f"<{tag}{attrs}>{_html.escape(raw_inner)}</{tag}>"
+        return f"<{out_tag}{attrs}>{_html.escape(raw_inner)}</{out_tag}>"
     c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _fix_heading, c, flags=re.S | re.I)
 
     # 4) Paragraflar arası tekrar eden cümleler ve özet kutusuyla birebir örtüşen cümleler
@@ -413,12 +415,12 @@ def clean_article_html(content: str) -> str:
     c = re.sub(r"\btext-white\b", "text-slate-900", c)
     c = re.sub(r"\btext-slate-[23]00\b", "text-slate-800", c)
 
-    # 6) Alt başlıklara (<h3>) Google Arama Jump-Link SEO id etiketi ekle
+    # 6) Alt başlıklara (<h2>/<h3>) Google Arama Jump-Link SEO id etiketi ekle
     tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
     used_ids = set()
 
-    def _add_h3_id(m):
-        attrs, inner = m.group(1), m.group(2)
+    def _add_heading_id(m):
+        tag, attrs, inner = m.group(1), m.group(2), m.group(3)
         if "id=" in attrs.lower():
             return m.group(0)
         base_id = re.sub(r"[^a-z0-9]+", "-", _norm(inner).translate(tr_map).lower()).strip("-")[:64] or "bolum"
@@ -428,9 +430,9 @@ def clean_article_html(content: str) -> str:
             hid = f"{base_id}-{idx}"
             idx += 1
         used_ids.add(hid)
-        return f'<h3{attrs} id="{hid}">{inner}</h3>'
+        return f'<{tag}{attrs} id="{hid}">{inner}</{tag}>'
 
-    c = re.sub(r"<h3([^>]*)>(.*?)</h3>", _add_h3_id, c, flags=re.S | re.I)
+    c = re.sub(r"<(h[23])([^>]*)>(.*?)</\1>", _add_heading_id, c, flags=re.S | re.I)
     return c
 
 

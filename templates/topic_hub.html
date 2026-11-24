@@ -44,6 +44,17 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc !important; color: #0f172a !important; }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://xn--gndemanalizi-dlb.com.tr/"},
+        {"@type": "ListItem", "position": 2, "name": "Özel Dosyalar", "item": "https://xn--gndemanalizi-dlb.com.tr/dosya"}{% if hub %},
+        {"@type": "ListItem", "position": 3, "name": {{ hub.title | tojson }}, "item": "https://xn--gndemanalizi-dlb.com.tr{{ page_path }}"}{% endif %}
+      ]
+    }
+    </script>
 
     {% if hub and hub.faqs %}
     <script type="application/ld+json">

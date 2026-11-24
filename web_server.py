@@ -2525,6 +2525,9 @@ async def article_detail(request: Request, slug: str):
 
     canonical_url = f"https://xn--gndemanalizi-dlb.com.tr/haber/{slug}"
     clean_src = content_quality.clean_source_name(article.get("source"))
+    import urllib.parse as _up_art
+    visible_wc = content_quality.visible_word_count(raw_content)
+    category_url_encoded = _up_art.quote(category or "Gündem")
     resp = templates.TemplateResponse(
         request=request,
         name="article.html",
@@ -2544,6 +2547,8 @@ async def article_detail(request: Request, slug: str):
             "prev_article": prev_article,
             "breaking_news": breaking_news,
             "reading_time_min": reading_time_min,
+            "word_count": visible_wc,
+            "category_url_encoded": category_url_encoded,
             "ad_settings": ({**ad_settings, "ads_enabled": False} if (is_thin_article or is_ads_restricted) else ad_settings),
             "market_rates": get_market_rates()["rates"],
             "weather_data": get_live_weather(),
@@ -3005,6 +3010,7 @@ async def robots(request: Request):
         "User-agent: *",
         "Allow: /",
         "Disallow: /arama",
+        "Disallow: /*?q=",
         "Disallow: /api/",
         f"Sitemap: {base_url}/sitemap.xml",
         f"Sitemap: {base_url}/news-sitemap.xml",
@@ -3077,6 +3083,7 @@ def _render_pretty_sitemap_html(title: str, subtitle: str, rows: list, raw_xml_p
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
     <title>{title} | Gündem Analizi</title>
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="stylesheet" href="/assets/style.min.css">
@@ -3473,6 +3480,7 @@ async def rss_feed(request: Request):
     <title>Gündem Analizi | Doğru Haber • Tarafsız Analiz</title>
     <link>{base_url}/</link>
     <atom:link href="{base_url}/rss.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://pubsubhubbub.appspot.com/" rel="hub"/>
     <description>Türkiye ve dünyadan son dakika gelişmeleri ve tarafsız analizler.</description>
     <language>tr-TR</language>
 {chr(10).join(items_xml)}
