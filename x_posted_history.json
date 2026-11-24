@@ -182,15 +182,6 @@
     "ts": 1794369497.014356
   },
   {
-    "slug": "alman-otomotiv-devi-audi-amerika-birlesik-devletleri-icin-yatirimlarini-buyutuyo",
-    "title": "Alman otomotiv devi Audi Amerika Birleşik Devletleri için yatırımlarını büyütüyor",
-    "summary": "Audi, Amerika Birleşik Devletleri'ndeki ilk üretim tesisi projesine ek olarak yeni bir fon aktarımı ve kapasite artışı planlıyor.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794374695.1560335
-  },
-  {
     "slug": "ilkogretim-ve-ortaogretim-kurumlarinda-birinci-donem-ara-tatil-takvimi-netlesti",
     "title": "İlköğretim ve Ortaöğretim Kurumlarında Birinci Dönem Ara Tatil Takvimi Netleşti",
     "summary": "Milli Eğitim Bakanlığı takvimine göre okullarda birinci dönem ara tatili 16 Kasım Pazartesi günü başlayacak ve 20 Kasım Cuma günü sona erecektir. Öğrenciler tatil dönüşü 23 Kasım tarihinde yeniden ders başı yapacaklar.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795549480.933266
+  },
+  {
+    "slug": "boeing-cin-pazarinda-yillar-sonra-dev-siparis-aldi",
+    "title": "Boeing Çin pazarında yıllar sonra dev sipariş aldı",
+    "summary": "Boeing, China Southern Airlines biriminden 50 adet tek koridorlu uçak için milyarlarca dolarlık sipariş aldı. Bu gelişme, şirketin 2017 yılından bu yana Çin'den aldığı en büyük alım oldu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795552203.9989295
   }
 ]
