@@ -182,15 +182,6 @@
     "ts": 1794369497.014356
   },
   {
-    "slug": "apple-tv-cihazlarina-yeni-isaret-dili-ceviri-ozelligi-eklendi",
-    "title": "Apple TV Cihazlarına Yeni İşaret Dili Çeviri Özelliği Eklendi",
-    "summary": "Apple, Apple TV platformundaki içerikler için yeni bir işaret dili çeviri özelliğini kullanıcıların hizmetine sundu.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794370128.3392036
-  },
-  {
     "slug": "alman-otomotiv-devi-audi-amerika-birlesik-devletleri-icin-yatirimlarini-buyutuyo",
     "title": "Alman otomotiv devi Audi Amerika Birleşik Devletleri için yatırımlarını büyütüyor",
     "summary": "Audi, Amerika Birleşik Devletleri'ndeki ilk üretim tesisi projesine ek olarak yeni bir fon aktarımı ve kapasite artışı planlıyor.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795546756.8008718
+  },
+  {
+    "slug": "kubilay-kaan-kundakci-cinayeti-davasinda-aile-beraat-kararlarina-karsi-istinafa",
+    "title": "Kubilay KAAN Kundakçı cinayeti davasında aile beraat kararlarına karşı istinafa başvurdu",
+    "summary": "İstanbul Ümraniye'de yaşamını yitiren 21 yaşındaki futbolcu Kubilay Kaan Kundakçı'nın ailesi, yerel mahkemenin kararına itiraz ederek 35 sayfalık bir istinaf dilekçesi sundu.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795549480.933266
   }
 ]
