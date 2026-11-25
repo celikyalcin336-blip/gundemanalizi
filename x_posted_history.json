@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "irandan-washington-yonetimine-karsi-avrupa-usleri-tehdidi",
-    "title": "İran'dan Washington Yönetimine Karşı Avrupa Üsleri Tehdidi",
-    "summary": "İran Ulusal Güvenlik Yüksek Konseyi Genel Sekreteri Muhsin Rızai, olası bir Amerikan askeri müdahalesine karşı Avrupa kıtasındaki ABD üslerini vurabileceklerini açıkladı.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794435368.135864
-  },
-  {
     "slug": "yari-iletken-devi-tsmcden-yapay-zeka-girisimlerine-dev-finansman",
     "title": "Yarı İletken Devi TSMC'den Yapay Zeka Girişimlerine Dev Finansman",
     "summary": "Yarı iletken sektörünün küresel lideri TSMC, yönetim kurulu kararıyla OpenAI ve Anthropic'e 500'er milyon dolara kadar yatırım yapma planını onayladı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795598513.6242101
+  },
+  {
+    "slug": "kolombiyadaki-alisveris-merkezinde-cikan-rehine-krizi-operasyonla-sona-erdi",
+    "title": "Kolombiya'daki alışveriş merkezinde çıkan rehine krizi operasyonla sona erdi",
+    "summary": "Kolombiya'nın Cartagena kentindeki bir süpermarkette soygun girişimi sonrası başlayan rehine krizi, güvenlik güçlerinin düzenlediği operasyonla tamamlandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795601235.4251342
   }
 ]
