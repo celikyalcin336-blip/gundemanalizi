@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "istanbul-merkezli-kara-para-aklama-operasyonunda-yedi-gozalti",
-    "title": "İstanbul Merkezli Kara Para Aklama Operasyonunda Yedi Gözaltı",
-    "summary": "Bakırköy Cumhuriyet Başsavcılığı koordinesinde yürütülen soruşturmada, uluslararası yasaklı madde ticaretinden elde edilen suç gelirlerini gayrimenkul yatırımıyla aklayan yedi şüpheli yakalandı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794406269.4364133
-  },
-  {
     "slug": "kuresel-tasimacilik-hatlarinda-oynaklik-artarken-tedarik-zinciri-ve-raflardaki-f",
     "title": "Küresel Taşımacılık Hatlarında Oynaklık Artarken Tedarik Zinciri Ve Raflardaki Fiyatlar Şekilleniyor",
     "summary": "Uluslararası deniz taşımacılığındaki navlun dalgalanmaları, küresel ticaret dengeleri üzerinde belirleyici bir unsur olarak öne çıkıyor.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795574002.837169
+  },
+  {
+    "slug": "birlesmis-milletlerden-myanmara-geri-gonderilme-guvenli-degil-aciklamasi",
+    "title": "Birleşmiş Milletler'den Myanmar'a geri gönderilme güvenli değil açıklaması",
+    "summary": "Birleşmiş Milletler Mülteciler Yüksek Komiserliği, Malezya'nın planladığı Myanmar vatandaşlarının ülkesine dönüşü için koşulların uygun olmadığını bildirdi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795576724.9206436
   }
 ]
