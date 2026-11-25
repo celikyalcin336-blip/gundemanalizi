@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "milli-egitim-bakanligi-ortak-sinav-takviminde-kritik-hafta",
-    "title": "Milli Eğitim Bakanlığı Ortak Sınav Takviminde Kritik Hafta",
-    "summary": "Milli Eğitim Bakanlığı tarafından hayata geçirilen Ortak Yazılı Sınav Sistemi kapsamında ülke genelindeki ilk dönem sınavları için kritik haftaya girildi.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794400808.699641
-  },
-  {
     "slug": "rush-tip-fakultesi-arastirmasi-sabah-saatlerinde-inme-riskindeki-belirgin-artisi",
     "title": "Rush Tıp Fakültesi Araştırması Sabah Saatlerinde İnme Riskindeki Belirgin Artışı Ortaya Koydu",
     "summary": "Rush Tıp Fakültesi tarafından gerçekleştirilen geniş çaplı araştırma, inme vakalarının günün belirli saat dilimlerinde yoğunlaştığını ortaya koydu.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795568559.3534677
+  },
+  {
+    "slug": "birlesik-krallikta-meme-kanseri-taramalarinda-yapay-zeka-donemi-basliyor",
+    "title": "Birleşik Krallık'ta meme kanseri taramalarında yapay zeka dönemi başlıyor",
+    "summary": "Birleşik Krallık genelinde başlatılan yeni araştırmada, mamografileri incelemek için yapay zeka kullanılacak.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795571281.144605
   }
 ]
