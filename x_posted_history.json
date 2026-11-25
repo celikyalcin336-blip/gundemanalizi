@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "iklim-krizi-dogrudan-halk-sagligi-tehdidine-donustu",
-    "title": "İklim Krizi Doğrudan Halk Sağlığı Tehdidine Dönüştü",
-    "summary": "Uzmanlar, iklim değişikliğinin ekosistemleri sarsarak insan sağlığını doğrudan etkileyen küresel bir halk sağlığı krizine dönüştüğünü vurguladı.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794424465.3836982
-  },
-  {
     "slug": "toyota-abd-pazari-icin-scion-markasiyla-minik-kamyonet-kei-01-modelini-duyurdu",
     "title": "Toyota ABD Pazarı İçin Scion Markasıyla Minik Kamyonet KEI-01 Modelini Duyurdu",
     "summary": "Japon otomotiv üreticisi Toyota, Scion markasını yeniden canlandırarak KEI-01 adını verdiği yeni küçük ticari aracını sergiledi.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795587619.4168873
+  },
+  {
+    "slug": "google-arama-yapay-zeka-ozelliklerini-kisisel-verilerle-genisletiyor",
+    "title": "Google arama yapay zeka özelliklerini kişisel verilerle genişletiyor",
+    "summary": "Google, Arama uygulamasındaki yapay zeka destekli AI Mode özelliğini kullanıcıların kişisel verilerinden yararlanacak şekilde genişletiyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795590340.08887
   }
 ]
