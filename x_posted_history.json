@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "dirk-kuyt-icin-eredivisie-temsilcisi-utrecht-iddiasi",
-    "title": "Dirk Kuyt İçin Eredivisie Temsilcisi Utrecht İddiası",
-    "summary": "Fenerbahçe ile yolları ayrılan Dirk Kuyt'ın, futbola başladığı Utrecht kulübüyle teknik direktörlük görevi için görüşebileceği iddia edildi.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794486940.5758457
-  },
-  {
     "slug": "trump-meksika-sinirindaki-gocmen-hareketliligi-nedeniyle-ek-gumruk-vergisi-tehdi",
     "title": "Trump Meksika Sınırındaki Göçmen Hareketliliği Nedeniyle Ek Gümrük Vergisi Tehdidinde Bulundu",
     "summary": "ABD Başkanı Donald Trump, sınır hattına ilerleyen göçmen gruplarının durdurulmaması halinde Meksika'ya uygulanan gümrük vergilerini iki katına çıkaracağını duyurdu.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795644801.8884835
+  },
+  {
+    "slug": "spacex-sirketinin-uzayda-veri-merkezi-projesine-komisyon-onayi-cikti",
+    "title": "SpaceX şirketinin uzayda veri merkezi projesine komisyon onayı çıktı",
+    "summary": "ABD Federal İletişim Komisyonu, SpaceX şirketinin uzayda veri merkezi kurmak amacıyla yapacağı 1 milyon uydu fırlatma başvurusunu onayladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795647524.318361
   }
 ]
