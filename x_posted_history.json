@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "avrupa-kupalarinin-turkiye-yayin-haklarinda-exxen-ve-tivibu-ortakligi-iddiasi",
-    "title": "Avrupa Kupalarının Türkiye Yayın Haklarında Exxen ve Tivibu Ortaklığı İddiası",
-    "summary": "UEFA kulüp turnuvalarının Türkiye yayın haklarının dört sezonluğuna Exxen ve Tivibu ortaklığı tarafından devralındığı öne sürüldü.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794481487.783284
-  },
-  {
     "slug": "nissan-turkiyeden-onceki-nesil-qashqai-ve-x-trail-modellerine-bakim-avantaji",
     "title": "Nissan Türkiye'den Önceki Nesil Qashqai ve X-Trail Modellerine Bakım Avantajı",
     "summary": "Nissan Türkiye, yaşı ilerleyen popüler SUV modelleri için satış sonrası özel bir servis kampanyası başlattı.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795639360.075982
+  },
+  {
+    "slug": "misirin-giza-kentinde-petrol-tankeri-yangini-faciasi",
+    "title": "Mısır'ın Giza kentinde petrol tankeri yangını faciası",
+    "summary": "Mısır'ın Giza kentinde petrol ürünleri taşıyan bir tankerde çıkan yangın sonucu otuz kişi hayatını kaybederken on beş kişi yaralandı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795642080.8531592
   }
 ]
