@@ -182,15 +182,6 @@
     "ts": 1794369497.014356
   },
   {
-    "slug": "akilli-telefonlarda-depolama-yarisi-ve-tuketici-butcesine-yansiyan-yuksek-maliye",
-    "title": "Akıllı Telefonlarda Depolama Yarışı ve Tüketici Bütçesine Yansıyan Yüksek Maliyet Baskısı",
-    "summary": "Mobil cihaz sektöründe sunulan 2 terabaytlık depolama alanları, tüketicilerin gerçek kullanım ihtiyaçları ile maliyet dengesini yeniden tartışmaya açtı.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794392905.0949547
-  },
-  {
     "slug": "pirelli-ve-zes-is-birligiyle-elektrikli-arac-suruculerine-ozel-sarj-ve-garanti-d",
     "title": "Pirelli ve ZES İş Birliğiyle Elektrikli Araç Sürücülerine Özel Şarj ve Garanti Desteği",
     "summary": "Pirelli, elektrikli ve şarj edilebilir hibrit araçlara yönelik ELECT teknolojili lastik alımlarında ZES ortaklığıyla yeni bir promosyon dönemi başlattı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795563117.1335332
+  },
+  {
+    "slug": "israil-basini-tel-aviv-yonetiminin-olasi-iran-gerilimine-hazirlandigini-yazdi",
+    "title": "İsrail basını Tel Aviv yönetiminin olası İran gerilimine hazırlandığını yazdı",
+    "summary": "İsrail medya kuruluşları Tel Aviv yönetiminin ABD ile İran arasındaki gelişmeleri izlediğini ve gerilimin tırmanma ihtimaline karşı hazırlık yaptığını aktardı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795565838.6511235
   }
 ]
