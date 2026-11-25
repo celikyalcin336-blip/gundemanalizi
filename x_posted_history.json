@@ -182,15 +182,6 @@
     "ts": 1794369497.014356
   },
   {
-    "slug": "pirelli-ve-zes-is-birligiyle-elektrikli-arac-suruculerine-ozel-sarj-ve-garanti-d",
-    "title": "Pirelli ve ZES İş Birliğiyle Elektrikli Araç Sürücülerine Özel Şarj ve Garanti Desteği",
-    "summary": "Pirelli, elektrikli ve şarj edilebilir hibrit araçlara yönelik ELECT teknolojili lastik alımlarında ZES ortaklığıyla yeni bir promosyon dönemi başlattı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794395633.4732683
-  },
-  {
     "slug": "tff-hukuk-musavirligi-super-lig-ve-alt-liglerden-dokuz-kulubu-disipline-sevk-ett",
     "title": "TFF Hukuk Müşavirliği Süper Lig ve Alt Liglerden Dokuz Kulübü Disipline Sevk Etti",
     "status": "skipped",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795565838.6511235
+  },
+  {
+    "slug": "izmirdeki-is-insani-cinayetinde-kizi-ve-soforu-tutuklandi",
+    "title": "İzmirdeki iş insanı cinayetinde kızı ve şoförü tutuklandı",
+    "summary": "İzmirin Urla ilçesinde evinde ölü bulunan iş insanı Bekir Kayabaşının cinayetine ilişkin yürütülen soruşturmada, kızı ve özel şoförünün de aralarında bulunduğu dört şüpheli tutuklandı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795568559.3534677
   }
 ]
