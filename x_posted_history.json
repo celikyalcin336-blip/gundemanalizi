@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "dogadan-toplanan-yabani-mantarlar-olumcul-risk-tasiyor",
-    "title": "Doğadan Toplanan Yabani Mantarlar Ölümcül Risk Taşıyor",
-    "summary": "Sakarya Uygulamalı Bilimler Üniversitesi'nden uzmanlar, yağışlı havalarda artan yabani mantar tüketiminin ciddi sağlık sorunları ve ölüme yol açabileceğini belirtti.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794454455.7977893
-  },
-  {
     "slug": "bakan-kurum-antalyadaki-cop31-bulusmasinda-kuresel-iklim-krizine-karsi-birlik-ca",
     "title": "Bakan Kurum Antalya’daki COP31 Buluşmasında Küresel İklim Krizine Karşı Birlik Çağrısı Yaptı",
     "summary": "Çevre, Şehircilik ve İklim Değişikliği Bakanı Murat Kurum, Antalya NEST Kongre ve Fuar Merkezi'nde düzenlenen yemekte uluslararası katılımcılara hitap etti.",
@@ -3857,5 +3848,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795617581.5060747
+  },
+  {
+    "slug": "israil-saldirilarinda-hayatini-kaybeden-cocuk-ve-ogrenci-sayisi-artiyor",
+    "title": "İsrail saldırılarında hayatını kaybeden çocuk ve öğrenci sayısı artıyor",
+    "summary": "Gazze'deki Eğitim Bakanlığı, İsrail ordusunun Şatii Mülteci Kampı'na düzenlediği saldırıda iki kız kardeşin anne ve babasıyla birlikte hayatını kaybettiğini duyurdu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795620302.32608
   }
 ]
