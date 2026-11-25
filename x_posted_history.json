@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "rush-tip-fakultesi-arastirmasi-sabah-saatlerinde-inme-riskindeki-belirgin-artisi",
-    "title": "Rush Tıp Fakültesi Araştırması Sabah Saatlerinde İnme Riskindeki Belirgin Artışı Ortaya Koydu",
-    "summary": "Rush Tıp Fakültesi tarafından gerçekleştirilen geniş çaplı araştırma, inme vakalarının günün belirli saat dilimlerinde yoğunlaştığını ortaya koydu.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794403534.6660397
-  },
-  {
     "slug": "istanbul-merkezli-kara-para-aklama-operasyonunda-yedi-gozalti",
     "title": "İstanbul Merkezli Kara Para Aklama Operasyonunda Yedi Gözaltı",
     "summary": "Bakırköy Cumhuriyet Başsavcılığı koordinesinde yürütülen soruşturmada, uluslararası yasaklı madde ticaretinden elde edilen suç gelirlerini gayrimenkul yatırımıyla aklayan yedi şüpheli yakalandı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795571281.144605
+  },
+  {
+    "slug": "fitch-ratings-2027-kuresel-ulke-notlari-gorunumunu-notr-acikladi",
+    "title": "Fitch Ratings 2027 küresel ülke notları görünümünü nötr açıkladı",
+    "summary": "Uluslararası kredi derecelendirme kuruluşu Fitch Ratings, küresel büyümenin yatay seyredeceği ve enflasyon baskılarının azalacağı beklentisiyle 2027 yılı küresel ülke notları görünümünü nötr olarak belirledi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795574002.837169
   }
 ]
