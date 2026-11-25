@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "ingiliz-havacilik-devi-easyjet-icin-cok-milyarlik-satis-onayi",
-    "title": "İngiliz Havacılık Devi EasyJet İçin Çok Milyarlık Satış Onayı",
-    "summary": "Küresel havacılık sektöründe dengeleri sarsacak devasa bir sermaye hareketi resmiyet kazandı. Ortakların onayıyla birlikte şirketin Londra Borsası'ndaki uzun soluklu hisse işlem dönemi kapanma eşiğine geldi.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794443550.439193
-  },
-  {
     "slug": "alman-otomotiv-devinin-luks-sedani-audi-a8-uretim-hattina-veda-etti",
     "title": "Alman Otomotiv Devinin Lüks Sedanı Audi A8 Üretim Hattına Veda Etti",
     "summary": "Audi, otuz iki yıllık köklü geçmişe sahip lüks sedan modeli A8’in üretimini sonlandırarak birinci sıra temsilini SUV sınıfındaki Q9 modeline devretti.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795606686.9088857
+  },
+  {
+    "slug": "anthropic-yapay-zeka-araclarini-masaustu-uygulamasina-donusturuyor",
+    "title": "Anthropic yapay zeka araçlarını masaüstü uygulamasına dönüştürüyor",
+    "summary": "Yapay zeka şirketi Anthropic, Claude üzerinden hazırlanan araçların Mac ve Windows bilgisayarlara uygulama olarak yüklenmesini sağlayan yeni özelliğini duyurdu.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795609408.7293298
   }
 ]
