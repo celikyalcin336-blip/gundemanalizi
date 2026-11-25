@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "arlington-ulusal-mezarligindaki-torende-pete-hegseth-vakasi",
-    "title": "Arlington Ulusal Mezarlığındaki Törende Pete Hegseth Vakası",
-    "summary": "Gaziler Günü anma töreninde yüksek sesle konuşan Savunma Bakanı Pete Hegseth anıtın nöbetçi askeri tarafından uyarıldı. Yaşanan bu protokol ihlali kameralar aracılığıyla kamuoyuna yansıdı.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794469616.9172678
-  },
-  {
     "slug": "abd-gida-ve-ilac-dairesinden-zayiflama-ignelerinde-gorme-kaybi-uyarisi",
     "title": "ABD Gıda ve İlaç Dairesinden Zayıflama İğnelerinde Görme Kaybı Uyarısı",
     "summary": "ABD Gıda ve İlaç Dairesi, kullanımı yaygınlaşan zayıflama iğnelerinin etiketlerine ciddi göz hastalığı ve görme kaybı riski uyarısının eklenmesini talep etti.",
@@ -3857,5 +3848,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795631188.8452663
+  },
+  {
+    "slug": "a-milliler-fiba-2027-dunya-kupasi-elemelerinde-italya-ile-karsilasacak",
+    "title": "A milliler FIBA 2027 dünya Kupası elemelerinde İtalya ile karşılaşacak",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795633890.2828739
+  },
+  {
+    "slug": "burak-yilmaz-basaksehir-yenilgisinin-ardindan-takiminin-kirilganligindan-dert",
+    "title": "Burak Yılmaz Başakşehir yenilgisinin ardından takımının kırılganlığından dert yandı",
+    "summary": "Arca Çorum FK Teknik Direktörü Burak Yılmaz, Trendyol Süper Lig'in 12'nci haftasında 4-2 kaybettikleri İstanbul Başakşehir FK mücadelesini değerlendirdi.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795633917.856464
   }
 ]
