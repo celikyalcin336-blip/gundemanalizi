@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "lucid-yeni-elektrikli-suv-modeli-cosmos-icin-uretim-takvimini-guncelledi",
-    "title": "Lucid Yeni Elektrikli SUV Modeli Cosmos İçin Üretim Takvimini Güncelledi",
-    "summary": "ABD merkezli elektrikli araç üreticisi Lucid, yeni orta segment SUV modeli Cosmos'un seri üretimini 2027 yılının ikinci yarısına erteledi.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794416286.9669185
-  },
-  {
     "slug": "ingiltere-yuksek-mahkemesinden-cocuk-kitaplari-yazarinin-yasak-talebine-ret",
     "title": "İngiltere Yüksek Mahkemesinden Çocuk Kitapları Yazarının Yasak Talebine Ret",
     "summary": "Çocuk kitapları yazarı ve eski televizyon jürisi David Walliams hakkında ortaya atılan cinsel istismar suçlamaları yargıya taşındı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795579456.2085624
+  },
+  {
+    "slug": "yapay-zeka-sirketleri-gelismis-yeni-modelleri-kontrol-etmekte-zorlaniyor",
+    "title": "Yapay zeka şirketleri gelişmiş yeni modelleri kontrol etmekte zorlanıyor",
+    "summary": "Anthropic ve OpenAI'ın kamuoyuna sunulanlardan daha gelişmiş modeller geliştirdiği ancak bu sistemlerin güvenliğini sağlamakta zorlandığı bildirildi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795582177.7928736
   }
 ]
