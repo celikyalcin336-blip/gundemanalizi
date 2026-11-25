@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "yari-iletken-devi-tsmcden-yapay-zeka-girisimlerine-dev-finansman",
-    "title": "Yarı İletken Devi TSMC'den Yapay Zeka Girişimlerine Dev Finansman",
-    "summary": "Yarı iletken sektörünün küresel lideri TSMC, yönetim kurulu kararıyla OpenAI ve Anthropic'e 500'er milyon dolara kadar yatırım yapma planını onayladı.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794438102.313677
-  },
-  {
     "slug": "kahramanmarastaki-okul-saldirisinin-guvenlik-kamerasi-ve-hts-inceleme-tutanaklar",
     "title": "Kahramanmaraş'taki Okul Saldırısının Güvenlik Kamerası ve HTS İnceleme Tutanakları",
     "summary": "Kahramanmaraş Ayser Çalık Ortaokulu'nda 15 Nisan tarihinde gerçekleştirilen silahlı saldırıya ilişkin kamera ve HTS inceleme tutanakları ortaya çıktı.",
@@ -3850,5 +3841,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795601235.4251342
+  },
+  {
+    "slug": "abddeki-mahkemede-juri-huaweiyi-yoneltilen-10-suclamadan-mahkum-etti",
+    "title": "ABD'deki mahkemede jüri Huawei'yi yöneltilen 10 suçlamadan mahkum etti",
+    "summary": "New York'taki federal mahkemede görülen davada jüri, Çinli teknoloji şirketi Huawei'yi karşı karşıya olduğu 12 suçlamanın 10'undan suçlu buldu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795603964.88212
   }
 ]
