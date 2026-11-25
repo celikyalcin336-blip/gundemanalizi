@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "hyper-x-cloud-alpha-air-modelinin-turkiye-piyasasindaki-konumu",
-    "title": "Hyper X Cloud Alpha Air Modelinin Türkiye Piyasasındaki Konumu",
-    "summary": "Markanın ilk açık arkalı tasarıma sahip oyuncu kulaklığı Türkiye pazarında yerini aldı. Donanım, ses dalgalarını geniş alana yayarak rekabetçi nişancı yapımlarında rakiplerin konumunu tespit etmeyi kolaylaştırıyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794463860.3747425
-  },
-  {
     "slug": "koleksiyonluk-dusuk-yakit-tuketimli-volkswagen-modeli-muzayedede",
     "title": "Koleksiyonluk Düşük Yakıt Tüketimli Volkswagen Modeli Müzayedede",
     "summary": "Volkswagen markasının sıra dışı tasarıma sahip iki kişilik hibrit modeli, düşük kilometresiyle açık artırma yoluyla satışa sunuldu.",
@@ -3857,5 +3848,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795625745.767081
+  },
+  {
+    "slug": "hsk-mazeret-kararnamesiyle-957-hakim-ve-savcinin-gorev-yeri-degisti",
+    "title": "HSK mazeret kararnamesiyle 957 hakim ve savcının görev yeri değişti",
+    "summary": "Hakimler ve Savcılar Kurulu Birinci Dairesi tarafından yayımlanan mazeret kararnamesiyle adli ve idari yargıda görev yapan 957 ismin ataması gerçekleştirildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795628467.1152296
   }
 ]
