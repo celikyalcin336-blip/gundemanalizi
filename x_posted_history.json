@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "koleksiyonluk-dusuk-yakit-tuketimli-volkswagen-modeli-muzayedede",
-    "title": "Koleksiyonluk Düşük Yakıt Tüketimli Volkswagen Modeli Müzayedede",
-    "summary": "Volkswagen markasının sıra dışı tasarıma sahip iki kişilik hibrit modeli, düşük kilometresiyle açık artırma yoluyla satışa sunuldu.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794466586.2171948
-  },
-  {
     "slug": "arlington-ulusal-mezarligindaki-torende-pete-hegseth-vakasi",
     "title": "Arlington Ulusal Mezarlığındaki Törende Pete Hegseth Vakası",
     "summary": "Gaziler Günü anma töreninde yüksek sesle konuşan Savunma Bakanı Pete Hegseth anıtın nöbetçi askeri tarafından uyarıldı. Yaşanan bu protokol ihlali kameralar aracılığıyla kamuoyuna yansıdı.",
@@ -3857,5 +3848,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795628467.1152296
+  },
+  {
+    "slug": "turk-somonu-ihracati-otuz-yedi-ulkeye-ulasti",
+    "title": "Türk somonu ihracatı otuz yedi ülkeye ulaştı",
+    "summary": "Karadeniz'de yetiştirilerek işlenen Türk somonu, yılın ilk dokuz ayında otuz yedi farklı ülkeye ihraç edildi. Gerçekleştirilen bu dış satım faaliyetleriyle milyonlarca dolar gelir sağlandı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795631188.8452663
   }
 ]
