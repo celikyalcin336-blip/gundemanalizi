@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "uluslararasi-para-fonu-kuresel-enflasyon-tahminini-uzun-vadeye-yaydi",
-    "title": "Uluslararası Para Fonu Küresel Enflasyon Tahminini Uzun Vadeye Yaydı",
-    "summary": "Uluslararası Para Fonu, Amerika Birleşik Devletleri'nde enflasyonun hedeflenen orana ulaşma takvimini ileri bir tarihe erteledi.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794526408.517494
-  },
-  {
     "slug": "malatyadaki-askeri-helikopter-kazasinda-dort-personel-sehit-oldu",
     "title": "Malatya'daki Askeri Helikopter Kazasında Dört Personel Şehit Oldu",
     "summary": "Milli Savunma Bakanlığı, Malatya'nın Yeşilyurt ilçesinde S-70 tipi bir askeri helikopterin henüz bilinmeyen bir nedenle kaza kırıma uğradığını ve dört askerin şehit düştüğünü açıkladı.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795677468.930882
+  },
+  {
+    "slug": "makineye-sikisan-eli-dokuz-bucuk-saatlik-operasyonla-kurtarildi",
+    "title": "Makineye sıkışan eli dokuz buçuk saatlik operasyonla kurtarıldı",
+    "summary": "Makineye elini kaptıran hasta, hastanede gerçekleştirilen dokuz buçuk saatlik cerrahi müdahaleyle sağlığına kavuşturuldu. Uzman hekimler, kirli yaralanmalarda enfeksiyon riskine karşı yakın takibin sürdüğünü belirtti.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795680191.3351598
   }
 ]
