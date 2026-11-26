@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "meteoroloji-genel-mudurlugu-sonbahar-donemi-sicaklik-tahminlerini-acikladi",
-    "title": "Meteoroloji Genel Müdürlüğü Sonbahar Dönemi Sıcaklık Tahminlerini Açıkladı",
-    "summary": "Meteoroloji Genel Müdürlüğü, ülke genelindeki güncel hava tahmin raporunu paylaşarak belirli kıyı ve Karadeniz illeri için sağanak yağış uyarısında bulundu.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794550938.618222
-  },
-  {
     "slug": "milyonlarca-ogrenci-icin-dokuz-gunluk-birinci-donem-ara-tatili-basliyor",
     "title": "Milyonlarca Öğrenci İçin Dokuz Günlük Birinci Dönem Ara Tatili Başlıyor",
     "summary": "Milli Eğitim Bakanlığına bağlı ilk ve ortaöğretim kurumlarında eğitim gören milyonlarca öğrenci için ilk ara tatil dönemi resmen başlıyor.",
@@ -3871,5 +3862,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795702286.0283139
+  },
+  {
+    "slug": "eski-tbmm-baskani-hikmet-cetin-hastanedeki-torenin-ardindan-ankaraya-ugurlandi",
+    "title": "Eski TBMM Başkanı Hikmet Çetin hastanedeki törenin ardından Ankara'ya uğurlandı",
+    "summary": "Tedavi gördüğü hastanede salı günü vefat eden eski TBMM Başkanı ve CHP 5'inci Genel Başkanı Hikmet Çetin için İstanbul'da veda töreni düzenlendi. Törenin ardından Çetin'in cenazesi defnedilmek üzere Ankara'ya gönderildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795705008.033243
   }
 ]
