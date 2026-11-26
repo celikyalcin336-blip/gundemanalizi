@@ -192,6 +192,64 @@ SPECIAL_DOSSIERS: List[Dict] = [
 <h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">31 Aralık 2026 Mesai Bitimine Kadar Dikkat Edilecek İşlemler</h2>
 <p class="text-slate-800 leading-relaxed mb-4">Pasaport yenileyecek, yeni ehliyet harcı yatıracak veya yurt dışından getirdiği telefonun IMEI kaydını tamamlayacak vatandaşlar için <strong>31 Aralık 2026</strong> tarihi belirleyici sınır niteliği taşıyor. Harç ödemesinin 2026 yılı içinde Gelir İdaresi Başkanlığı (Dijital Vergi Dairesi) veya anlaşmalı bankalar üzerinden yatırılması ve ilgili başvurunun yıl kapanmadan sisteme işlenmesi halinde 2026 tarifesi geçerli oluyor. 1 Ocak 2027 saat 00.00 itibarıyla tamamlanmamış başvurularda yeni tarife farkı tahsil ediliyor. Aynı döneme denk gelen emekli ve memur maaş zammı takvimini de <a href="/dosya/emekli-ve-memur-zammi" class="text-red-600 font-semibold hover:underline">Emekli ve Memur Zammı Dosyası</a> üzerinden takip edebilirsiniz.</p>""",
     },
+    {
+        "key": "special_dossier_2026_11_26_osym_meb_2027_takvim",
+        "title": "ÖSYM 2027 sınav takvimi ve MEB tatil rehberi: YKS, KPSS, LGS, MSÜ ve 15 tatil resmi tarih tablosu",
+        "summary": "ÖSYM ve Millî Eğitim Bakanlığı'nın yayımladığı 2027 resmi takvimiyle YKS (19–20 Haziran), LGS (13 Haziran), MSÜ (20 Mart), MEB-AGS (8–9 Mayıs), DGS (18 Temmuz) ve KPSS A Grubu (12–19 Eylül) başvuru, sınav ve sonuç günleri ile 15 tatil takvimi kesinleşti.",
+        "category": "Eğitim",
+        "source": "Gündem Analizi Özel",
+        "image_filename": "post_ozel_20261126_sinav2027.jpg",
+        "image_candidates": [
+            "https://trthaberstatic.cdn.wp.trt.com.tr/resimler/1572000/lgsve-yks-1572887.jpg",
+            "https://trthaberstatic.cdn.wp.trt.com.tr/resimler/1690000/osym-aa-1690834.jpg",
+        ],
+        "tg_bullets": [
+            "2027-YKS 19–20 Haziran'da (başvurular 4 Şubat–2 Mart), 2027 LGS ise 13 Haziran Pazar günü yapılacak.",
+            "MSÜ (20 Mart), MEB-AGS/ÖABT (8–9 Mayıs), DGS (18 Temmuz) ve KPSS A Grubu (12–19 Eylül) tüm başvuru ve sonuç tarihleri tek tabloda.",
+            "MEB 2026–2027 takvimi: 15 tatil 25 Ocak–5 Şubat 2027, 2. ara tatil 8–12 Mart 2027, yaz tatili 25 Haziran 2027.",
+        ],
+        "content": """<p class="lead font-medium text-lg text-slate-900 mb-6">Ölçme, Seçme ve Yerleştirme Merkezi (ÖSYM) ile Millî Eğitim Bakanlığı'nın (MEB) yayımladığı 2027 yılı resmi sınav uygulama ve çalışma takvimleriyle milyonlarca öğrenci, öğretmen adayı ve kamu personeli adayının yıl boyu izleyeceği takvim netleşti. Başvuru pencerelerinin kaçırılmaması, geç başvuru ek ücretine kalınmaması ve dönem tatillerine göre çalışma planının kurulması için tüm birincil resmi tarihler tek rehberde toplandı.</p>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">ÖSYM 2027 Merkezi Sınav Takvimi: Başvuru, Sınav ve Sonuç Günleri</h2>
+<p class="text-slate-800 leading-relaxed mb-4">ÖSYM'nin <strong>osym.gov.tr</strong> üzerinden ilan ettiği 2027 takvimine göre yılın ilk büyük merkezi oturumu 20 Mart'ta yapılacak <strong>2027-MSÜ</strong> olacak; başvurular 13 Ocak'ta açılacak. Üniversite adaylarının beklediği <strong>2027-YKS</strong> başvuruları 4 Şubat–2 Mart 2027 arasında alınacak, Temel Yeterlilik Testi (TYT) 19 Haziran Cumartesi, Alan Yeterlilik Testleri (AYT) ile Yabancı Dil Testi (YDT) 20 Haziran Pazar günü gerçekleştirilecek.</p>
+<p class="text-slate-800 leading-relaxed mb-4">Öğretmen adaylarının katılacağı <strong>2027-MEB-AGS</strong> 8 Mayıs'ta, Öğretmenlik Alan Bilgisi Testi (ÖABT) ise 9 Mayıs'ta uygulanacak. Lisans mezunlarına yönelik <strong>2027-KPSS A Grubu</strong> Genel Yetenek–Genel Kültür oturumu 12 Eylül'de, Alan Bilgisi oturumları ise 18–19 Eylül 2027 tarihlerinde düzenlenecek.</p>
+
+<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">
+<thead><tr class="bg-slate-100 text-slate-900 font-bold">
+<th class="p-2.5 border border-slate-200">Sınav Adı (2027)</th>
+<th class="p-2.5 border border-slate-200">Başvuru Tarihleri</th>
+<th class="p-2.5 border border-slate-200">Sınav Tarihi</th>
+<th class="p-2.5 border border-slate-200">Sonuç Açıklama</th>
+</tr></thead>
+<tbody>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2027-MSÜ (Millî Savunma Üni.)</td><td class="p-2.5 border border-slate-200">13 Ocak – 10 Şubat 2027</td><td class="p-2.5 border border-slate-200 font-bold">20 Mart 2027</td><td class="p-2.5 border border-slate-200">15 Nisan 2027</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2027-MEB-AGS ve ÖABT</td><td class="p-2.5 border border-slate-200">19 – 29 Mart 2027</td><td class="p-2.5 border border-slate-200 font-bold">8 – 9 Mayıs 2027</td><td class="p-2.5 border border-slate-200">11 Haziran 2027</td></tr>
+<tr class="border-b border-slate-200 bg-red-50/60"><td class="p-2.5 border border-slate-200 font-bold text-slate-900">2027 LGS (MEB Merkezi Sınav)</td><td class="p-2.5 border border-slate-200">MEB kılavuzuyla ilan edilecek</td><td class="p-2.5 border border-slate-200 font-extrabold text-red-600">13 Haziran 2027 Pazar</td><td class="p-2.5 border border-slate-200">MEB takvimine göre</td></tr>
+<tr class="border-b border-slate-200 bg-red-50/60"><td class="p-2.5 border border-slate-200 font-bold text-slate-900">2027-YKS (TYT • AYT • YDT)</td><td class="p-2.5 border border-slate-200">4 Şubat – 2 Mart 2027<br><span class="text-[11px] text-slate-500">Geç başvuru: 16–18 Mart</span></td><td class="p-2.5 border border-slate-200 font-extrabold text-red-600">19 – 20 Haziran 2027</td><td class="p-2.5 border border-slate-200 font-bold">21 Temmuz 2027</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2027-DGS (Dikey Geçiş)</td><td class="p-2.5 border border-slate-200">ÖSYM AİS üzerinden</td><td class="p-2.5 border border-slate-200 font-bold">18 Temmuz 2027</td><td class="p-2.5 border border-slate-200">12 Ağustos 2027</td></tr>
+<tr><td class="p-2.5 border border-slate-200 font-semibold">2027-KPSS A Grubu (GY-GK / Alan)</td><td class="p-2.5 border border-slate-200">8 – 19 Temmuz 2027<br><span class="text-[11px] text-slate-500">Geç başvuru: 28–29 Temmuz</span></td><td class="p-2.5 border border-slate-200 font-bold">12 Eylül / 18–19 Eylül 2027</td><td class="p-2.5 border border-slate-200">13 Ekim 2027</td></tr>
+</tbody></table></div>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">MEB 2026–2027 Eğitim Yılı Çalışma ve Tatil Takvimi</h2>
+<p class="text-slate-800 leading-relaxed mb-4">Millî Eğitim Bakanlığı'nın 81 ile gönderdiği 2026–2027 çalışma takvimine göre ilk ara tatil 16–20 Kasım 2026 tarihlerinde tamamlandı. İlk dönemin son ders zili <strong>22 Ocak 2027 Cuma</strong> günü çalacak; öğrenciler hafta sonlarıyla birlikte 16 gün sürecek yarıyıl tatiline (15 tatil) çıkacak. İkinci dönem <strong>8 Şubat 2027 Pazartesi</strong> başlayacak, ikinci ara tatil ise Ramazan Bayramı haftasıyla aynı döneme denk gelen <strong>8–12 Mart 2027</strong> tarihleri arasında uygulanacak.</p>
+
+<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse border border-slate-200 text-xs sm:text-sm">
+<thead><tr class="bg-slate-100 text-slate-900 font-bold">
+<th class="p-2.5 border border-slate-200">MEB 2026–2027 Dönem Aşaması</th>
+<th class="p-2.5 border border-slate-200">Resmi Tarih Aralığı</th>
+<th class="p-2.5 border border-slate-200">Not</th>
+</tr></thead>
+<tbody>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">1. Dönem Karne Günü</td><td class="p-2.5 border border-slate-200 font-bold">22 Ocak 2027 Cuma</td><td class="p-2.5 border border-slate-200 text-slate-600">İlk dönemin son ders günü</td></tr>
+<tr class="border-b border-slate-200 bg-red-50/60"><td class="p-2.5 border border-slate-200 font-bold text-slate-900">Yarıyıl Tatili (15 Tatil / Sömestr)</td><td class="p-2.5 border border-slate-200 font-extrabold text-red-600">25 Ocak – 5 Şubat 2027</td><td class="p-2.5 border border-slate-200 text-slate-600">Hafta sonları dahil 16 gün</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2. Dönem Başlangıcı</td><td class="p-2.5 border border-slate-200 font-bold">8 Şubat 2027 Pazartesi</td><td class="p-2.5 border border-slate-200 text-slate-600">Ders zili yeniden çalıyor</td></tr>
+<tr class="border-b border-slate-200"><td class="p-2.5 border border-slate-200 font-semibold">2. Dönem Ara Tatili</td><td class="p-2.5 border border-slate-200 font-bold">8 – 12 Mart 2027</td><td class="p-2.5 border border-slate-200 text-slate-600">Ramazan Bayramı haftasıyla eş zamanlı</td></tr>
+<tr><td class="p-2.5 border border-slate-200 font-semibold">Yaz Tatili (Karnelerin Dağıtımı)</td><td class="p-2.5 border border-slate-200 font-bold">25 Haziran 2027 Cuma</td><td class="p-2.5 border border-slate-200 text-slate-600">2026–2027 eğitim yılı kapanışı</td></tr>
+</tbody></table></div>
+
+<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3">Adayların Başvuru Öncesi Kontrol Etmesi Gereken 3 Kural</h2>
+<p class="text-slate-800 leading-relaxed mb-4">ÖSYM Aday İşlemleri Sistemi (AİS) üzerinden yapılan tüm 2027 başvurularında fotoğraf geçerlilik süresi (son 50 ay) ile e-Devlet/kimlik kartı doğrulaması zorunlu tutuluyor. Geç başvuru günlerinde sınav ücreti yüzde 50 artırımlı tahsil edildiği için adayların normal başvuru süresi içinde (YKS için en geç 2 Mart 2027, MSÜ için en geç 10 Şubat 2027) işlemlerini tamamlaması önem taşıyor. Sınav kılavuzları, oturum süreleri ve yıl içindeki son dakika değişikliklerini <a href="/dosya/sinav-takvimi" class="text-red-600 font-semibold hover:underline">ÖSYM ve MEB Sınav Dosyası</a> sayfamızdan canlı kronolojiyle takip edebilirsiniz.</p>""",
+    },
 ]
 
 
