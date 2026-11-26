@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "bes-ilde-tasinmaz-satisi-ve-orduda-kiralama-ihalesi-basliyor",
-    "title": "Beş İlde Taşınmaz Satışı ve Ordu'da Kiralama İhalesi Başlıyor",
-    "summary": "Beş farklı ildeki yerel yönetimler ile Milli Emlak birimleri, toplam muhammen bedeli 1 milyar 621 milyon lirayı aşan yirmi beş gayrimenkulü satışa sunarken Ordu'da on sekiz taşınmaz kiraya verilecek.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794534581.5899785
-  },
-  {
     "slug": "ispanya-deplasmanda-cekya-macini-kazanarak-grupta-fire-vermedi",
     "title": "İspanya Deplasmanda Çekya Maçını Kazanarak Grupta Fire Vermedi",
     "status": "skipped",
@@ -3864,5 +3855,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795685633.8539374
+  },
+  {
+    "slug": "genc-futbolcu-diabateden-newcastle-united-transferi-ve-hedefleri-uzerine",
+    "title": "Genç futbolcu Diabate'den Newcastle United transferi ve hedefleri üzerine açıklamalar",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795688334.9694057
+  },
+  {
+    "slug": "prosus-found-her-challenge-programinda-uc-turk-girisim-hibe-kazandi",
+    "title": "Prosus Found HER challenge programında üç Türk girişim hibe kazandı",
+    "summary": "Kadın kurucuların liderliğindeki teknoloji girişimlerini destekleyen Prosus Found HER Challenge programının Türkiye finali tamamlandı. Yarışmada dereceye giren üç girişim toplam 100 bin dolar karşılıksız hibe aldı.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795688354.9127061
   }
 ]
