@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "abd-bebek-mamasi-piyasasinda-rekor-fiyat-artisi-ve-sektorel-yapilanma-dalgasi",
-    "title": "ABD Bebek Maması Piyasasında Rekor Fiyat Artışı ve Sektörel Yapılanma Dalgası",
-    "summary": "Amerika Birleşik Devletleri'nde bebek maması ve gıdalarında ekim ayında tarihi bir fiyat artışı yaşanırken, üretici şirketler maliyet ile güvenlik krizleri nedeniyle kurumsal yapılarını değiştiriyor.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794520960.0009542
-  },
-  {
     "slug": "anadolu-efes-avrupa-ligi-randevusunda-virtus-bolognayi-agirliyor",
     "title": "Anadolu Efes Avrupa Ligi Randevusunda Virtus Bologna'yı Ağırlıyor",
     "summary": "Anadolu Efes, Basketbol Avrupa Ligi on birinci hafta mücadelesinde yarın İtalyan temsilcisi Virtus Bologna ile sahasında karşılaşacak.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795672017.0755622
+  },
+  {
+    "slug": "hazirlanan-egitim-raporu-matematik-olimpiyatlarinda-madalya-kazanan-genclerin",
+    "title": "Hazırlanan eğitim raporu matematik olimpiyatlarında madalya kazanan gençlerin durumunu inceledi",
+    "summary": "Enstitü Sosyal tarafından hazırlanan eğitim raporu, uluslararası matematik olimpiyatlarında madalya kazanan gençlerin kariyer yolculuklarını ve yurt dışına gitme oranlarını inceledi.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795674739.2656298
   }
 ]
