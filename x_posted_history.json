@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "milli-egitim-bakanligindan-okullara-yerli-robotik-kit-ve-yenilikci-sinif-hamlesi",
-    "title": "Milli Eğitim Bakanlığından Okullara Yerli Robotik Kit ve Yenilikçi Sınıf Hamlesi",
-    "summary": "Milli Eğitim Bakanlığı, dijital dönüşüm çalışmaları doğrultusunda okullardaki bilişim teknolojileri laboratuvarı ve yenilikçi sınıf sayılarını artırarak teknoloji odaklı eğitimi yaygınlaştırmayı hedefliyor.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794572721.3266113
-  },
-  {
     "slug": "old-trafford-kulubesinde-mali-bilanco-manchester-united-yonetiminin-teknik-adam-",
     "title": "Old Trafford Kulübesinde Mali Bilanço: Manchester United Yönetiminin Teknik Adam Çıkmazı",
     "status": "skipped",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795724072.88211
+  },
+  {
+    "slug": "avrupa-merkez-bankasi-tutanaklarinda-kalici-enflasyon-baskisi-uyarisi",
+    "title": "Avrupa Merkez Bankası tutanaklarında kalıcı enflasyon baskısı uyarısı",
+    "summary": "Avrupa Merkez Bankası'nın Frankfurt'ta gerçekleştirilen para politikası toplantısının tutanakları yayımlandı. Tutanaklarda enerji fiyatlarındaki artışın enflasyon üzerindeki kalıcı baskı riskini artırdığı vurgulandı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795726795.1480186
   }
 ]
