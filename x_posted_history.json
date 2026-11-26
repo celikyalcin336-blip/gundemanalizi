@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "istanbul-merkezli-yuksek-kazanc-vaatli-kripto-varlik-dolandiriciligi-operasyonun",
-    "title": "İstanbul merkezli yüksek kazanç vaatli kripto varlık dolandırıcılığı operasyonunda dört gözaltı",
-    "summary": "Kripto para yatırımı vaadiyle vatandaşları mağdur eden suç örgütü, emniyet birimlerinin çalışmasıyla çökertildi.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794564553.7394607
-  },
-  {
     "slug": "irlanda-merkezli-fly4-airlines-green-mali-kriz-nedeniyle-tasfiye-surecini-baslat",
     "title": "İrlanda Merkezli Fly4 Airlines Green Mali Kriz Nedeniyle Tasfiye Sürecini Başlattı",
     "summary": "Dublin merkezli bölgesel havayolu firması Fly4 Airlines Green, artan yakıt maliyetleri ve zararlar gerekçesiyle İrlanda Yüksek Mahkemesine başvurarak tasfiye sürecine girdi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795715907.1962829
+  },
+  {
+    "slug": "milli-egitim-bakanligi-2027-yili-akademi-giris-sinavi-takvimini-guncelledi",
+    "title": "Milli eğitim Bakanlığı 2027 yılı Akademi Giriş sınavı takvimini güncelledi",
+    "summary": "Milli Eğitim Bakanı Yusuf Tekin, Ankara'da yaptığı açıklamada 2027 yılı Akademi Giriş Sınavı'nın mayıs ayında yapılacağını duyurdu.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795718628.9501736
   }
 ]
