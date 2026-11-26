@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "malatyadaki-askeri-helikopter-kazasinda-dort-personel-sehit-oldu",
-    "title": "Malatya'daki Askeri Helikopter Kazasında Dört Personel Şehit Oldu",
-    "summary": "Milli Savunma Bakanlığı, Malatya'nın Yeşilyurt ilçesinde S-70 tipi bir askeri helikopterin henüz bilinmeyen bir nedenle kaza kırıma uğradığını ve dört askerin şehit düştüğünü açıkladı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794529133.1020968
-  },
-  {
     "slug": "uykusuzlugun-siber-guvenlik-aciklari-uzerindeki-kritik-etkisi",
     "title": "Uykusuzluğun Siber Güvenlik Açıkları Üzerindeki Kritik Etkisi",
     "summary": "California Üniversitesi araştırmacıları, çalışanların uyku eksikliği yaşadığı dönemlerde sahte e-postalardaki oltalama bağlantılarına karşı daha savunmasız hale geldiğini ortaya koydu.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795680191.3351598
+  },
+  {
+    "slug": "elon-musk-abd-merkezli-spacex-uzerinden-her-cocuga-iki-hisse-devredecek",
+    "title": "Elon Musk ABD merkezli SpaceX üzerinden her çocuğa iki hisse devredecek",
+    "summary": "Elon Musk, ABD'deki 18 yaş altındaki çocuklara SpaceX şirketinden ikişer adet hisse senedi verileceğini açıkladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795682912.7877676
   }
 ]

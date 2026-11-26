@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-26 11:03:11",
+  "last_check": "2026-11-26 11:48:32",
   "result": "posted",
-  "last_post": "2026-11-26 11:03:11",
-  "next_planned": "2026-11-26 11:48:11",
+  "last_post": "2026-11-26 11:48:32",
+  "next_planned": "2026-11-26 12:33:32",
   "runner": "github-actions",
-  "log_tail": "[2026-11-26 08:02:49] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: ABD'de tek doz kızamık aşısı olan m... (Birebir slug eşleşmesi: abdde-tek-doz-kizamik-asisi-olan-milyonlarca-yetiskin-icin-risk-uyarisi)\n🎯 [X Paylaşım Adayı] Kategori: Sağlık | Virallik/Duygu Skoru: 180 | Başlık: Makineye sıkışan eli dokuz buçuk saatlik operasyonla kurtarıldı\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795680170.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Makineye sıkışan eli dokuz buçuk saatlik operasyonla kurtarıldı\n"
+  "log_tail": "[2026-11-26 08:48:11] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Dünya | Virallik/Duygu Skoru: 195 | Başlık: Elon Musk ABD merkezli SpaceX üzerinden her çocuğa iki hisse devredecek\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795682893.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Elon Musk ABD merkezli SpaceX üzerinden her çocuğa iki hisse devredecek\n"
 }
