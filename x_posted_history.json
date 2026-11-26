@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "samil-tayyardan-fon-skandali-ve-kisisel-haklar-cikisi",
-    "title": "Şamil Tayyar'dan Fon Skandalı ve Kişisel Haklar Çıkışı",
-    "summary": "Eski milletvekili Şamil Tayyar, fon mağduriyeti iddialarına ilişkin listede yer alan isimlerin gizliliğini ve kamuoyuna yansıma biçimini eleştirdi.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794545475.4822767
-  },
-  {
     "slug": "ankarada-hirsizlik-ihbariyla-yakalanan-zanlinin-153-yil-hapis-cezasi-bulundugu-a",
     "title": "Ankara'da Hırsızlık İhbarıyla Yakalanan Zanlının 153 Yıl Hapis Cezası Bulunduğu Anlaşıldı",
     "summary": "Ankara'nın Sincan ilçesinde bir iş yerinden hırsızlık yapıldığı ihbarı üzerine harekete geçen emniyet güçleri, düzenledikleri operasyonla şüpheli G. A.'yı yakaladı.",
@@ -3871,5 +3862,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795696841.9632955
+  },
+  {
+    "slug": "new-yorkta-geleneksel-sukran-gunu-yuruyusu-siddetli-firtina-uyarisiyla-ertelendi",
+    "title": "New York'ta geleneksel Şükran günü yürüyüşü şiddetli fırtına uyarısıyla ertelendi",
+    "summary": "ABD'nin doğu kıyısını etkisi altına alan kuzeydoğu fırtınası sebebiyle New York'taki geleneksel Şükran Günü geçit töreni ertelendi.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795699563.7970114
   }
 ]
