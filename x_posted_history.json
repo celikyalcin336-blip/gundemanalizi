@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "cinli-bilim-insanlarindan-mikroplastik-kirliligine-karsi-lifli-beslenme-arastirm",
-    "title": "Çinli Bilim İnsanlarından Mikroplastik Kirliliğine Karşı Lifli Beslenme Araştırması",
-    "summary": "Güney Çin Teknoloji Enstitüsü tarafından yürütülen araştırma, lifli gıdaların mikroplastiklerin vücuttan atılmasına katkı sunduğunu ortaya koydu.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794561830.4028761
-  },
-  {
     "slug": "istanbul-merkezli-yuksek-kazanc-vaatli-kripto-varlik-dolandiriciligi-operasyonun",
     "title": "İstanbul merkezli yüksek kazanç vaatli kripto varlık dolandırıcılığı operasyonunda dört gözaltı",
     "summary": "Kripto para yatırımı vaadiyle vatandaşları mağdur eden suç örgütü, emniyet birimlerinin çalışmasıyla çökertildi.",
@@ -3871,5 +3862,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795713184.5829031
+  },
+  {
+    "slug": "mika-hakkinen-akmdeki-soyleside-istanbul-parki-degerlendirdi",
+    "title": "Mika Hakkinen AKM'deki söyleşide İstanbul Park'ı değerlendirdi",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795715886.0098526
+  },
+  {
+    "slug": "whatsapp-yurt-disi-seyahatleri-icin-esim-hizmeti-hazirliginda",
+    "title": "Whatsapp yurt dışı seyahatleri için esim hizmeti hazırlığında",
+    "summary": "WhatsApp, sık seyahat eden kullanıcıların yerel SIM kart arama derdine son vermek için doğrudan uygulama üzerinden eSIM kurulumu ve veri paketi satın alımı sağlayan yeni bir özellik geliştiriyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795715907.1962829
   }
 ]
