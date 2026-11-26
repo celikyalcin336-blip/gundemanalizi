@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "uykusuzlugun-siber-guvenlik-aciklari-uzerindeki-kritik-etkisi",
-    "title": "Uykusuzluğun Siber Güvenlik Açıkları Üzerindeki Kritik Etkisi",
-    "summary": "California Üniversitesi araştırmacıları, çalışanların uyku eksikliği yaşadığı dönemlerde sahte e-postalardaki oltalama bağlantılarına karşı daha savunmasız hale geldiğini ortaya koydu.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794531857.815497
-  },
-  {
     "slug": "bes-ilde-tasinmaz-satisi-ve-orduda-kiralama-ihalesi-basliyor",
     "title": "Beş İlde Taşınmaz Satışı ve Ordu'da Kiralama İhalesi Başlıyor",
     "summary": "Beş farklı ildeki yerel yönetimler ile Milli Emlak birimleri, toplam muhammen bedeli 1 milyar 621 milyon lirayı aşan yirmi beş gayrimenkulü satışa sunarken Ordu'da on sekiz taşınmaz kiraya verilecek.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795682912.7877676
+  },
+  {
+    "slug": "federal-mahkeme-donald-trumpin-dogustan-vatandaslik-kararini-durdurdu",
+    "title": "Federal mahkeme Donald Trump'ın doğuştan vatandaşlık kararını durdurdu",
+    "summary": "ABD federal mahkemesi, Başkan Donald Trump'ın doğuştan vatandaşlığı kısıtlamayı hedefleyen kararnamelerinin uygulanmasını durdurdu. Yargıç Christopher Cooper, bu tür istisnaların getirilemeyeceğine hükmetti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795685633.8539374
   }
 ]
