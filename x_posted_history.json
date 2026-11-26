@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "ingilterede-yuz-tanima-teknolojisi-haksiz-tutuklama-riskini-artiriyor",
-    "title": "İngiltere'de Yüz Tanıma Teknolojisi Haksız Tutuklama Riskini Artırıyor",
-    "summary": "İngiltere'de hazırlanan resmi bir denetçi raporu, polisin geriye dönük yüz tanıma sistemini kullanırken veri doğruluğunu yeterince teyit etmediğini ortaya koydu.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794540028.5711493
-  },
-  {
     "slug": "uzmanlardan-covid-19-ve-zaturre-vakalarindaki-artis-icin-kritik-uyarilar",
     "title": "Uzmanlardan Covid-19 ve Zatürre Vakalarındaki Artış İçin Kritik Uyarılar",
     "summary": "Göğüs Hastalıkları Uzmanı Prof. Dr. Şevket Özkaya, Dünya Zatürre Günü kapsamında yaptığı açıklamada Covid-19 ile birlikte zatürre vakalarının yeniden görülmeye başladığını bildirdi.",
@@ -3871,5 +3862,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795691077.9994016
+  },
+  {
+    "slug": "abd-baskan-yardimcisi-vanceten-jensen-huang-aciklamasi",
+    "title": "ABD başkan Yardımcısı Vance'ten Jensen Huang açıklaması",
+    "summary": "Amerika Birleşik Devletleri Başkan Yardımcısı Vance, Nvidia CEO'su Jensen Huang'ın affa ihtiyacı olmadığını ve hakkında federal soruşturma yürütülmediğini belirtti.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795693799.457767
   }
 ]
