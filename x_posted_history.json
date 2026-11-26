@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "koleksiyon-pazarinda-tarih-yazan-nadir-italyan-spor-otomobil-satisi",
-    "title": "Koleksiyon Pazarında Tarih Yazan Nadir İtalyan Spor Otomobil Satışı",
-    "summary": "Sadece pist kullanımı için üretilen nadir bir model, kamu müzayedesinde rekor bir rakamla alıcı buldu. İsviçre'deki organizasyon, prestijli koleksiyon araçlarının yüksek piyasa değerini bir kez daha kanıtladı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794559106.860213
-  },
-  {
     "slug": "cinli-bilim-insanlarindan-mikroplastik-kirliligine-karsi-lifli-beslenme-arastirm",
     "title": "Çinli Bilim İnsanlarından Mikroplastik Kirliliğine Karşı Lifli Beslenme Araştırması",
     "summary": "Güney Çin Teknoloji Enstitüsü tarafından yürütülen araştırma, lifli gıdaların mikroplastiklerin vücuttan atılmasına katkı sunduğunu ortaya koydu.",
@@ -3871,5 +3862,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795710463.206711
+  },
+  {
+    "slug": "trump-ekonomik-verilerin-revize-edilmesi-sonrasinda-resmi-sorusturma-acilmasini",
+    "title": "Trump ekonomik verilerin revize edilmesi sonrasında resmi soruşturma açılmasını istedi",
+    "summary": "ABD Başkanı Donald Trump, üçüncü çeyrek büyüme verisinin yukarı yönlü revize edilmesinin ardından seçim öncesi açıklanan rakamların sahte olduğunu öne sürdü.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795713184.5829031
   }
 ]
