@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "anadolu-efes-avrupa-ligi-randevusunda-virtus-bolognayi-agirliyor",
-    "title": "Anadolu Efes Avrupa Ligi Randevusunda Virtus Bologna'yı Ağırlıyor",
-    "summary": "Anadolu Efes, Basketbol Avrupa Ligi on birinci hafta mücadelesinde yarın İtalyan temsilcisi Virtus Bologna ile sahasında karşılaşacak.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794523684.6814873
-  },
-  {
     "slug": "uluslararasi-para-fonu-kuresel-enflasyon-tahminini-uzun-vadeye-yaydi",
     "title": "Uluslararası Para Fonu Küresel Enflasyon Tahminini Uzun Vadeye Yaydı",
     "summary": "Uluslararası Para Fonu, Amerika Birleşik Devletleri'nde enflasyonun hedeflenen orana ulaşma takvimini ileri bir tarihe erteledi.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795674739.2656298
+  },
+  {
+    "slug": "antalyada-kepez-belediyesi-operasyonunda-yirmi-bir-kisi-tutuklandi",
+    "title": "Antalya'da Kepez Belediyesi operasyonunda yirmi bir kişi tutuklandı",
+    "summary": "Antalya merkezli iki ilde Kepez Belediyesine yönelik düzenlenen operasyonda gözaltına alınan şüphelilerden yirmi biri tutuklandı. Soruşturma kapsamında rüşvet ve ihaleye fesat karıştırma suçlamaları yer alıyor.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795677468.930882
   }
 ]
