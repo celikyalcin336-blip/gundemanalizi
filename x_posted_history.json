@@ -203,15 +203,6 @@
     "ts": 1794575422.4403925
   },
   {
-    "slug": "ingiltere-gida-sektorunde-folik-asit-zorunlulugu-basliyor",
-    "title": "İngiltere Gıda Sektöründe Folik Asit Zorunluluğu Başlıyor",
-    "summary": "İngiltere yönetimi, halk sağlığını korumak amacıyla unlu mamullerde yeni bir vitamin zenginleştirme zorunluluğunu hayata geçiriyor.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794580889.4815695
-  },
-  {
     "slug": "chicago-federal-rezerv-bankasi-baskani-goolsbee-enflasyon-mesaji",
     "title": "Chicago Federal Rezerv Bankası Başkanı Goolsbee Enflasyon Mesajı",
     "summary": "Goolsbee, merkez bankasının fiyat istikrarı karnesinde güven unsurunu pekiştirmesi gerektiğini belirtti. Yetkili, enflasyonist baskıların öngörülenden daha kalıcı bir seyir izlediğini ifade etti.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795732246.4841704
+  },
+  {
+    "slug": "bbc-efsanevi-otomobil-programi-top-gear-icin-gordon-ramsay-ile-anlasti",
+    "title": "BBC efsanevi otomobil programı top Gear için Gordon Ramsay ile anlaştı",
+    "summary": "BBC Studios, 2023 yılında yayını durdurulan Top Gear programının yeni sezonunda ana sunucu olarak ünlü şef Gordon Ramsay ile anlaştığını açıkladı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795734967.7420862
   }
 ]
