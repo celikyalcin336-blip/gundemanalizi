@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "fenerbahce-trendyol-super-lig-surecinde-arca-corum-galibiyeti-aldi",
-    "title": "Fenerbahçe Trendyol Süper Lig Sürecinde Arca Çorum Galibiyeti Aldı",
-    "summary": "Fenerbahçe, Trendyol Süper Lig'in 11'inci haftasında Arca Çorum FK karşısında galibiyet elde ederek milli araya girdi. Sarı-lacivertli ekip bu sonuçla Emre Belözoğlu yönetimindeki ilk galibiyetine ulaştı.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794556384.4258275
-  },
-  {
     "slug": "koleksiyon-pazarinda-tarih-yazan-nadir-italyan-spor-otomobil-satisi",
     "title": "Koleksiyon Pazarında Tarih Yazan Nadir İtalyan Spor Otomobil Satışı",
     "summary": "Sadece pist kullanımı için üretilen nadir bir model, kamu müzayedesinde rekor bir rakamla alıcı buldu. İsviçre'deki organizasyon, prestijli koleksiyon araçlarının yüksek piyasa değerini bir kez daha kanıtladı.",
@@ -3871,5 +3862,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795707729.9317303
+  },
+  {
+    "slug": "iran-ile-abd-arasindaki-arabuluculuk-faaliyetleri-ve-tahranin-talepleri",
+    "title": "İran ile ABD arasındaki arabuluculuk faaliyetleri ve Tahran'ın talepleri",
+    "summary": "İran Dışişleri Bakanı Abbas Arakçi, Katar ve Pakistan'ın Washington ile müzakerelerde arabuluculuk faaliyetlerini sürdürdüğünü açıkladı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795710463.206711
   }
 ]
