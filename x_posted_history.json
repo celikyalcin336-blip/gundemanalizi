@@ -196,15 +196,6 @@
     "ts": 1794537282.7398193
   },
   {
-    "slug": "berlin-konferansinda-luks-otomobil-rekabeti-ve-elektrikli-arac-stratejileri-cati",
-    "title": "Berlin Konferansında Lüks Otomobil Rekabeti Ve Elektrikli Araç Stratejileri Çatıştı",
-    "summary": "Porsche CEO'su Michael Leiters, Berlin'de gerçekleşen konferansta Tesla'nın pazarlama yöntemlerini eleştirerek markanın Mission S konseptiyle somut teknolojilere odaklandığını vurguladı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794569999.001825
-  },
-  {
     "slug": "milli-egitim-bakanligindan-okullara-yerli-robotik-kit-ve-yenilikci-sinif-hamlesi",
     "title": "Milli Eğitim Bakanlığından Okullara Yerli Robotik Kit ve Yenilikçi Sınıf Hamlesi",
     "summary": "Milli Eğitim Bakanlığı, dijital dönüşüm çalışmaları doğrultusunda okullardaki bilişim teknolojileri laboratuvarı ve yenilikçi sınıf sayılarını artırarak teknoloji odaklı eğitimi yaygınlaştırmayı hedefliyor.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795721351.7409453
+  },
+  {
+    "slug": "rizede-farkli-sikayetlerle-hastaneye-basvuran-iki-hastaya-akciger-kanseri",
+    "title": "Rize'de farklı şikayetlerle hastaneye başvuran iki hastaya akciğer kanseri tanısı konuldu",
+    "summary": "Rize'deki Recep Tayyip Erdoğan Üniversitesi Eğitim ve Araştırma Hastanesine farklı şikayetlerle başvuran iki hastanın akciğerinde kitle tespit edildi.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795724072.88211
   }
 ]
