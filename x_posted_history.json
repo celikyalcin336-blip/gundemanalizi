@@ -203,15 +203,6 @@
     "ts": 1794575422.4403925
   },
   {
-    "slug": "google-gemini-akilli-gozluklerde-yeni-sesli-uyandirma-komutuyla-sahneye-cikiyor",
-    "title": "Google Gemini Akıllı Gözlüklerde Yeni Sesli Uyandırma Komutuyla Sahneye Çıkıyor",
-    "summary": "Google, yapay zeka asistanı Gemini için \"Hey Gemini\" sesli uyandırma komutunu Android XR tabanlı akıllı gözlüklerde test etmeye başladı.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794575443.9969442
-  },
-  {
     "slug": "japonyanin-ciba-eyaletindeki-ciftlikte-kus-gribi-alarmi-sonrasi-karantina-tedbir",
     "title": "Japonya'nın Çiba Eyaletindeki Çiftlikte Kuş Gribi Alarmı Sonrası Karantina Tedbirleri Başlatıldı",
     "summary": "Japonya'nın Çiba eyaletindeki bir çiftlikte tespit edilen kuş gribi salgını üzerine yerel yönetim kapsamlı sağlık tedbirlerini devreye soktu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795726795.1480186
+  },
+  {
+    "slug": "salih-ozcandan-hapoel-beer-sheva-maci-ve-taraftar-mudahalesi-aciklamasi",
+    "title": "Salih Özcan'dan Hapoel beer-sheva maçı ve taraftar müdahalesi açıklaması",
+    "summary": "Beşiktaş, Gürcistan'da oynanan UEFA Avrupa Ligi 5. hafta karşılaşmasında Hapoel Beer-Sheva'yı 2-1 mağlup etti.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795729525.4060931
   }
 ]
