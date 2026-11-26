@@ -189,15 +189,6 @@
     "ts": 1794398336.9481957
   },
   {
-    "slug": "istanbuldaki-balikcilar-carsisinda-gerceklesen-ucretsiz-palamut-dagitimi",
-    "title": "İstanbul'daki Balıkçılar Çarşısı'nda Gerçekleşen Ücretsiz Palamut Dağıtımı",
-    "summary": "Beylikdüzü Balıkçılar Çarşısı'nda düzenlenen organizasyonda tonlarca palamut vatandaşlara ücretsiz olarak sunuldu. Etkinlik, emekliler ve şehit yakınları başta olmak üzere geniş bir katılımcı kitlesinin ilgisini çekti.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794497844.4060943
-  },
-  {
     "slug": "ingiltere-ekonomisi-enerji-krizine-ragmen-ucuncu-ceyrekte-buyudu",
     "title": "İngiltere Ekonomisi Enerji Krizine Rağmen Üçüncü Çeyrekte Büyüdü",
     "summary": "İngiltere ekonomisi, enerji maliyetleri ve tedarik aksaklıklarına rağmen teknoloji harcamalarının desteğiyle üçüncü çeyrekte beklentiler doğrultusunda ivme kazandı.",
@@ -3864,5 +3855,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795655688.2029998
+  },
+  {
+    "slug": "sislideki-oto-servis-dolandiriciligi-kamerada-3-supheli-adliyede",
+    "title": "Şişli'deki oto servis dolandırıcılığı kamerada: 3 şüpheli adliyede",
+    "summary": "Şişli'deki bir oto servisinde müşterinin aracında sahte arıza üreterek haksız kazanç sağladığı iddia edilen 3 şüpheli gözaltına alınarak adliyeye sevk edildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795658408.8453617
   }
 ]
