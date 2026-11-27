@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "corludaki-biyogaz-tesisinde-is-kazasi-sonrasi-dort-yonetici-tutuklandi",
-    "title": "Çorlu'daki Biyogaz Tesisinde İş Kazası Sonrası Dört Yönetici Tutuklandı",
-    "summary": "Tekirdağ’ın Çorlu ilçesinde bulunan katı atık bertaraf ve biyogaz tesisinde sulu çamur çukuruna düşen işçinin yaşamını yitirmesinin ardından adli süreç başlatıldı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794651758.2960107
-  },
-  {
     "slug": "openai-yapay-zeka-ajanlari-icin-chatgpt-wallet-dijital-cuzdan-altyapisini-tanitt",
     "title": "OpenAI Yapay Zeka Ajanları İçin ChatGPT Wallet Dijital Cüzdan Altyapısını Tanıttı",
     "summary": "OpenAI, Dots yapay zeka ajanlarının otonom finansal işlemler gerçekleştirebilmesini sağlayan ChatGPT Wallet aracını duyurdu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795803014.841628
+  },
+  {
+    "slug": "rus-yapay-zeka-modeli-gogolun-1852de-yaktigi-olu-canlar-romanini-tamamladi",
+    "title": "Rus yapay zeka modeli Gogol'ün 1852'de yaktığı ölü Canlar romanını tamamladı",
+    "summary": "Rus teknoloji ve bankacılık grubu Sber tarafından geliştirilen GigaChat yapay zeka modeli, Nikolay Gogol'ün tamamlayamadan yaktığı Ölü Canlar romanının kayıp ikinci cildini kaleme aldı.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795805743.5268068
   }
 ]
