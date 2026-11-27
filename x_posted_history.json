@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "toronto-zirvesinde-yapay-zeka-denetimi-icin-kritik-uc-yil-uyarisi",
-    "title": "Toronto Zirvesinde Yapay Zeka Denetimi İçin Kritik Üç Yıl Uyarısı",
-    "summary": "Toronto’da düzenlenen Hinton Konferansları’nda, gelişmiş yapay zekalar üzerindeki insan denetiminin üç yıl içinde kaybedilebileceği ihtimali dile getirildi.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794610873.4140291
-  },
-  {
     "slug": "inme-sonrasi-robotik-rehabilitasyon-tedavisi-hastalara-yeniden-hareket-ozgurlugu",
     "title": "İnme Sonrası Robotik Rehabilitasyon Tedavisi Hastalara Yeniden Hareket Özgürlüğü Sunuyor",
     "summary": "İnme veya ağır travma sonrası kısmi ya da tam hareket kaybı yaşayan hastalar için erken dönemde başlatılan robotik rehabilitasyon uygulamaları iyileşme şansını artırıyor.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795762187.9719367
+  },
+  {
+    "slug": "turkiye-sigorta-ile-sgk-arasinda-emeklilere-ozel-sigorta-donemi",
+    "title": "Türkiye sigorta ile SGK arasında emeklilere özel sigorta dönemi",
+    "summary": "Türkiye Sigorta ve SGK iş birliğiyle emeklilere özel avantajlı sigorta kampanyası hayata geçirildi. Kampanya kapsamında sağlık ve kasko sigortalarında çeşitli kolaylıklar sunuluyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795764908.2295792
   }
 ]
