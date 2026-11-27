@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "elon-muskin-casusluk-iddialariyla-nvidiadan-ayrilan-jensen-huanga-acik-ise-alim-",
-    "title": "Elon Musk'ın Casusluk İddialarıyla Nvidia'dan Ayrılan Jensen Huang'a Açık İşe Alım Daveti",
-    "summary": "Nvidia firmasındaki görevinden casusluk ile çıkar çatışması iddiaları yüzünden ayrılan Jensen Huang için Elon Musk destek açıklamasında bulundu.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794649035.8482993
-  },
-  {
     "slug": "corludaki-biyogaz-tesisinde-is-kazasi-sonrasi-dort-yonetici-tutuklandi",
     "title": "Çorlu'daki Biyogaz Tesisinde İş Kazası Sonrası Dört Yönetici Tutuklandı",
     "summary": "Tekirdağ’ın Çorlu ilçesinde bulunan katı atık bertaraf ve biyogaz tesisinde sulu çamur çukuruna düşen işçinin yaşamını yitirmesinin ardından adli süreç başlatıldı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795800294.3398438
+  },
+  {
+    "slug": "irandan-abd-ablukasina-karsi-hem-deniz-hem-hava-operasyon-sinyali",
+    "title": "İRAN'dan ABD ablukasına karşı hem deniz hem Hava operasyon sinyali",
+    "summary": "İran Devrim Muhafızları Ordusu, Washington yönetiminin uygulamaya koyduğu deniz ablukasına karşı havada ve denizde harekete geçeceklerini duyurdu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795803014.841628
   }
 ]
