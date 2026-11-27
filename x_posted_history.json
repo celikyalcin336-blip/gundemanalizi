@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "casper-excalibur-g915-serisi-donanim-ve-fiyat-secenekleri",
-    "title": "Casper Excalibur G915 Serisi Donanım ve Fiyat Seçenekleri",
-    "summary": "Casper, yeni oyun bilgisayarı Excalibur G915 modelini farklı ekran kartı ve işlemci kombinasyonlarıyla kullanıcıların beğenisine sunuyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794640843.9347434
-  },
-  {
     "slug": "halic-koprusunde-makas-atma-nedeniyle-zincirleme-kaza-yasandi",
     "title": "Haliç Köprüsünde Makas Atma Nedeniyle Zincirleme Kaza Yaşandı",
     "summary": "İstanbul Haliç Köprüsü üzerinde seyir halindeki bir otomobilin makas atması sonucu beş aracın karıştığı zincirleme trafik kazasında iki kişi yaralandı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795792129.626994
+  },
+  {
+    "slug": "mhp-kayseri-milletvekili-ismail-ozdemir-25-yas-uzeri-hurda-arac-teklifini",
+    "title": "MHP Kayseri Milletvekili İsmail Özdemir 25 yaş üzeri hurda araç teklifini yineledi",
+    "summary": "MHP Genel Başkan Yardımcısı İsmail Özdemir, 25 yaşını doldurmuş araçların hurdaya ayrılarak yerli üretim araçlarla değiştirilmesini öngören kanun teklifini yeniden gündeme getirdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795794850.9759376
   }
 ]
