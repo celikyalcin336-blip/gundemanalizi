@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "jeremy-clarksonin-teksastaki-tesla-cybercab-deneyiminde-yasanan-otonom-surus-aks",
-    "title": "Jeremy Clarkson'ın Teksas'taki Tesla Cybercab Deneyiminde Yaşanan Otonom Sürüş Aksaklıkları",
-    "summary": "Otomobil gazetecisi Jeremy Clarkson, Teksas'ta deneyimlediği sürücüsüz Tesla Cybercab yolculuklarında ciddi yazılım hataları ve güvenlik sorunlarıyla karşılaştığını duyurdu.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794605404.5808294
-  },
-  {
     "slug": "besiktas-fransa-deplasmanindan-basketbol-avrupa-ligi-galibiyetiyle-dondu",
     "title": "Beşiktaş Fransa Deplasmanından Basketbol Avrupa Ligi Galibiyetiyle Döndü",
     "summary": "Siyah beyazlı ekip, Avrupa organizasyonunun on birinci haftasında deplasmanda Fransız rakibi Asvel takımını mağlup etmeyi başardı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795756747.2058969
+  },
+  {
+    "slug": "putinin-onayladigi-yeni-arktik-stratejisinin-detaylari-aciklandi",
+    "title": "Putin'in onayladığı yeni Arktik stratejisinin detayları açıklandı",
+    "summary": "Kremlin tarafından yayımlanan kararnameyle onaylanan yeni strateji, Arktik bölgesinin ekonomik, lojistik ve güvenlik alanlarında 2035 yılına kadar geliştirilmesini hedefliyor.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795759467.636228
   }
 ]
