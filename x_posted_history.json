@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "cafer-mahiroglu-sorusturmasinda-alti-supheli-icin-tutuklama-talebi",
-    "title": "Cafer Mahiroğlu Soruşturmasında Altı Şüpheli İçin Tutuklama Talebi",
-    "summary": "Yürütülen soruşturmanın ikinci dalga operasyonunda, aralarında eski İzmir Büyükşehir Belediyesi Genel Sekreteri Ramazan Tezcan'ın da bulunduğu altı şüpheli tutuklama talebiyle mahkemeye sevk edildi.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794599959.130406
-  },
-  {
     "slug": "adalet-bakanligindan-faili-mechul-dosyalarda-yeni-cozumler",
     "title": "Adalet Bakanlığından Faili Meçhul Dosyalarda Yeni Çözümler",
     "summary": "Adalet Bakanı Akın Gürlek, Bursa ve Bitlis'te yıllardır çözülemeyen üç ayrı adli vaka dosyasının aydınlatıldığını ve operasyonlar yapıldığını duyurdu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795751305.7436988
+  },
+  {
+    "slug": "ikinci-el-otomobil-pazarinda-sedan-ilanlari-azalirken-suv-satislari-zirveye",
+    "title": "İkinci el otomobil pazarında SEDAN ilanları azalırken SUV satışları zirveye yerleşti",
+    "summary": "Ekim 2026 verilerine göre ikinci el çevrim içi otomobil pazarında en yüksek büyüme oranına SUV araçlar ulaştı.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795754026.253192
   }
 ]
