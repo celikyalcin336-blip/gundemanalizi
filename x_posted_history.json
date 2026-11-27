@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "otomotiv-sektorunde-kritik-yangin-riski-ve-geri-cagirma-sureci",
-    "title": "Otomotiv Sektöründe Kritik Yangın Riski ve Geri Çağırma Süreci",
-    "summary": "Otomotiv üreticisi BMW, potansiyel yangın tehlikesi barındıran yüz binlerce aracı için resmi geri çağrı operasyonu başlattı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794619045.2540112
-  },
-  {
     "slug": "malatyadaki-helikopter-kazasinda-sehit-dort-askerin-cenaze-programi",
     "title": "Malatya'daki Helikopter Kazasında Şehit Dört Askerin Cenaze Programı",
     "summary": "Malatya'da düşen askeri helikopterdeki dört mürettebat şehit olurken pilotların sivil yerleşimleri korumak için büyük fedakarlık gösterdiği belirlendi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795770362.0039341
+  },
+  {
+    "slug": "bursada-eglence-mekanindaki-cinayet-davasinda-saniklarin-yargilanmasina-devam",
+    "title": "Bursa'da eğlence mekanındaki cinayet davasında sanıkların yargılanmasına devam edildi",
+    "summary": "Bursa'nın Nilüfer ilçesindeki bir eğlence mekanında çıkan ve ölümle sonuçlanan kavgaya ilişkin davanın duruşması gerçekleştirildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795773082.6387231
   }
 ]
