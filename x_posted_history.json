@@ -203,15 +203,6 @@
     "ts": 1794575422.4403925
   },
   {
-    "slug": "xiaomi-redmi-note-serisi-yeni-modelleriyle-sertifika-surecinde",
-    "title": "Xiaomi Redmi Note Serisi Yeni Modelleriyle Sertifika Sürecinde",
-    "summary": "Xiaomi'nin yeni Redmi Note serisine ait cihazlar Çin'in zorunlu güvenlik sertifikası kayıtlarında görülürken, serinin en üst modelinde büyük batarya kapasitesi olacağı iddia ediliyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794586336.059937
-  },
-  {
     "slug": "volkswagen-yeni-t-roc-r-modeli-guclu-ozellikleriyle-tanitiliyor",
     "title": "Volkswagen Yeni T-Roc R Modeli Güçlü Özellikleriyle Tanıtılıyor",
     "summary": "Volkswagen, yeni performans SUV modeli T-Roc R için hazırlanan kamuflajlı prototip fotoğraflarını yayımladı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795737689.5616894
+  },
+  {
+    "slug": "pixo-analytics-girisimi-act-venture-partnerstan-yatirim-aldi",
+    "title": "Pixo Analytics girişimi ACT venture Partners'tan yatırım aldı",
+    "summary": "Pixo Analytics, ACT Venture Partners'tan 1 milyon euro yatırım alarak mühendislik kapasitesini artırmayı ve yeni pazarlara açılmayı hedefliyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795740411.0133598
   }
 ]
