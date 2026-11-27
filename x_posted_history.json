@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "canakkale-bayramicte-lokanta-isletmecisi-kadin-cinayete-kurban-gitti",
-    "title": "Çanakkale Bayramiç'te Lokanta İşletmecisi Kadın Cinayete Kurban Gitti",
-    "summary": "Çanakkale'nin Bayramiç ilçesinde işlettiği lokantada eski eşi tarafından bıçaklı saldırıya uğrayan kadın, hastanede yapılan tüm müdahalelere rağmen kurtarılamadı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794616322.0244334
-  },
-  {
     "slug": "otomotiv-sektorunde-kritik-yangin-riski-ve-geri-cagirma-sureci",
     "title": "Otomotiv Sektöründe Kritik Yangın Riski ve Geri Çağırma Süreci",
     "summary": "Otomotiv üreticisi BMW, potansiyel yangın tehlikesi barındıran yüz binlerce aracı için resmi geri çağrı operasyonu başlattı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795767641.553517
+  },
+  {
+    "slug": "vivo-yeni-amiral-gemisi-akilli-telefon-prototipinde-ozel-islemci-yapisina",
+    "title": "Vivo yeni amiral gemisi akıllı telefon prototipinde özel işlemci yapısına odaklanıyor",
+    "summary": "Çinli teknoloji üreticisi vivo, henüz mühendislik prototipi aşamasında olan yeni amiral gemisi akıllı telefonu üzerinde donanım ve yazılım özelleştirmelerine devam ediyor.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795770362.0039341
   }
 ]
