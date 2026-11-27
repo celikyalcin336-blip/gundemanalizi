@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "besiktas-fransa-deplasmanindan-basketbol-avrupa-ligi-galibiyetiyle-dondu",
-    "title": "Beşiktaş Fransa Deplasmanından Basketbol Avrupa Ligi Galibiyetiyle Döndü",
-    "summary": "Siyah beyazlı ekip, Avrupa organizasyonunun on birinci haftasında deplasmanda Fransız rakibi Asvel takımını mağlup etmeyi başardı.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794608149.860175
-  },
-  {
     "slug": "toronto-zirvesinde-yapay-zeka-denetimi-icin-kritik-uc-yil-uyarisi",
     "title": "Toronto Zirvesinde Yapay Zeka Denetimi İçin Kritik Üç Yıl Uyarısı",
     "summary": "Toronto’da düzenlenen Hinton Konferansları’nda, gelişmiş yapay zekalar üzerindeki insan denetiminin üç yıl içinde kaybedilebileceği ihtimali dile getirildi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795759467.636228
+  },
+  {
+    "slug": "samsunda-yenidogan-bebegini-cope-atan-anneye-muebbet-hapis-cezasi",
+    "title": "Samsun'da yenidoğan bebeğini çöpe atan anneye müebbet hapis cezası",
+    "summary": "Samsun'da evinde doğum yaptıktan sonra bebeğini poşete koyup çöpe attığı belirlenen tutuklu sanık yargılandığı davada müebbet hapis cezasına çarptırıldı. Mahkeme heyeti sanığın tutukluluk halinin devamına hükmetti.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795762187.9719367
   }
 ]
