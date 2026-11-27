@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "ulusal-egitim-politikasinda-pisa-sinavi-ile-gelen-kuresel-basari",
-    "title": "Ulusal Eğitim Politikasında PISA Sınavı ile Gelen Küresel Başarı",
-    "summary": "Milli Eğitim Bakanı Yusuf Tekin, TBMM Plan ve Bütçe Komisyonunda yaptığı açıklamada Türkiye'nin PISA değerlendirmelerinde tarihsel bir sıçrama kaydettiğini duyurdu.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794635396.6638503
-  },
-  {
     "slug": "avrupa-birligi-yapay-zeka-bagimsizligi-icin-dev-yatirim-hedefini-ilan-etti",
     "title": "Avrupa Birliği Yapay Zeka Bağımsızlığı İçin Dev Yatırım Hedefini İlan Etti",
     "summary": "Avrupa Birliği yönetimi, kıtanın teknolojik özerkliğini güçlendirmek amacıyla yapay zeka alanında yarım trilyon avroluk devasa bir finansman ihtiyacı bulunduğunu açıkladı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795786687.526974
+  },
+  {
+    "slug": "bakan-yumakli-tarimsal-hasilanin-90-milyar-dolar-tavanina-yaklastigini-acikladi",
+    "title": "Bakan Yumaklı tarımsal hasılanın 90 milyar dolar tavanına yaklaştığını açıkladı",
+    "summary": "Tarım ve Orman Bakanı İbrahim Yumaklı, Türkiye'nin tarımsal ihracatının 30 milyar doların üzerine çıktığını ve tarımsal üretimde dayanıklılığın arttığını açıkladı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795789408.9005158
   }
 ]
