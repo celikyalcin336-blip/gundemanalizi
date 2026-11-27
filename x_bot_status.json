@@ -1,8 +1,8 @@
 {
-  "last_check": "2026-11-27 10:35:08",
+  "last_check": "2026-11-27 11:20:41",
   "result": "posted",
-  "last_post": "2026-11-27 10:35:08",
-  "next_planned": "2026-11-27 11:20:08",
+  "last_post": "2026-11-27 11:20:41",
+  "next_planned": "2026-11-27 12:05:41",
   "runner": "github-actions",
-  "log_tail": "[2026-11-27 07:34:48] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n🎯 [X Paylaşım Adayı] Kategori: Ekonomi | Virallik/Duygu Skoru: 185 | Başlık: Türkiye sigorta ile SGK arasında emeklilere özel sigorta dönemi\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795764888.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Türkiye sigorta ile SGK arasında emeklilere özel sigorta dönemi\n"
+  "log_tail": "[2026-11-27 08:20:08] 🚀 [X Auto-Poster] Kontrol başlatılıyor...\n⏩ [Mükerrer Haber Kalkanı] Atlandı: New York'ta geleneksel Şükran günü ... (Birebir slug eşleşmesi: new-yorkta-geleneksel-sukran-gunu-yuruyusu-siddetli-firtina-uyarisiyla-ertelendi)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Elon Musk ABD merkezli SpaceX üzeri... (Birebir slug eşleşmesi: elon-musk-abd-merkezli-spacex-uzerinden-her-cocuga-iki-hisse-devredecek)\n⏩ [Mükerrer Haber Kalkanı] Atlandı: Makineye sıkışan eli dokuz buçuk sa... (Birebir slug eşleşmesi: makineye-sikisan-eli-dokuz-bucuk-saatlik-operasyonla-kurtarildi)\n🎯 [X Paylaşım Adayı] Kategori: Otomobil | Virallik/Duygu Skoru: 170 | Başlık: Audi Çin pazarına özel elektrikli modeline benzinli motor ekliyor\n🎨 [X Editoryal Kart Hazırlandı: /home/runner/work/gundemanalizi/gundemanalizi/output/x_card_1795767610.jpg]\n⏳ Medya X'e yükleniyor (Görsel)...\n✅ Medya başarıyla yüklendi ve doğrulandı (1. saniye).\n✅ [X/Twitter] Tweet başarıyla paylaşıldı: @gndmanalizi\n🎉 [X Auto-Poster] Başarıyla tweetlendi: Audi Çin pazarına özel elektrikli modeline benzinli motor ekliyor\n"
 }

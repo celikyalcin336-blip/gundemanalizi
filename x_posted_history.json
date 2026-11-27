@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "inme-sonrasi-robotik-rehabilitasyon-tedavisi-hastalara-yeniden-hareket-ozgurlugu",
-    "title": "İnme Sonrası Robotik Rehabilitasyon Tedavisi Hastalara Yeniden Hareket Özgürlüğü Sunuyor",
-    "summary": "İnme veya ağır travma sonrası kısmi ya da tam hareket kaybı yaşayan hastalar için erken dönemde başlatılan robotik rehabilitasyon uygulamaları iyileşme şansını artırıyor.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794613597.9858842
-  },
-  {
     "slug": "canakkale-bayramicte-lokanta-isletmecisi-kadin-cinayete-kurban-gitti",
     "title": "Çanakkale Bayramiç'te Lokanta İşletmecisi Kadın Cinayete Kurban Gitti",
     "summary": "Çanakkale'nin Bayramiç ilçesinde işlettiği lokantada eski eşi tarafından bıçaklı saldırıya uğrayan kadın, hastanede yapılan tüm müdahalelere rağmen kurtarılamadı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795764908.2295792
+  },
+  {
+    "slug": "audi-cin-pazarina-ozel-elektrikli-modeline-benzinli-motor-ekliyor",
+    "title": "Audi Çin pazarına özel elektrikli modeline benzinli motor ekliyor",
+    "summary": "Audi, Çin pazarı için kurduğu yeni markası altında yer alan E7X modeline menzil uzatıcılı içten yanmalı motor entegre ediyor.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795767641.553517
   }
 ]
