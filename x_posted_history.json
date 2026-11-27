@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "adalet-bakanligindan-faili-mechul-dosyalarda-yeni-cozumler",
-    "title": "Adalet Bakanlığından Faili Meçhul Dosyalarda Yeni Çözümler",
-    "summary": "Adalet Bakanı Akın Gürlek, Bursa ve Bitlis'te yıllardır çözülemeyen üç ayrı adli vaka dosyasının aydınlatıldığını ve operasyonlar yapıldığını duyurdu.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794602682.2965682
-  },
-  {
     "slug": "jeremy-clarksonin-teksastaki-tesla-cybercab-deneyiminde-yasanan-otonom-surus-aks",
     "title": "Jeremy Clarkson'ın Teksas'taki Tesla Cybercab Deneyiminde Yaşanan Otonom Sürüş Aksaklıkları",
     "summary": "Otomobil gazetecisi Jeremy Clarkson, Teksas'ta deneyimlediği sürücüsüz Tesla Cybercab yolculuklarında ciddi yazılım hataları ve güvenlik sorunlarıyla karşılaştığını duyurdu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795754026.253192
+  },
+  {
+    "slug": "asya-piyasalarinda-haftanin-son-islem-gununde-izlenen-tablo",
+    "title": "Asya piyasalarında haftanın son işlem gününde izlenen tablo",
+    "summary": "Wall Street borsasının tatil nedeniyle kapalı olduğu günde Asya piyasalarında vadeli kontratlar ve endeksler artış kaydetti.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795756747.2058969
   }
 ]
