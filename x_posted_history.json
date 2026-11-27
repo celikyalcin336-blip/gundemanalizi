@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "diyabet-ve-kilo-verme-ilaclarina-gorme-kaybi-uyarisi",
-    "title": "Diyabet ve Kilo Verme İlaçlarına Görme Kaybı Uyarısı",
-    "summary": "Amerika Birleşik Devletleri Gıda ve İlaç Dairesi, popüler diyabet ve obezite ilaçlarının güvenlik etiketlerinde kalıcı görme kaybı riskine karşı güncelleme yapılmasına karar verdi.",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794591787.381177
-  },
-  {
     "slug": "hindistanin-golaghat-bolgesinde-meydana-gelen-trafik-kazasi-can-aldi",
     "title": "Hindistan'ın Golaghat Bölgesinde Meydana Gelen Trafik Kazası Can Aldı",
     "summary": "Hindistan'ın Assam eyaletine bağlı Golaghat bölgesinde bir minibüs ile kamyonun çarpışması sonucu ilk belirlemelere göre yirmi üç kişi hayatını kaybetti.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795743132.2155867
+  },
+  {
+    "slug": "ekonomistlerin-kasim-ayi-enflasyon-ve-dolar-tahminleri-revize-edildi",
+    "title": "Ekonomistlerin kasım ayı enflasyon ve dolar tahminleri revize edildi",
+    "summary": "Ekonomistlerin kasım ayı enflasyonuna ve gelecek yıllara ilişkin beklentileri güncellendi. Enflasyon ve kur tahminlerinde yukarı ve aşağı yönlü revizyonlar yapıldı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795745853.1216633
   }
 ]
