@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "yok-baskanliginda-universite-hastaneleri-icin-yeni-koordinasyon-ve-mali-denetim-",
-    "title": "YÖK Başkanlığında Üniversite Hastaneleri İçin Yeni Koordinasyon ve Mali Denetim Mekanizması Kuruldu",
-    "summary": "Resmi Gazete’de yayımlanan kararla devlet ve vakıf üniversitelerinin sağlık uygulama merkezlerini kapsayan Üniversite Hastaneleri Koordinasyon Komitesi hayata geçirildi.",
-    "category": "Eğitim",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794665381.7566361
-  },
-  {
     "slug": "keny-arroyonun-avrupa-ilgi-odakli-yukselisi-besiktasin-transfer-planini-sekillen",
     "title": "Keny Arroyo'nun Avrupa İlgi Odaklı Yükselişi Beşiktaş'ın Transfer Planını Şekillendiriyor",
     "summary": "Beşiktaş'tan ayrılarak Brezilya Serie A ekiplerinden Cruzeiro'ya transfer olan Keny Arroyo, sergilediği performansla Avrupa kulüplerinin radarına girdi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795816628.8198552
+  },
+  {
+    "slug": "turkiye-cumhuriyet-merkez-bankasi-bir-elektronik-para-kurulusunun-faaliyet",
+    "title": "Türkiye Cumhuriyet Merkez Bankası bir elektronik para kuruluşunun faaliyet iznini kaldırdı",
+    "summary": "Türkiye Cumhuriyet Merkez Bankası, Fintlix Elektronik Para ve Ödeme Hizmetleri A.Ş.'nin elektronik para kuruluşu olarak faaliyet gösterme izninin iptal edildiğini duyurdu.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795819350.967434
   }
 ]
