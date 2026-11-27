@@ -203,15 +203,6 @@
     "ts": 1794575422.4403925
   },
   {
-    "slug": "chicago-federal-rezerv-bankasi-baskani-goolsbee-enflasyon-mesaji",
-    "title": "Chicago Federal Rezerv Bankası Başkanı Goolsbee Enflasyon Mesajı",
-    "summary": "Goolsbee, merkez bankasının fiyat istikrarı karnesinde güven unsurunu pekiştirmesi gerektiğini belirtti. Yetkili, enflasyonist baskıların öngörülenden daha kalıcı bir seyir izlediğini ifade etti.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794583612.87141
-  },
-  {
     "slug": "xiaomi-redmi-note-serisi-yeni-modelleriyle-sertifika-surecinde",
     "title": "Xiaomi Redmi Note Serisi Yeni Modelleriyle Sertifika Sürecinde",
     "summary": "Xiaomi'nin yeni Redmi Note serisine ait cihazlar Çin'in zorunlu güvenlik sertifikası kayıtlarında görülürken, serinin en üst modelinde büyük batarya kapasitesi olacağı iddia ediliyor.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795734967.7420862
+  },
+  {
+    "slug": "turkiye-futbol-federasyonundan-batumdaki-taraftar-olaylarina-sert-kinama",
+    "title": "Türkiye Futbol federasyonundan batumdaki taraftar olaylarına sert kınama",
+    "summary": "Türkiye Futbol Federasyonu, Beşiktaşın Gürcistan maçında taraftarlarına yönelik müdahaleler ve güvenlik zaafiyetleri nedeniyle kınama yayımladı.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795737689.5616894
   }
 ]
