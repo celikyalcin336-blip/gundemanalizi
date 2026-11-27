@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "igli-tareden-galatasaraya-transfer-olan-rafael-leao-hakkinda-elestirel-degerlend",
-    "title": "Igli Tare'den Galatasaray'a Transfer Olan Rafael Leao Hakkında Eleştirel Değerlendirme",
-    "summary": "AC Milan yöneticisi Igli Tare, Galatasaray'ın kadrosuna kattığı Portekizli hücum oyuncusu Rafael Leao'nun saha dışı ilgi alanları nedeniyle futbol odağını kaybettiğini dile getirdi.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794659927.8200173
-  },
-  {
     "slug": "trump-pekin-temaslarinda-nvidia-casusluk-iddialari-yerine-ticaret-anlasmasina-od",
     "title": "Trump Pekin Temaslarında Nvidia Casusluk İddiaları Yerine Ticaret Anlaşmasına Odaklanıyor",
     "summary": "ABD Başkanı Donald Trump'ın Asya-Pasifik Ekonomik İşbirliği Zirvesi için gerçekleştireceği Çin ziyaretinde Nvidia'nın eski yöneticisine yönelik casusluk iddialarını masaya getirmeyeceği bildirildi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795811185.8134897
+  },
+  {
+    "slug": "avrupa-birliginden-deutsche-borse-ve-allfunds-birlesmesine-rekabet-onayi",
+    "title": "Avrupa Birliği'nden Deutsche Börse ve Allfunds birleşmesine rekabet onayı",
+    "summary": "Deutsche Börse, Allfunds platformunu satın almak için Avrupa Birliği'nden koşulsuz rekabet onayı aldı. Bu hamle, finansal piyasa altyapısında Avrupa şampiyonu olma hedefi taşıyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795813907.5760205
   }
 ]
