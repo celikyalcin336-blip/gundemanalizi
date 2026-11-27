@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "malatyadaki-helikopter-kazasinda-sehit-dort-askerin-cenaze-programi",
-    "title": "Malatya'daki Helikopter Kazasında Şehit Dört Askerin Cenaze Programı",
-    "summary": "Malatya'da düşen askeri helikopterdeki dört mürettebat şehit olurken pilotların sivil yerleşimleri korumak için büyük fedakarlık gösterdiği belirlendi.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794621768.478525
-  },
-  {
     "slug": "apple-kamera-tedarikinde-samsung-donemine-gecerken-standart-iphone-modelini-erte",
     "title": "Apple Kamera Tedarikinde Samsung Dönemine Geçerken Standart iPhone Modelini Erteliyor",
     "summary": "Apple, yeni akıllı telefon serisinde yer alması beklenen standart modelin tanıtımını görüntü sensörlerindeki tedarikçi değişimi sebebiyle ileri bir tarihe itti.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795773082.6387231
+  },
+  {
+    "slug": "resmi-gazetede-yayimlanan-yeni-bina-yangin-yonetmeligi-ile-yapi-guvenlik",
+    "title": "Resmî Gazete'de yayımlanan yeni bina yangın Yönetmeliği ile yapı güvenlik şartları değişti",
+    "summary": "Cumhurbaşkanı Kararı ile onaylanan Bina Yangın Yönetmeliği, binaların bakım, kullanım ve denetim süreçlerine yeni güvenlik zorunlulukları getirdi.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795775803.736767
   }
 ]
