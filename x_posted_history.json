@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "izmir-merkezli-operasyonda-on-alti-supheli-tutuklandi",
-    "title": "İzmir Merkezli Operasyonda On Altı Şüpheli Tutuklandı",
-    "summary": "İzmir merkezli iki ilde gerçekleştirilen organize yasaklı madde operasyonunda gözaltına alınan on yedi şüpheliden on biri tutuklandı. Adliyeye sevk edilen zanlılardan biri ise adli kontrol şartıyla serbest bırakıldı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794687181.6329715
-  },
-  {
     "slug": "besiktasta-kiralik-oynayan-fabio-mirettinin-gelecegi-masada",
     "title": "Beşiktaş'ta Kiralık Oynayan Fabio Miretti'nin Geleceği Masada",
     "summary": "Beşiktaş'ın kiralık kadrosuna kattığı Fabio Miretti, siyah-beyazlı formayla gösterdiği performansla kulübün ve bonservisini elinde bulunduran Juventus'un yakın takibinde bulunuyor.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795838424.290006
+  },
+  {
+    "slug": "2026-yili-milli-egitim-bakanligi-akademi-giris-sinavi-ogretmen-kontenjanlari",
+    "title": "2026 yılı milli EĞİTİM Bakanlığı Akademi Giriş sınavı öğretmen kontenjanları açıklandı",
+    "summary": "Milli Eğitim Bakanlığı Akademi Giriş Sınavı sonuçlarına göre hazırlık eğitimine alınacak 15 bin öğretmen adayının branş dağılımı ile başvuru takvimi netleşti.",
+    "category": "Eğitim",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795841146.2159255
   }
 ]
