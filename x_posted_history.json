@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "yerli-uretim-tvs-callisto-110-turkiye-motosiklet-pazarinda-satista",
-    "title": "Yerli Üretim TVS Callisto 110 Türkiye Motosiklet Pazarında Satışta",
-    "summary": "Hindistan menşeli TVS markasının yeni scooter modeli Callisto 110, Uğur Motorlu Araçlar iş birliğiyle Aydın'daki tesiste üretilerek pazara sunuldu.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794676274.8524027
-  },
-  {
     "slug": "apple-yapay-zeka-asistani-siri-akilli-ev-testlerinde-geride-kaldi",
     "title": "Apple Yapay Zeka Asistanı Siri Akıllı Ev Testlerinde Geride Kaldı",
     "summary": "Tom's Guide genel yayın yönetmeninin değerlendirmelerine göre Apple'ın yapay zeka entegreli asistanı Siri, en yakın rakiplerinin performans seviyesine ulaşmakta güçlük çekiyor.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795827536.6259985
+  },
+  {
+    "slug": "uzmanlar-genc-yasta-gorulen-kalp-krizi-risklerine-karsi-uyariyor",
+    "title": "Uzmanlar genç yaşta görülen kalp krizi risklerine karşı uyarıyor",
+    "summary": "Uzmanlar, kolesterol plaklarının damar duvarında birikerek ani tıkanıklıklara ve kalp krizine yol açabileceğini belirtiyor.",
+    "category": "Sağlık",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795830258.698167
   }
 ]
