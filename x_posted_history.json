@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "macaristan-siyasetinde-sarsici-yolsuzluk-ve-rusvet-operasyonu",
-    "title": "Macaristan Siyasetinde Sarsıcı Yolsuzluk ve Rüşvet Operasyonu",
-    "summary": "Macaristan'daki kapsamlı bir yolsuzluk soruşturmasında, eski bakan Miklos Sesztak'ın ormanlara gömdüğü ve depolar ile konutlarda sakladığı milyonlarca dolarlık nakit para ele geçirildi.",
-    "category": "Dünya",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794714421.0873957
-  },
-  {
     "slug": "ilkokul-egitimi-ve-sinav-duzenlemesinde-yeni-donem-basliyor",
     "title": "İlkokul Eğitimi Ve Sınav Düzenlemesinde Yeni Dönem Başlıyor",
     "summary": "Milli Eğitim Bakanlığı tarafından hayata geçirilen yeni Ölçme ve Değerlendirme Yönetmeliği ile ilkokul ve okul öncesi kademelerde sınav uygulamaları tamamen kaldırıldı.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795865636.1960242
+  },
+  {
+    "slug": "jaguar-yeni-elektrikli-rotasini-yuksek-govdeli-suv-modeliyle-genisletiyor",
+    "title": "Jaguar yeni elektrikli rotasını yüksek gövdeli SUV modeliyle genişletiyor",
+    "summary": "İngiliz otomobil üreticisi Jaguar, Type 01 modeline eşlik edecek teknik altyapı ve tasarım diline sahip yeni bir SUV modeli için çalışmalarını sürdürüyor.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795868357.2297454
   }
 ]
