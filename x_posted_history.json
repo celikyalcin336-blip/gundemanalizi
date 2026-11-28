@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "universitelerden-iklim-degisikligini-konu-alan-dijital-harita-projesi",
-    "title": "Üniversitelerden İklim Değişikliğini Konu Alan Dijital Harita Projesi",
-    "summary": "İki üniversiteden yedi akademisyenin ortaklaşa yürüttüğü çalışmayla kentin iklim dönüşümü belgeselleştirildi. Hazırlanan dijital harita ve görsel materyaller uluslararası iklim konferansında katılımcılara tanıtılacak.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794670828.5409467
-  },
-  {
     "slug": "pegasus-hava-yollarindan-mobil-kanallara-ozel-yurt-disi-ulasim-kampanyasi",
     "title": "Pegasus Hava Yollarından Mobil Kanallara Özel Yurt Dışı Ulaşım Kampanyası",
     "summary": "Pegasus Hava Yolları, belirli dış hat uçuşlarında geçerli olmak üzere on bir avrodan başlayan fiyatlarla yeni bir indirimli seyahat kampanyası başlattı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795822072.1823988
+  },
+  {
+    "slug": "ocak-ayinda-emekli-maas-zammi-icin-uc-kriterli-formul-masada",
+    "title": "Ocak ayında emekli maaş zammı için üç kriterli formül masada",
+    "summary": "Emekli maaşları için enflasyon farkı ve refah payının yanı sıra prim, yaş ve çalışma durumuna göre kademeli artış formülleri değerlendiriliyor.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795824804.7925897
   }
 ]
