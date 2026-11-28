@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "samsung-kuresel-pazarda-haber-uygulamasini-kapatma-karari-aldi",
-    "title": "Samsung Küresel Pazarda Haber Uygulamasını Kapatma Kararı Aldı",
-    "summary": "Teknoloji devi Samsung, dijital içerik stratejisinde değişikliğe giderek popüler haber platformunu belirli pazarlarda sonlandırma kararı aldı.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794695350.3958423
-  },
-  {
     "slug": "romanya-polonya-macinda-sahadan-galibiyetle-ayrildi",
     "title": "Romanya Polonya Maçında Sahadan Galibiyetle Ayrıldı",
     "summary": "Romanya, UEFA Uluslar B Ligi karşılaşmasında sahasında konuk ettiği Polonya'yı iki bire bir skorla mağlup etti. Bu sonuçla ev sahibi ekip gruptaki puanını yükseltirken konuk takım da mevcut sıralamadaki yerini korudu.",
@@ -3878,5 +3869,21 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795846588.9934433
+  },
+  {
+    "slug": "a-milli-erkek-basketbol-takimi-yarin-izlandayi-konuk-ediyor",
+    "title": "A milli Erkek Basketbol Takımı yarın İzlanda'yı konuk ediyor",
+    "status": "skipped",
+    "reason": "Sıradan spor haberi filtrelendi (Sadece derbi ve milli maçlar paylaşılır).",
+    "ts": 1795849290.2651312
+  },
+  {
+    "slug": "nissanin-yeni-hibrit-modeli-n-serisinin-dorduncu-uyesi-olarak-satisa-cikti",
+    "title": "Nissan'ın yeni hibrit modeli n serisinin dördüncü üyesi olarak satışa çıktı",
+    "summary": "Nissan ve Dongfeng ortaklığıyla geliştirilen yeni şarj edilebilir hibrit SUV modeli NX7, Guangzhou Uluslararası Otomobil Fuarı'nda satışa sunuldu.",
+    "category": "Otomobil",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795849310.0766468
   }
 ]
