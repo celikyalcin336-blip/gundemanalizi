@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "pegasus-hava-yollarindan-mobil-kanallara-ozel-yurt-disi-ulasim-kampanyasi",
-    "title": "Pegasus Hava Yollarından Mobil Kanallara Özel Yurt Dışı Ulaşım Kampanyası",
-    "summary": "Pegasus Hava Yolları, belirli dış hat uçuşlarında geçerli olmak üzere on bir avrodan başlayan fiyatlarla yeni bir indirimli seyahat kampanyası başlattı.",
-    "category": "Ekonomi",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794673551.324081
-  },
-  {
     "slug": "yerli-uretim-tvs-callisto-110-turkiye-motosiklet-pazarinda-satista",
     "title": "Yerli Üretim TVS Callisto 110 Türkiye Motosiklet Pazarında Satışta",
     "summary": "Hindistan menşeli TVS markasının yeni scooter modeli Callisto 110, Uğur Motorlu Araçlar iş birliğiyle Aydın'daki tesiste üretilerek pazara sunuldu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795824804.7925897
+  },
+  {
+    "slug": "kanadali-milletvekili-abd-buyukelcisinin-sinir-disi-edilmesini-istedi",
+    "title": "Kanadalı milletvekili ABD büyükelçisinin sınır dışı edilmesini istedi",
+    "summary": "Kanadalı milletvekili Elizabeth May, ABD'li büyükelçi Pete Hoekstra'nın sınır dışı edilmesi için yaklaşık 290 bin imzanın bulunduğu dilekçeyi Avam Kamarasına sundu.",
+    "category": "Dünya",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795827536.6259985
   }
 ]
