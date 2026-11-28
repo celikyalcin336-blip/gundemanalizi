@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "aston-martin-ve-star-wars-elli-yil-kutlamalarinda-bulusuyor",
-    "title": "Aston Martin ve Star Wars Elli Yıl Kutlamalarında Buluşuyor",
-    "summary": "Lüks otomobil üreticisi Aston Martin, sinema tarihinin önemli serilerinden Star Wars'un yarım asırlık yıl dönümü etkinlikleri için küresel bir ortaklığa imza attı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794719867.435175
-  },
-  {
     "slug": "uzmanlardan-glp-1-igneleri-ve-diyabet-tedavisi-uyarisi",
     "title": "Uzmanlardan GLP-1 İğneleri Ve Diyabet Tedavisi Uyarısı",
     "summary": "Endokrinoloji uzmanları, artış gösteren diyabet vakalarına karşı erken tanının ve kişiye özel tedavilerin hayati önem taşıdığına dikkat çekti.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795871078.3691542
+  },
+  {
+    "slug": "esenboga-havalimaninda-gece-saatlerinde-senaryo-geregi-ucak-yangini-tatbikati",
+    "title": "Esenboğa Havalimanı'nda gece saatlerinde senaryo gereği uçak yangını tatbikatı yapıldı",
+    "summary": "Devlet Hava Meydanları İşletmesi Esenboğa Havalimanı Başmüdürlüğü tarafından gece saatlerinde uçak yangını tatbikatı gerçekleştirildi.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795873811.0212402
   }
 ]
