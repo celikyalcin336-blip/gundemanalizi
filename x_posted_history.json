@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "besiktasta-kiralik-oynayan-fabio-mirettinin-gelecegi-masada",
-    "title": "Beşiktaş'ta Kiralık Oynayan Fabio Miretti'nin Geleceği Masada",
-    "summary": "Beşiktaş'ın kiralık kadrosuna kattığı Fabio Miretti, siyah-beyazlı formayla gösterdiği performansla kulübün ve bonservisini elinde bulunduran Juventus'un yakın takibinde bulunuyor.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794689905.1753569
-  },
-  {
     "slug": "ak-parti-mugla-bulusmasinda-emekli-maaslari-ve-asgari-ucret-calismasini-duyurdu",
     "title": "AK Parti Muğla Buluşmasında Emekli Maaşları ve Asgari Ücret Çalışmasını Duyurdu",
     "summary": "AK Parti Genel Başkan Yardımcısı Mustafa Şen, Muğla'da düzenlenen basın toplantısında emekli maaşları ile asgari ücretin artırılmasına yönelik Ankara'da hazırlıklar yapıldığını söyledi.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795841146.2159255
+  },
+  {
+    "slug": "steve-jobs-doneminin-uretilmeyen-konsept-bilgisayari-calisir-duruma-getirildi",
+    "title": "Steve Jobs döneminin üretilmeyen konsept bilgisayarı çalışır duruma getirildi",
+    "summary": "Apple'ın geçmişte seri üretime geçirmediği konsept tasarımı Happy Mac, bir geliştirici tarafından günümüz donanımlarıyla çalışır hale getirildi.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795843868.3400362
   }
 ]
