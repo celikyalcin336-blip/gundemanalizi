@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "yuce-auto-skoda-karadeniz-rotali-mobil-sarj-saha-turunu-tamamladi",
-    "title": "Yüce Auto-Škoda Karadeniz Rotalı Mobil Şarj Saha Turunu Tamamladı",
-    "summary": "Yüce Auto-Škoda'nın 2025 yılında hayata geçirdiği Mobil Şarj hizmeti, Karadeniz Bölgesi'ni kapsayan ilk saha yolculuğunu başarıyla sonlandırdı.",
-    "category": "Otomobil",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794700796.6634314
-  },
-  {
     "slug": "adalet-bakanligindan-faili-mechul-cinayetler-icin-dis-tahlili-hamlesi",
     "title": "Adalet Bakanlığından Faili Meçhul Cinayetler İçin Diş Tahlili Hamlesi",
     "summary": "Adalet Bakanı Akın Gürlek, faili meçhul dosyaların aydınlatılması amacıyla yürütülen çalışmalar kapsamında çok sayıda cinayetin çözüldüğünü duyurdu.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795852030.3498752
+  },
+  {
+    "slug": "openai-ticari-sir-iddiasiyla-apple-sirketine-dava-acti",
+    "title": "OpenAI ticari sır iddiasıyla Apple şirketine dava açtı",
+    "summary": "Yapay zeka şirketi OpenAI, donanım tedarikçilerine erişimini kısıtladığı ve ticari sırlarını ele geçirdiği gerekçesiyle Apple şirketine karşı dava açtı.",
+    "category": "Ekonomi",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795854751.459594
   }
 ]
