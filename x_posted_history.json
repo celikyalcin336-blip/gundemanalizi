@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "fenerbahce-kocaelispor-deplasmani-hazirliklarini-can-bartu-tesislerinde-surduruy",
-    "title": "Fenerbahçe Kocaelispor Deplasmanı Hazırlıklarını Can Bartu Tesisleri'nde Sürdürüyor",
-    "summary": "Fenerbahçe, Süper Lig'in 12'nci haftasında oynayacağı Kocaelispor maçı için çalışmalarına Fenerbahçe Can Bartu Tesisleri'nde devam ediyor.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794728039.6642709
-  },
-  {
     "slug": "almanyada-cinko-bromur-temelli-yeni-enerji-depolama-tesisine-onay",
     "title": "Almanya'da Çinko Bromür Temelli Yeni Enerji Depolama Tesisine Onay",
     "summary": "Almanya'nın Gaggenau kentinde çinko-bromür teknolojisine dayalı yeni bir enerji depolama tesisi kurulması için harekete geçildi.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795879253.25786
+  },
+  {
+    "slug": "kocaeliden-boluya-geziye-giden-ve-haber-alinamayan-minibus-yigilcada-bulundu",
+    "title": "Kocaeli'den Bolu'ya geziye giden ve haber alınamayan minibüs Yığılca'da bulundu",
+    "summary": "Kocaeli Çocuk Evleri Sitesi Müdürlüğünden Bolu'ya günübirlik geziye giden 10 kız çocuğu ve 3 görevliyi taşıyan minibüs Düzce'de çamura saplandı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795881981.7704422
   }
 ]
