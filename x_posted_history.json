@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "apple-yapay-zeka-asistani-siri-akilli-ev-testlerinde-geride-kaldi",
-    "title": "Apple Yapay Zeka Asistanı Siri Akıllı Ev Testlerinde Geride Kaldı",
-    "summary": "Tom's Guide genel yayın yönetmeninin değerlendirmelerine göre Apple'ın yapay zeka entegreli asistanı Siri, en yakın rakiplerinin performans seviyesine ulaşmakta güçlük çekiyor.",
-    "category": "Teknoloji",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794679004.6865864
-  },
-  {
     "slug": "nijeryadaki-difteri-salgininda-kritik-antitoksin-tedarik-krizi-derinlesiyor",
     "title": "Nijerya'daki Difteri Salgınında Kritik Antitoksin Tedarik Krizi Derinleşiyor",
     "summary": "Sınır Tanımayan Doktorlar örgütü, Nijerya'daki difteri salgınında kritik antitoksin stoklarının tükendiğini ve tedavilerin kısıtlandığını duyurdu.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795830258.698167
+  },
+  {
+    "slug": "ucretsiz-yazilim-egitimi-veren-42-istanbulun-seker-han-kampusu-aciliyor",
+    "title": "Ücretsiz yazılım eğitimi veren 42 İstanbul'un Şeker Han kampüsü açılıyor",
+    "summary": "Ücretsiz yazılım eğitimi sunan 42 İstanbul'un Şeker Han'daki yeni ana kampüsü 28 Kasım Cumartesi günü açılıyor. Açılış törenine Sanayi ve Teknoloji Bakanı Mehmet Fatih Kacır katılacak.",
+    "category": "Teknoloji",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795832980.844002
   }
 ]
