@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "derya-baykal-diyabet-hastaligiyla-yasam-mucadelesini-anlatti",
-    "title": "Derya Baykal Diyabet Hastalığıyla Yaşam Mücadelesini Anlattı",
-    "summary": "Uluslararası Diyabet Federasyonu verilerine göre küresel ölçekte milyonlarca insanı etkileyen kronik rahatsızlık, uzmanlar tarafından erken tanı ve düzenli takip gerektiren bir halk sağlığı meselesi olarak ele",
-    "category": "Sağlık",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794684458.8509188
-  },
-  {
     "slug": "izmir-merkezli-operasyonda-on-alti-supheli-tutuklandi",
     "title": "İzmir Merkezli Operasyonda On Altı Şüpheli Tutuklandı",
     "summary": "İzmir merkezli iki ilde gerçekleştirilen organize yasaklı madde operasyonunda gözaltına alınan on yedi şüpheliden on biri tutuklandı. Adliyeye sevk edilen zanlılardan biri ise adli kontrol şartıyla serbest bırakıldı.",
@@ -3878,5 +3869,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795835702.681712
+  },
+  {
+    "slug": "boludaki-arama-kurtarma-calismalarinda-insansiz-hava-araclari-gorev-aldi",
+    "title": "Bolu'daki arama kurtarma çalışmalarında insansız hava araçları görev aldı",
+    "summary": "Kocaeli'den Bolu'ya günübirlik geziye giden çocukları ve personeli taşıyan araçla irtibat kesilmesi üzerine arama kurtarma çalışması başlatıldı.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795838424.290006
   }
 ]
