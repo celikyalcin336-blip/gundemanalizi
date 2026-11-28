@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "istanbulda-gece-kulubu-saldirisindan-haliya-sarili-cesede-ulasan-organize-adli-v",
-    "title": "İstanbul'da Gece Kulübü Saldırısından Halıya Sarılı Cesede Ulaşan Organize Adli Vaka Tahkikatı",
-    "summary": "Beşiktaş'taki bir eğlence mekanına düzenlenen silahlı saldırının ardından başlatılan geniş çaplı adli soruşturma, Beyoğlu'nda halıya sarılmış ikinci bir adli vakası ortaya çıkardı.",
-    "category": "Gündem",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794733487.4700572
-  },
-  {
     "slug": "yuksekogretimde-uc-yillik-lisans-egitimi-donemi-icin-mufredat-sadelestirme-adimi",
     "title": "Yükseköğretimde Üç Yıllık Lisans Eğitimi Dönemi İçin Müfredat Sadeleştirme Adımı",
     "summary": "Yükseköğretim Kurulu, bazı lisans bölümlerinde eğitim süresini dörtten üç yıla düşürmeye yönelik teknik çalışma yürütüyor.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795884703.561087
+  },
+  {
+    "slug": "fenerbahce-kulubunden-maltepe-stadyum-projesi-iddialarina-resmi-yanit",
+    "title": "Fenerbahçe kulübünden Maltepe stadyum projesi iddialarına resmi yanıt",
+    "summary": "Fenerbahçe, Maltepe'de stadyum yapılmasıyla ilgili iddialara yönelik resmi açıklama yaparak kendilerine iletilen herhangi bir resmi teklif olmadığını duyurdu.",
+    "category": "Spor",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795887425.251547
   }
 ]
