@@ -210,15 +210,6 @@
     "ts": 1794591764.9883463
   },
   {
-    "slug": "romanya-polonya-macinda-sahadan-galibiyetle-ayrildi",
-    "title": "Romanya Polonya Maçında Sahadan Galibiyetle Ayrıldı",
-    "summary": "Romanya, UEFA Uluslar B Ligi karşılaşmasında sahasında konuk ettiği Polonya'yı iki bire bir skorla mağlup etti. Bu sonuçla ev sahibi ekip gruptaki puanını yükseltirken konuk takım da mevcut sıralamadaki yerini korudu.",
-    "category": "Spor",
-    "status": "posted",
-    "url": "https://x.com/gndmanalizi",
-    "ts": 1794698073.3740025
-  },
-  {
     "slug": "yuce-auto-skoda-karadeniz-rotali-mobil-sarj-saha-turunu-tamamladi",
     "title": "Yüce Auto-Škoda Karadeniz Rotalı Mobil Şarj Saha Turunu Tamamladı",
     "summary": "Yüce Auto-Škoda'nın 2025 yılında hayata geçirdiği Mobil Şarj hizmeti, Karadeniz Bölgesi'ni kapsayan ilk saha yolculuğunu başarıyla sonlandırdı.",
@@ -3885,5 +3876,14 @@
     "status": "posted",
     "url": "https://x.com/gndmanalizi",
     "ts": 1795849310.0766468
+  },
+  {
+    "slug": "ozel-egitim-alan-cocuklar-icin-elli-sekiz-oyunluk-iki-kitap-hazirlandi",
+    "title": "Özel eğitim alan çocuklar için elli sekiz oyunluk iki kitap hazırlandı",
+    "summary": "Özel eğitim ihtiyacı olan çocukların gelişimi için hazırlanan iki kitap yayımlandı. Aileler ile öğretmenlere rehberlik etmesi hedeflenen eserlerde toplam elli sekiz oyun yer alıyor.",
+    "category": "Gündem",
+    "status": "posted",
+    "url": "https://x.com/gndmanalizi",
+    "ts": 1795852030.3498752
   }
 ]
